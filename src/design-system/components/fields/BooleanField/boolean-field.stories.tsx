@@ -6,7 +6,7 @@ import { DataTable } from '@/design-system/components/DataTable/data-table'
 import '@/design-system/components/DataTable/column-types'
 
 const meta: Meta<typeof BooleanField> = {
-  title: 'Design System/Components/Fields/BooleanField',
+  title: 'Design System/Components/Fields/BooleanField/展示',
   component: BooleanField,
   tags: ['autodocs'],
 }

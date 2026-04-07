@@ -4,7 +4,7 @@ import { Checkbox } from './checkbox'
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
 
 const meta: Meta<typeof Checkbox> = {
-  title: 'Design System/Components/Checkbox',
+  title: 'Design System/Components/Checkbox/展示',
   component: Checkbox,
   tags: ['autodocs'],
 }

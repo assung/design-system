@@ -4,7 +4,7 @@ import { DateField, DateFieldDisplay } from './date-field'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta<typeof DateField> = {
-  title: 'Design System/Components/Fields/DateField',
+  title: 'Design System/Components/Fields/DateField/展示',
   component: DateField,
   tags: ['autodocs'],
   parameters: {

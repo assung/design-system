@@ -41,6 +41,17 @@ const preview: Preview = {
       },
     },
     backgrounds: { disable: true },
+    options: {
+      storySort: {
+        order: [
+          'Design System', [
+            'Tokens',
+            'Components', ['*', ['展示', '設計規格', '設計原則']],
+            'Patterns',
+          ],
+        ],
+      },
+    },
   },
 
   decorators: [

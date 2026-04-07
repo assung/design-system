@@ -6,7 +6,7 @@ import { Button } from '@/design-system/components/Button/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 
 const meta: Meta<typeof TextField> = {
-  title: 'Design System/Components/Fields/TextField',
+  title: 'Design System/Components/Fields/TextField/展示',
   component: TextField,
   tags: ['autodocs'],
 }

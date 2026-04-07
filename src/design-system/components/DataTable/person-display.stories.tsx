@@ -4,7 +4,7 @@ import { PersonDisplay, MultiPersonDisplay } from './person-display'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
-  title: 'Design System/Components/Fields/PersonField',
+  title: 'Design System/Components/Fields/PersonField/展示',
   parameters: {
     docs: {
       description: {

@@ -9,7 +9,7 @@ import { ButtonGroup } from './button-group'
 import { Badge } from '@/design-system/components/Badge/badge'
 
 const meta: Meta = {
-  title: 'Design System/Components/Button/使用原則',
+  title: 'Design System/Components/Button/設計原則',
   parameters: { layout: 'padded' },
 }
 export default meta

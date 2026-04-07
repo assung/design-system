@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from './radio'
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
 
 const meta: Meta<typeof RadioGroupItem> = {
-  title: 'Design System/Components/Radio',
+  title: 'Design System/Components/Radio/展示',
   component: RadioGroupItem,
   tags: ['autodocs'],
 }

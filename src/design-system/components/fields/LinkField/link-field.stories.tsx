@@ -4,7 +4,7 @@ import { LinkField, LinkFieldDisplay } from './link-field'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta<typeof LinkField> = {
-  title: 'Design System/Components/Fields/LinkField',
+  title: 'Design System/Components/Fields/LinkField/展示',
   component: LinkField,
   // autodocs disabled — LinkField 有 stateful render logic，Docs page 需要手動 stories
   parameters: {

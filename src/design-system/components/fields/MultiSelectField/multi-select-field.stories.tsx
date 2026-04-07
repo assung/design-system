@@ -15,7 +15,7 @@ const categoryOptions = [
 ]
 
 const meta: Meta<typeof MultiSelectField> = {
-  title: 'Design System/Components/Fields/MultiSelectField',
+  title: 'Design System/Components/Fields/MultiSelectField/展示',
   component: MultiSelectField,
   tags: ['autodocs'],
 }

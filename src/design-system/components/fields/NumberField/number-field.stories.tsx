@@ -7,7 +7,7 @@ import { DataTable } from '@/design-system/components/DataTable/data-table'
 import '@/design-system/components/DataTable/column-types'
 
 const meta: Meta<typeof NumberField> = {
-  title: 'Design System/Components/Fields/NumberField',
+  title: 'Design System/Components/Fields/NumberField/展示',
   component: NumberField,
   tags: ['autodocs'],
 }

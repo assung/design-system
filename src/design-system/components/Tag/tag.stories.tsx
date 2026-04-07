@@ -4,7 +4,7 @@ import { Hash, Circle, Star } from 'lucide-react'
 import { Tag } from './tag'
 
 const meta: Meta<typeof Tag> = {
-  title: 'Design System/Components/Tag',
+  title: 'Design System/Components/Tag/展示',
   component: Tag,
   tags: ['autodocs'],
   parameters: {
