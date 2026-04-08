@@ -38,9 +38,9 @@ export const Basic: StoryObj = {
           <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <DropdownMenuItemIcon><Trash2 size={16} className="text-error" /></DropdownMenuItemIcon>
-          <span className="text-error">刪除</span>
+        <DropdownMenuItem className="text-error">
+          <DropdownMenuItemIcon><Trash2 size={16} /></DropdownMenuItemIcon>
+          刪除
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -245,9 +245,9 @@ export const Sizes: StoryObj = {
               編輯
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className="text-error">
               <DropdownMenuItemIcon><Trash2 size={sz === 'lg' ? 20 : 16} /></DropdownMenuItemIcon>
-              <span className="text-error">刪除</span>
+              刪除
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
