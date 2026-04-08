@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { Check, ChevronRight, Circle } from "lucide-react"
+import { Check, ChevronRight } from "lucide-react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
@@ -206,26 +206,28 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 })
 DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName
 
-// ── RadioItem ──
+// ── RadioItem（視覺同 CheckboxItem ✓，行為互斥）──
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
 >(({ className, children, ...props }, ref) => {
   const size = React.useContext(SizeContext)
-  const dotSize = size === 'lg' ? 10 : 8
+  // RadioGroup 透過 value 比對判斷選中，Radix 在元素上設 data-state="checked"
+  // 但子 div 無法讀取父層 data-state，改用 group + group-data selector
   return (
     <DropdownMenuPrimitive.RadioItem
       ref={ref}
-      className={cn(menuItemVariants({ size }), className)}
+      className={cn(menuItemVariants({ size }), 'group', className)}
       {...props}
     >
       <div className="h-[1lh] flex items-center shrink-0">
         <div className={cn(
-          'grid place-content-center shrink-0 rounded-full border border-border bg-surface',
+          'grid place-content-center shrink-0 rounded-md border border-border bg-surface',
           size === 'lg' ? 'h-5 w-5' : 'h-4 w-4',
+          'group-data-[state=checked]:bg-primary group-data-[state=checked]:border-primary group-data-[state=checked]:text-white',
         )}>
           <DropdownMenuPrimitive.ItemIndicator>
-            <Circle style={{ width: dotSize, height: dotSize }} className="fill-primary text-primary" />
+            <Check style={{ width: size === 'lg' ? 16 : 12, height: size === 'lg' ? 16 : 12 }} />
           </DropdownMenuPrimitive.ItemIndicator>
         </div>
       </div>

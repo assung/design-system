@@ -181,5 +181,6 @@ Menu item 的 prefix icon 跟 label 同色（foreground），不是 fg-muted。P
 - ❌ `startIcon` 和 `avatar` 不可同時使用
 - ❌ 無 `description` 時不可使用 > 24px 的 avatar
 - ❌ disabled item 不可有 hover 效果
+- ❌ disabled item 內的所有子元件（icon、checkbox、文字）都必須呈現 disabled 狀態——fg-disabled 統一，checkbox 用 disabled 樣式
 - ❌ header item 不可被選中
 - ❌ 不在 item 內放獨立互動元素（如 Button）——item 本身就是互動單位
