@@ -1,6 +1,6 @@
 import type { Meta } from '@storybook/react'
-import { useState } from 'react'
-import { Copy, Pencil, Trash2, Monitor, ChevronDown, ChevronRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Copy, Pencil, Trash2, Monitor, ChevronDown, ChevronRight, ExternalLink, Check } from 'lucide-react'
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator,
@@ -34,7 +34,7 @@ const ITEM_TOKEN_MAP: Record<'item' | 'checkbox', Record<StateKey, ColorSpec>> =
   checkbox: {
     default:          { bg: '--surface-raised', text: '--foreground', border: 'transparent' },
     hover:            { bg: '--neutral-hover', text: '--foreground', border: 'transparent' },
-    'active/selected': { bg: '--neutral-hover', text: '--foreground', border: 'transparent' },
+    'active/selected': { bg: '--surface-raised', text: '--foreground', border: 'transparent' },
     disabled:         { bg: '--surface-raised', text: '--fg-disabled', border: 'transparent' },
   },
 }
@@ -42,7 +42,7 @@ const ITEM_TOKEN_MAP: Record<'item' | 'checkbox', Record<StateKey, ColorSpec>> =
 const DANGER_ITEM_MAP: Record<StateKey, ColorSpec> = {
   default:          { bg: '--surface-raised', text: '--error', border: 'transparent' },
   hover:            { bg: '--neutral-hover', text: '--error', border: 'transparent' },
-  'active/selected': { bg: '--neutral-hover', text: '--error', border: 'transparent' },
+  'active/selected': { bg: '--neutral-active', text: '--error', border: 'transparent' },
   disabled:         { bg: '--surface-raised', text: '--fg-disabled', border: 'transparent' },
 }
 
@@ -115,14 +115,17 @@ const TokenAnnotation = ({ colors }: { colors: ColorSpec }) => (
   </div>
 )
 
-const Tab = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
-  <button type="button" onClick={onClick}
-    className={`px-2.5 py-1 text-[12px] font-mono rounded-md cursor-pointer transition-colors ${
-      active ? 'bg-primary text-white font-semibold' : 'bg-neutral-hover text-fg-secondary hover:bg-neutral-active'
-    }`}>
-    {children}
-  </button>
-)
+const Tab = ({ active, onClick, disabled, children }: { active: boolean; onClick: () => void; disabled?: boolean; children: React.ReactNode }) => {
+  if (disabled) return <span className="px-2.5 py-1 text-[12px] font-mono rounded-md text-fg-disabled bg-neutral-hover cursor-not-allowed">{children}</span>
+  return (
+    <button type="button" onClick={onClick}
+      className={`px-2.5 py-1 text-[12px] font-mono rounded-md cursor-pointer transition-colors ${
+        active ? 'bg-primary text-white font-semibold' : 'bg-neutral-hover text-fg-secondary hover:bg-neutral-active'
+      }`}>
+      {children}
+    </button>
+  )
+}
 
 const PropRow = ({ label, dot, children }: { label: string; dot?: string; children: React.ReactNode }) => (
   <div className="flex items-start gap-3 py-2 border-b border-divider last:border-b-0">
@@ -282,13 +285,25 @@ const InspectorInner = () => {
   const [danger, setDanger] = useState(false)
   const [state, setState] = useState<StateKey>('default')
 
-  const s = SIZE_SPECS[size]
   const canDanger = itemMode === 'item'
+  useEffect(() => { if (!canDanger) setDanger(false) }, [canDanger])
   const hasDanger = danger && canDanger
 
+  const s = SIZE_SPECS[size]
+
+  // Checkbox active/selected: bg stays --surface-raised (no bg change), checkbox shows checked
+  // Item active/selected: bg-neutral-active
   const colors = hasDanger
     ? DANGER_ITEM_MAP[state]
     : ITEM_TOKEN_MAP[itemMode === 'subTrigger' ? 'item' : itemMode][state]
+
+  // Whether the checkbox is visually checked in the preview
+  const isCheckboxChecked = itemMode === 'checkbox' && state === 'active/selected'
+
+  // Suffix gap info
+  const suffixGapToken = itemMode === 'subTrigger' ? 'gap-1' : 'gap-2'
+  const suffixGapPx = itemMode === 'subTrigger' ? '4px' : '8px'
+  const suffixContent = itemMode === 'subTrigger' ? 'value + ChevronRight' : 'badge + endIcon'
 
   return (
     <div className="flex flex-col gap-6">
@@ -310,9 +325,9 @@ const InspectorInner = () => {
           <span className="text-[11px] text-fg-muted w-16 shrink-0">Danger</span>
           <div className="flex gap-1.5">
             <Tab active={!danger} onClick={() => setDanger(false)}>off</Tab>
-            <Tab active={danger && canDanger} onClick={() => setDanger(true)}>on</Tab>
+            <Tab active={danger && canDanger} onClick={() => setDanger(true)} disabled={!canDanger}>on</Tab>
           </div>
-          {!canDanger && <span className="text-[11px] text-fg-muted">only for Item</span>}
+          {!canDanger && <span className="text-[11px] text-fg-muted">僅限 Item</span>}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-fg-muted w-16 shrink-0">State</span>
@@ -343,12 +358,12 @@ const InspectorInner = () => {
               )}
               {itemMode === 'checkbox' && (
                 <>
-                  <CheckboxPreview size={size} label="狀態" checked state={state} />
+                  <CheckboxPreview size={size} label="狀態" checked={isCheckboxChecked || true} state={state} />
                   <CheckboxPreview size={size} label="最近活動" checked={false} state="default" />
                 </>
               )}
               {itemMode === 'subTrigger' && (
-                <ItemPreview size={size} danger={false} state={state} icon={Monitor} label="主題" isSubTrigger triggerValue="深色" />
+                <SubTriggerPreview size={size} state={state} icon={Monitor} label="主題" triggerValue="深色" />
               )}
             </div>
           </div>
@@ -378,7 +393,7 @@ const InspectorInner = () => {
                 {itemMode !== 'checkbox' && (
                   <>
                     <BpZone w={24} color={Z.gap} label="auto" sub="ml-auto" />
-                    <BpZone w={56} color={Z.suffix} label="Suffix" sub={itemMode === 'subTrigger' ? 'value+chevron' : 'shortcut'} />
+                    <BpZone w={56} color={Z.suffix} label={suffixGapToken} sub={`${suffixGapPx} ${suffixContent}`} />
                   </>
                 )}
                 <BpZone w={44} color={Z.pad} label="px-3" sub="12px" />
@@ -411,6 +426,7 @@ const InspectorInner = () => {
             <PropRow label="Text"><TokenValue value={colors.text} /></PropRow>
             <PropRow label="Stroke"><TokenValue value={colors.border} /></PropRow>
             {hasDanger && <PropRow label="Danger"><span className="text-[11px] text-error">prefix icon + label both --error</span></PropRow>}
+            {isCheckboxChecked && <PropRow label="Checkbox"><span className="text-[11px] text-primary">checked — bg-primary border-primary</span></PropRow>}
           </div>
 
           {/* LAYOUT */}
@@ -421,6 +437,9 @@ const InspectorInner = () => {
             <PropRow label="Padding-x" dot={Z.pad.text}><TkVal token="px-3" value="12px" /></PropRow>
             <PropRow label="Gap" dot={Z.gap.text}><TkVal token="gap-2" value="8px" /></PropRow>
             <PropRow label="Icon" dot={Z.icon.text}>{s.icon}px</PropRow>
+            {itemMode !== 'checkbox' && (
+              <PropRow label="Suffix Gap" dot={Z.suffix.text}><TkVal token={suffixGapToken} value={`${suffixGapPx} — ${suffixContent}`} /></PropRow>
+            )}
             <PropRow label="Prefix 對齊"><TkVal token="一行文字高度" value="items-center" /></PropRow>
           </div>
 
@@ -450,11 +469,11 @@ const InspectorInner = () => {
 }
 
 /** Static item preview for inspector (not interactive) */
-const ItemPreview = ({ size, danger, state, icon: Icon, label, shortcut, isSubTrigger, triggerValue }: {
-  size: SizeKey; danger: boolean; state: StateKey; icon: React.ComponentType<{ size: number }>; label: string; shortcut?: string; isSubTrigger?: boolean; triggerValue?: string
+const ItemPreview = ({ size, danger, state, icon: Icon, label, shortcut }: {
+  size: SizeKey; danger: boolean; state: StateKey; icon: React.ComponentType<{ size: number; className?: string }>; label: string; shortcut?: string
 }) => {
   const iconPx = SIZE_SPECS[size].icon
-  const bgClass = state === 'hover' || state === 'active/selected' ? 'bg-neutral-hover' : ''
+  const bgClass = state === 'hover' ? 'bg-neutral-hover' : state === 'active/selected' ? 'bg-neutral-active' : ''
   const textClass = danger ? 'text-error' : state === 'disabled' ? 'text-fg-disabled' : ''
   const fontClass = size === 'lg' ? 'text-body-lg' : 'text-body'
   return (
@@ -462,13 +481,28 @@ const ItemPreview = ({ size, danger, state, icon: Icon, label, shortcut, isSubTr
       style={{ paddingTop: `calc((var(--field-height-${size}) - 1lh) / 2)`, paddingBottom: `calc((var(--field-height-${size}) - 1lh) / 2)` }}>
       <div className="h-[1lh] flex items-center shrink-0"><Icon size={iconPx} /></div>
       <span>{label}</span>
-      {shortcut && <span className="h-[1lh] flex items-center ml-auto text-caption text-fg-muted shrink-0">{shortcut}</span>}
-      {isSubTrigger && (
-        <div className="h-[1lh] flex items-center gap-1 ml-auto shrink-0">
-          {triggerValue && <span className="text-fg-muted">{triggerValue}</span>}
-          <ChevronRight size={iconPx} className="text-fg-muted" />
-        </div>
-      )}
+      {shortcut && <span className="h-[1lh] flex items-center ml-auto text-caption text-fg-muted shrink-0 gap-2">{shortcut}</span>}
+    </div>
+  )
+}
+
+/** Static subTrigger preview — suffix uses gap-1, shows value + ChevronRight */
+const SubTriggerPreview = ({ size, state, icon: Icon, label, triggerValue }: {
+  size: SizeKey; state: StateKey; icon: React.ComponentType<{ size: number; className?: string }>; label: string; triggerValue?: string
+}) => {
+  const iconPx = SIZE_SPECS[size].icon
+  const bgClass = state === 'hover' || state === 'active/selected' ? 'bg-neutral-hover' : ''
+  const textClass = state === 'disabled' ? 'text-fg-disabled' : ''
+  const fontClass = size === 'lg' ? 'text-body-lg' : 'text-body'
+  return (
+    <div className={`flex items-start gap-2 px-3 ${fontClass} leading-compact ${bgClass} ${textClass}`}
+      style={{ paddingTop: `calc((var(--field-height-${size}) - 1lh) / 2)`, paddingBottom: `calc((var(--field-height-${size}) - 1lh) / 2)` }}>
+      <div className="h-[1lh] flex items-center shrink-0"><Icon size={iconPx} /></div>
+      <span>{label}</span>
+      <div className="h-[1lh] flex items-center gap-1 ml-auto shrink-0">
+        {triggerValue && <span className="text-fg-muted">{triggerValue}</span>}
+        <ChevronRight size={iconPx} className="text-fg-muted" />
+      </div>
     </div>
   )
 }
@@ -476,14 +510,19 @@ const ItemPreview = ({ size, danger, state, icon: Icon, label, shortcut, isSubTr
 const CheckboxPreview = ({ size, label, checked, state }: {
   size: SizeKey; label: string; checked: boolean; state: StateKey
 }) => {
-  const bgClass = state === 'hover' || state === 'active/selected' ? 'bg-neutral-hover' : ''
+  // Checkbox active/selected: show checkbox as checked, no bg change
+  const isCheckedVisual = state === 'active/selected' ? true : checked
+  const bgClass = state === 'hover' ? 'bg-neutral-hover' : ''
+  const textClass = state === 'disabled' ? 'text-fg-disabled' : ''
   const fontClass = size === 'lg' ? 'text-body-lg' : 'text-body'
+  const checkboxPx = SIZE_SPECS[size].icon
   return (
-    <div className={`flex items-start gap-2 px-3 ${fontClass} leading-compact ${bgClass}`}
+    <div className={`flex items-start gap-2 px-3 ${fontClass} leading-compact ${bgClass} ${textClass}`}
       style={{ paddingTop: `calc((var(--field-height-${size}) - 1lh) / 2)`, paddingBottom: `calc((var(--field-height-${size}) - 1lh) / 2)` }}>
       <div className="h-[1lh] flex items-center shrink-0">
-        <div className={`w-4 h-4 rounded border ${checked ? 'bg-primary border-primary' : 'border-border'} flex items-center justify-center`}>
-          {checked && <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" /></svg>}
+        <div className={`rounded border flex items-center justify-center shrink-0 ${isCheckedVisual ? 'bg-primary border-primary' : 'border-border'}`}
+          style={{ width: checkboxPx, height: checkboxPx }}>
+          {isCheckedVisual && <Check size={checkboxPx * 0.65} className="text-white" strokeWidth={2.5} />}
         </div>
       </div>
       <span>{label}</span>
@@ -525,25 +564,34 @@ export const ColorMatrix = {
             {(['item', 'checkbox'] as const).map((type) => (
               <tr key={type}>
                 <td className="p-3 border-b border-divider font-mono text-caption font-medium align-top">{type}</td>
-                {STATES.map((st) => (
-                  <td key={st} className="p-3 border-b border-divider align-top min-w-[160px]">
-                    <div className="rounded px-3 py-1.5 text-body leading-compact border border-border flex items-center gap-2"
-                      style={{
-                        backgroundColor: `var(${ITEM_TOKEN_MAP[type][st].bg})`,
-                        color: `var(${ITEM_TOKEN_MAP[type][st].text})`,
-                      }}>
-                      {type === 'checkbox' && (
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                          st === 'active/selected' ? 'bg-primary border-primary' : 'border-border'
-                        }`}>
-                          {st === 'active/selected' && <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" /></svg>}
+                {STATES.map((st) => {
+                  const isCheckboxSelected = type === 'checkbox' && st === 'active/selected'
+                  return (
+                    <td key={st} className="p-3 border-b border-divider align-top min-w-[160px]">
+                      <div className="rounded px-3 py-1.5 text-body leading-compact border border-border flex items-center gap-2"
+                        style={{
+                          backgroundColor: `var(${ITEM_TOKEN_MAP[type][st].bg})`,
+                          color: `var(${ITEM_TOKEN_MAP[type][st].text})`,
+                        }}>
+                        {type === 'checkbox' && (
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                            isCheckboxSelected ? 'bg-primary border-primary' : 'border-border'
+                          }`}>
+                            {isCheckboxSelected && <Check size={10} className="text-white" strokeWidth={2.5} />}
+                          </div>
+                        )}
+                        {st === 'active/selected' ? (type === 'checkbox' ? 'checked' : 'selected') : type}
+                      </div>
+                      <TokenAnnotation colors={ITEM_TOKEN_MAP[type][st]} />
+                      {isCheckboxSelected && (
+                        <div className="flex items-center gap-1 mt-1 text-[10px]">
+                          <span className="w-3 h-3 rounded-sm shrink-0 bg-primary border border-black/10" />
+                          <span className="text-fg-muted">checkbox: bg-primary</span>
                         </div>
                       )}
-                      {st === 'active/selected' ? (type === 'checkbox' ? 'checked' : 'selected') : type}
-                    </div>
-                    <TokenAnnotation colors={ITEM_TOKEN_MAP[type][st]} />
-                  </td>
-                ))}
+                    </td>
+                  )
+                })}
               </tr>
             ))}
           </tbody>
@@ -633,9 +681,9 @@ export const SizeMatrix = {
             {[
               { label: 'Item 高度 (single-line)', key: 'heightToken' as const, sub: 'height' as const },
               { label: 'Padding-y', key: 'paddingFormula' as const, sub: undefined },
-              { label: 'Label 字體', key: 'fontToken' as const, subFn: (s: SizeSpec) => s.font },
+              { label: 'Label 字體', key: 'fontToken' as const, subFn: (sp: SizeSpec) => sp.font },
               { label: '行高', key: 'lineHeight' as const, sub: undefined },
-              { label: 'Icon', key: undefined, subFn: (s: SizeSpec) => `${s.icon}px` },
+              { label: 'Icon', key: undefined, subFn: (sp: SizeSpec) => `${sp.icon}px` },
               { label: 'Checkbox 控件', key: 'checkboxSize' as const, sub: undefined },
             ].map((row) => (
               <tr key={row.label}>

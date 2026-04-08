@@ -369,7 +369,7 @@ const InspectorInner = () => {
 
             {/* Diagram — 2D: vertical padding + horizontal zones */}
             <div className="flex items-center">
-              <div className="flex flex-col rounded-lg overflow-hidden" style={{ outline: `2px solid ${Z.dim.text}22` }}>
+              <div className="inline-flex flex-col rounded-lg overflow-hidden" style={{ outline: `2px solid ${Z.dim.text}22` }}>
                 {/* Top padding zone */}
                 <div className="flex items-center justify-center"
                   style={{ height: 20, background: Z.pad.bg, borderBottom: `1.5px dashed ${Z.pad.border}` }}>
@@ -565,7 +565,7 @@ export const AlignmentThreshold = {
 
           {/* Blueprint diagram — LARGE */}
           <div className="flex flex-col gap-3">
-            <div className="flex items-stretch rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
+            <div className="inline-flex items-stretch rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
               <div className="flex items-center justify-center shrink-0"
                 style={{ width: 72, height: '100%', background: Z.icon.bg, borderRight: `1.5px dashed ${Z.icon.border}` }}>
                 <div className="flex flex-col items-center gap-1">
@@ -614,7 +614,7 @@ export const AlignmentThreshold = {
 
           {/* Blueprint diagram — LARGE */}
           <div className="flex flex-col gap-3">
-            <div className="flex items-stretch rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
+            <div className="inline-flex items-stretch rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
               <div className="flex items-center justify-center shrink-0"
                 style={{ width: 72, height: '100%', background: Z.icon.bg, borderRight: `1.5px dashed ${Z.icon.border}` }}>
                 <div className="flex flex-col items-center gap-0.5">

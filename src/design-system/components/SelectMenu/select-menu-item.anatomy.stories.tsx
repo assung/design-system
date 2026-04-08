@@ -145,6 +145,34 @@ const TokenValue = ({ value }: { value: string }) => (
   <span className="inline-flex items-center gap-2"><Swatch value={value} /><span>{value}</span></span>
 )
 
+/* ── Blueprint zone colors ── */
+const Z = {
+  pad:     { bg: 'rgba(194,225,154,0.6)', border: 'rgba(139,179,91,0.9)', text: '#5a7a2e' },
+  prefix:  { bg: 'rgba(166,208,245,0.6)', border: 'rgba(80,145,210,0.9)', text: '#2d6a9f' },
+  gap:     { bg: 'rgba(253,218,158,0.6)', border: 'rgba(218,165,60,0.9)', text: '#8a6010' },
+  content: { bg: 'rgba(199,178,230,0.6)', border: 'rgba(138,103,190,0.9)', text: '#6035a8' },
+  suffix:  { bg: 'rgba(251,191,206,0.6)', border: 'rgba(220,110,140,0.9)', text: '#a33060' },
+  dim:     { text: '#d04040' },
+}
+
+/** Horizontal zone block */
+const BpZoneH = ({ w, color, label, sub }: { w: number; color: { bg: string; border: string; text: string }; label: string; sub?: string }) => (
+  <div className="flex flex-col items-center justify-center shrink-0 gap-0.5"
+    style={{ width: w, height: '100%', background: color.bg, borderLeft: `1.5px dashed ${color.border}`, borderRight: `1.5px dashed ${color.border}` }}>
+    <span className="text-[10px] font-mono font-bold leading-none" style={{ color: color.text }}>{label}</span>
+    {sub && <span className="text-[9px] font-mono leading-none opacity-70" style={{ color: color.text }}>{sub}</span>}
+  </div>
+)
+
+/** Vertical zone block (full width, fixed height) */
+const BpZoneV = ({ h, color, label, sub }: { h: number; color: { bg: string; border: string; text: string }; label: string; sub?: string }) => (
+  <div className="flex items-center justify-center gap-1.5"
+    style={{ height: h, width: '100%', background: color.bg, borderTop: `1.5px dashed ${color.border}`, borderBottom: `1.5px dashed ${color.border}` }}>
+    <span className="text-[10px] font-mono font-bold leading-none" style={{ color: color.text }}>{label}</span>
+    {sub && <span className="text-[9px] font-mono leading-none opacity-70" style={{ color: color.text }}>{sub}</span>}
+  </div>
+)
+
 const MenuContainer = ({ children, width = 320 }: { children: React.ReactNode; width?: number }) => (
   <div className="rounded-lg bg-surface-raised border border-border overflow-hidden"
     style={{ boxShadow: 'var(--elevation-200)', width }}>
@@ -297,6 +325,7 @@ const InspectorInner = () => {
   const colors = isMulti ? MULTI_TOKEN_MAP[stateKey] : SINGLE_TOKEN_MAP[stateKey]
   const avatarPx = hasAvatar ? (hasDesc ? s.avatarBlock : s.avatarInline) : 0
   const prefixAlign = avatarPx > 24 && hasDesc ? 'block' : 'inline'
+  const hasPrefix = isMulti || hasIcon || hasAvatar
 
   return (
     <div className="flex flex-col gap-6">
@@ -361,7 +390,7 @@ const InspectorInner = () => {
 
       {/* Preview + Panel */}
       <div className="flex gap-6 items-start">
-        {/* Left: preview */}
+        {/* Left: preview + blueprint */}
         <div className="flex flex-col gap-5 min-w-[360px]">
           <div className="px-4 py-6 rounded-lg bg-canvas border border-divider flex items-center justify-center">
             <MenuContainer width={340}>
@@ -381,6 +410,73 @@ const InspectorInner = () => {
                 </SelectMenuItem>
               </SelectMenuGroup>
             </MenuContainer>
+          </div>
+
+          {/* 2D Blueprint */}
+          <div className="flex flex-col gap-2">
+            {/* Legend */}
+            <div className="flex items-center gap-4 text-[10px] flex-wrap">
+              {[
+                { c: Z.pad, l: '內距' },
+                ...(hasPrefix ? [{ c: Z.prefix, l: 'Prefix' }] : []),
+                { c: Z.gap, l: '間距' },
+                { c: Z.content, l: 'Content' },
+                ...(hasTag ? [{ c: Z.suffix, l: 'Suffix' }] : []),
+              ].map(({ c, l }) => (
+                <span key={l} className="inline-flex items-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
+                  <span className="font-medium" style={{ color: c.text }}>{l}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* Blueprint rows: top padding → content row → bottom padding */}
+            <div className="flex items-start gap-0">
+              <div className="flex flex-col rounded-md overflow-hidden" style={{ outline: `2px solid ${Z.dim.text}22` }}>
+                {/* Top padding-y */}
+                <BpZoneV h={20} color={Z.pad} label="padding-y" sub={s.py} />
+                {/* Horizontal content row */}
+                <div className="flex items-center" style={{ height: 44 }}>
+                  {/* Left padding-x */}
+                  <BpZoneH w={40} color={Z.pad} label="px-3" sub="12px" />
+                  {/* Prefix */}
+                  {hasPrefix && (
+                    <>
+                      <BpZoneH w={isMulti ? 50 : 44} color={Z.prefix}
+                        label={isMulti && hasIcon ? 'CB+Icon' : isMulti ? 'Checkbox' : hasIcon ? `${s.icon}px` : hasAvatar ? `${avatarPx}px` : '—'}
+                        sub={isMulti && hasIcon ? `${s.checkbox}+${s.icon}px` : isMulti ? s.checkbox : hasIcon ? 'icon' : hasAvatar ? 'avatar' : ''} />
+                      <BpZoneH w={28} color={Z.gap} label="gap-2" sub="8px" />
+                    </>
+                  )}
+                  {/* Content */}
+                  <BpZoneH w={hasDesc ? 80 : 64} color={Z.content}
+                    label={hasDesc ? 'Label+Desc' : 'Label'}
+                    sub={s.labelFont} />
+                  {/* Suffix */}
+                  {hasTag && (
+                    <>
+                      <BpZoneH w={28} color={Z.gap} label="gap-2" sub="8px" />
+                      <BpZoneH w={36} color={Z.suffix} label="Tag" sub="suffix" />
+                    </>
+                  )}
+                  {/* Right padding-x */}
+                  <BpZoneH w={40} color={Z.pad} label="px-3" sub="12px" />
+                </div>
+                {/* Bottom padding-y */}
+                <BpZoneV h={20} color={Z.pad} label="padding-y" sub={s.py} />
+              </div>
+
+              {/* Height dimension line */}
+              <div className="ml-3 flex items-center" style={{ height: 84 }}>
+                <svg width="10" height="84" className="shrink-0">
+                  <line x1="5" y1="2" x2="5" y2="82" stroke={Z.dim.text} strokeWidth="1" />
+                  <line x1="1" y1="2" x2="9" y2="2" stroke={Z.dim.text} strokeWidth="1.5" />
+                  <line x1="1" y1="82" x2="9" y2="82" stroke={Z.dim.text} strokeWidth="1.5" />
+                </svg>
+                <div className="ml-1.5"><TkVal token={s.heightToken} /></div>
+              </div>
+            </div>
+            <p className="text-[10px] text-fg-muted">寬度為示意比例，實際由內容決定</p>
           </div>
         </div>
 

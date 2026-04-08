@@ -6,6 +6,9 @@
 @import "./design-system/tokens/layoutSpace/layoutSpace.css";
 @import "./design-system/components/DataTable/data-table.css";
 
+/* ── Floating layer ── */
+:root { --menu-min-width: 180px; }
+
 /* ── Icon stroke width ── */
 .lucide { stroke-width: 1.75; }
 

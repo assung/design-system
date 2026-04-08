@@ -81,7 +81,7 @@ const DropdownMenuContent = React.forwardRef<
       className={cn(floatingLayerClass, 'py-2', maxHeight && 'overflow-y-auto', className)}
       style={{
         boxShadow: 'var(--elevation-200)',
-        minWidth: minWidth ?? 'max(180px, var(--radix-dropdown-menu-trigger-width))',
+        minWidth: minWidth ?? 'max(var(--menu-min-width), var(--radix-dropdown-menu-trigger-width))',
         maxHeight,
       }}
       {...props}
@@ -105,7 +105,7 @@ const DropdownMenuSubContent = React.forwardRef<
       ref={ref}
       sideOffset={8}
       className={cn(floatingLayerClass, 'py-2', className)}
-      style={{ boxShadow: 'var(--elevation-200)', minWidth: 180 }}
+      style={{ boxShadow: 'var(--elevation-200)', minWidth: 'var(--menu-min-width)' }}
       {...props}
     >
       <SizeContext.Provider value={size}>
