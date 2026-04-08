@@ -1,8 +1,9 @@
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
-import { Mail, Bell, Settings, User, FileText, Folder, Plus } from 'lucide-react'
+import { Mail, Bell, Settings, FileText, Folder, Plus } from 'lucide-react'
 import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from './select-menu-item'
 import { Tag } from '@/design-system/components/Tag/tag'
+import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
   title: 'Design System/Components/SelectMenu/設計規格',
@@ -180,11 +181,6 @@ const MenuContainer = ({ children, width = 320 }: { children: React.ReactNode; w
   </div>
 )
 
-const AvatarImg = ({ bg = '#e0e7ff' }: { bg?: string }) => (
-  <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: bg }}>
-    <User size={12} className="text-fg-muted" />
-  </div>
-)
 
 /* ═══════════════════════════════════════════════════════════════════════════
    1. 元件總覽
@@ -398,7 +394,7 @@ const InspectorInner = () => {
                 <SelectMenuItem
                   size={size}
                   startIcon={hasIcon ? Mail : undefined}
-                  avatar={hasAvatar ? <AvatarImg /> : undefined}
+                  avatar={hasAvatar ? <Avatar alt="Alice" color="indigo" className="w-full h-full" /> : undefined}
                   description={hasDesc ? '每日摘要信件到信箱' : undefined}
                   checkbox={isMulti}
                   checked={isMulti ? selected : undefined}
@@ -750,10 +746,10 @@ export const SizeMatrix = {
                   <SelectMenuItem size={sz} startIcon={Mail} description="每日摘要信件">
                     電子郵件通知
                   </SelectMenuItem>
-                  <SelectMenuItem size={sz} avatar={<AvatarImg />}>
+                  <SelectMenuItem size={sz} avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />}>
                     Alice Chen
                   </SelectMenuItem>
-                  <SelectMenuItem size={sz} avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">
+                  <SelectMenuItem size={sz} avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">
                     Bob Wang
                   </SelectMenuItem>
                   <SelectMenuItem size={sz} checkbox checked={true} startIcon={Bell}>

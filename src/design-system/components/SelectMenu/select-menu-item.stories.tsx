@@ -1,8 +1,9 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Mail, Check, Circle, Star, Bell, User, Settings, Plus, Folder, FileText, BarChart3 } from 'lucide-react'
+import { Mail, Check, Circle, Star, Bell, Settings, Plus, Folder, FileText, BarChart3 } from 'lucide-react'
 import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from './select-menu-item'
+import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta<typeof SelectMenuItem> = {
   title: 'Design System/Components/SelectMenu/MenuItem 展示',
@@ -61,19 +62,13 @@ export const WithDescription: Story = {
 
 // ── Avatar（無 description → inline 20/24px）──
 
-const AvatarImg = ({ bg = '#e0e7ff' }: { bg?: string }) => (
-  <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: bg }}>
-    <User size={12} className="text-fg-muted" />
-  </div>
-)
-
 export const AvatarInline: Story = {
   name: 'Avatar（inline）',
   render: () => (
     <MenuContainer><SelectMenuGroup>
-      <SelectMenuItem avatar={<AvatarImg />}>Alice Chen</SelectMenuItem>
-      <SelectMenuItem avatar={<AvatarImg bg="#fce7f3" />}>Bob Wang</SelectMenuItem>
-      <SelectMenuItem avatar={<AvatarImg bg="#d1fae5" />}>Carol Lin</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />}>Alice Chen</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />}>Bob Wang</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Carol" color="success" className="w-full h-full" />}>Carol Lin</SelectMenuItem>
     </SelectMenuGroup></MenuContainer>
   ),
 }
@@ -84,9 +79,9 @@ export const AvatarBlock: Story = {
   name: 'Avatar + description（block）',
   render: () => (
     <MenuContainer><SelectMenuGroup>
-      <SelectMenuItem avatar={<AvatarImg />} description="設計部門">Alice Chen</SelectMenuItem>
-      <SelectMenuItem avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">Bob Wang</SelectMenuItem>
-      <SelectMenuItem avatar={<AvatarImg bg="#d1fae5" />} description="行銷部門">Carol Lin</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="設計部門">Alice Chen</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Carol" color="success" className="w-full h-full" />} description="行銷部門">Carol Lin</SelectMenuItem>
     </SelectMenuGroup></MenuContainer>
   ),
 }
@@ -183,8 +178,8 @@ export const Sizes: Story = {
           <MenuContainer width={360}>
             <SelectMenuGroup>
               <SelectMenuItem size={sz} startIcon={Mail} description="每日寄送摘要信件">電子郵件通知</SelectMenuItem>
-              <SelectMenuItem size={sz} avatar={<AvatarImg />}>Alice Chen</SelectMenuItem>
-              <SelectMenuItem size={sz} avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">Bob Wang</SelectMenuItem>
+              <SelectMenuItem size={sz} avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />}>Alice Chen</SelectMenuItem>
+              <SelectMenuItem size={sz} avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
             </SelectMenuGroup>
           </MenuContainer>
         </div>
@@ -212,9 +207,9 @@ const FullExampleDemo = () => {
     <MenuContainer>
       <SelectMenuGroup>
         <SelectMenuItem header>成員</SelectMenuItem>
-        <SelectMenuItem checkbox checked={selected.alice} onClick={() => toggle('alice')} avatar={<AvatarImg />} description="設計部門">Alice Chen</SelectMenuItem>
-        <SelectMenuItem checkbox checked={selected.bob} onClick={() => toggle('bob')} avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">Bob Wang</SelectMenuItem>
-        <SelectMenuItem checkbox checked={false} avatar={<AvatarImg bg="#d1fae5" />} description="行銷部門" disabled>Carol Lin（已離職）</SelectMenuItem>
+        <SelectMenuItem checkbox checked={selected.alice} onClick={() => toggle('alice')} avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="設計部門">Alice Chen</SelectMenuItem>
+        <SelectMenuItem checkbox checked={selected.bob} onClick={() => toggle('bob')} avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
+        <SelectMenuItem checkbox checked={false} avatar={<Avatar alt="Carol" color="success" className="w-full h-full" />} description="行銷部門" disabled>Carol Lin（已離職）</SelectMenuItem>
       </SelectMenuGroup>
       <SelectMenuFooter>
         <SelectMenuItem checkbox checked={allState} onClick={toggleAll}>全部</SelectMenuItem>

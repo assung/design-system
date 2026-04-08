@@ -2,12 +2,13 @@ import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import {
   Mail, Bell, Settings, Star, ChevronRight, Globe, Lock,
-  Trash2, User, ExternalLink,
+  Trash2, ExternalLink,
 } from 'lucide-react'
 import { SelectMenuItem } from '@/design-system/components/SelectMenu/select-menu-item'
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Tag } from '@/design-system/components/Tag/tag'
+import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
   title: 'Design System/Patterns/Item Layout',
@@ -178,15 +179,6 @@ const MenuFrame = ({ children, width = 320 }: { children: React.ReactNode; width
   </div>
 )
 
-/** Avatar placeholder */
-const AvatarImg = ({ bg = '#e0e7ff' }: { bg?: string }) => (
-  <div
-    className="w-full h-full rounded-full flex items-center justify-center text-[10px] font-medium"
-    style={{ backgroundColor: bg }}
-  >
-    <User size={12} className="text-fg-muted" />
-  </div>
-)
 
 /** ListItem preview (simulated — component not yet built) */
 const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, description, suffix }: {
@@ -317,7 +309,7 @@ const InspectorInner = () => {
                 <SelectMenuItem
                   size={size}
                   startIcon={hasPrefix && prefixType === 'icon' ? Mail : undefined}
-                  avatar={hasPrefix && prefixType === 'avatar' ? <AvatarImg /> : undefined}
+                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" className="w-full h-full" /> : undefined}
                   description={hasDescription ? '每日寄送摘要信件' : undefined}
                   tag={hasSuffix ? <Tag size={size} variant="blue">Pro</Tag> : undefined}
                 >
@@ -340,7 +332,7 @@ const InspectorInner = () => {
                 <ListItemPreview
                   size={size}
                   startIcon={hasPrefix && prefixType === 'icon' ? Mail : undefined}
-                  avatar={hasPrefix && prefixType === 'avatar' ? <AvatarImg /> : undefined}
+                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" className="w-full h-full" /> : undefined}
                   label="電子郵件通知"
                   description={hasDescription ? '每日寄送摘要信件到您的電子信箱' : undefined}
                   suffix={hasSuffix ? <ChevronRight size={spec.iconPx} className="text-fg-muted" /> : undefined}
@@ -369,8 +361,8 @@ const InspectorInner = () => {
 
             {/* Diagram — 2D: vertical padding + horizontal zones */}
             <div className="flex items-center">
-              <div className="inline-flex flex-col rounded-lg overflow-hidden" style={{ outline: `2px solid ${Z.dim.text}22` }}>
-                {/* Top padding zone */}
+              <div className="flex flex-col rounded-lg overflow-hidden" style={{ width: 'fit-content', outline: `2px solid ${Z.dim.text}22` }}>
+                {/* Top padding zone — width controlled by content row */}
                 <div className="flex items-center justify-center"
                   style={{ height: 20, background: Z.pad.bg, borderBottom: `1.5px dashed ${Z.pad.border}` }}>
                   <span className="text-[10px] font-mono font-bold" style={{ color: Z.pad.text }}>padding-y</span>
@@ -397,8 +389,8 @@ const InspectorInner = () => {
                     </div>
                   </>
                 )}
-                <div className="flex flex-col items-center justify-center shrink-0"
-                  style={{ width: hasDescription ? 140 : 110, height: '100%', background: Z.label.bg, borderLeft: `1.5px dashed ${Z.label.border}`, borderRight: `1.5px dashed ${Z.label.border}` }}>
+                <div className="flex flex-col items-center justify-center flex-1 min-w-[80px]"
+                  style={{ height: '100%', background: Z.label.bg, borderLeft: `1.5px dashed ${Z.label.border}`, borderRight: `1.5px dashed ${Z.label.border}` }}>
                   <span className="text-[14px] font-mono font-bold" style={{ color: Z.label.text }}>Label</span>
                   {hasDescription && (
                     <>
@@ -647,10 +639,10 @@ export const AlignmentThreshold = {
 
           {/* Live example */}
           <MenuFrame width={360}>
-            <SelectMenuItem size="md" avatar={<AvatarImg bg="#e0e7ff" />} description="Design team lead">
+            <SelectMenuItem size="md" avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="Design team lead">
               Alice Chen
             </SelectMenuItem>
-            <SelectMenuItem size="md" avatar={<AvatarImg bg="#fde68a" />} description="Backend engineer">
+            <SelectMenuItem size="md" avatar={<Avatar alt="Bob" color="warning" className="w-full h-full" />} description="Backend engineer">
               Bob Wang
             </SelectMenuItem>
           </MenuFrame>
