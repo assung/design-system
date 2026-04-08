@@ -110,39 +110,56 @@
   --fg-muted:             var(--color-neutral-7);
   --fg-disabled:          var(--color-neutral-6);
 
-  /* Brand / Action */
-  --primary:              var(--color-blue-6);
-  --primary-hover:        var(--color-blue-5);
-  --primary-active:       var(--color-blue-7);
-  --primary-subtle:       var(--color-blue-1);
+  /* Brand / Action — 指向 categorical --blue */
+  --primary:              var(--blue);
+  --primary-hover:        var(--blue-hover);
+  --primary-active:       var(--blue-active);
+  --primary-subtle:       var(--blue-subtle);
 
-  /* Status: Info */
+  /* Status: Info — = primary = blue */
   --info:                 var(--primary);
   --info-hover:           var(--primary-hover);
   --info-active:          var(--primary-active);
   --info-subtle:          var(--primary-subtle);
 
-  /* Status: Error */
-  --error:                var(--color-deep-orange-6);
-  --error-hover:          var(--color-deep-orange-5);
-  --error-active:         var(--color-deep-orange-7);
-  --error-subtle:         var(--color-deep-orange-1);
+  /* Status: Error — 指向 categorical --red */
+  --error:                var(--red);
+  --error-hover:          var(--red-hover);
+  --error-active:         var(--red-active);
+  --error-subtle:         var(--red-subtle);
 
-  /* Status: Success */
-  --success:              var(--color-green-6);
-  --success-hover:        var(--color-green-5);
-  --success-active:       var(--color-green-7);
-  --success-subtle:       var(--color-green-1);
+  /* Status: Success — 指向 categorical --green */
+  --success:              var(--green);
+  --success-hover:        var(--green-hover);
+  --success-active:       var(--green-active);
+  --success-subtle:       var(--green-subtle);
 
-  /* Status: Warning */
-  --warning:              var(--color-yellow-6);
-  --warning-hover:        var(--color-yellow-5);
-  --warning-active:       var(--color-yellow-7);
-  --warning-subtle:       var(--color-yellow-1);
+  /* Status: Warning — 指向 categorical --yellow */
+  --warning:              var(--yellow);
+  --warning-hover:        var(--yellow-hover);
+  --warning-active:       var(--yellow-active);
+  --warning-subtle:       var(--yellow-subtle);
 
   /* Categorical — 分類色，用於 Tag、Avatar 等需要多色區分的場景
      無固定語義，消費端自行決定用途（專案標籤、團隊分類等）
-     base = -6，subtle = -1，hover = -5，active = -7（跟 status 色同邏輯） */
+     base = -6，subtle = -1，hover = -5，active = -7
+     語義色（primary/error/success/warning）指向對應的 categorical token */
+  --blue:                 var(--color-blue-6);
+  --blue-hover:           var(--color-blue-5);
+  --blue-active:          var(--color-blue-7);
+  --blue-subtle:          var(--color-blue-1);
+  --red:                  var(--color-deep-orange-6);
+  --red-hover:            var(--color-deep-orange-5);
+  --red-active:           var(--color-deep-orange-7);
+  --red-subtle:           var(--color-deep-orange-1);
+  --green:                var(--color-green-6);
+  --green-hover:          var(--color-green-5);
+  --green-active:         var(--color-green-7);
+  --green-subtle:         var(--color-green-1);
+  --yellow:               var(--color-yellow-6);
+  --yellow-hover:         var(--color-yellow-5);
+  --yellow-active:        var(--color-yellow-7);
+  --yellow-subtle:        var(--color-yellow-1);
   --turquoise:            var(--color-turquoise-6);
   --turquoise-hover:      var(--color-turquoise-5);
   --turquoise-active:     var(--color-turquoise-7);
@@ -205,15 +222,15 @@
   --overlay:              var(--black-a65);
   --tooltip:              var(--color-neutral-5-opaque);
 
-  /* Hover / Active 方向反轉 */
-  --primary-hover:        var(--color-blue-7);
-  --primary-active:       var(--color-blue-5);
-  --error-hover:          var(--color-deep-orange-7);
-  --error-active:         var(--color-deep-orange-5);
-  --success-hover:        var(--color-green-7);
-  --success-active:       var(--color-green-5);
-  --warning-hover:        var(--color-yellow-7);
-  --warning-active:       var(--color-yellow-5);
+  /* Categorical hover/active 方向反轉（dark: hover=step-7, active=step-5） */
+  --blue-hover:           var(--color-blue-7);
+  --blue-active:          var(--color-blue-5);
+  --red-hover:            var(--color-deep-orange-7);
+  --red-active:           var(--color-deep-orange-5);
+  --green-hover:          var(--color-green-7);
+  --green-active:         var(--color-green-5);
+  --yellow-hover:         var(--color-yellow-7);
+  --yellow-active:        var(--color-yellow-5);
 
   /* Subtle — alpha + 亮度補償 */
   --primary-subtle:       oklch(from var(--primary) l c h / calc(0.12 / l));

@@ -54,16 +54,18 @@ const tagVariants = cva(
 
 // ── Solid variant 色彩（step-6 底 + 白字，warning 用 --warning-foreground）──
 // solid: step-6 底 + 白字（Tag 本身不 hover，hover 只在 dismiss inline action）
+// 統一用 categorical token（--turquoise 等）或語義等價（--primary = blue-6）
+// 不混用語義名和色名——Tag 的 "blue" 不代表 "primary" 語義
 const SOLID_CLASSES: Record<string, string> = {
   neutral:   'bg-[var(--fg-secondary)] text-white',
-  blue:      'bg-primary text-white',
-  red:       'bg-error text-white',
-  green:     'bg-success text-white',
-  yellow:    'bg-warning text-[var(--warning-foreground)]',
-  turquoise: 'bg-turquoise text-white',
-  purple:    'bg-purple text-white',
-  magenta:   'bg-magenta text-white',
-  indigo:    'bg-indigo text-white',
+  blue:      'bg-[var(--blue)] text-white',
+  red:       'bg-[var(--red)] text-white',
+  green:     'bg-[var(--green)] text-white',
+  yellow:    'bg-[var(--yellow)] text-[var(--warning-foreground)]',
+  turquoise: 'bg-[var(--turquoise)] text-white',
+  purple:    'bg-[var(--purple)] text-white',
+  magenta:   'bg-[var(--magenta)] text-white',
+  indigo:    'bg-[var(--indigo)] text-white',
 }
 
 export interface TagProps
@@ -80,16 +82,19 @@ export interface TagProps
 }
 
 // ── Solid dismiss hover/active bg（用色相自己的 hover/active token）──
+// solid dismiss hover/active：用 step-5 (hover) / step-7 (active)，跟 semantic.css 同邏輯
+// 直接引用色階 token，不混用語義名
+// 統一用 categorical hover/active token（自動處理 dark mode 方向反轉）
 const SOLID_DISMISS_HOVER: Record<string, { hover: string; active: string }> = {
-  neutral:   { hover: 'var(--fg-muted)',           active: 'var(--foreground)' },
-  blue:      { hover: 'var(--primary-hover)',       active: 'var(--primary-active)' },
-  red:       { hover: 'var(--error-hover)',         active: 'var(--error-active)' },
-  green:     { hover: 'var(--success-hover)',       active: 'var(--success-active)' },
-  yellow:    { hover: 'var(--warning-hover)',       active: 'var(--warning-active)' },
-  turquoise: { hover: 'var(--turquoise-hover)',     active: 'var(--turquoise-active)' },
-  purple:    { hover: 'var(--purple-hover)',        active: 'var(--purple-active)' },
-  magenta:   { hover: 'var(--magenta-hover)',       active: 'var(--magenta-active)' },
-  indigo:    { hover: 'var(--indigo-hover)',        active: 'var(--indigo-active)' },
+  neutral:   { hover: 'var(--fg-muted)',          active: 'var(--foreground)' },
+  blue:      { hover: 'var(--blue-hover)',        active: 'var(--blue-active)' },
+  red:       { hover: 'var(--red-hover)',         active: 'var(--red-active)' },
+  green:     { hover: 'var(--green-hover)',       active: 'var(--green-active)' },
+  yellow:    { hover: 'var(--yellow-hover)',      active: 'var(--yellow-active)' },
+  turquoise: { hover: 'var(--turquoise-hover)',   active: 'var(--turquoise-active)' },
+  purple:    { hover: 'var(--purple-hover)',      active: 'var(--purple-active)' },
+  magenta:   { hover: 'var(--magenta-hover)',     active: 'var(--magenta-active)' },
+  indigo:    { hover: 'var(--indigo-hover)',      active: 'var(--indigo-active)' },
 }
 
 // ── Dismiss（internal）────────────────────────────────────────────────────
