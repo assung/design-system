@@ -122,6 +122,34 @@ export const Clearable: Story = {
   },
 }
 
+/* ── 搜尋（Combobox 模式）── */
+export const Searchable: Story = {
+  name: '搜尋',
+  render: () => {
+    const [value, setValue] = React.useState<string>('')
+    const manyOptions = [
+      { value: 'tw', label: '台灣' }, { value: 'jp', label: '日本' },
+      { value: 'us', label: '美國' }, { value: 'gb', label: '英國' },
+      { value: 'de', label: '德國' }, { value: 'fr', label: '法國' },
+      { value: 'kr', label: '韓國' }, { value: 'sg', label: '新加坡' },
+      { value: 'au', label: '澳洲' }, { value: 'ca', label: '加拿大' },
+    ]
+    return (
+      <div className="flex flex-col gap-4 max-w-xs">
+        <p className="text-caption text-fg-muted">searchable — 點擊後 field 變 input，打字即篩選</p>
+        <SelectField
+          options={manyOptions}
+          value={value}
+          onChange={setValue}
+          searchable
+          clearable
+          placeholder="選擇國家…"
+        />
+      </div>
+    )
+  },
+}
+
 /* ── DataTable 整合 ── */
 export const InDataTable: Story = {
   name: 'DataTable 整合',

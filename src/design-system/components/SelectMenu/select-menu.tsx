@@ -211,10 +211,7 @@ export function SelectMenu({
       >
         <Command shouldFilter={searchable} className="bg-transparent">
           {searchable && (
-            <div className={cn(
-              'flex items-center gap-2 px-3 border-b border-divider',
-              size === 'lg' ? 'h-field-lg' : size === 'sm' ? 'h-field-sm' : 'h-field-md',
-            )}>
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-divider">
               <Search size={size === 'lg' ? 20 : 16} className="shrink-0 text-fg-muted" aria-hidden />
               <CommandPrimitive.Input
                 placeholder={searchPlaceholder}

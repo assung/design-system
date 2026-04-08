@@ -1,11 +1,16 @@
 import * as React from 'react'
-import { X, ChevronDown } from 'lucide-react'
+import { X, ChevronDown, Plus } from 'lucide-react'
+import { Command as CommandPrimitive } from 'cmdk'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/fields/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/design-system/components/Tooltip/tooltip'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
+import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
+import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/design-system/components/Command/command'
+import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from '@/design-system/components/SelectMenu/select-menu-item'
+import { useIsMobile } from '@/design-system/hooks/use-is-mobile'
 
 // ── constants ───────────────────────────────────────────────────────────────
 
@@ -19,10 +24,7 @@ const tagPadding: Record<string, string> = {
 
 export interface SelectOption { value: string; label: string }
 
-// ── useOverflowCount ────────────────────────────────────────────────────────
-// 量測容器可用寬度與每個 tag 的自然寬度，計算多少個放得下。
-// tag 全部渲染為 shrink-0，容器 overflow-hidden 裁切。
-// 初次量測前 opacity:0，量測後 opacity:1，避免閃爍。
+// ── useOverflowCount (unchanged) ────────────────────────────────────────────
 
 function useOverflowCount(
   containerRef: React.RefObject<HTMLDivElement | null>,
@@ -34,29 +36,18 @@ function useOverflowCount(
   const [state, setState] = React.useState({ visibleCount: totalCount, ready: !enabled })
 
   React.useEffect(() => {
-    if (!enabled || totalCount === 0) {
-      setState({ visibleCount: totalCount, ready: true })
-      return
-    }
+    if (!enabled || totalCount === 0) { setState({ visibleCount: totalCount, ready: true }); return }
     const container = containerRef.current
     if (!container) return
 
     const calc = () => {
       const cs = getComputedStyle(container)
-      const available = container.clientWidth
-        - (parseFloat(cs.paddingLeft) || 0)
-        - (parseFloat(cs.paddingRight) || 0)
-
-      // 讓所有 tag 可見以量測自然寬度
+      const available = container.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)
       for (const el of tagEls.current) if (el) el.hidden = false
-
-      // overflow 指示器：暫時可見以量測
       const ofEl = overflowEl.current
       if (ofEl) ofEl.hidden = false
       const overflowW = ofEl?.offsetWidth || 60
-
-      let used = 0
-      let count = 0
+      let used = 0, count = 0
       for (let i = 0; i < totalCount; i++) {
         const el = tagEls.current[i]
         if (!el) continue
@@ -65,17 +56,10 @@ function useOverflowCount(
         const remaining = totalCount - count - 1
         if (remaining > 0 && next + GAP + overflowW > available && count > 0) break
         if (remaining === 0 && next > available && count > 0) break
-        used = next
-        count++
+        used = next; count++
       }
-
-      // 套用結果：隱藏超出的 tag，控制 overflow 指示器
-      for (let i = 0; i < tagEls.current.length; i++) {
-        const el = tagEls.current[i]
-        if (el) el.hidden = i >= count
-      }
+      for (let i = 0; i < tagEls.current.length; i++) { const el = tagEls.current[i]; if (el) el.hidden = i >= count }
       if (ofEl) ofEl.hidden = count >= totalCount
-
       setState({ visibleCount: count, ready: true })
     }
 
@@ -88,9 +72,7 @@ function useOverflowCount(
   return state
 }
 
-// ── OverflowTagList ───────────────────────────────────────────────────────
-// 單行：所有 tag 渲染為 shrink-0，DOM hidden 控制超出的。
-// wrap：全部顯示，不量測。
+// ── OverflowTagList (unchanged) ──────────────────────────────────────────────
 
 interface OverflowTagListProps {
   containerRef: React.RefObject<HTMLDivElement | null>
@@ -105,80 +87,47 @@ function OverflowTagList({ containerRef, items, size, wrap, renderTag, trailing 
   const tagEls = React.useRef<(HTMLDivElement | null)[]>([])
   const overflowEl = React.useRef<HTMLDivElement>(null)
   const { visibleCount, ready } = useOverflowCount(containerRef, tagEls, overflowEl, items.length, !wrap)
-
-  // 清理舊 refs
   tagEls.current.length = items.length
 
-  if (wrap) {
-    return <>{items.map((item, i) => renderTag(item, i))}{trailing}</>
-  }
+  if (wrap) return <>{items.map((item, i) => renderTag(item, i))}{trailing}</>
 
   const overflow = items.length - visibleCount
   const hiddenItems = items.slice(visibleCount)
 
   return (
-    <>
-      {/* opacity:0 直到量測完成 */}
-      <span className="contents" style={{ opacity: ready ? 1 : 0 }}>
-        {items.map((item, i) => (
-          <div key={item.value} ref={el => { tagEls.current[i] = el }} className="shrink-0">
-            {renderTag(item, i)}
-          </div>
-        ))}
-        <div ref={overflowEl} className="shrink-0">
-          <OverflowIndicator count={overflow} shape="tag" size={size}>
-            {hiddenItems.map(item => (
-              <Tag key={item.value} size="sm">{item.label}</Tag>
-            ))}
-          </OverflowIndicator>
-        </div>
-        {trailing}
-      </span>
-    </>
+    <span className="contents" style={{ opacity: ready ? 1 : 0 }}>
+      {items.map((item, i) => (
+        <div key={item.value} ref={el => { tagEls.current[i] = el }} className="shrink-0">{renderTag(item, i)}</div>
+      ))}
+      <div ref={overflowEl} className="shrink-0">
+        <OverflowIndicator count={overflow} shape="tag" size={size}>
+          {hiddenItems.map(item => <Tag key={item.value} size="sm">{item.label}</Tag>)}
+        </OverflowIndicator>
+      </div>
+      {trailing}
+    </span>
   )
 }
 
-// ── Display ─────────────────────────────────────────────────────────────────
+// ── Display (unchanged) ─────────────────────────────────────────────────────
 
 function MultiSelectFieldDisplay({
-  value, options, tagSize = 'md', wrap = false,
-  containerRef: externalRef, disabled = false,
+  value, options, tagSize = 'md', wrap = false, containerRef: externalRef, disabled = false,
 }: {
-  value?: string[] | null
-  options?: SelectOption[]
-  tagSize?: 'sm' | 'md' | 'lg'
-  wrap?: boolean
-  containerRef?: React.RefObject<HTMLDivElement | null>
-  disabled?: boolean
+  value?: string[] | null; options?: SelectOption[]; tagSize?: 'sm' | 'md' | 'lg'
+  wrap?: boolean; containerRef?: React.RefObject<HTMLDivElement | null>; disabled?: boolean
 }) {
   const ownRef = React.useRef<HTMLDivElement>(null)
-
-  if (!value || value.length === 0) {
-    return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
-  }
-
-  const items = value.map(v => ({
-    value: v,
-    label: options?.find(o => o.value === v)?.label ?? v,
-  }))
-
-  // disabled: bg-disabled(neutral-2) + text-fg-disabled(neutral-6)
+  if (!value || value.length === 0) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+  const items = value.map(v => ({ value: v, label: options?.find(o => o.value === v)?.label ?? v }))
   const disabledClass = disabled ? 'bg-disabled text-fg-disabled' : undefined
 
   const content = (
-    <OverflowTagList
-      containerRef={externalRef ?? ownRef}
-      items={items}
-      size={tagSize}
-      wrap={wrap}
-      renderTag={(item) => (
-        <Tag size={tagSize} className={cn('shrink-0', disabledClass)}>{item.label}</Tag>
-      )}
-    />
+    <OverflowTagList containerRef={externalRef ?? ownRef} items={items} size={tagSize} wrap={wrap}
+      renderTag={(item) => <Tag size={tagSize} className={cn('shrink-0', disabledClass)}>{item.label}</Tag>} />
   )
 
   if (externalRef) return content
-
   return (
     <div ref={ownRef} className={cn('flex items-center min-w-0', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
       {content}
@@ -201,178 +150,238 @@ export interface MultiSelectFieldProps {
   disabled?: boolean
   wrap?: boolean
   clearable?: boolean
+  /** 啟用搜尋 */
+  searchable?: boolean
+  /** 搜尋框位置：menu（浮層內，預設）或 trigger（inline input） */
+  searchIn?: 'menu' | 'trigger'
 }
 
-// ── Component ───────────────────────────────────────────────────────────────
+const getIconSize = (size: string) => size === 'lg' ? 20 : 16
 
-function MultiSelectField({
-  mode = 'edit',
-  error = false,
-  size = 'md',
-  options,
-  value = [],
-  onChange,
-  placeholder,
-  className,
-  disabled,
-  wrap = false,
-  clearable = false,
+// ── Shared readonly/disabled render ─────────────────────────────────────────
+
+function ReadonlyMultiSelect({
+  mode, size, options, value, wrap, className,
+}: Pick<MultiSelectFieldProps, 'mode' | 'size' | 'options' | 'value' | 'wrap' | 'className'>) {
+  const resolvedMode = mode ?? 'readonly'
+  const sz = size ?? 'md'
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const hasTags = (value?.length ?? 0) > 0
+
+  return (
+    <div ref={containerRef}
+      className={cn(fieldWrapperStyles({ mode: resolvedMode, size: sz }), hasTags && tagPadding[sz],
+        wrap ? 'flex-wrap py-1' : 'overflow-hidden', className)}
+      style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}>
+      {hasTags ? (
+        <MultiSelectFieldDisplay value={value} options={options} tagSize={sz} wrap={wrap}
+          containerRef={containerRef} disabled={resolvedMode === 'disabled'} />
+      ) : (
+        <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+      )}
+    </div>
+  )
+}
+
+// ── Native MultiSelectField (mobile) ────────────────────────────────────────
+
+function NativeMultiSelectField({
+  mode = 'edit', error = false, size = 'md', options, value = [], onChange, placeholder,
+  className, disabled, wrap = false, clearable = false,
 }: MultiSelectFieldProps) {
   const resolvedMode = disabled ? 'disabled' : mode
-  const isEditable = resolvedMode === 'edit'
-  const containerRef = React.useRef<HTMLDivElement>(null)
-  const iconSize = size === 'lg' ? 20 : 16
-  const showClear = clearable && value.length > 0 && isEditable
+  const iconSize = getIconSize(size)
+  const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
 
   const handleRemove = (v: string) => onChange?.(value.filter(x => x !== v))
-  const handleAdd = (v: string) => {
-    if (!value.includes(v)) onChange?.([...value, v])
+  const handleAdd = (v: string) => { if (!value.includes(v)) onChange?.([...value, v]) }
+
+  if (resolvedMode !== 'edit') {
+    return <ReadonlyMultiSelect mode={resolvedMode} size={size} options={options} value={value} wrap={wrap} className={className} />
   }
 
-  const items = value.map(v => ({
-    value: v,
-    label: options.find(o => o.value === v)?.label ?? v,
-  }))
-
-  // readonly / disabled
-  if (!isEditable) {
-    const hasTags = value.length > 0
-    return (
-      <div
-        ref={containerRef}
-        className={cn(
-          fieldWrapperStyles({ mode: resolvedMode, size }),
-          hasTags && tagPadding[size],
-          wrap ? 'flex-wrap py-1' : 'overflow-hidden',
-          className,
-        )}
-        style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }}
-        data-field-mode={resolvedMode}
-      >
-        {hasTags ? (
-          <MultiSelectFieldDisplay
-            value={value}
-            options={options}
-            tagSize={size}
-            wrap={wrap}
-            containerRef={containerRef}
-            disabled={resolvedMode === 'disabled'}
-          />
-        ) : (
-          <span className={cn('text-fg-muted', resolvedMode === 'disabled' && 'opacity-disabled')}>
-            {EMPTY_DISPLAY}
-          </span>
-        )}
-      </div>
-    )
-  }
-
-  // edit
+  const items = value.map(v => ({ value: v, label: options.find(o => o.value === v)?.label ?? v }))
   const unselected = options.filter(o => !value.includes(o.value))
-  // 有值時 select 覆蓋整個 field（absolute inset-0），
-  // 無值時正常顯示 placeholder。tags 和右側控件用 z-10 蓋在 select 上方。
   const selectRef = React.useRef<HTMLSelectElement>(null)
+  const tagAreaRef = React.useRef<HTMLDivElement>(null)
+  const tagHeight = size === 'sm' ? 20 : 24
+
   const selectDropdown = unselected.length > 0 ? (
-    <select
-      ref={selectRef}
-      value=""
-      onChange={(e) => handleAdd(e.target.value)}
-      className={cn(
-        'bg-transparent outline-none border-none p-0 text-[inherit] font-[inherit] leading-[inherit] text-fg-muted cursor-pointer appearance-none',
-        value.length > 0
-          ? 'absolute inset-0 w-full h-full opacity-0 z-0 cursor-pointer'
-          : 'relative z-10 flex-1 min-w-20',
-      )}
-    >
+    <select ref={selectRef} value="" onChange={(e) => handleAdd(e.target.value)}
+      className={cn('bg-transparent outline-none border-none p-0 text-[inherit] font-[inherit] leading-[inherit] text-fg-muted cursor-pointer appearance-none',
+        value.length > 0 ? 'absolute inset-0 w-full h-full opacity-0 z-0 cursor-pointer' : 'relative z-10 flex-1 min-w-20')}>
       <option value="" disabled>{placeholder ?? '選擇...'}</option>
-      {unselected.map(opt => (
-        <option key={opt.value} value={opt.value}>{opt.label}</option>
-      ))}
+      {unselected.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
     </select>
   ) : null
 
-  // tags 區域的 ref（overflow 量測用這個，不是 field wrapper）
-  const tagAreaRef = React.useRef<HTMLDivElement>(null)
-
-  const tagHeight = size === 'sm' ? 20 : 24
-
   return (
-    <div
-      className={cn(
-        fieldWrapperStyles({ mode: 'edit', size }),
-        tagPadding[size],
-        'relative',
-        wrap && 'items-start py-1',
-        error && [
-          'border-error hover:border-error-hover',
-          'focus-within:border-error focus-within:hover:border-error',
-        ],
-        className,
-      )}
-      style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
-      data-field-mode="edit"
-      data-error={error ? '' : undefined}
-      onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}
-    >
-      {/* tags 區域 */}
-      <div
-        ref={tagAreaRef}
-        className={cn('flex-1 min-w-0 flex items-center relative', wrap ? 'flex-wrap' : 'overflow-hidden')}
-        style={{ gap: GAP }}
-        onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}
-      >
-        <OverflowTagList
-          containerRef={tagAreaRef}
-          items={items}
-          size={size}
-          wrap={wrap}
+    <div className={cn(fieldWrapperStyles({ mode: 'edit', size }), tagPadding[size], 'relative',
+      wrap && 'items-start py-1', error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
+      style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode="edit" data-error={error ? '' : undefined}
+      onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}
+        onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
+        <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
           renderTag={(item) => (
-            <Tag
-              size={size}
-              className="shrink-0 relative z-10"
-              onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }}
-              onDismiss={() => handleRemove(item.value)}
-            >
-              {item.label}
-            </Tag>
-          )}
-          trailing={value.length === 0 ? selectDropdown : undefined}
-        />
+            <Tag size={size} className="shrink-0 relative z-10" onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }}
+              onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
+          )} trailing={value.length === 0 ? selectDropdown : undefined} />
       </div>
-      {/* 有值時 select 覆蓋整個 field */}
       {value.length > 0 && selectDropdown}
-      {/* 右側固定：single-line 置中，wrap 時 self-start 固定在第一行 */}
-      <div
-        className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
-        style={wrap ? { height: tagHeight } : undefined}
-      >
+      <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
+        style={wrap ? { height: tagHeight } : undefined}>
         {showClear && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                onClick={() => onChange?.([])}
-                className="group/action relative grid place-content-center shrink-0 text-fg-muted hover:text-foreground active:text-foreground transition-colors pointer-events-auto"
-                style={{ width: iconSize, height: iconSize }}
-                aria-label="清除全部"
-              >
-                <span
-                  className={cn('absolute rounded-sm pointer-events-none bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active transition-colors', size === 'lg' && 'rounded-md')}
-                  style={{ width: iconSize + 2, height: iconSize + 2, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-                  aria-hidden
-                />
-                <X size={iconSize} className="relative" aria-hidden />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>清除全部</TooltipContent>
-          </Tooltip>
+          <Tooltip><TooltipTrigger asChild>
+            <button type="button" onClick={() => onChange?.([])}
+              className="group/action relative grid place-content-center shrink-0 text-fg-muted hover:text-foreground active:text-foreground transition-colors pointer-events-auto"
+              style={{ width: iconSize, height: iconSize }} aria-label="清除全部">
+              <span className={cn('absolute rounded-sm pointer-events-none bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active transition-colors', size === 'lg' && 'rounded-md')}
+                style={{ width: iconSize + 2, height: iconSize + 2, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} aria-hidden />
+              <X size={iconSize} className="relative" aria-hidden />
+            </button>
+          </TooltipTrigger><TooltipContent>清除全部</TooltipContent></Tooltip>
         )}
-        <ChevronDown size={iconSize} className="shrink-0 text-fg-muted cursor-pointer pointer-events-auto" onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }} aria-hidden />
+        <ChevronDown size={iconSize} className="shrink-0 text-fg-muted cursor-pointer pointer-events-auto"
+          onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }} aria-hidden />
       </div>
     </div>
   )
 }
 
+// ── Custom MultiSelectField (desktop — Popover + Command) ───────────────────
+
+function CustomMultiSelectField({
+  mode = 'edit', error = false, size = 'md', options, value = [], onChange, placeholder,
+  className, disabled, wrap = false, clearable = false, searchable = false, searchIn = 'menu',
+}: MultiSelectFieldProps) {
+  const resolvedMode = disabled ? 'disabled' : mode
+  const iconSize = getIconSize(size)
+  const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
+  const [open, setOpen] = React.useState(false)
+  const [search, setSearch] = React.useState('')
+
+  React.useEffect(() => { if (!open) setSearch('') }, [open])
+
+  if (resolvedMode !== 'edit') {
+    return <ReadonlyMultiSelect mode={resolvedMode} size={size} options={options} value={value} wrap={wrap} className={className} />
+  }
+
+  const items = value.map(v => ({ value: v, label: options.find(o => o.value === v)?.label ?? v }))
+  const tagAreaRef = React.useRef<HTMLDivElement>(null)
+  const tagHeight = size === 'sm' ? 20 : 24
+
+  const handleToggle = (optValue: string) => {
+    if (value.includes(optValue)) onChange?.(value.filter(v => v !== optValue))
+    else onChange?.([...value, optValue])
+  }
+
+  const handleRemove = (v: string) => onChange?.(value.filter(x => x !== v))
+
+  // Select all
+  const selectableOptions = options.filter(o => !(o as any).disabled)
+  const checkedCount = selectableOptions.filter(o => value.includes(o.value)).length
+  const allState: boolean | 'indeterminate' = checkedCount === 0 ? false : checkedCount === selectableOptions.length ? true : 'indeterminate'
+  const handleSelectAll = () => {
+    if (allState === true) onChange?.([])
+    else onChange?.(selectableOptions.map(o => o.value))
+  }
+
+  // 過濾
+  const filteredOptions = searchable && search
+    ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
+    : options
+
+  const chevronEl = <ChevronDown size={iconSize} className={cn('shrink-0 text-fg-muted transition-transform', open && 'rotate-180')} aria-hidden />
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <div
+          role="combobox" aria-expanded={open} tabIndex={0}
+          className={cn(fieldWrapperStyles({ mode: 'edit', size }), tagPadding[size], 'relative cursor-pointer',
+            wrap && 'items-start py-1',
+            error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
+          style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
+          data-field-mode="edit" data-error={error ? '' : undefined}>
+          <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+            {value.length > 0 ? (
+              <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
+                renderTag={(item) => (
+                  <Tag size={size} className="shrink-0 relative z-10"
+                    onDismiss={(e) => { e.stopPropagation(); handleRemove(item.value) }}>{item.label}</Tag>
+                )}
+                trailing={searchable && searchIn === 'trigger' ? (
+                  <input value={search} onChange={(e) => setSearch(e.target.value)}
+                    placeholder="搜尋…" onClick={(e) => { e.stopPropagation(); setOpen(true) }}
+                    className="flex-1 min-w-[60px] bg-transparent outline-none text-body leading-compact relative z-10" />
+                ) : undefined} />
+            ) : (
+              <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
+            )}
+          </div>
+          <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
+            style={wrap ? { height: tagHeight } : undefined}>
+            {showClear && (
+              <Tooltip><TooltipTrigger asChild>
+                <button type="button" onClick={(e) => { e.stopPropagation(); onChange?.([]) }}
+                  className="group/action relative grid place-content-center shrink-0 text-fg-muted hover:text-foreground active:text-foreground transition-colors pointer-events-auto"
+                  style={{ width: iconSize, height: iconSize }} aria-label="清除全部">
+                  <span className={cn('absolute rounded-sm pointer-events-none bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active transition-colors', size === 'lg' && 'rounded-md')}
+                    style={{ width: iconSize + 2, height: iconSize + 2, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} aria-hidden />
+                  <X size={iconSize} className="relative" aria-hidden />
+                </button>
+              </TooltipTrigger><TooltipContent>清除全部</TooltipContent></Tooltip>
+            )}
+            {chevronEl}
+          </div>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 rounded-lg border border-border bg-surface-raised overflow-hidden"
+        style={{ boxShadow: 'var(--elevation-200)', minWidth: 'var(--radix-popover-trigger-width)' }}
+        align="start" sideOffset={8}>
+        <Command shouldFilter={searchable && searchIn === 'menu'}>
+          {searchable && searchIn === 'menu' && (
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-divider">
+              <span className="shrink-0 text-fg-muted" aria-hidden>
+                <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                </svg>
+              </span>
+              <CommandPrimitive.Input placeholder="搜尋…" value={search} onValueChange={setSearch}
+                className={cn('flex w-full bg-transparent outline-none placeholder:text-fg-muted',
+                  size === 'lg' ? 'text-body-lg leading-compact' : 'text-body leading-compact')} />
+            </div>
+          )}
+          <CommandList>
+            <CommandEmpty className="py-4 text-center text-caption text-fg-muted">沒有符合的選項</CommandEmpty>
+            <CommandGroup className="p-0 py-2">
+              {filteredOptions.map((opt) => (
+                <CommandItem key={opt.value} value={opt.label} onSelect={() => handleToggle(opt.value)}
+                  className="p-0 rounded-none data-[selected=true]:bg-transparent">
+                  <SelectMenuItem size={size} checkbox checked={value.includes(opt.value)}>
+                    {opt.label}
+                  </SelectMenuItem>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+          <SelectMenuFooter>
+            <SelectMenuItem size={size} checkbox checked={allState} onClick={handleSelectAll}>全部</SelectMenuItem>
+          </SelectMenuFooter>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+// ── Public component ────────────────────────────────────────────────────────
+
+function MultiSelectField(props: MultiSelectFieldProps) {
+  const isMobile = useIsMobile()
+  if (isMobile) return <NativeMultiSelectField {...props} />
+  return <CustomMultiSelectField {...props} />
+}
 MultiSelectField.displayName = 'MultiSelectField'
 
 export { MultiSelectField, MultiSelectFieldDisplay }

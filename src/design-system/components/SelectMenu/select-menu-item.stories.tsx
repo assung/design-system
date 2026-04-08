@@ -174,7 +174,10 @@ export const Creatable: Story = {
 
 export const Sizes: Story = {
   name: '尺寸比較',
-  decorators: [(Story) => <div className="flex flex-col gap-6"><Story /></div>],
+  decorators: [
+    // 移除外層 menu container decorator，避免雙重邊框
+    (Story) => <div className="flex flex-col gap-6 p-4"><Story /></div>,
+  ],
   render: () => (
     <>
       {(['sm', 'md', 'lg'] as const).map((sz) => (
