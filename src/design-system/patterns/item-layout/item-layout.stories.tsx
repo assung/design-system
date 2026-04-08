@@ -642,7 +642,7 @@ export const AlignmentThreshold = {
             <SelectMenuItem size="md" avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="Design team lead">
               Alice Chen
             </SelectMenuItem>
-            <SelectMenuItem size="md" avatar={<Avatar alt="Bob" color="warning" className="w-full h-full" />} description="Backend engineer">
+            <SelectMenuItem size="md" avatar={<Avatar alt="Bob" color="yellow" className="w-full h-full" />} description="Backend engineer">
               Bob Wang
             </SelectMenuItem>
           </MenuFrame>

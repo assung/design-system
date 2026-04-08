@@ -68,7 +68,7 @@ export const AvatarInline: Story = {
     <MenuContainer><SelectMenuGroup>
       <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />}>Alice Chen</SelectMenuItem>
       <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />}>Bob Wang</SelectMenuItem>
-      <SelectMenuItem avatar={<Avatar alt="Carol" color="success" className="w-full h-full" />}>Carol Lin</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Carol" color="green" className="w-full h-full" />}>Carol Lin</SelectMenuItem>
     </SelectMenuGroup></MenuContainer>
   ),
 }
@@ -81,7 +81,7 @@ export const AvatarBlock: Story = {
     <MenuContainer><SelectMenuGroup>
       <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="設計部門">Alice Chen</SelectMenuItem>
       <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
-      <SelectMenuItem avatar={<Avatar alt="Carol" color="success" className="w-full h-full" />} description="行銷部門">Carol Lin</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Carol" color="green" className="w-full h-full" />} description="行銷部門">Carol Lin</SelectMenuItem>
     </SelectMenuGroup></MenuContainer>
   ),
 }
@@ -209,7 +209,7 @@ const FullExampleDemo = () => {
         <SelectMenuItem header>成員</SelectMenuItem>
         <SelectMenuItem checkbox checked={selected.alice} onClick={() => toggle('alice')} avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="設計部門">Alice Chen</SelectMenuItem>
         <SelectMenuItem checkbox checked={selected.bob} onClick={() => toggle('bob')} avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
-        <SelectMenuItem checkbox checked={false} avatar={<Avatar alt="Carol" color="success" className="w-full h-full" />} description="行銷部門" disabled>Carol Lin（已離職）</SelectMenuItem>
+        <SelectMenuItem checkbox checked={false} avatar={<Avatar alt="Carol" color="green" className="w-full h-full" />} description="行銷部門" disabled>Carol Lin（已離職）</SelectMenuItem>
       </SelectMenuGroup>
       <SelectMenuFooter>
         <SelectMenuItem checkbox checked={allState} onClick={toggleAll}>全部</SelectMenuItem>

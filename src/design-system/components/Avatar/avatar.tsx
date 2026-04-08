@@ -22,16 +22,17 @@ import { cn } from '@/lib/utils'
  */
 
 // ── 語義色對應 ──
+// 色彩對齊 Tag 元件：neutral 用 foreground，有色用 step-7（非 step-6）優先辨識度
 const COLOR_MAP: Record<string, { bg: string; text: string }> = {
-  info:    { bg: 'var(--info-subtle)',    text: 'var(--info)' },
-  success: { bg: 'var(--success-subtle)', text: 'var(--success)' },
-  warning: { bg: 'var(--warning-subtle)', text: 'var(--warning)' },
-  error:   { bg: 'var(--error-subtle)',   text: 'var(--error)' },
-  neutral: { bg: 'var(--muted)',          text: 'var(--fg-muted)' },
-  purple:  { bg: 'var(--purple-subtle)',  text: 'var(--purple)' },
-  magenta: { bg: 'var(--magenta-subtle)', text: 'var(--magenta)' },
-  turquoise: { bg: 'var(--turquoise-subtle)', text: 'var(--turquoise)' },
-  indigo:  { bg: 'var(--indigo-subtle)',  text: 'var(--indigo)' },
+  neutral:   { bg: 'var(--muted)',              text: 'var(--foreground)' },
+  blue:      { bg: 'var(--info-subtle)',        text: 'var(--color-blue-7)' },
+  red:       { bg: 'var(--error-subtle)',       text: 'var(--color-deep-orange-7)' },
+  green:     { bg: 'var(--success-subtle)',     text: 'var(--color-green-7)' },
+  yellow:    { bg: 'var(--warning-subtle)',     text: 'var(--color-yellow-7)' },
+  turquoise: { bg: 'var(--turquoise-subtle)',   text: 'var(--color-turquoise-7)' },
+  purple:    { bg: 'var(--purple-subtle)',      text: 'var(--color-purple-7)' },
+  magenta:   { bg: 'var(--magenta-subtle)',     text: 'var(--color-magenta-7)' },
+  indigo:    { bg: 'var(--indigo-subtle)',      text: 'var(--color-indigo-7)' },
 }
 
 // ── Icon size: round to nearest even, ≈ 60% ──

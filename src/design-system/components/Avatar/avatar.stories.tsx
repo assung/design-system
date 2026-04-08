@@ -26,7 +26,7 @@ export const Modes = {
       <div className="flex items-center gap-6">
         {[
           { label: 'Image', el: <Avatar size={40} src="https://i.pravatar.cc/80?u=a" alt="Alice" /> },
-          { label: 'Icon', el: <Avatar size={40} icon={Building2} color="info" /> },
+          { label: 'Icon', el: <Avatar size={40} icon={Building2} color="blue" /> },
           { label: 'Text fallback', el: <Avatar size={40} alt="Bob" color="purple" /> },
           { label: '預設（無任何 prop）', el: <Avatar size={40} /> },
         ].map(({ label, el }) => (
@@ -62,7 +62,7 @@ export const Shapes = {
             <div className="flex items-end gap-4">
               {sizes.map((s) => (
                 <div key={s} className="flex flex-col items-center gap-2">
-                  <Avatar size={s} alt="Alice" color="info" />
+                  <Avatar size={s} alt="Alice" color="blue" />
                   <span className="text-[10px] text-fg-muted font-mono">{s}px</span>
                 </div>
               ))}
@@ -166,7 +166,7 @@ export const Sizes = {
               <td className="p-2 border-b border-divider text-caption">Icon</td>
               {SIZES.map((s) => (
                 <td key={s} className="p-2 border-b border-divider text-center">
-                  <div className="inline-block"><Avatar size={s} icon={Folder} color="info" /></div>
+                  <div className="inline-block"><Avatar size={s} icon={Folder} color="blue" /></div>
                 </td>
               ))}
             </tr>
@@ -205,11 +205,11 @@ export const Fallback = {
           <span className="text-caption text-fg-muted">圖片正常載入</span>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <Avatar size={40} src="https://broken-url.invalid/img.jpg" alt="Bob" color="success" />
+          <Avatar size={40} src="https://broken-url.invalid/img.jpg" alt="Bob" color="green" />
           <span className="text-caption text-fg-muted">圖片失敗 + 有 alt → 首字</span>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <Avatar size={40} src="https://broken-url.invalid/img.jpg" color="warning" />
+          <Avatar size={40} src="https://broken-url.invalid/img.jpg" color="yellow" />
           <span className="text-caption text-fg-muted">圖片失敗 + 無 alt → User icon</span>
         </div>
       </div>
@@ -238,7 +238,7 @@ export const InContext = {
             <SelectMenuItem avatar={<Avatar size={24} src="https://i.pravatar.cc/48?u=a1" alt="Alice" />}>
               Alice Chen
             </SelectMenuItem>
-            <SelectMenuItem avatar={<Avatar size={24} alt="Bob" color="info" />}>
+            <SelectMenuItem avatar={<Avatar size={24} alt="Bob" color="blue" />}>
               Bob Wang
             </SelectMenuItem>
             <SelectMenuItem avatar={<Avatar size={24} icon={Globe} color="purple" shape="square" />}>

@@ -111,7 +111,7 @@ export const Overview = {
         <div className="flex gap-8">
           {([
             { mode: 'Image', desc: '有 src → 圖片填滿容器', el: <Avatar size={48} src="https://i.pravatar.cc/96?u=overview" alt="Alice" /> },
-            { mode: 'Icon', desc: '有 icon → Icon 在底色背景', el: <Avatar size={48} icon={Building2} color="info" /> },
+            { mode: 'Icon', desc: '有 icon → Icon 在底色背景', el: <Avatar size={48} icon={Building2} color="blue" /> },
             { mode: 'Text', desc: '有 alt → 首字大寫', el: <Avatar size={48} alt="Bob" color="purple" /> },
           ] as const).map(({ mode, desc, el }) => (
             <div key={mode} className="flex flex-col gap-3 items-center">
@@ -135,7 +135,7 @@ export const Overview = {
         </div>
         <div className="flex gap-8">
           <div className="flex flex-col items-center gap-2">
-            <Avatar size={40} alt="Alice" color="info" shape="circle" />
+            <Avatar size={40} alt="Alice" color="blue" shape="circle" />
             <span className="text-[11px] font-mono text-fg-muted">circle（預設）</span>
             <span className="text-[10px] text-fg-muted">rounded-full</span>
           </div>
@@ -505,7 +505,7 @@ export const SizeMatrix = {
                 <Td>Icon (circle)</Td>
                 {PRESET_SIZES.map((s) => (
                   <td key={s} className="p-3 border-b border-divider">
-                    <Avatar size={s} icon={Folder} color="info" />
+                    <Avatar size={s} icon={Folder} color="blue" />
                   </td>
                 ))}
               </tr>
@@ -521,7 +521,7 @@ export const SizeMatrix = {
                 <Td>Text (circle)</Td>
                 {PRESET_SIZES.map((s) => (
                   <td key={s} className="p-3 border-b border-divider">
-                    <Avatar size={s} alt="Alice" color="success" />
+                    <Avatar size={s} alt="Alice" color="green" />
                   </td>
                 ))}
               </tr>
