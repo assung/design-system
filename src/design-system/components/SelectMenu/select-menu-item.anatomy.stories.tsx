@@ -55,7 +55,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
     descFont: 'text-caption', descSize: '12px × 1.3',
     icon: 16, checkbox: 'sm (16px)',
     avatarInline: 20, avatarBlock: 32,
-    py: 'calc((var(--field-height-sm) - 1lh) / 2)',
+    py: 'calc((var(--field-height-sm) − 一行文字高度) / 2)',
   },
   md: {
     heightToken: '--field-height-md',
@@ -63,7 +63,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
     descFont: 'text-caption', descSize: '12px × 1.3',
     icon: 16, checkbox: 'md (16px)',
     avatarInline: 24, avatarBlock: 32,
-    py: 'calc((var(--field-height-md) - 1lh) / 2)',
+    py: 'calc((var(--field-height-md) − 一行文字高度) / 2)',
   },
   lg: {
     heightToken: '--field-height-lg',
@@ -71,7 +71,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
     descFont: 'text-body leading-compact', descSize: '14px × 1.3',
     icon: 20, checkbox: 'lg (20px)',
     avatarInline: 24, avatarBlock: 40,
-    py: 'calc((var(--field-height-lg) - 1lh) / 2)',
+    py: 'calc((var(--field-height-lg) − 一行文字高度) / 2)',
   },
 }
 
@@ -207,7 +207,7 @@ export const Overview = {
                     style={{ borderColor: 'var(--magenta)', backgroundColor: 'var(--magenta-subtle)', color: 'var(--magenta)' }}>description</span>
                 </div>
               </div>
-              <span className="text-[10px] text-fg-muted font-mono">prefix 容器 h-[1lh]，對齊第一行 label</span>
+              <span className="text-[10px] text-fg-muted font-mono">prefix 容器高度 = 一行文字高度，對齊第一行 label</span>
             </div>
             <div className="flex flex-col gap-2 items-start">
               <span className="text-[11px] text-fg-muted font-medium">Block 對齊（avatar &gt; 24px + description）</span>
@@ -221,7 +221,7 @@ export const Overview = {
                     style={{ borderColor: 'var(--magenta)', backgroundColor: 'var(--magenta-subtle)', color: 'var(--magenta)' }}>description</span>
                 </div>
               </div>
-              <span className="text-[10px] text-fg-muted font-mono">prefix 容器 h-[calc(1lh+2px+desc_1lh)]，對齊文字塊中心</span>
+              <span className="text-[10px] text-fg-muted font-mono">prefix 容器高度 = label行高 + 2px + desc行高，對齊文字塊中心</span>
             </div>
           </div>
         </div>
@@ -408,8 +408,8 @@ const InspectorInner = () => {
             <PropRow label="元素間距"><TkVal token="gap-2" value="8px" /></PropRow>
             <PropRow label="Prefix align">
               {prefixAlign === 'inline'
-                ? <TkVal token="h-[1lh]" value="對齊第一行 label" />
-                : <TkVal token={`h-[calc(1lh+2px+desc_1lh)]`} value="對齊文字塊中心" />
+                ? <TkVal token="一行文字高度" value="對齊第一行 label" />
+                : <TkVal token="label行高 + 2px + desc行高" value="對齊文字塊中心" />
               }
             </PropRow>
             {hasIcon && <PropRow label="Icon">{s.icon}px</PropRow>}
@@ -587,7 +587,7 @@ export const SizeMatrix = {
             </tr>
             <tr>
               <Td>padding-y</Td>
-              {SIZES.map((sz) => <Td key={sz} mono><span className="text-fg-secondary text-[11px]">(field-height - 1lh) / 2</span></Td>)}
+              {SIZES.map((sz) => <Td key={sz} mono><span className="text-fg-secondary text-[11px]">(field-height − 一行文字高度) / 2</span></Td>)}
             </tr>
             <tr>
               <Td>padding-x</Td>
@@ -617,7 +617,7 @@ export const SizeMatrix = {
       <div className="flex flex-col gap-3">
         <H3>Avatar 尺寸——24px 閾值</H3>
         <Desc>
-          avatar 尺寸由 description 決定。無 description 時使用 inline 尺寸（對齊 Tag 高度，&le; 24px），有 description 時使用 block 尺寸（floor8(1lh+2px+desc_1lh)，&gt; 24px）。24px 是物理限制——16px icon 在 24px 圓內可辨識，更小則不行。
+          avatar 尺寸由 description 決定。無 description 時使用 inline 尺寸（對齊 Tag 高度，&le; 24px），有 description 時使用 block 尺寸（floor8(label行高 + 2px + desc行高)，&gt; 24px）。24px 是物理限制——16px icon 在 24px 圓內可辨識，更小則不行。
         </Desc>
         <div className="overflow-x-auto">
           <table className="border-collapse text-caption">
@@ -630,12 +630,12 @@ export const SizeMatrix = {
               <tr>
                 <Td>inline（無 description）</Td>
                 {SIZES.map((sz) => <Td key={sz} mono>{SIZE_SPECS[sz].avatarInline}px</Td>)}
-                <Td mono>h-[1lh]</Td>
+                <Td mono>一行文字高度</Td>
               </tr>
               <tr>
                 <Td>block（有 description）</Td>
                 {SIZES.map((sz) => <Td key={sz} mono>{SIZE_SPECS[sz].avatarBlock}px</Td>)}
-                <Td mono>h-[calc(1lh+2px+desc_1lh)]</Td>
+                <Td mono>label行高 + 2px + desc行高</Td>
               </tr>
             </tbody>
           </table>

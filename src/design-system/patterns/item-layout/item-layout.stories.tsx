@@ -450,7 +450,7 @@ const InspectorInner = () => {
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-[10px] font-mono text-fg-muted">
               {hasPx && <span><strong style={{ color: Z.pad.text }}>padding-x</strong> = {pxPx}</span>}
               {hasPrefix && <span><strong style={{ color: Z.icon.text }}>prefix-content gap</strong> = {gapPx}</span>}
-              <span><strong style={{ color: Z.label.text }}>py</strong> = {preset.py.includes('calc') ? `calc((field-height-${size} - 1lh) / 2)` : preset.py}</span>
+              <span><strong style={{ color: Z.label.text }}>py</strong> = {preset.py.includes('calc') ? `calc((field-height-${size} − 一行文字高度) / 2)` : preset.py}</span>
               {hasDescription && <span>label-desc gap = mt-0.5 (2px)</span>}
             </div>
           </div>

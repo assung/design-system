@@ -171,7 +171,7 @@ export const Overview = {
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">flex items-start gap-2 · control 在 h-[1lh] 容器內置中</span>
+            <span className="text-[10px] text-fg-muted font-mono">flex items-start gap-2 · control 在一行文字高度的容器內置中</span>
           </div>
         </div>
       </div>
@@ -325,10 +325,10 @@ const InspectorInner = () => {
                   <line x1="1" y1="2" x2="9" y2="2" stroke={Z.dim.text} strokeWidth="1.5" />
                   <line x1="1" y1="46" x2="9" y2="46" stroke={Z.dim.text} strokeWidth="1.5" />
                 </svg>
-                <div className="ml-1.5"><TkVal token="h-[1lh]" value="控件容器 = 一行文字高度" /></div>
+                <div className="ml-1.5"><TkVal token="一行文字高度" value="控件容器高度" /></div>
               </div>
             </div>
-            <p className="text-[10px] text-fg-muted">控件包在 h-[1lh] 容器內，多行文字時對齊第一行。寬度為示意比例。</p>
+            <p className="text-[10px] text-fg-muted">控件包在一行文字高度的容器內，多行文字時對齊第一行。寬度為示意比例。</p>
           </div>
         </div>
 
@@ -499,7 +499,7 @@ export const SizeMatrix = {
               <Td>Item padding</Td>
               {SIZES.map((sz) => (
                 <Td key={sz} mono>
-                  <div className="text-fg-secondary">py = (field-height - 1lh) / 2</div>
+                  <div className="text-fg-secondary">py = (field-height − 一行文字高度) / 2</div>
                   <div className="text-fg-muted text-[10px]">單行 = field-height-{sz}</div>
                 </Td>
               ))}

@@ -543,7 +543,7 @@ export const StateBehavior = {
       {/* Vertical Group */}
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">垂直排列 — Item 間距由 padding 處理，不加 gap</span>
-        <Desc>每個 SelectionItem 的 py = (field-height - 1lh) / 2，單行高度剛好等於同 size 的 TextField，多行時 padding 不變自然撐高。</Desc>
+        <Desc>每個 SelectionItem 的 py = (field-height − 一行文字高度) / 2，單行高度剛好等於同 size 的 TextField，多行時 padding 不變自然撐高。</Desc>
         <div className="flex gap-8">
           {(['md', 'lg'] as const).map((sz) => (
             <div key={sz} className="flex flex-col gap-1">
@@ -571,7 +571,7 @@ export const StateBehavior = {
       {/* Multiline alignment */}
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">多行對齊 — 控件對齊第一行文字中心</span>
-        <Desc>控件包在 h-[1lh] 容器內，外層 flex items-start 確保多行時控件對齊第一行。字體改變時 1lh 自動重算。</Desc>
+        <Desc>控件包在一行文字高度的容器內，外層 flex items-start 確保多行時控件對齊第一行。字體改變時高度自動重算。</Desc>
         <div className="max-w-sm grid border border-dashed border-divider rounded-md">
           <SelectionItem
             control={<Checkbox id="ml-a" />}

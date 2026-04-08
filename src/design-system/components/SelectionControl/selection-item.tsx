@@ -37,7 +37,7 @@ export interface SelectionItemProps extends React.HTMLAttributes<HTMLDivElement>
   control: React.ReactNode
   /** Label 文字 */
   label: React.ReactNode
-  /** 描述文字（同 label 字體，fg-secondary） */
+  /** 描述文字（fg-secondary；lg 時降為 text-body 14px，sm/md 與 label 同字體） */
   description?: React.ReactNode
   /** htmlFor（label 指向 control 的 id） */
   htmlFor?: string
@@ -63,7 +63,11 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
           {label}
         </label>
         {description && (
-          <p className={cn('mt-0.5', disabled ? 'text-fg-disabled' : 'text-fg-secondary')}>
+          <p className={cn(
+            'mt-0.5',
+            size === 'lg' && 'text-body leading-compact',
+            disabled ? 'text-fg-disabled' : 'text-fg-secondary',
+          )}>
             {description}
           </p>
         )}

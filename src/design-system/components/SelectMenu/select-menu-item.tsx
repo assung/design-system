@@ -238,7 +238,7 @@ const SelectMenuItem = React.forwardRef<HTMLDivElement, SelectMenuItemProps>(
 
         {/* Suffix：tag / endContent，靠右對齊，跟 prefix 同對齊高度 */}
         {(tag || endContent) && (
-          <div className={cn(prefixAlignVariants({ align: prefixAlign }), 'ml-auto gap-2')}>
+          <div className={cn(prefixAlignVariants({ align: prefixAlign }), 'ml-auto gap-2', disabled && 'opacity-40')}>
             {tag}
             {endContent}
           </div>

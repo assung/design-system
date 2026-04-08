@@ -56,9 +56,9 @@ interface SizeSpec {
 }
 
 const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
-  sm: { heightToken: '--field-height-sm', height: '28px', paddingFormula: '(field-height-sm - 1lh) / 2', fontToken: 'text-body', font: '14px', lineHeight: 'leading-compact (1.3)', icon: 16, checkboxSize: 'sm (16px)' },
-  md: { heightToken: '--field-height-md', height: '32px', paddingFormula: '(field-height-md - 1lh) / 2', fontToken: 'text-body', font: '14px', lineHeight: 'leading-compact (1.3)', icon: 16, checkboxSize: 'md (16px)' },
-  lg: { heightToken: '--field-height-lg', height: '36px', paddingFormula: '(field-height-lg - 1lh) / 2', fontToken: 'text-body-lg', font: '16px', lineHeight: 'leading-compact (1.3)', icon: 20, checkboxSize: 'lg (20px)' },
+  sm: { heightToken: '--field-height-sm', height: '28px', paddingFormula: '(field-height-sm − 一行文字高度) / 2', fontToken: 'text-body', font: '14px', lineHeight: 'leading-compact (1.3)', icon: 16, checkboxSize: 'sm (16px)' },
+  md: { heightToken: '--field-height-md', height: '32px', paddingFormula: '(field-height-md − 一行文字高度) / 2', fontToken: 'text-body', font: '14px', lineHeight: 'leading-compact (1.3)', icon: 16, checkboxSize: 'md (16px)' },
+  lg: { heightToken: '--field-height-lg', height: '36px', paddingFormula: '(field-height-lg − 一行文字高度) / 2', fontToken: 'text-body-lg', font: '16px', lineHeight: 'leading-compact (1.3)', icon: 20, checkboxSize: 'lg (20px)' },
 }
 
 const ITEM_TYPE_DESC: Record<ItemTypeKey, string> = {
@@ -195,9 +195,9 @@ export const Overview = {
               ))}
             </div>
             <div className="text-[10px] text-fg-muted font-mono flex flex-col gap-0.5">
-              <span>prefix: startIcon (h-[1lh]) or Checkbox</span>
+              <span>prefix: startIcon (一行文字高度) or Checkbox</span>
               <span>label: flex-1, text content + description</span>
-              <span>suffix: tag / badge / endIcon / shortcut (h-[1lh] ml-auto)</span>
+              <span>suffix: tag / badge / endIcon / shortcut (一行文字高度 ml-auto)</span>
             </div>
           </div>
         </div>
@@ -393,7 +393,7 @@ const InspectorInner = () => {
               </div>
             </div>
             <p className="text-[10px] text-fg-muted">
-              py = (field-height - 1lh) / 2 — 單行時總高度等於同 size 的 Button / TextField
+              py = (field-height − 一行文字高度) / 2 — 單行時總高度等於同 size 的 Button / TextField
             </p>
           </div>
         </div>
@@ -417,11 +417,11 @@ const InspectorInner = () => {
           <div className="px-4 py-1">
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Layout</span></div>
             <PropRow label="Item 高度" dot={Z.dim.text}><TkVal token={s.heightToken} value={`${s.height} (single-line)`} /></PropRow>
-            <PropRow label="Padding-y"><TkVal token={`calc((${s.heightToken} - 1lh) / 2)`} /></PropRow>
+            <PropRow label="Padding-y"><TkVal token={`calc((${s.heightToken} − 一行文字高度) / 2)`} /></PropRow>
             <PropRow label="Padding-x" dot={Z.pad.text}><TkVal token="px-3" value="12px" /></PropRow>
             <PropRow label="Gap" dot={Z.gap.text}><TkVal token="gap-2" value="8px" /></PropRow>
             <PropRow label="Icon" dot={Z.icon.text}>{s.icon}px</PropRow>
-            <PropRow label="Prefix 對齊"><TkVal token="h-[1lh]" value="items-center" /></PropRow>
+            <PropRow label="Prefix 對齊"><TkVal token="一行文字高度" value="items-center" /></PropRow>
           </div>
 
           {/* TYPOGRAPHY */}
@@ -497,7 +497,7 @@ export const Inspector = {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <H3>元件檢閱器</H3>
-        <Desc>選擇 size 與 item 類型，即時查看所有 token。Item 的 py 由公式 (field-height - 1lh) / 2 計算，density 切換時自動調整。</Desc>
+        <Desc>選擇 size 與 item 類型，即時查看所有 token。Item 的 py 由公式 (field-height − 一行文字高度) / 2 計算，density 切換時自動調整。</Desc>
       </div>
       <InspectorInner />
     </div>
@@ -527,12 +527,19 @@ export const ColorMatrix = {
                 <td className="p-3 border-b border-divider font-mono text-caption font-medium align-top">{type}</td>
                 {STATES.map((st) => (
                   <td key={st} className="p-3 border-b border-divider align-top min-w-[160px]">
-                    <div className="rounded px-3 py-1.5 text-body leading-compact border border-border"
+                    <div className="rounded px-3 py-1.5 text-body leading-compact border border-border flex items-center gap-2"
                       style={{
                         backgroundColor: `var(${ITEM_TOKEN_MAP[type][st].bg})`,
                         color: `var(${ITEM_TOKEN_MAP[type][st].text})`,
                       }}>
-                      {st === 'active/selected' ? 'selected' : type}
+                      {type === 'checkbox' && (
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                          st === 'active/selected' ? 'bg-primary border-primary' : 'border-border'
+                        }`}>
+                          {st === 'active/selected' && <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" /></svg>}
+                        </div>
+                      )}
+                      {st === 'active/selected' ? (type === 'checkbox' ? 'checked' : 'selected') : type}
                     </div>
                     <TokenAnnotation colors={ITEM_TOKEN_MAP[type][st]} />
                   </td>
