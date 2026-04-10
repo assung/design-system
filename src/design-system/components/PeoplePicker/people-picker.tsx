@@ -18,7 +18,13 @@ function personToMenuOption(person: PersonValue): SelectMenuOption {
     value: p.name,
     label: p.name,
     description: (person as { description?: string }).description,
-    avatar: <Avatar person={p} size="md" />,
+    // 選單是 scanning mode,avatar 用 inline size(≤24px），不用 block(32px)
+    // 這樣 checkbox + avatar + name + desc 的行高跟其他 SelectMenuItem 一致
+    avatar: (
+      <div className="w-6 h-6 shrink-0 rounded-full overflow-hidden">
+        <Avatar person={p} size="sm" />
+      </div>
+    ),
   }
 }
 
