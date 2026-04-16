@@ -48,7 +48,7 @@ Outer padding 由 **consumer 容器** 決定:
 | 元素 | Class | 大小 | 色彩 |
 |---|---|---|---|
 | Title | `text-body-lg font-medium` | 16px | `text-foreground` |
-| Description | `text-body` | 14px | `text-fg-secondary` |
+| Description | `text-body` | 14px | `text-fg-muted` — placeholder 等級(跟 input placeholder 同色) |
 
 固定不隨 density 變——展示性文字,不需要跟 field-height tier 連動。
 

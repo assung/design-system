@@ -58,7 +58,7 @@ const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
         {description && (
           <span
             className={cn(
-              'text-body text-fg-secondary',
+              'text-body text-fg-muted',
               title && 'mt-0.5',
             )}
           >

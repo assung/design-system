@@ -568,13 +568,14 @@ export const SliderWithLiveNumberInput: Story = {
         <Field>
           <FieldLabel>縮放比例</FieldLabel>
           <div className="flex items-center gap-3">
-            <Slider
-              className="flex-1"
-              value={[value]}
-              onValueChange={v => setValue(v[0])}
-              min={0}
-              max={200}
-            />
+            <div className="flex-1 min-w-0">
+              <Slider
+                value={[value]}
+                onValueChange={v => setValue(v[0])}
+                min={0}
+                max={200}
+              />
+            </div>
             <NumberInput
               className="w-[96px]"
               value={value}
