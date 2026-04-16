@@ -319,7 +319,9 @@ const stepItemVariants = cva('group/step-item outline-none', {
     orientation: {
       // pb-6 on li provides spacing for next item; connector is absolute within li
       vertical: 'relative flex flex-col',
-      horizontal: 'flex min-w-0 shrink-0',
+      // Items flex-1 等寬:不論 label / description 多長,每個 item 分配相同寬度。
+      // Description 在等寬空間內自然 wrap,不會把 item 撐寬、壓縮 connector。
+      horizontal: 'flex-1 min-w-0',
     },
     size: {
       sm: 'text-body',
@@ -536,6 +538,9 @@ function HorizontalLayout({
   label: React.ReactNode
   description: React.ReactNode
 }) {
+  // Description 在 flow 裡正常 wrap。Item 用 flex-1 等寬(不是 shrink-0 natural),
+  // 所以 description 再長也不會把 item 撐寬——它被限制在 item 分配到的等寬空間裡。
+  // Connector 用固定寬度(不是 flex-1 均分),跟 item 寬度無關,永遠一致。
   return (
     <StepItemHeader className="flex items-start gap-3 min-w-0 w-full">
       <div className="h-[1lh] flex items-center shrink-0">
@@ -559,8 +564,9 @@ function HorizontalRootConnector({ isBlue, size }: { isBlue: boolean; size: Step
     <li
       role="presentation"
       aria-hidden
-      // self-stretch: 填滿行高(跟 items 等高),讓 absolute line 有正確定位空間
-      className="flex-1 min-w-6 relative self-stretch"
+      // shrink-0 w-8:固定 32px 短寬度,跟 item 內容無關,connector 永遠一致。
+      // self-stretch:填滿行高(跟 items 等高),讓 absolute line 有正確定位空間。
+      className="shrink-0 w-8 relative self-stretch"
     >
       {/* 絕對定位到 indicator 中心 Y,不依賴 `lh` CSS 單位 */}
       <div
