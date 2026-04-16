@@ -9,6 +9,7 @@ import { Command as CommandPrimitive } from 'cmdk'
 import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from './select-menu-item'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Empty } from '@/design-system/components/Empty/empty'
+import { getMenuListMinHeight } from '@/design-system/components/fields/field-types'
 import { RowSizeProvider } from '@/design-system/patterns/item-layout/item-layout'
 
 /**
@@ -243,9 +244,7 @@ export function SelectMenu({
           {/* min-height = minRows 個 item 高度,確保空狀態跟有選項時視覺一致 */}
           <CommandList
             className="relative"
-            style={{
-              minHeight: `calc(var(--field-height-${size === 'lg' ? 'lg' : size === 'sm' ? 'sm' : 'md'}) * ${minRows} + 16px)`,
-            }}
+            style={{ minHeight: getMenuListMinHeight(size, minRows) }}
           >
             {/* 空狀態:absolute 填滿 CommandList,文案垂直 + 水平居中 */}
             <CommandEmpty className="absolute inset-0 flex items-center justify-center">

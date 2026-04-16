@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/compone
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from '@/design-system/components/Command/command'
 import { SelectMenuItem, SelectMenuGroup } from '@/design-system/components/SelectMenu/select-menu-item'
 import { Empty } from '@/design-system/components/Empty/empty'
+import { getMenuListMinHeight } from '@/design-system/components/fields/field-types'
 import { useIsMobile } from '@/design-system/hooks/use-is-mobile'
 
 // ── Tag padding per size ────────────────────────────────────────────────────
@@ -298,7 +299,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
           onOpenAutoFocus={(e) => { if (searchable) { e.preventDefault(); inputRef.current?.focus() } }}
         >
           <Command shouldFilter={false}>
-            <CommandList className="relative" style={{ minHeight: `calc(var(--field-height-${size === 'lg' ? 'lg' : size === 'sm' ? 'sm' : 'md'}) * 3 + 16px)` }}>
+            <CommandList className="relative" style={{ minHeight: getMenuListMinHeight(size) }}>
               <CommandEmpty className="absolute inset-0 flex items-center justify-center">
                 <Empty description="沒有符合的選項" />
               </CommandEmpty>

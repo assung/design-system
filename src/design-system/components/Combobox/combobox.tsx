@@ -3,6 +3,7 @@ import { X, ChevronDown, Plus } from 'lucide-react'
 import { Command as CommandPrimitive } from 'cmdk'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/fields/field-types'
+import { getMenuListMinHeight } from '@/design-system/components/fields/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
@@ -360,7 +361,7 @@ function CustomCombobox({
                   size === 'lg' ? 'text-body-lg leading-compact' : 'text-body leading-compact')} />
             </div>
           )}
-          <CommandList className="relative" style={{ minHeight: `calc(var(--field-height-${size === 'lg' ? 'lg' : size === 'sm' ? 'sm' : 'md'}) * 3 + 16px)` }}>
+          <CommandList className="relative" style={{ minHeight: getMenuListMinHeight(size) }}>
             <CommandEmpty className="absolute inset-0 flex items-center justify-center">
               <Empty description="沒有符合的選項" />
             </CommandEmpty>
