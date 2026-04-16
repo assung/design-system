@@ -273,5 +273,5 @@ Slider 的 `readonly` 等同於 `disabled`——一個不能操作的 slider 本
 - **Field height tier** — `tokens/uiSize/uiSize.spec.md` 的 `field-height-*` family
 - **Elevation hover / active 語意** — `tokens/elevation/elevation.spec.md`
 - **Primary / muted / fg-disabled token** — `tokens/color/color.spec.md`
-- **Field 容器整合規則** — `components/fields/field.spec.md`
+- **Field 容器整合規則** — `components/Field/field.spec.md`
 - **禁止用 Tailwind `shadow-*`,陰影一律用 CSS var** — `CLAUDE.md` 的「陰影一律用 `--elevation-*` token」章節

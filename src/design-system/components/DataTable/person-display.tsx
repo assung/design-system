@@ -1,6 +1,6 @@
 import type React from 'react'
 import { User } from 'lucide-react'
-import { EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
+import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
 

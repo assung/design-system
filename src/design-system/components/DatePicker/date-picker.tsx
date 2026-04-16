@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { X, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/fields/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
+import type { FieldMode } from '@/design-system/components/Field/field-types'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
 
 // ── Format ──────────────────────────────────────────────────────────────────

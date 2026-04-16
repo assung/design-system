@@ -8,7 +8,7 @@ import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandS
 import { Command as CommandPrimitive } from 'cmdk'
 import { SelectMenuItem, SelectMenuFooter } from './select-menu-item'
 import { Empty } from '@/design-system/components/Empty/empty'
-import { getMenuListMinHeight } from '@/design-system/components/fields/field-types'
+import { getMenuListMinHeight } from '@/design-system/components/Field/field-types'
 import { RowSizeProvider } from '@/design-system/patterns/item-layout/item-layout'
 
 /**

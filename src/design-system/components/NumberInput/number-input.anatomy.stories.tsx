@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { NumberInput } from './number-input'
-import type { FieldMode } from '@/design-system/components/fields/field-types'
+import type { FieldMode } from '@/design-system/components/Field/field-types'
 
 const meta: Meta = {
   title: 'Design System/Components/NumberInput/設計規格',

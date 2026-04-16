@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode, InlineActionConfig } from '@/design-system/components/fields/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
+import type { FieldMode, InlineActionConfig } from '@/design-system/components/Field/field-types'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
 
 // ── Format ──────────────────────────────────────────────────────────────────

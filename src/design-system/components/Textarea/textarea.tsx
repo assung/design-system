@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/fields/field-types'
+import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 
 /**

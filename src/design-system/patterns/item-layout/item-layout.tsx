@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/design-system/components/Tooltip/tooltip"
-import type { InlineActionConfig } from "@/design-system/components/fields/field-types"
+import type { InlineActionConfig } from "@/design-system/components/Field/field-types"
 
 /**
  * Item Layout — 共用工具與常數
