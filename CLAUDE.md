@@ -139,7 +139,10 @@ src/
 │   │   ├── Tabs/                      ← 切 view 的頁籤（Radix Tabs + underline + primary-hover + overflow scroll/menu）
 │   │   ├── SegmentedControl/          ← 切 value 的互斥選擇器（Radix ToggleGroup type="single"）
 │   │   ├── Chip/                      ← Material Filter Chip（Radix ToggleGroup + wrap/scroll/menu overflow）
-│   │   ├── FileItem/                  ← 檔案上傳列表項目（uploading / completed / error，lg=avatar / sm=icon）
+│   │   ├── FileItem/                  ← 檔案上傳列表項目（detail=avatar / compact=icon，uploading/completed/error）
+│   │   ├── DescriptionList/           ← 唯讀 label+value 展示（dl/dt/dd，Atlassian/Polaris 命名對齊）
+│   │   ├── HoverCard/                 ← ⚙ internal primitive：hover 觸發可互動浮層（行為 primitive，不含視覺樣式）
+│   │   ├── NameCard/                  ← 人員 HoverCard 內容（profile + status + actions + info fields）
 │   │   ├── Sidebar/                   ← 佈局外殼（Provider + Header + Content + Footer + Trigger）
 │   │   ├── Field/                     ← shadcn Field（Label + Control + Description + Message）
 │   │   │   ├── field.tsx
