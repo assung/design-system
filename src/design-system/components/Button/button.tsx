@@ -31,10 +31,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *     - text      + pressed → neutral-selected 底，hover 反向變淺，:active 深一階
  *   primary / link 傳入 pressed 無視覺效果（語意不符）
  *
- * ── Sizes（預設 sm）──
+ * ── Sizes（預設 md）──
  *   xs   h-field-xs（24px 固定），不隨 density 縮放
- *   sm   h-field-sm，md=28px / lg=32px  ← 預設
- *   md   h-field-md，md=32px / lg=36px
+ *   sm   h-field-sm，md=28px / lg=32px
+ *   md   h-field-md，md=32px / lg=36px  ← 預設（跟 Field/Input 對齊）
  *   lg   h-field-lg，md=36px / lg=40px
  *   icon-only 不是獨立尺寸 — 加 iconOnly prop 讓任何尺寸變正方形
  *
@@ -156,7 +156,7 @@ const buttonVariants = cva(
     ],
     defaultVariants: {
       variant: 'primary',
-      size: 'sm',
+      size: 'md',
     },
   }
 )
@@ -246,7 +246,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     // ── FieldContext：在 Field 內時自動讀 size，讓 Button 跟 Input 同高 ──
     const fieldCtx = useFieldContext?.()
-    const resolvedSize = size ?? (fieldCtx?.size as typeof size) ?? 'sm'
+    const resolvedSize = size ?? (fieldCtx?.size as typeof size) ?? 'md'
 
     // shadcn compat：AlertDialog、Toast 等元件內部會傳入這些 alias，
     // 在此靜默轉換，不暴露到型別或自動完成。

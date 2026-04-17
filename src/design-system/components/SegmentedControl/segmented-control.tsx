@@ -44,7 +44,7 @@ interface SegmentedControlContextValue {
 }
 
 const SegmentedControlContext = React.createContext<SegmentedControlContextValue>({
-  size: 'sm',
+  size: 'md',
   fullWidth: false,
   iconOnly: false,
   disabled: false,
@@ -102,7 +102,7 @@ const SegmentedControl = React.forwardRef<
     // Field 內自動讀 size，跟 Button 同機制
     const fieldCtx = useFieldContext?.()
     const resolvedSize: SegmentedControlSize =
-      sizeProp ?? (fieldCtx?.size as SegmentedControlSize) ?? 'sm'
+      sizeProp ?? (fieldCtx?.size as SegmentedControlSize) ?? 'md'
     const resolvedDisabled = disabled || !!fieldCtx?.disabled
 
     return (
@@ -192,7 +192,7 @@ const itemVariants = cva(
       },
     },
     defaultVariants: {
-      size: 'sm',
+      size: 'md',
       fullWidth: false,
     },
   }

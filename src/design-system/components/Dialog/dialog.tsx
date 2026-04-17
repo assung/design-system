@@ -3,14 +3,32 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { ItemInlineActionButton } from "@/design-system/patterns/item-layout/item-layout"
+
+/**
+ * Dialog (Modal) — Radix Dialog + 設計系統 token
+ *
+ * ── Layout ──
+ * px = layout-space-loose, header/footer py = layout-space-tight。
+ * Body pt = layout-space-tight, pb = layout-space-bottom。
+ * data-density="lg" 讓所有 token 解析為 lg。
+ *
+ * ── Viewport Inset ──
+ * Modal 與 viewport 四邊保持 DIALOG_VIEWPORT_INSET (32px) 最小間距。
+ * maxWidth / maxHeight 預設填滿 viewport（扣除 inset），consumer 可覆寫。
+ *
+ * ── 高度行為 ──
+ * 預設：填滿 viewport 有最大高度，body 捲動。防止動態內容跳動。
+ * maxHeight="auto"：高度隨內容（極簡靜態 Modal）。
+ */
 
 const Dialog = DialogPrimitive.Root
-
 const DialogTrigger = DialogPrimitive.Trigger
-
 const DialogPortal = DialogPrimitive.Portal
-
 const DialogClose = DialogPrimitive.Close
+
+// Modal 與 viewport 四邊的最小間距
+const DIALOG_VIEWPORT_INSET = 32
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
@@ -19,64 +37,114 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
+      "fixed inset-0 z-50 bg-overlay",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out",
+      "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className,
     )}
     {...props}
   />
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  /** 最大寬度。預設 512px。寬度填滿 viewport（扣除 inset），受 maxWidth 限制。 */
+  maxWidth?: string
+  /** 最大高度。預設填滿 viewport（扣除 inset）。傳 "auto" = 高度隨內容。 */
+  maxHeight?: string | 'auto'
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
+  DialogContentProps
+>(({ className, maxWidth = '512px', maxHeight, children, style, ...props }, ref) => {
+  const inset2 = DIALOG_VIEWPORT_INSET * 2
+  const resolvedMaxHeight = maxHeight === 'auto'
+    ? undefined
+    : (maxHeight ?? `calc(100vh - ${inset2}px)`)
+
+  return (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        data-density="lg"
+        className={cn(
+          "fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2",
+          "flex flex-col bg-surface-raised rounded-lg border border-border",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+          "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
+          "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+          className,
+        )}
+        style={{
+          boxShadow: 'var(--elevation-200)',
+          maxWidth: `min(${maxWidth}, calc(100vw - ${inset2}px))`,
+          maxHeight: resolvedMaxHeight,
+          ...style,
+        }}
+        {...props}
+      >
+        {children}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
-const DialogHeader = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => (
   <div
+    ref={ref}
     className={cn(
-      "flex flex-col space-y-1.5 text-center sm:text-left",
-      className
+      "flex items-center justify-between gap-2 shrink-0 border-b border-divider",
+      "px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]",
+      className,
     )}
     {...props}
-  />
-)
+  >
+    <div className="flex-1 min-w-0">{children}</div>
+    <DialogPrimitive.Close asChild>
+      <ItemInlineActionButton icon={X} aria-label="關閉" size="md" />
+    </DialogPrimitive.Close>
+  </div>
+))
 DialogHeader.displayName = "DialogHeader"
 
-const DialogFooter = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogBody = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
   <div
+    ref={ref}
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
+      "flex-1 overflow-y-auto",
+      "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
+      className,
     )}
     {...props}
   />
-)
+))
+DialogBody.displayName = "DialogBody"
+
+const DialogFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "flex items-center justify-end gap-2 shrink-0 border-t border-divider",
+      "px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]",
+      className,
+    )}
+    {...props}
+  />
+))
 DialogFooter.displayName = "DialogFooter"
 
 const DialogTitle = React.forwardRef<
@@ -85,10 +153,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn(
-      "text-lg font-semibold leading-none tracking-tight",
-      className
-    )}
+    className={cn("text-body-lg font-medium truncate", className)}
     {...props}
   />
 ))
@@ -100,7 +165,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-body text-fg-secondary", className)}
     {...props}
   />
 ))
@@ -114,6 +179,7 @@ export {
   DialogTrigger,
   DialogContent,
   DialogHeader,
+  DialogBody,
   DialogFooter,
   DialogTitle,
   DialogDescription,
