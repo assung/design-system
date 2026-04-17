@@ -2,6 +2,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
+import { Alert } from '@/design-system/components/Alert/alert'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 
 /**
@@ -25,22 +26,11 @@ const AVATAR_SIZE = 64
 
 type StatusType = 'available' | 'away' | 'busy' | 'offline'
 
-const STATUS_COLOR: Record<StatusType, string> = {
-  available: 'bg-success',
-  away: 'bg-warning',
-  busy: 'bg-error',
-  offline: 'bg-fg-muted',
-}
-
 const STATUS_LABEL: Record<StatusType, string> = {
   available: 'Available',
   away: 'Away',
   busy: 'Busy',
   offline: 'Offline',
-}
-
-function StatusDot({ status, className }: { status: StatusType; className?: string }) {
-  return <span className={cn('inline-block w-2 h-2 rounded-full shrink-0', STATUS_COLOR[status], className)} />
 }
 
 export interface NameCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -105,20 +95,16 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
           </div>
         )}
 
-        {/* ── Status ── */}
+        {/* ── Status: neutral Alert (無 dismiss) ── */}
         {hasStatus && (
           <div className="border-t border-divider px-4 py-3">
-            <div className="flex items-center gap-1.5 text-body">
-              <StatusDot status={status!} />
-              <span>{STATUS_LABEL[status!]}</span>
-            </div>
-            {statusMessage && (
-              <div className="mt-2">
-                <DescriptionItem label="Status message">
-                  <span className="line-clamp-2">{statusMessage}</span>
-                </DescriptionItem>
-              </div>
-            )}
+            <Alert
+              variant="neutral"
+              appearance="subtle"
+              dismissible={false}
+              title={STATUS_LABEL[status!]}
+              description={statusMessage ? String(statusMessage) : undefined}
+            />
           </div>
         )}
 
@@ -145,4 +131,4 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
 )
 NameCard.displayName = 'NameCard'
 
-export { NameCard, StatusDot }
+export { NameCard }
