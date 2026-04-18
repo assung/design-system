@@ -31,7 +31,7 @@ const floatingLayerClass = [
   'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
   'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2',
   'data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-  'origin-[--radix-dropdown-menu-content-transform-origin]',
+  'origin-[var(--radix-dropdown-menu-content-transform-origin)]',
 ].join(' ')
 
 // ── Size:統一用 RowSizeContext(item-layout module),消除本地 SizeContext 漂移 ──
