@@ -72,6 +72,45 @@
 把規則從 CLAUDE.md 搬到 spec 時，**CLAUDE.md 必須留下一行指標**（「詳見 `xxx.spec.md`」）；反之亦然。**規則有家、也有路標**，不可只搬走不留索引。
 
 
+# 命名與語言一致性（Meta 規則）
+
+**本節是 meta 規則**——影響所有後續命名決定（檔案、資料夾、變數、spec 章節、story、API prop）。建立任何命名前先讀這節。
+
+## 命名前必查既有 pattern
+
+建立任何名稱前，**必須先 `ls` / `grep` 既有 pattern**，嚴格對齊不憑直覺。涵蓋：
+
+| 類別 | 慣例 | 範例 |
+|------|------|------|
+| 檔案 / 資料夾 | kebab-case | `item-layout.tsx` / `item-layout/` |
+| React 元件 / Type | PascalCase | `ItemLayout` / `ItemLayoutProps` |
+| 函式 / hook / 本地變數 | camelCase | `useOverflow` / `itemCount` |
+| CSS custom property | `--kebab-case-with-purpose` | `--field-height-md` |
+| Tailwind class | 既有 utility 優先；自訂 kebab-case | `text-body-lg` |
+| Spec 章節標題 | 繁體中文（英術語例外）| 「何時用」、「禁止事項」；例外：Props / API / Token / CSS |
+| Story 變數名 | `{Concept}Rule`（principles）/ 簡短名詞（showcase） | `VariantRule` / `Modes` |
+| Pattern 資料夾 | kebab-case 名詞 pattern | `item-layout` / `action-bar` |
+
+**建立新類別時**（新資料夾、新 spec 類型、新 story 類型、新 pattern kind）：
+先在 CLAUDE.md 現有清單（「技術架構概覽」、「Story 三層定位」等）找相似類別的命名模式，沿用。**不自創新 suffix / prefix**。
+
+## 語言一致性（critical）
+
+- **本專案 spec.md 一律繁體中文**（已定案）
+- **Code identifier 一律英文**（約定俗成）
+- **單一檔案內註解統一語言**——中文檔註中、英文檔註英，不中英夾雜
+- **同一段落不跨語言**——spec 裡「Rule A」「判斷法 A」擇一，不兩種並存
+
+## 禁止事項
+
+- ❌ 憑直覺命名（「聽起來順」「讀起來順」）——必先 `ls` / `grep` 既有 pattern
+- ❌ 為突顯新功能用非常規命名——新元件名必須對齊既有元件家族
+- ❌ 一個檔案裡註解中英夾雜
+- ❌ 複合詞用底線 / PascalCase 命檔（`ItemLayout.spec.md` 錯，`item-layout.spec.md` 對）
+- ❌ 自創 spec 章節標題格式（既有 spec 用「何時用」就不要另寫「When to use」/「何時該使用」）
+- ❌ 對新元件用新的 suffix（既有都是 `.tsx` / `.spec.md` / `.stories.tsx` / `.anatomy.stories.tsx` / `.principles.stories.tsx`，不自創如 `.design.md` / `.tokens.tsx`）
+
+
 # 技術架構概覽
 
 ```
