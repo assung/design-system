@@ -177,7 +177,37 @@ element.style.backgroundColor = 'var(--primary)'
 - **回答任何設計問題前，必須先讀取所有相關的 spec.md**，以實際內容為基礎，不憑記憶回答
 - **每次回答必須有邏輯、有架構、符合世界級設計水準**——不提出未經深思的建議，不為了回答而回答
 - **對標世界級 DS（mindset 層）**：編輯任何 spec 或建立新元件時，必須對照 **Polaris / Material / Ant Design / Atlassian / Carbon / Apple HIG**，檢查本專案是否缺少下列判斷維度——**「何時用 / 何時不用」、「與近親元件的分界」、「常見誤解」、「相關元件 links」、「空值呈現」、「驗證時機」、「Loading / 無障礙預設」**。有缺口主動提出討論，**不要假設「沒寫 = 不需要」**。SegmentedControl spec 是本專案的 template（完整實踐此 pattern）
-- **Spec 結構對齊 SSOT**：跨元件比較（如「Tabs vs SegmentedControl」）必須由**一個元件 spec 擁有**完整對照表，其他元件 point back。不可兩邊都寫完整版（會漂移）；不可建立孤立的 `xxx-selection.spec.md` 單獨承載比較（世界級 DS 都把比較放在元件 spec 自己身上）
+- **Spec 結構對齊 SSOT（Single Source of Truth）**：跨元件比較由**一個 spec own 完整內容，其他 spec 用一行 pointer 指回**。規則如下：
+
+  **何時需要 SSOT（深度比較）**：
+  - 多維度分析（如「與 X 的分界」分多個角度討論）
+  - 情境對照表超過 3 rows
+  - 涉及另一個元件的內部機制或權衡
+  
+  **何時不需要 SSOT（本地引用即可）**：
+  - 「何時不用」表格中一行帶過（「改用 X」+「原因」一句話）——兩側並存不會漂移
+  - 「相關」links section 列出相關元件
+  - 只描述自己元件的 props / variants / 內部 state
+  
+  **Ownership 判斷順序**：
+  1. 通用預設元件 own（Select owns vs RadioGroup、Input owns vs NumberInput——因為通用者是 fallback）
+  2. 若一側 spec 明顯更深、另一側是薄 wrapper → 深側 own（Tabs owns vs SegmentedControl）
+  3. 若兩側對等、都需要此判斷 → 按字母序決定 anchor，避免循環爭議
+  
+  **執行規則**：
+  - Own 方寫深度 section；被指方寫一行 pointer（**reciprocal 必須存在，不可單向**）
+  - Pointer 必須明確指出 anchor spec 和該 spec 的 section 名稱
+  - 本專案目前的 SSOT anchors：
+    * Tabs vs SegmentedControl → `tabs.spec.md`「Tabs 與 SegmentedControl 的分界」
+    * Select vs RadioGroup → `select.spec.md`「與 RadioGroup 的分界」
+    * Row primitives 共用 → `patterns/item-layout/item-layout.spec.md`
+    * Field Controls 共用 → `components/Field/field-controls.spec.md`
+  
+  **禁止事項**：
+  - ❌ 兩個 spec 都寫完整對照（保證漂移）
+  - ❌ 建立孤立 `xxx-selection.spec.md` 或 `xxx-comparison.spec.md` 承載比較——世界級 DS 都把比較放在元件 spec 內
+  - ❌ 單向指向（A 指向 B，B 沒指回 A）
+  - ❌ Pointer 只說「見 X spec」不說 section 名稱——讀者必須掃整份 spec 才找得到
 - **編輯 spec.md 時，必須交叉比對所有相關的 spec.md 與 Storybook 範例**，確認無矛盾、無術語不一致、無重複定義
 - **若結論與既有 spec.md 有邏輯衝突或概念混淆，必須主動提出討論**，不默默修改、不迴避矛盾
 - **所有元件必須遵循 shadcn 框架**，確保保留 shadcn 的結構優勢（forwardRef、Slot、data-* attributes、cva 等），不從零重寫
