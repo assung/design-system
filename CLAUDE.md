@@ -265,6 +265,8 @@ element.style.backgroundColor = 'var(--primary)'
   - 本專案目前的 SSOT anchors：
     * Tabs vs SegmentedControl → `tabs.spec.md`「Tabs 與 SegmentedControl 的分界」
     * Select vs RadioGroup → `select.spec.md`「與 RadioGroup 的分界」
+    * Checkbox vs Switch → `checkbox.spec.md`「與 Switch 的分界」
+    * HoverCard vs Tooltip → `hover-card.spec.md`「與 Tooltip 的分界」
     * Row primitives 共用 → `patterns/item-layout/item-layout.spec.md`
     * Field Controls 共用 → `components/Field/field-controls.spec.md`
   
