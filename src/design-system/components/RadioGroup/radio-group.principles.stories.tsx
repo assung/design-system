@@ -1,0 +1,144 @@
+import React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
+import { RadioGroup, RadioGroupItem } from './radio-group'
+
+const meta: Meta = {
+  title: 'Design System/Components/RadioGroup/設計原則',
+  parameters: { layout: 'padded' },
+}
+export default meta
+type Story = StoryObj
+
+const Rule = ({
+  title, note, children,
+}: {
+  title: string; note?: string; children: React.ReactNode
+}) => (
+  <div className="mb-14">
+    <h3 className="text-body font-bold text-foreground mb-1">{title}</h3>
+    {note && <p className="text-caption text-fg-muted mb-5 max-w-[720px] leading-relaxed">{note}</p>}
+    <div className="flex flex-col gap-3 max-w-md">{children}</div>
+  </div>
+)
+
+const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }) => (
+  <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
+)
+
+export const DecisionNodeRule: Story = {
+  name: '決策節點（需對比評估）',
+  render: () => {
+    const [payment, setPayment] = React.useState('credit')
+    const [plan, setPlan] = React.useState('pro')
+    return (
+      <div>
+        <Rule
+          title="RadioGroup 的 sweet spot — 使用者需對比所有選項才能決定"
+          note="付款方式、訂閱方案、票種、權限角色——選項需要閱讀 description(價格、手續費、權限範圍)才能下決定。RadioGroup 全露選項 + 支援 description"
+        >
+          <RadioGroup value={payment} onValueChange={setPayment}>
+            <RadioGroupItem value="credit" label="信用卡" description="手續費 2.5%,即時入帳" />
+            <RadioGroupItem value="bank" label="銀行轉帳" description="無手續費,1-2 個工作日" />
+            <RadioGroupItem value="cash" label="貨到付款" description="手續費 NT$30,到貨時付" />
+          </RadioGroup>
+          <Label>↑ 付款方式必須看完手續費 / 處理時間才能決定 → 全露選項</Label>
+        </Rule>
+
+        <Rule
+          title="訂閱方案 — description 承載 feature 差異"
+          note="方案比較需要看到每個方案的 features + 價格。RadioGroup 的 label + description 可以清楚列出,Select 下拉藏起來會失去比較能力"
+        >
+          <RadioGroup value={plan} onValueChange={setPlan}>
+            <RadioGroupItem
+              value="basic"
+              label="Basic · NT$99/月"
+              description="5 個專案、2 GB 儲存空間、基本支援"
+            />
+            <RadioGroupItem
+              value="pro"
+              label="Pro · NT$299/月"
+              description="無限專案、50 GB 儲存空間、優先支援、進階分析"
+            />
+            <RadioGroupItem
+              value="enterprise"
+              label="Enterprise · 聯絡我們"
+              description="客製化配額、專屬客戶經理、SSO / SAML 整合"
+            />
+          </RadioGroup>
+          <Label>↑ 方案比較必須看 features 才能決策 → RadioGroup 全露 + description</Label>
+        </Rule>
+      </div>
+    )
+  },
+}
+
+export const VsSelectRule: Story = {
+  name: '與 Select 的分界',
+  render: () => {
+    const [status, setStatus] = React.useState('in_stock')
+    return (
+      <div>
+        <Rule
+          title="❌ label 自帶語意 + 空間受限：用 Select"
+          note="「庫存狀態」「類別」這類 label 本身夠清楚、使用者知道要選什麼 → Select 下拉節省空間。RadioGroup 全露反而浪費垂直空間"
+        >
+          <RadioGroup value={status} onValueChange={setStatus}>
+            <RadioGroupItem value="in_stock" label="In stock" />
+            <RadioGroupItem value="low_stock" label="Low stock" />
+            <RadioGroupItem value="out_of_stock" label="Out of stock" />
+          </RadioGroup>
+          <Label warn>↑ 庫存狀態 label 自帶語意 → 用 Select 一格就夠,不需要 3 行 RadioGroup</Label>
+        </Rule>
+
+        <Rule
+          title="判斷三角度（完整 SSOT 在 Select spec）"
+          note="1. Progressive disclosure 成本(Select 藏 vs RadioGroup 露)2. 視覺重量(O(1) vs O(n))3. 評估深度(使用者需對比嗎)。完整對照詳見 select.spec.md「與 RadioGroup 的分界」"
+        >
+          <Label>SSOT owner: Select spec(通用預設元件 own 此比較)</Label>
+        </Rule>
+
+        <Rule
+          title="Fallback heuristic"
+          note="「使用者看一眼 label 就能下決定嗎？」能 → Select;不能、需要閱讀 description → RadioGroup"
+        >
+          <Label>灰色地帶時用這句話判斷</Label>
+        </Rule>
+      </div>
+    )
+  },
+}
+
+export const MustBeInGroupRule: Story = {
+  name: 'Radio 不可單獨使用',
+  render: () => {
+    const [accept, setAccept] = React.useState('yes')
+    return (
+      <div>
+        <Rule
+          title="Radio 必須在 RadioGroup 內（TS 層強制）"
+          note="Radio 的語意是「從 N 個選項選一個」——N ≥ 2 才有意義。單個 Radio 無法表達互斥選擇,若只是 yes/no 用 Checkbox 或 Switch"
+        >
+          <RadioGroup value={accept} onValueChange={setAccept}>
+            <RadioGroupItem value="yes" label="我同意" />
+            <RadioGroupItem value="no" label="我不同意" />
+          </RadioGroup>
+          <Label>↑ yes/no 的 RadioGroup 是合法的(兩個互斥選項),但常見場景用 Checkbox(「我同意」)更輕</Label>
+        </Rule>
+
+        <Rule
+          title="❌ 單個 Radio 假裝 Checkbox"
+          note="想用「radio 形狀」當勾選提示 → 錯。Radio 的視覺是「從多選一」的承諾,單個不符合這個語意"
+        >
+          <Label warn>單個同意框用 Checkbox,不用 Radio 假裝</Label>
+        </Rule>
+
+        <Rule
+          title="RadioGroup 必須有 default value"
+          note="Radio 的語意不允許「都沒選」——沒有預設值使用者看到一組全空的 radio 會困惑「我要選什麼」。必須指定 defaultValue 或 value"
+        >
+          <Label>若真的「可以不選」（選填）→ 用 Select + clearable 或 Checkbox stack</Label>
+        </Rule>
+      </div>
+    )
+  },
+}
