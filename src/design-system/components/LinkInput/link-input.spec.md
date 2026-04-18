@@ -2,7 +2,27 @@
 
 ## 定位
 
-LinkInput 是 URL 輸入與顯示元件。外觀基於 Input，但 value 以藍色連結樣式呈現，可直接點擊開啟。
+LinkInput 是 **URL 的**輸入與顯示元件。外觀基於 Input，但 value 以藍色連結樣式呈現，可直接點擊開啟。核心互動差異：**點擊 value 是開啟連結，不是進入編輯**。
+
+共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 LinkInput 特有的原則。
+
+---
+
+## 何時用
+
+- **需要儲存的外部 URL**：網站連結、文件 URL、repo 地址、社群連結
+- **顯示時使用者希望直接點開**：在 readonly / table cell / 設定頁可點擊開啟
+- **需要 URL 格式驗證**（blur 時驗證 protocol + 結構）
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 純字串 slug（`my-project-name`）| `Input` | 不是完整 URL，不需驗證 protocol 與點擊開啟 |
+| Email 地址 | `Input` + `type="email"` | Email 不是 URL,`mailto:` 點擊體驗取決於 OS 設定,非核心需求 |
+| 內部 React Router 路徑 | `Input`（或自訂元件）| Router 路徑不是絕對 URL,LinkInput 的 protocol 驗證會 false reject |
+| Markdown 連結（顯示文字 + URL）| 自訂編輯器 | LinkInput 只處理 URL value,不處理 display text 搭配 |
+| URL 清單（多個 URL）| 多個 LinkInput 或自訂清單元件 | 單一 LinkInput 一次一個 URL |
 
 ---
 
@@ -56,3 +76,11 @@ URL 格式要求：必須包含 `http://` 或 `https://` protocol。
 - ❌ 不在 link 狀態下讓點擊 value 進入編輯——點擊連結必須開啟連結
 - ❌ 不在打字過程中即時驗證格式——等 blur
 - ❌ 不省略 protocol（http/https）驗證——裸 domain 不是合法 URL
+
+---
+
+## 相關
+
+- `../Input/input.spec.md` — 純文字 / slug / email 等非 URL 場景
+- `../Field/field-controls.spec.md` — Field Control 共用規則（mode / size / endAction / error）
+- `../Field/form-validation.spec.md` — blur 驗證標準
