@@ -218,7 +218,7 @@ export const FullWidthRule: Story = {
               <SegmentedControlItem value="week">週</SegmentedControlItem>
               <SegmentedControlItem value="month">月</SegmentedControlItem>
             </SegmentedControl>
-            <div className="h-5 w-px bg-border" />
+            <div className="h-5 w-px bg-divider" />
             <span className="text-body text-fg-muted">其他工具列元素…</span>
           </div>
           <Label>↑ 這裡若 fullWidth 會搶走同行其他元素的空間</Label>

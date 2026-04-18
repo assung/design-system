@@ -330,7 +330,7 @@ TreeItem 右側的 `actions` slot **只在 hover 該列時出現**(opacity 0 →
 
 - Icon 尺寸:跟 TreeView size 的 icon tier 一致(16/16/20 @ sm/md/lg)
 - 色彩:`fg-muted`,hover `foreground`
-- Hover 背景:`neutral-hover`,rounded-sm
+- Hover 背景:`neutral-hover`,rounded-md
 - 每個 action 之間:`gap-2`(8px,跟 Select 的 clear X ↔ ChevronDown 間距一致)
 - 包在 `h-[1lh]` 容器裡,對齊 label 第一行
 

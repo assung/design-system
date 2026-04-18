@@ -28,7 +28,7 @@ const STATES: StateKey[] = ['default', 'hover', 'selected', 'disabled']
 const SINGLE_TOKEN_MAP: Record<StateKey, ColorSpec> = {
   default:  { bg: 'transparent',     text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
   hover:    { bg: '--neutral-hover', text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
-  selected: { bg: '--neutral-active',text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
+  selected: { bg: '--neutral-selected',text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
   disabled: { bg: 'transparent',     text: '--fg-disabled',icon: '--fg-disabled', desc: '--fg-disabled' },
 }
 
@@ -103,10 +103,10 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
   const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
   if (value === 'transparent') {
-    return <span className={`${s} rounded-sm shrink-0 border border-border`}
+    return <span className={`${s} rounded-md shrink-0 border border-border`}
       style={{ backgroundImage: 'linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%)', backgroundSize: '6px 6px', backgroundPosition: '0 0,3px 3px' }} />
   }
-  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
+  return <span className={`${s} rounded-md shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
 }
 
 const TokenAnnotation = ({ colors }: { colors: ColorSpec }) => (
@@ -252,22 +252,6 @@ export const Overview = {
         </div>
       </div>
 
-      {/* searchIn rules */}
-      <div className="flex flex-col gap-3">
-        <H3>搜尋行為（searchIn）</H3>
-        <Desc>搜尋框位置由選擇模式決定，影響選後行為。</Desc>
-        <div className="overflow-x-auto">
-          <table className="border-collapse text-caption">
-            <thead><tr><Th>模式</Th><Th>searchIn 預設</Th><Th>選了之後</Th><Th>原因</Th></tr></thead>
-            <tbody>
-              <tr><Td>單選</Td><Td mono>trigger（不可覆寫）</Td><Td>關閉浮層</Td><Td>選完就結束</Td></tr>
-              <tr><Td>多選</Td><Td mono>menu</Td><Td>關鍵字保留，繼續勾選</Td><Td>搜一個詞，勾多個相關項</Td></tr>
-              <tr><Td>多選 + searchIn=trigger</Td><Td mono>trigger</Td><Td>關鍵字清除</Td><Td>一個一個挑不同類型</Td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       {/* Props */}
       <div className="flex flex-col gap-3">
         <H3>Props</H3>
@@ -282,11 +266,14 @@ export const Overview = {
                 ['avatar', 'AvatarData', '—', '左側頭像資料（{ src?, alt, color? }），元件內部渲染 Avatar。與 startIcon 互斥'],
                 ['checkbox', 'boolean', 'false', '顯示 checkbox（多選模式）'],
                 ['checked', "boolean | 'indeterminate'", 'false', 'checkbox 選中狀態'],
-                ['selected', 'boolean', 'false', '單選選中（bg-neutral-active 背景）'],
+                ['selected', 'boolean', 'false', '單選選中（bg-neutral-selected 背景）'],
                 ['tag', 'ReactNode', '—', '後綴 Tag，靠右對齊'],
                 ['disabled', 'boolean', 'false', '停用，所有子元素統一 fg-disabled'],
                 ['header', 'boolean', 'false', '群組標題，不可選不可 hover'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '尺寸，對齊 field-height token'],
+                ['endContent', 'ReactNode', '—', '後綴自訂內容（DropdownMenu 的 badge/endIcon/shortcut 經由此注入）'],
+                ['labelMaxLines', "number | 'none'", '1', '標籤最大行數，'none' 不截斷'],
+                ['descMaxLines', "number | 'none'", '2', '描述最大行數，'none' 不截斷'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -421,7 +408,7 @@ const InspectorInner = () => {
                 ...(hasTag ? [{ c: Z.suffix, l: 'Suffix' }] : []),
               ].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
+                  <span className="w-2.5 h-2.5 rounded-md" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
                   <span className="font-medium" style={{ color: c.text }}>{l}</span>
                 </span>
               ))}
@@ -521,7 +508,7 @@ const InspectorInner = () => {
           {/* SELECTION */}
           <div className="px-4 py-1 pb-3">
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Selection</span></div>
-            <PropRow label="模式">{isMulti ? 'Checkbox 勾選' : 'bg-neutral-active 背景'}</PropRow>
+            <PropRow label="模式">{isMulti ? 'Checkbox 勾選' : 'bg-neutral-selected 背景'}</PropRow>
             <PropRow label="選後行為">{isMulti ? '不關閉浮層' : '關閉浮層'}</PropRow>
           </div>
         </div>
@@ -553,12 +540,12 @@ export const ColorMatrix = {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
         <H3>State 色彩對照</H3>
-        <Desc>單選用 bg-neutral-active 背景指示選中，多選用 Checkbox 勾選——背景不變。disabled 時所有元素統一 fg-disabled。色塊即時渲染，切 dark mode 自動更新。</Desc>
+        <Desc>單選用 bg-neutral-selected 背景指示選中，多選用 Checkbox 勾選——背景不變。disabled 時所有元素統一 fg-disabled。色塊即時渲染，切 dark mode 自動更新。</Desc>
       </div>
 
       {/* Single-select */}
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">單選（selected = bg-neutral-active）</span>
+        <span className="text-caption font-medium text-fg-secondary">單選（selected = bg-neutral-selected）</span>
         <div className="overflow-x-auto">
           <table className="border-collapse">
             <thead><tr><Th>State</Th><Th>預覽</Th><Th>Token</Th></tr></thead>

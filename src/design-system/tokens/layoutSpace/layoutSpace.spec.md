@@ -1,5 +1,7 @@
 # Layout Space Spec
 
+Layout Space 定義頁面與容器的巨觀間距 token，隨 density 自動縮放。
+
 頁面結構間距，隨 `data-density`（或 `data-layout-space`）切換。
 
 ## Token 表

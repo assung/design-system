@@ -3,12 +3,12 @@
 :root {
   --layout-space-loose:  16px;
   --layout-space-tight:  12px;
-  --layout-space-bottom: 48px;
+  --layout-space-bottom: 48px; /* intentionally fixed — same in md and lg density (see spec) */
 }
 
 [data-layout-space="lg"],
 [data-density="lg"] {
   --layout-space-loose:  24px;
   --layout-space-tight:  16px;
-  --layout-space-bottom: 48px;
+  --layout-space-bottom: 48px; /* intentionally fixed — same in md and lg density (see spec) */
 }

@@ -331,20 +331,23 @@ export const Interactive: Story = {
 
       {/* Ghost */}
       <div>
-        <SectionLabel>Neutral Interaction — 低調互動背景（list row、tree node）</SectionLabel>
+        <SectionLabel>Neutral Interaction — Default family（hover/active）+ Selected family（持續選中）</SectionLabel>
         <div className="mt-3 space-y-1">
           {[
-            { label: '正常狀態（無背景）', bg: 'transparent',              token: '' },
-            { label: 'Hover 狀態',         bg: 'var(--neutral-hover)',      token: 'bg-neutral-hover' },
-            { label: 'Active / Selected',   bg: 'var(--neutral-active)',     token: 'bg-neutral-active' },
-            { label: 'Disabled 狀態',      bg: 'var(--bg-disabled)',        token: 'bg-disabled' },
+            { label: '正常狀態（無背景）', bg: 'transparent',                    token: '' },
+            { label: 'Hover 回饋',         bg: 'var(--neutral-hover)',        token: 'bg-neutral-hover' },
+            { label: 'Active 回饋（:active click）', bg: 'var(--neutral-active)', token: 'bg-neutral-active' },
+            { label: 'Selected 持續選中',   bg: 'var(--neutral-selected)',     token: 'bg-neutral-selected' },
+            { label: 'Selected + Hover',    bg: 'var(--neutral-selected-hover)', token: 'bg-neutral-selected-hover' },
+            { label: 'Selected + Active',   bg: 'var(--neutral-selected-active)', token: 'bg-neutral-selected-active' },
+            { label: 'Disabled 狀態',      bg: 'var(--bg-disabled)',          token: 'bg-disabled' },
           ].map(({ label, bg, token }) => (
             <div
               key={label}
               className="flex items-center gap-3 rounded-md px-3 py-2 text-body"
               style={{ background: bg }}
             >
-              <span className="h-4 w-4 shrink-0 rounded-md bg-[var(--neutral-active)]" />
+              <span className="h-4 w-4 shrink-0 rounded-md bg-[var(--fg-disabled)]" />
               <span className="flex-1 text-fg-disabled">{label}</span>
               {token && <code className="text-caption text-fg-muted">{token}</code>}
             </div>

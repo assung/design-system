@@ -1,7 +1,8 @@
 import * as React from 'react'
+import type { FieldMode } from './field-types'
 
 // ── Types ──
-export type FieldMode = 'edit' | 'readonly' | 'disabled'
+export type { FieldMode }
 export type FieldOrientation = 'vertical' | 'horizontal'
 export type FieldSize = 'sm' | 'md' | 'lg'
 export type FieldControlLayout = 'inline' | 'block'

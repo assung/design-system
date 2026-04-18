@@ -8,8 +8,6 @@
 @import "./design-system/tokens/opacity/opacity.css";
 @import "./design-system/components/DataTable/data-table.css";
 
-@custom-variant dark (&:is(.dark *));
-
 /* ── Icon stroke width（全域 lucide 預設）── */
 .lucide { stroke-width: 1.75; }
 

@@ -399,7 +399,6 @@ const FieldDescription = React.forwardRef<
 >(({ className, children, id: idProp, ...props }, ref) => {
   const ctx = useFieldContext()
   const disabled = ctx?.disabled ?? false
-  const size: FieldSize = ctx?.size ?? 'md'
 
   return (
     <p
@@ -426,7 +425,6 @@ const FieldError = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, id: idProp, ...props }, ref) => {
   const ctx = useFieldContext()
-  const size: FieldSize = ctx?.size ?? 'md'
 
   // 無內容不渲染，避免空殼佔位
   if (children == null || children === false || children === '') return null

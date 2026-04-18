@@ -34,7 +34,7 @@ item-layout 4-slot：
 ```
 
 - Icon: 16px，`h-[1lh]` inline 對齊 first line
-- Dismiss X: inline action pattern（16px icon / 18px hover bg / rounded-sm）
+- Dismiss X: inline action pattern（16px icon / 18px hover bg / rounded-md）
 - endContent: 通常放 `<Button variant="tertiary" size="xs">`
 
 ## Variant

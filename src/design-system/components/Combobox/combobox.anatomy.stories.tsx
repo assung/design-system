@@ -123,10 +123,10 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
   const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
   if (value === 'transparent' || value === '—') {
-    return <span className={`${s} rounded-sm shrink-0 border border-border`}
+    return <span className={`${s} rounded-md shrink-0 border border-border`}
       style={{ backgroundImage: 'linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%)', backgroundSize: '6px 6px', backgroundPosition: '0 0,3px 3px' }} />
   }
-  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
+  return <span className={`${s} rounded-md shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
 }
 
 const TokenAnnotation = ({ colors }: { colors: ColorSpec }) => (
@@ -418,7 +418,7 @@ const InspectorInner = () => {
                 { c: Z.icon, l: 'chevron / clear' },
               ].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
+                  <span className="w-2.5 h-2.5 rounded-md" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
                   <span className="font-medium" style={{ color: c.text }}>{l}</span>
                 </span>
               ))}
@@ -877,7 +877,7 @@ export const StateBehavior = {
           </div>
           <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
             <span>Tag dismiss = Tag 元件的 onDismiss prop，按鈕由 Tag 內部渲染</span>
-            <span>dismiss icon: 16px X，hover bg: 18px rounded-sm neutral-hover</span>
+            <span>dismiss icon: 16px X，hover bg: 18px rounded-md neutral-hover</span>
             <span>readonly / disabled 的 Tag 沒有 dismiss 按鈕</span>
           </div>
         </div>

@@ -413,10 +413,11 @@
   --color-red-9:  oklch(from var(--color-red-6) calc(l + (1 - l) * 0.58) calc(c * 0.35) h);
   --color-red-10: oklch(from var(--color-red-6) calc(l + (1 - l) * 0.75) calc(c * 0.14) h);
 
-  /* Elevation */
-  --elevation-100:        0 8px  16px var(--black-a37);
-  --elevation-100-hover: 0 8px  16px var(--black-a45);
-  --elevation-200:        0 16px 32px var(--black-a45);
-  --elevation-200-hover: 0 16px 32px var(--black-a65);
+  /* Elevation — dark mode 陰影是輔助信號（主信號是 surface color）
+     遞進：a09 → a15 → a25 → a45（步進 ×1.67 一致，dark 最輕 = light 最重，自然 mode shift） */
+  --elevation-100:        0 8px  16px var(--black-a09);
+  --elevation-100-hover: 0 8px  16px var(--black-a15);
+  --elevation-200:        0 16px 32px var(--black-a25);
+  --elevation-200-hover: 0 16px 32px var(--black-a45);
 
 }

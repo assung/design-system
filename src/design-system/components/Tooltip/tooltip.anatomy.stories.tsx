@@ -38,10 +38,10 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
   const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
   if (value === 'transparent') {
-    return <span className={`${s} rounded-sm shrink-0 border border-border`}
+    return <span className={`${s} rounded-md shrink-0 border border-border`}
       style={{ backgroundImage: 'linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%)', backgroundSize: '6px 6px', backgroundPosition: '0 0,3px 3px' }} />
   }
-  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
+  return <span className={`${s} rounded-md shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
 }
 
 const Tab = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
@@ -239,7 +239,7 @@ const InspectorInner = () => {
             <div className="flex items-center gap-4 text-[10px]">
               {[{ c: Z.pad, l: '水平內距' }, { c: Z.content, l: '文字' }, { c: Z.gap, l: '垂直內距' }].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
+                  <span className="w-2.5 h-2.5 rounded-md" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
                   <span className="font-medium" style={{ color: c.text }}>{l}</span>
                 </span>
               ))}

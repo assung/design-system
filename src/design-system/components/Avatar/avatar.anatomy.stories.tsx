@@ -85,7 +85,7 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 
 const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
   const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
-  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
+  return <span className={`${s} rounded-md shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
 }
 
 const Tab = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
@@ -274,7 +274,7 @@ const InspectorInner = () => {
             <div className="flex items-center gap-4 text-[10px]">
               {[{ c: Z.container, l: '容器' }, { c: Z.content, l: '內容' }].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
+                  <span className="w-2.5 h-2.5 rounded-md" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
                   <span className="font-medium" style={{ color: c.text }}>{l}</span>
                 </span>
               ))}

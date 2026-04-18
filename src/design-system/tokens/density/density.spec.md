@@ -1,5 +1,7 @@
 # Density Spec
 
+Density 透過 `data-density` attribute 統一控制 UI Size 和 Layout Space，提供 md / lg 兩種密度模式。
+
 `data-density` 統一控制 **UI Size**（元件高度 / 內距）與 **Layout Space**（版面間距），一個 attribute 切換整個介面密度。
 
 詳細 token 數值見各自的 spec：

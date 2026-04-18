@@ -56,7 +56,7 @@ interface ConsumerPreset {
 /** Consumer tab 顯示名(情境導向,不用元件名) */
 const CONSUMER_DISPLAY: Record<ConsumerKey, { tab: string; sub: string }> = {
   MenuItem: { tab: '選單', sub: 'MenuItem · 浮層內快速掃視' },
-  SelectionItem:  { tab: '表單選項', sub: 'SelectionItem · Checkbox / Radio' },
+  SelectionItem:  { tab: '表單選項', sub: 'SelectionItem · Checkbox / RadioGroup' },
   ListItem:       { tab: '列表', sub: 'ListItem · 頁面內瀏覽' },
 }
 
@@ -81,7 +81,7 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
   },
   SelectionItem: {
     label: 'SelectionItem',
-    desc: '表單 Checkbox / Radio',
+    desc: '表單 Checkbox / RadioGroup',
     mode: 'reading',
     py: '(field-height − 一行文字高度) / 2',
     pyDesc: '單行 = field-height',
@@ -168,10 +168,10 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
   const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
   if (value === 'transparent') {
-    return <span className={`${s} rounded-sm shrink-0 border border-border`}
+    return <span className={`${s} rounded-md shrink-0 border border-border`}
       style={{ backgroundImage: 'linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%)', backgroundSize: '6px 6px', backgroundPosition: '0 0,3px 3px' }} />
   }
-  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
+  return <span className={`${s} rounded-md shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
 }
 
 const Tab = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
@@ -563,7 +563,7 @@ const InspectorInner = () => {
                 ...(effectiveHasSuffix ? [{ c: Z.suffix, l: 'Suffix' }] : []),
               ].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-sm" style={{ background: c.bg, border: `1.5px dashed ${c.border}` }} />
+                  <span className="w-3 h-3 rounded-md" style={{ background: c.bg, border: `1.5px dashed ${c.border}` }} />
                   <span className="font-medium" style={{ color: c.text }}>{l}</span>
                 </span>
               ))}
@@ -1105,7 +1105,7 @@ export const ReadingModes = {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-caption font-semibold text-foreground">閱讀模式（Reading）</span>
-            <span className="text-[11px] text-fg-muted">頁面 / 表單 — SelectionItem (Checkbox/Radio)</span>
+            <span className="text-[11px] text-fg-muted">頁面 / 表單 — SelectionItem (Checkbox/RadioGroup)</span>
           </div>
           {SIZES.map((sz) => (
             <div key={sz} className="flex items-start gap-3">

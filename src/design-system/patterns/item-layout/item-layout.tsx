@@ -101,7 +101,7 @@ export function getUniformPrefixSlotStyle(size: RowSize): React.CSSProperties {
 /**
  * Inline action(suffix 裡的 hover-action icon button)hover 背景尺寸(px)。
  * 規則:icon size + 2px(每邊 +1px,用 absolute positioning 溢出不影響排版)。
- * 對齊 `uiSize.spec.md` 的 inline action 規則。
+ * 對齊 `item-layout.spec.md`「Inline Action 設計規格」節。
  */
 export const INLINE_ACTION_HOVER_BG_SIZE: Record<RowSize, number> = {
   sm: 18,
@@ -284,13 +284,13 @@ ItemAvatar.displayName = "ItemAvatar"
 // ── Inline action (suffix slot) ───────────────────────────────────────────
 //
 // 共用 row-primitive 的 suffix inline action 渲染——消除過去 Input / NumberInput /
-// Tag / LinkField / Combobox 各自複製 18 行 JSX 的狀況(見 `uiSize.spec.md`
-// 「Inline Action」節)。
+// Tag / LinkInput / Combobox 各自複製 18 行 JSX 的狀況(見 `item-layout.spec.md`
+// 「Inline Action 設計規格」節)。
 //
-// 規格(完全對齊 uiSize.spec.md):
+// 規格(完全對齊 item-layout.spec.md「Inline Action 設計規格」節):
 // - Icon 尺寸 = ICON_SIZE[rowSize]      (16/16/20)
 // - Hover bg 尺寸 = icon + 2            (18/18/22,INLINE_ACTION_HOVER_BG_SIZE)
-// - Hover bg 圓角 = rounded-sm (sm/md)/ rounded-md (lg)
+// - Hover bg 圓角 = rounded-md (sm/md)/ rounded-md (lg)
 // - Icon 顏色:fg-muted → foreground on hover/active
 // - 必須 <button type="button">,aria-label = label,Tooltip(同 label)
 // - cursor-pointer
@@ -305,7 +305,7 @@ export type { InlineActionConfig }
 // 自動從 `RowSizeContext` 查:
 //   - 寬高 = ICON_SIZE[size]
 //   - Hover bg 尺寸 = INLINE_ACTION_HOVER_BG_SIZE[size]
-//   - Hover bg 圓角 = rounded-sm (sm/md) / rounded-md (lg)
+//   - Hover bg 圓角 = rounded-md (sm/md) / rounded-md (lg)
 //   - Icon color = fg-muted → foreground on hover/active
 //
 // 接受任何 button props 並 spread(讓 Radix Slot 可以 merge onClick / data-state 等)
@@ -352,7 +352,7 @@ export const ItemInlineActionButton = React.forwardRef<
         aria-hidden
         className={cn(
           "absolute pointer-events-none",
-          size === "lg" ? "rounded-md" : "rounded-sm",
+          "rounded-md",
           "bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active",
           "transition-colors"
         )}
@@ -381,7 +381,7 @@ ItemInlineActionButton.displayName = "ItemInlineActionButton"
 
 export interface ItemInlineActionProps {
   action: InlineActionConfig
-  /** Size 覆寫(見 `ItemInlineActionButtonProps.size`)——fields/Tag 必傳 */
+  /** Size 覆寫(見 `ItemInlineActionButtonProps.size`)——Field Controls / Tag 必傳 */
   size?: RowSize
 }
 
@@ -409,7 +409,7 @@ ItemInlineAction.displayName = "ItemInlineAction"
 // `<ItemSuffix>` — row primitive 的 suffix 容器。對齊 item-layout spec:
 // - `h-[1lh]`:suffix 永遠對齊第一行 label(跟 prefix 解耦)
 // - `ml-auto`:靠右
-// - `gap-2`:多個 inline action 之間的標準間距(uiSize.spec.md)
+// - `gap-2`:多個 inline action 之間的標準間距(item-layout.spec.md「Inline Action 設計規格」節)
 // - `hoverReveal` opt-in:opacity 0→1 on 父層 `group/menu-item` hover(TreeView 模式)
 
 export interface ItemSuffixProps extends React.HTMLAttributes<HTMLSpanElement> {

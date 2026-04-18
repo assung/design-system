@@ -1,6 +1,8 @@
 # Elevation Spec
 
-陰影系統。兩個層級對應兩種「浮起高度」，用 CSS 變數實現，light / dark mode 自動切換。
+Elevation 定義陰影層級，區分內容層（Card）和浮層（Modal/Popover）的視覺深度。
+
+兩個層級對應兩種「浮起高度」，用 CSS 變數實現，light / dark mode 自動切換。
 
 **不要用 Tailwind 的 `shadow-*`**，改用 CSS 變數：
 
@@ -49,7 +51,7 @@ elevation-100 < elevation-200，數字越大浮起越高。
 |---------|-----------|------|
 | Tooltip | 8px | TooltipContent 預設值 |
 | SelectMenu | 8px | PopoverContent sideOffset |
-| Dropdown | 8px | 未來元件 |
+| DropdownMenu | 8px | DropdownMenuContent sideOffset |
 | Popover | 8px | 通用浮層 |
 
 ## 浮層共用樣式

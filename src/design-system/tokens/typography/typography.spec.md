@@ -1,5 +1,7 @@
 # Typography Token Spec
 
+Typography 定義字體尺寸與行高的 token 系統，確保全系統文字層級一致。
+
 ## 設計原則
 
 Typography 由三個獨立維度組成，分開疊加：
@@ -99,3 +101,8 @@ Typography 由三個獨立維度組成，分開疊加：
 // ❌ 不要把 font-weight 寫死在外層容器（應在需要的元素上疊加）
 <section className="text-body font-medium">...</section>
 ```
+
+
+## 跨元件參考
+
+行高在 row 類元件中的應用（scanning vs reading 模式）詳見 `patterns/item-layout/item-layout.spec.md`「兩種閱讀模式」節。

@@ -155,10 +155,10 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
   const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
   if (value === 'transparent') {
-    return <span className={`${s} rounded-sm shrink-0 border border-border`}
+    return <span className={`${s} rounded-md shrink-0 border border-border`}
       style={{ backgroundImage: 'linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%)', backgroundSize: '6px 6px', backgroundPosition: '0 0,3px 3px' }} />
   }
-  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
+  return <span className={`${s} rounded-md shrink-0 border border-black/10`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
 }
 
 const TokenAnnotation = ({ colors }: { colors: ColorSpec }) => (
@@ -230,7 +230,7 @@ export const Overview = {
               <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                 style={{ borderColor: 'var(--info)', backgroundColor: 'var(--info-subtle)', color: 'var(--info)' }}>startIcon</span>
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">aspect-square · p-0 · 自動 tooltip</span>
+            <span className="text-[10px] text-fg-muted font-mono">px-[calc((h-icon)/2)] · 自然正方形 · 自動 tooltip</span>
           </div>
         </div>
       </div>
@@ -268,7 +268,7 @@ export const Overview = {
                 ['variant', "'primary'|'secondary'|'tertiary'|'text'|'link'", "'primary'", '視覺強調等級'],
                 ['danger', 'boolean', 'false', '套用紅色，與 variant 正交'],
                 ['pressed', 'boolean', '—', 'Toggle 按下狀態（aria-pressed + data-state），僅 secondary/tertiary/text 有視覺效果'],
-                ['size', "'xs'|'sm'|'md'|'lg'", "'sm'", '尺寸，xs 固定不縮放'],
+                ['size', "'xs'|'sm'|'md'|'lg'", "'md'", '尺寸，xs 固定不縮放'],
                 ['startIcon', 'LucideIcon', '—', '左側 icon，loading 時替換為 spinner'],
                 ['endIcon', 'LucideIcon', '—', '右側 icon（方向指示，如 ChevronDown）'],
                 ['badge', 'ReactNode', '—', '右側 badge（通知計數）'],
@@ -379,7 +379,7 @@ const InspectorInner = () => {
                 <div className="flex items-center gap-4 text-[10px]">
                   {[{ c: Z.pad, l: '左右內距' }, { c: Z.icon, l: 'Icon' }, { c: Z.gap, l: '元素間距' }, { c: Z.label, l: 'Label' }].map(({ c, l }) => (
                     <span key={l} className="inline-flex items-center gap-1">
-                      <span className="w-2.5 h-2.5 rounded-sm" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
+                      <span className="w-2.5 h-2.5 rounded-md" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
                       <span className="font-medium" style={{ color: c.text }}>{l}</span>
                     </span>
                   ))}
@@ -416,7 +416,7 @@ const InspectorInner = () => {
                 </div>
                 <div className="ml-3 flex flex-col gap-0.5">
                   <TkVal token={s.heightToken} value={s.height} />
-                  <span className="font-mono text-[10px] text-fg-muted">aspect-square · p-0 · min-w-0</span>
+                  <span className="font-mono text-[10px] text-fg-muted">px-[calc((h-icon)/2)] · 自然正方形 · min-w-0</span>
                 </div>
               </div>
             )}
@@ -444,8 +444,8 @@ const InspectorInner = () => {
             <PropRow label="高度" dot={Z.dim.text}><TkVal token={s.heightToken} value={s.height} /></PropRow>
             {iconOnly ? (
               <>
-                <PropRow label="寬度">aspect-square</PropRow>
-                <PropRow label="內距">p-0</PropRow>
+                <PropRow label="內距">px-[calc((h-icon)/2)]</PropRow>
+                <PropRow label="形狀">自然正方形（padding 推導）</PropRow>
                 <PropRow label="Min Width">min-w-0</PropRow>
               </>
             ) : (
@@ -570,7 +570,7 @@ export const SizeMatrix = {
         <table className="border-collapse text-caption">
           <thead><tr>
             <Th>屬性</Th>
-            {SIZES.map((sz) => <Th key={sz}>{sz}{sz === 'sm' ? '（預設）' : ''}</Th>)}
+            {SIZES.map((sz) => <Th key={sz}>{sz}{sz === 'md' ? '（預設）' : ''}</Th>)}
           </tr></thead>
           <tbody>
             {([
@@ -601,8 +601,8 @@ export const SizeMatrix = {
               <Td>iconOnly 覆寫</Td>
               {SIZES.map((sz) => (
                 <Td key={sz} mono>
-                  <div className="text-fg-secondary">aspect-square</div>
-                  <div className="text-fg-muted text-[10px]">p-0 · min-w-0</div>
+                  <div className="text-fg-secondary">px-[calc((h-icon)/2)]</div>
+                  <div className="text-fg-muted text-[10px]">自然正方形 · min-w-0</div>
                 </Td>
               ))}
             </tr>

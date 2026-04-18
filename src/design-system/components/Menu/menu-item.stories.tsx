@@ -5,7 +5,7 @@ import { Mail, Check, Circle, Star, Bell, Settings, Plus, Folder, FileText, BarC
 import { MenuItem, MenuGroup, MenuFooter } from './menu-item'
 
 const meta: Meta<typeof MenuItem> = {
-  title: 'Design System/Internal/Menu/MenuItem 展示',
+  title: 'Design System/Internal/Menu/展示',
   component: MenuItem,
   tags: ['!dev'],
   parameters: { layout: 'padded' },
@@ -27,9 +27,9 @@ export const Basic: Story = {
   name: '基本',
   render: () => (
     <MenuContainer><MenuGroup>
-      <MenuItem>選項一</MenuItem>
-      <MenuItem>選項二</MenuItem>
-      <MenuItem>選項三</MenuItem>
+      <MenuItem>收件匣</MenuItem>
+      <MenuItem>草稿</MenuItem>
+      <MenuItem>已傳送</MenuItem>
     </MenuGroup></MenuContainer>
   ),
 }

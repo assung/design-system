@@ -74,7 +74,7 @@ export const TabsVsSegmentedControl: Story = {
               <SegmentedControlItem value="list">清單</SegmentedControlItem>
               <SegmentedControlItem value="board">看板</SegmentedControlItem>
             </SegmentedControl>
-            <div className="h-5 w-px bg-border" />
+            <div className="h-5 w-px bg-divider" />
             <span className="text-body text-fg-muted">工具列其他控制項…</span>
           </div>
           <Label>↑ 同 toolbar 尺度，跟其他 control 並排。換成 Tabs 在這個位置會違和</Label>

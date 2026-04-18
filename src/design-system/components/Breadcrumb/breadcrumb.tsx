@@ -136,7 +136,7 @@ const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
           'hover:text-primary-hover',
           'transition-colors duration-150',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
-          'rounded-sm',
+          'rounded-md',
           className
         )}
         {...props}
@@ -228,7 +228,7 @@ const BreadcrumbEllipsis = React.forwardRef<HTMLButtonElement, BreadcrumbEllipsi
         className={cn(
           'inline-flex items-center text-fg-muted',
           'hover:text-primary-hover transition-colors duration-150',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded-sm',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded-md',
           className
         )}
         {...props}

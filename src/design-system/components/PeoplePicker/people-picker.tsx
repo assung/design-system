@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { PersonDisplay, MultiPersonDisplay, type PersonValue } from '@/design-system/components/DataTable/person-display'
+import { PersonDisplay, MultiPersonDisplay, type PersonValue } from './person-display'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

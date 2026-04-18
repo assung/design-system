@@ -261,11 +261,11 @@ export const HeightModes: Story = {
           <h3 className="text-body font-bold text-foreground mb-1">有約束</h3>
           <p className="text-caption text-fg-muted mb-3">height="300px"，兩張 table 在同樣的高度上限內。資料少時只佔內容高度，資料多時撐到上限後出現捲軸</p>
           <div className="grid grid-cols-2 gap-6">
-            <div className="bg-neutral-active rounded-lg p-4">
+            <div className="bg-muted rounded-lg p-4">
               <p className="text-footnote text-fg-muted mb-3">3 筆資料</p>
               <DataTable columns={baseColumns} data={sampleData.slice(0, 3)} height="300px" />
             </div>
-            <div className="bg-neutral-active rounded-lg p-4">
+            <div className="bg-muted rounded-lg p-4">
               <p className="text-footnote text-fg-muted mb-3">50 筆資料</p>
               <DataTable columns={baseColumns} data={manyRows} height="300px" />
             </div>

@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils'
  *
  * ── Icon: md tier ──
  * icon size: 16px（ICON_SIZE.md）
- * dismiss X: 16px icon, 18px hover bg, rounded-sm
+ * dismiss X: 16px icon, 18px hover bg, rounded-md
  */
 
 export type NoticeVariant = 'neutral' | 'info' | 'success' | 'warning' | 'error'
@@ -111,7 +111,7 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
               >
                 <span
                   aria-hidden
-                  className="absolute pointer-events-none rounded-sm bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active transition-colors"
+                  className="absolute pointer-events-none rounded-md bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active transition-colors"
                   style={{ width: 18, height: 18, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                 />
                 <X size={16} className="relative" aria-hidden />

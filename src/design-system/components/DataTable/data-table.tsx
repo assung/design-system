@@ -22,7 +22,7 @@ import { BooleanDisplay } from '@/design-system/components/Checkbox/boolean-disp
 import { SelectDisplay } from '@/design-system/components/Select/select'
 import { ComboboxDisplay } from '@/design-system/components/Combobox/combobox'
 import { DatePickerDisplay } from '@/design-system/components/DatePicker/date-picker'
-import { PersonDisplay, MultiPersonDisplay, type PersonValue } from './person-display'
+import { PersonDisplay, MultiPersonDisplay, type PersonValue } from '@/design-system/components/PeoplePicker/person-display'
 import { LinkInputDisplay } from '@/design-system/components/LinkInput/link-input'
 
 // ── Variants ─────────────────────────────────────────────────────────────────

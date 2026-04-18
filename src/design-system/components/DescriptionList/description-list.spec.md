@@ -5,7 +5,7 @@
 ## 定位
 
 - **是**：唯讀資訊展示（profile card 的欄位、detail panel 的屬性列表）
-- **不是**：表單輸入——需要編輯的 label + value 用 Field 系統（TextField / SelectField 等）
+- **不是**：表單輸入——需要編輯的 label + value 用 Field 系統（Input / Select 等）
 
 ## 結構
 

@@ -72,16 +72,21 @@ ButtonGroup.displayName = 'ButtonGroup'
  *   <Button variant="primary" danger size="sm" iconOnly startIcon={Trash2} aria-label="刪除" />
  * </ButtonGroup>
  */
-const ButtonDivider = ({ className }: { className?: string }) => (
+const ButtonDivider = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
   <div
-    aria-hidden
+    ref={ref}
+    role="separator"
     className={cn(
       'self-stretch w-px mx-1 my-1',
-      'bg-border',
+      'bg-divider',
       className,
     )}
+    {...props}
   />
-)
+))
 ButtonDivider.displayName = 'ButtonDivider'
 
 export { ButtonGroup, ButtonDivider }

@@ -12,7 +12,7 @@ import { ButtonGroup, ButtonDivider } from '@/design-system/components/Button/bu
 import { ItemInlineAction, type InlineActionConfig } from '@/design-system/patterns/item-layout/item-layout'
 
 const meta: Meta = {
-  title: 'Design System/Patterns/操作列',
+  title: 'Design System/Patterns/Action Bar',
   parameters: { layout: 'padded' },
 }
 export default meta

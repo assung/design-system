@@ -2,12 +2,7 @@ import type * as React from 'react'
 import type { LucideIcon } from 'lucide-react'
 
 // ── Field Mode ───────────────────────────────────────────────────────────────
-
 export type FieldMode = 'edit' | 'readonly' | 'disabled'
-
-// ── Inline Action ────────────────────────────────────────────────────────────
-// 宣告式 API：消費者只宣告 intent，host 根據 size tier 自動渲染。
-// 見 uiSize.spec.md 的 Inline Action 段落。Canonical 實作:`ItemInlineAction`。
 
 // ── Menu List Min Height ─────────────────────────────────────────────────────
 // SelectMenu / Select / Combobox 共用的 CommandList minHeight 計算。
@@ -26,6 +21,8 @@ export function getMenuListMinHeight(size: string, rows: number = 3): string {
 }
 
 // ── Inline Action ────────────────────────────────────────────────────────────
+// 宣告式 API：消費者只宣告 intent，host 根據 size tier 自動渲染。
+// Canonical 實作：`ItemInlineAction`（item-layout pattern）
 
 export interface InlineActionConfig {
   icon: LucideIcon

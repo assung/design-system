@@ -115,7 +115,7 @@ export const LineHeight: Story = {
         <code className="mb-2 block text-caption font-medium text-fg-secondary">
           text-body · leading-normal (1.5)
         </code>
-        <p className="text-body leading-normal rounded-md bg-[var(--neutral-hover)] p-4">
+        <p className="text-body leading-normal rounded-md bg-neutral-hover p-4">
           適合連續閱讀的段落內文。充足的行距讓眼睛在換行時容易找到下一行的起點，降低閱讀疲勞。
         </p>
       </div>
@@ -123,7 +123,7 @@ export const LineHeight: Story = {
         <code className="mb-2 block text-caption font-medium text-fg-secondary">
           text-body · leading-compact (1.3)
         </code>
-        <p className="text-body leading-compact rounded-md bg-[var(--neutral-hover)] p-4">
+        <p className="text-body leading-compact rounded-md bg-neutral-hover p-4">
           適合標題、截斷文字、不需要閱讀舒適度的短段落。視線不需在行間移動太多距離。
         </p>
       </div>

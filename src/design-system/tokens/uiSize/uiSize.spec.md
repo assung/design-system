@@ -73,9 +73,31 @@ Tag 有自己的尺寸定義（見 `tag.spec.md`），與 Field 的配對透過 
 
 ---
 
+## Tab Height
+
+Tabs 導覽容器的高度。獨立於 field-height 和 table-row——tabs 是 navigation container，需要比 form control 更大的呼吸感。數值目前與 table-row 對齊，但概念獨立，未來任何一方調整都不牽動另一方。
+
+| Token | md | lg | 消費者 |
+|-------|----|----|--------|
+| `--tab-height-sm` | 32px | 40px | Dialog / Sidebar 內的 dense tabs |
+| `--tab-height-md` | 40px | 48px | **預設**，頁面主要 tabs |
+| `--tab-height-lg` | 48px | 56px | Page-level hero tabs |
+
+Tailwind：`h-tab-sm` / `h-tab-md` / `h-tab-lg`。
+
+## Chrome Header Height
+
+應用程式 chrome 區域（Sidebar header、top bar）的高度。定義在 `globals.css`（不在 uiSize.css），因為它是佈局層級的 token，不是元件層級的。
+
+| Token | md | lg | 消費者 |
+|-------|----|----|--------|
+| `--chrome-header-height` | 48px | 56px | Sidebar header/footer、`--sidebar-width-icon` |
+
+---
+
 ## Inline Action
 
-詳見 `src/design-system/patterns/item-layout/item-layout.spec.md`「Inline Action 設計規格」節。
+詳見 `patterns/item-layout/item-layout.spec.md`「Inline Action 設計規格」節。
 
 ---
 

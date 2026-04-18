@@ -28,7 +28,7 @@ const ITEM_TOKEN_MAP: Record<'item' | 'checkbox', Record<StateKey, ColorSpec>> =
   item: {
     default:          { bg: '--surface-raised', text: '--foreground', border: 'transparent' },
     hover:            { bg: '--neutral-hover', text: '--foreground', border: 'transparent' },
-    'active/selected': { bg: '--neutral-active', text: '--foreground', border: 'transparent' },
+    'active/selected': { bg: '--neutral-selected', text: '--foreground', border: 'transparent' },
     disabled:         { bg: '--surface-raised', text: '--fg-disabled', border: 'transparent' },
   },
   checkbox: {
@@ -42,7 +42,7 @@ const ITEM_TOKEN_MAP: Record<'item' | 'checkbox', Record<StateKey, ColorSpec>> =
 const DANGER_ITEM_MAP: Record<StateKey, ColorSpec> = {
   default:          { bg: '--surface-raised', text: '--error', border: 'transparent' },
   hover:            { bg: '--neutral-hover', text: '--error', border: 'transparent' },
-  'active/selected': { bg: '--neutral-active', text: '--error', border: 'transparent' },
+  'active/selected': { bg: '--neutral-selected', text: '--error', border: 'transparent' },
   disabled:         { bg: '--surface-raised', text: '--fg-disabled', border: 'transparent' },
 }
 
@@ -62,7 +62,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
 }
 
 const ITEM_TYPE_DESC: Record<ItemTypeKey, string> = {
-  item: '執行一次性動作（複製、刪除），選完即關。selected=true 時作為單選項目（bg-neutral-active）',
+  item: '執行一次性動作（複製、刪除），選完即關。selected=true 時作為單選項目（bg-neutral-selected）',
   checkbox: '切換開關狀態（顯示/隱藏），選單保持開啟',
   subTrigger: '展開下一層選單，自動附加 ChevronRight',
   label: '群組標題，不可互動',
@@ -97,10 +97,10 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
   const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
   if (value === 'transparent') {
-    return <span className={`${s} rounded-sm shrink-0 border border-border`}
+    return <span className={`${s} rounded-md shrink-0 border border-border`}
       style={{ backgroundImage: 'linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%)', backgroundSize: '6px 6px', backgroundPosition: '0 0,3px 3px' }} />
   }
-  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
+  return <span className={`${s} rounded-md shrink-0 border border-black/10`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
 }
 
 const TokenAnnotation = ({ colors }: { colors: ColorSpec }) => (
@@ -239,7 +239,7 @@ export const Overview = {
                 ['Item', 'badge', 'ReactNode', '—', '後綴 Badge'],
                 ['Item', 'endIcon', 'LucideIcon', '—', '後綴指示 icon（fg-muted）'],
                 ['Item', 'shortcut', 'string', '—', '鍵盤快捷鍵'],
-                ['Item', 'selected', 'boolean', '—', '單選選中（bg-neutral-active）'],
+                ['Item', 'selected', 'boolean', '—', '單選選中（bg-neutral-selected）'],
                 ['SubTrigger', 'startIcon', 'LucideIcon', '—', '左側 icon'],
                 ['SubTrigger', 'value', 'string', '—', '子選單目前狀態文字（如 "深色"）'],
                 ['SubTrigger', 'badge', 'ReactNode', '—', '子選單狀態 badge'],
@@ -292,7 +292,7 @@ const InspectorInner = () => {
   const s = SIZE_SPECS[size]
 
   // Checkbox active/selected: bg stays --surface-raised (no bg change), checkbox shows checked
-  // Item active/selected: bg-neutral-active
+  // Item active/selected: bg-neutral-selected
   const colors = hasDanger
     ? DANGER_ITEM_MAP[state]
     : ITEM_TOKEN_MAP[itemMode === 'subTrigger' ? 'item' : itemMode][state]
@@ -379,7 +379,7 @@ const InspectorInner = () => {
                 ...(itemMode !== 'checkbox' ? [{ c: Z.suffix, l: 'Suffix' }] : []),
               ].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
+                  <span className="w-2.5 h-2.5 rounded-md" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
                   <span className="font-medium" style={{ color: c.text }}>{l}</span>
                 </span>
               ))}
@@ -473,7 +473,7 @@ const ItemPreview = ({ size, danger, state, icon: Icon, label, shortcut }: {
   size: SizeKey; danger: boolean; state: StateKey; icon: React.ComponentType<{ size: number; className?: string }>; label: string; shortcut?: string
 }) => {
   const iconPx = SIZE_SPECS[size].icon
-  const bgClass = state === 'hover' ? 'bg-neutral-hover' : state === 'active/selected' ? 'bg-neutral-active' : ''
+  const bgClass = state === 'hover' ? 'bg-neutral-hover' : state === 'active/selected' ? 'bg-neutral-selected' : ''
   const textClass = danger ? 'text-error' : state === 'disabled' ? 'text-fg-disabled' : ''
   const fontClass = size === 'lg' ? 'text-body-lg' : 'text-body'
   return (
@@ -585,7 +585,7 @@ export const ColorMatrix = {
                       <TokenAnnotation colors={ITEM_TOKEN_MAP[type][st]} />
                       {isCheckboxSelected && (
                         <div className="flex items-center gap-1 mt-1 text-[10px]">
-                          <span className="w-3 h-3 rounded-sm shrink-0 bg-primary border border-black/10" />
+                          <span className="w-3 h-3 rounded-md shrink-0 bg-primary border border-black/10" />
                           <span className="text-fg-muted">checkbox: bg-primary</span>
                         </div>
                       )}

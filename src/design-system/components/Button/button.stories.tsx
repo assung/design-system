@@ -27,7 +27,7 @@ const meta: Meta<typeof Button> = {
     size: {
       control: 'select',
       options: ['xs', 'sm', 'md', 'lg'],
-      description: '`xs` 固定尺寸；`sm`（預設）/ `md` / `lg` 會隨 density 自動縮放。',
+      description: '`xs` 固定尺寸；`sm` / `md`（預設）/ `lg` 會隨 density 自動縮放。',
     },
     startIcon: {
       control: false,
@@ -210,8 +210,8 @@ export const AllSizes: Story = {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end gap-3">
         <Button size="xs" startIcon={Plus}>xs（固定）</Button>
-        <Button size="sm" startIcon={Plus}>sm ← 預設</Button>
-        <Button size="md" startIcon={Plus}>md</Button>
+        <Button size="sm" startIcon={Plus}>sm</Button>
+        <Button size="md" startIcon={Plus}>md ← 預設</Button>
         <Button size="lg" startIcon={Plus}>lg</Button>
       </div>
       <div className="flex flex-wrap items-end gap-3">

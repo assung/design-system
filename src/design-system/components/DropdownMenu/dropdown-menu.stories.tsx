@@ -174,7 +174,7 @@ export const CheckboxItems: StoryObj = {
   render: () => <CheckboxDemo />,
 }
 
-// ── 單選（RadioGroup + selected + bg-neutral-active）──
+// ── 單選（RadioGroup + selected + bg-neutral-selected）──
 
 const RadioDemo = () => {
   const [sort, setSort] = useState('name')

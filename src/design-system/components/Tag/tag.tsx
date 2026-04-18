@@ -128,7 +128,7 @@ function TagDismiss({ onDismiss, label, solid, variant }: { onDismiss: () => voi
     >
       <span
         className={cn(
-          'absolute rounded-sm pointer-events-none transition-colors',
+          'absolute rounded-md pointer-events-none transition-colors',
           solidColors
             ? 'bg-transparent group-hover/action:bg-[var(--dismiss-hover)] group-active/action:bg-[var(--dismiss-active)]'
             : 'bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active',

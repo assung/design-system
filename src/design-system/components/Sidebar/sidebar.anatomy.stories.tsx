@@ -52,7 +52,7 @@ const TkVal = ({ token, value }: { token: string; value?: string }) => (
 
 const Swatch = ({ value }: { value: string }) => (
   <span
-    className="inline-block w-3 h-3 rounded-sm shrink-0 border border-black/10 align-middle mr-1.5"
+    className="inline-block w-3 h-3 rounded-md shrink-0 border border-black/10 align-middle mr-1.5"
     style={{ backgroundColor: `var(${value})` }}
   />
 )
