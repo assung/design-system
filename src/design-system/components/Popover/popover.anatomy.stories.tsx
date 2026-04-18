@@ -79,6 +79,7 @@ export const PlacementMatrix: Story = {
                   <PopoverContent side={side} align={align}>
                     <PopoverBody><div className="text-caption">side=<span className="font-mono">{side}</span>, align=<span className="font-mono">{align}</span></div></PopoverBody>
                   </PopoverContent>
+                  {/* each placement variant already wrapped in PopoverBody for consistent padding */}
                 </Popover>
               </div>
             ))

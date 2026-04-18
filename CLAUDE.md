@@ -406,6 +406,7 @@ src/
 │   │   │   └── form-validation.spec.md ← 表單驗證標準
 │   │   │
 │   │   │  其餘為 public-facing 元件，各有獨立資料夾
+│   │   │  （DatePicker/ 內含 calendar.tsx —— react-day-picker 包裝成本 DS token Calendar primitive）
 │   │   └── ...                        ← Alert, Avatar, Badge, Breadcrumb, Button, Checkbox,
 │   │                                     Chip, Combobox, DataTable, DatePicker, DescriptionList,
 │   │                                     Dialog, DropdownMenu, Empty, FileItem, Input, LinkInput,
@@ -416,7 +417,8 @@ src/
 │   └── patterns/                      ← 跨元件共用的佈局 / 互動公式
 │       ├── item-layout/               ← row primitive 共用規則（prefix + content 佈局）
 │       ├── action-bar/                ← 工具列 / 操作列排列規則
-│       └── horizontal-overflow/       ← 水平溢出處理（scroll arrows / menu trigger）
+│       ├── horizontal-overflow/       ← 水平溢出處理（scroll arrows / menu trigger）
+│       └── overlay-surface/           ← Dialog / Popover 共用 Header/Body/Footer primitive（padding SSOT）
 └── explorations/                      ← 未定案的 prototype 比稿
 ```
 
