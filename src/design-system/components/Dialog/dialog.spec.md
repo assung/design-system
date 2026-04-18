@@ -4,6 +4,8 @@
 
 Modal 對話框，基於 Radix Dialog。用於**需要使用者注意力、阻斷背景互動**的操作流程（建立、編輯、確認）。
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ---
 
 ## 何時用

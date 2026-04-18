@@ -5,6 +5,8 @@
 Tabs 用於在**同一個上下文底下切換平行的視圖**——每個 tab 對應一塊獨立內容區，同時只顯示一塊。
 基於 shadcn/ui Tabs（Radix Tabs），橋接設計系統 token。
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ---
 
 ## 何時用

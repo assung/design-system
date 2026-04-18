@@ -8,6 +8,8 @@
 
 預設只有 description——icon / title / action 全部可選。
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ---
 
 ## 何時用

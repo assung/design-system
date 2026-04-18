@@ -7,6 +7,8 @@
 - **是**：唯讀資訊展示（profile card 的欄位、detail panel 的屬性列表）
 - **不是**：表單輸入——需要編輯的 label + value 用 Field 系統（Input / Select 等）
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ---
 
 ## 何時用

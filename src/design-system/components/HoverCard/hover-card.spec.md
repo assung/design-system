@@ -9,6 +9,8 @@ Hover 觸發的**可互動浮層**，基於 Radix HoverCard。
 - **是**：hover 顯示可互動內容（按鈕、連結、可選取文字）的浮層容器
 - **不是**：Tooltip（純文字提示、不可互動、hover 離開即消失）
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ---
 
 ## 何時用

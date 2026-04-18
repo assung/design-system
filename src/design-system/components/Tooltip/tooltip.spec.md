@@ -5,6 +5,8 @@
 Tooltip 是 hover 或 focus 時出現的短文字提示，用於補充畫面上未能清楚傳達的資訊。
 基於 Radix Tooltip（shadcn 包裝）+ 橋接 DS token。
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ## 何時用
 
 Tooltip 的判斷標準是：**畫面上的資訊是否已經足夠讓使用者理解？**

@@ -7,6 +7,8 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 
 **Breadcrumb 是「你在哪裡」的指示器，不是「你可以去哪裡」的選單**——反映當前路徑，不是全部可能路徑。
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ---
 
 ## 何時用

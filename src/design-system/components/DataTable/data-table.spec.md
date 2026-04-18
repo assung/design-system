@@ -10,6 +10,8 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 
 **不是試算表**——不做公式計算、不做跨 cell 選取。
 
+**Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
+
 ---
 
 ## 何時用
