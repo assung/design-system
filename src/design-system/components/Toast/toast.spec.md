@@ -1,4 +1,4 @@
-# Toast
+# Toast 設計原則
 
 **非阻斷式浮動通知**——消費 Notice primitive + Sonner。
 

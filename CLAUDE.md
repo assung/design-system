@@ -78,21 +78,47 @@
 
 ## 命名前必查既有 pattern
 
-建立任何名稱前，**必須先 `ls` / `grep` 既有 pattern**，嚴格對齊不憑直覺。涵蓋：
+建立任何名稱前，**必須先 `ls` / `grep` 既有 pattern**，嚴格對齊不憑直覺。**本專案的命名慣例依類別而分，不是「全部 kebab-case」**——codify 世界級 DS 的分類慣例：
+
+### 檔案 / 資料夾
 
 | 類別 | 慣例 | 範例 |
 |------|------|------|
-| 檔案 / 資料夾 | kebab-case | `item-layout.tsx` / `item-layout/` |
-| React 元件 / Type | PascalCase | `ItemLayout` / `ItemLayoutProps` |
-| 函式 / hook / 本地變數 | camelCase | `useOverflow` / `itemCount` |
-| CSS custom property | `--kebab-case-with-purpose` | `--field-height-md` |
-| Tailwind class | 既有 utility 優先；自訂 kebab-case | `text-body-lg` |
-| Spec 章節標題 | 繁體中文（英術語例外）| 「何時用」、「禁止事項」；例外：Props / API / Token / CSS |
-| Story 變數名 | `{Concept}Rule`（principles）/ 簡短名詞（showcase） | `VariantRule` / `Modes` |
-| Pattern 資料夾 | kebab-case 名詞 pattern | `item-layout` / `action-bar` |
+| 元件資料夾 | PascalCase | `Button/`、`DatePicker/`、`NumberInput/` |
+| 元件檔案 | kebab-case | `button.tsx`、`date-picker.tsx`、`number-input.tsx` |
+| Pattern 資料夾 | kebab-case | `item-layout/`、`action-bar/`、`horizontal-overflow/` |
+| Pattern 檔案 | kebab-case（與資料夾同名） | `item-layout.tsx`、`action-bar.tsx` |
+| Hooks 資料夾 | lowercase | `hooks/` |
+| Hooks 檔案 | kebab-case（對齊 shadcn） | `use-is-mobile.ts`、`use-overflow-items.ts` |
+| Token 資料夾 | 單字 lowercase / 多字 camelCase | `color/`、`radius/`；`uiSize/`、`layoutSpace/` |
+| Token 檔案 | 與資料夾同名 | `color.css`、`uiSize.css`、`layoutSpace.spec.md` |
 
-**建立新類別時**（新資料夾、新 spec 類型、新 story 類型、新 pattern kind）：
-先在 CLAUDE.md 現有清單（「技術架構概覽」、「Story 三層定位」等）找相似類別的命名模式，沿用。**不自創新 suffix / prefix**。
+**分類原因**：
+- 元件 PascalCase folder + kebab-case file 是 shadcn / Chakra / Ant Design 共通做法——folder 對應 React 元件名（PascalCase），file 符合跨平台 filesystem 友善
+- Hooks 對齊 shadcn 的 kebab-case 慣例
+- Token 資料夾沿用 CSS `--token-name` 的多字構詞風格（單字不需要 case，多字用 camelCase 反映 `--uiSize` 概念整體）
+
+### 程式 identifier
+
+| 類別 | 慣例 | 範例 |
+|------|------|------|
+| React 元件 / TypeScript type | PascalCase | `ItemLayout`、`ItemLayoutProps` |
+| 函式 / hook / 本地變數 | camelCase | `useOverflow`、`itemCount` |
+| CSS custom property | kebab-case | `--field-height-md`、`--ui-size-24` |
+| Tailwind class | 既有 utility 優先；自訂 kebab-case | `text-body-lg` |
+
+### 文件內容
+
+| 類別 | 慣例 | 範例 |
+|------|------|------|
+| Spec 章節標題 | 繁體中文（約定俗成英文術語例外）| 「何時用」、「禁止事項」；例外：Props / API / Token / CSS |
+| Spec H1 標題 | `# {元件名} 設計原則` | `# Button 設計原則` |
+| Story 標題 path | `Design System/Components/{ComponentName}/{中文子頁}` | `Design System/Components/Button/設計原則` |
+| Story 變數名 | `{Concept}Rule`（principles）/ 簡短名詞（showcase） | `VariantRule`、`Modes` |
+
+### 建立新類別時
+
+先在 CLAUDE.md 現有清單（「技術架構概覽」、「Story 三層定位」、本節各表）找**相似類別**的命名模式，**沿用**，不自創新 suffix / prefix。例：新 pattern → kebab-case；新元件 → PascalCase folder + kebab-case file。
 
 ## 語言一致性（critical）
 

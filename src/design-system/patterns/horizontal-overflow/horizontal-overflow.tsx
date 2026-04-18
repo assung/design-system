@@ -5,7 +5,7 @@ import { Button } from '@/design-system/components/Button/button'
 import {
   useScrollEdges,
   useOverflowIndices,
-} from '@/design-system/hooks/useOverflowItems'
+} from '@/design-system/hooks/use-overflow-items'
 
 /**
  * Horizontal Overflow — canonical primitives + helpers

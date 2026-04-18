@@ -179,4 +179,4 @@ gap: 8px; /* gap-2 */
 - Button (`button.spec.md`) — Chip 內部結構對標的來源
 - SegmentedControl (`segmented-control.spec.md`) — compact 連體單選變體
 - Tag — 純顯示 / dismissible tag
-- `useOverflowItems` hook (`src/design-system/hooks/useOverflowItems.ts`) — scroll / menu 的共用追蹤邏輯，Tabs 也消費同一個 hook
+- `useOverflowItems` hook (`src/design-system/hooks/use-overflow-items.ts`) — scroll / menu 的共用追蹤邏輯，Tabs 也消費同一個 hook

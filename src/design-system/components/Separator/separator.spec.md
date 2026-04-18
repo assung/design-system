@@ -1,4 +1,4 @@
-# Separator
+# Separator 設計原則
 
 Separator 是語意分隔元件，用於標示內容群組之間的邊界。
 

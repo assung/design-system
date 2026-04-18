@@ -1,4 +1,4 @@
-# FileItem
+# FileItem 設計原則
 
 **檔案上傳列表項目**——顯示檔案名稱、上傳進度、狀態（uploading / completed / error）。
 

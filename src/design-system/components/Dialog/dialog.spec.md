@@ -1,4 +1,4 @@
-# Dialog
+# Dialog 設計原則
 
 Modal 對話框，基於 Radix Dialog。用於需要使用者注意力的操作流程（建立、編輯、確認），阻斷背景互動。
 

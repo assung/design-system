@@ -1,4 +1,4 @@
-# Spinner
+# Spinner 設計原則
 
 **載入中視覺 primitive**——整個設計系統唯一的 loading 旋轉圖示,任何要表達「進行中」的元件都從這裡消費。
 

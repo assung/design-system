@@ -1,4 +1,4 @@
-# Slider
+# Slider 設計原則
 
 **數值範圍選取器**——基於 Radix Slider primitive,橋接設計系統 token。
 

@@ -1,4 +1,4 @@
-# HoverCard
+# HoverCard 設計原則
 
 Hover 觸發的可互動浮層，基於 Radix HoverCard。純行為 primitive——只提供觸發邏輯、定位、動畫，不含視覺樣式。
 

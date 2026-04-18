@@ -201,7 +201,7 @@ Items 之間 `-ml-px`（除了第一個）讓相鄰 border 重疊、視覺上只
 
 ## 相關
 
-- Button（`button.spec.md`）——item 內部結構與 size 系統的來源
-- Tabs（`tabs.spec.md`）——切 view 而非切 value 的對照組
-- Field（`field.spec.md`）——SegmentedControl 作為 Field control 時的 size 繼承機制
-- Radio（`radio.spec.md`）——選項數量多、需要描述文字時的替代
+- `../Button/button.spec.md` — item 內部結構與 size 系統的來源
+- `../Tabs/tabs.spec.md` — container 切換 vs control 切換的判斷（完整分界 SSOT 在 Tabs spec「Tabs 與 SegmentedControl 的分界」段落）
+- `../Field/field-controls.spec.md` — SegmentedControl 作為 Field control 時的 size 繼承機制
+- `../Checkbox/checkbox.spec.md` — RadioGroup 共用規則（選項數量多或需要描述文字時的替代）

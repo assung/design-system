@@ -58,7 +58,7 @@
 
 ### Hook re-export
 
-為了消費者只 import 一處,本 module re-export `useScrollEdges` / `useOverflowIndices` from `hooks/useOverflowItems.ts`。
+為了消費者只 import 一處,本 module re-export `useScrollEdges` / `useOverflowIndices` from `hooks/use-overflow-items.ts`。
 
 ---
 
@@ -164,7 +164,7 @@ return (
 
 ## 反向引用
 
-- `hooks/useOverflowItems.ts` — 底層 scroll / overflow 計算 hooks(本 module re-export)
+- `hooks/use-overflow-items.ts` — 底層 scroll / overflow 計算 hooks(本 module re-export)
 - `CLAUDE.md`「選擇 / 狀態視覺」規則 — 為什麼 overflow trigger 不該用 selection-like 視覺
 - `components/Button/button.tsx` — text variant 的 canonical 樣式
 - `components/DropdownMenu/dropdown-menu.spec.md` — menu item 的 selection 指示器規則

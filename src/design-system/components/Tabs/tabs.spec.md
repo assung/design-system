@@ -172,7 +172,7 @@ Arrow buttons 用 `pointer-events-none` 外層 + `pointer-events-auto` 內層包
 
 ### 跨元件共用
 
-`useOverflowIndices` 和 `useScrollEdges` 是 `src/design-system/hooks/useOverflowItems.ts` 裡的共用 hook，`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 hook，確保 Tabs 和 Chip 的 overflow 行為視覺 / 機制一致。
+`useOverflowIndices` 和 `useScrollEdges` 是 `src/design-system/hooks/use-overflow-items.ts` 裡的共用 hook，`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 hook，確保 Tabs 和 Chip 的 overflow 行為視覺 / 機制一致。
 
 ---
 

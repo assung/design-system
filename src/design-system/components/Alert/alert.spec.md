@@ -1,4 +1,4 @@
-# Alert
+# Alert 設計原則
 
 **inline / fixed 持久通知**——消費 Notice primitive。
 
