@@ -41,6 +41,18 @@ Members: **Button, SegmentedControlItem, Chip**。
 
 **特徵**：padding 較鬆（xs=px-2、sm+=px-3）、font-medium 強調視覺重量、`cursor: pointer`——**因為需要命中區 + 視覺重量搶點擊焦點**。
 
+#### xs 的專屬用途：icon-only toolbar utility
+
+`xs` size 在系統中**不是一般 button**——它是為 **toolbar 的 icon-only compact button** 而存在：
+- **24px 固定**（不隨 density 縮放），配合工具列密集排佈
+- **主要用法**: icon-only（無 label 或極短 label），text editor / design canvas toolbar 情境
+- **不配對 Field**（Field 家族用 sm/md/lg），純 standalone utility
+- **Icon-only 時**自動套用 `px-[calc((field-height-xs - 16px)/2)]` = `px-1`（4px）以產生正方形 hit box
+
+雖然 code 允許 xs 帶短 label（text-caption 12px），但**主要場景應該是 icon-only**。有 label 的 compact button 建議直接用 `sm`（28px）。
+
+SegmentedControl 的 xs 遵循相同約束（見 `segmented-control.spec.md`）。
+
 ### Sub-profile 2: Data indicator（canonical: Tag）
 
 Members: **Tag**。

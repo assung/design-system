@@ -1,0 +1,17 @@
+#!/bin/bash
+# PostToolUse hook: remind to check sync when editing design-system files
+FILE_PATH=$(jq -r '.tool_input.file_path // empty')
+
+# Component .tsx edited → check spec + stories
+if echo "$FILE_PATH" | grep -q 'src/design-system/components/.*\.tsx$' && \
+   ! echo "$FILE_PATH" | grep -q '\.stories\.tsx$'; then
+  echo '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Sync check: you just edited a design-system component .tsx file. Check if the corresponding .spec.md and .stories.tsx need updates (see CLAUDE.md sync rules)."}}'
+
+# Spec .md edited → check stories
+elif echo "$FILE_PATH" | grep -q 'src/design-system/.*\.spec\.md$'; then
+  echo '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Sync check: you just edited a spec.md. Check if the corresponding .principles.stories.tsx and .anatomy.stories.tsx need updates to reflect the new rules."}}'
+
+# Pattern spec/code edited → check all consumers
+elif echo "$FILE_PATH" | grep -q 'src/design-system/patterns/.*\.\(tsx\|md\)$'; then
+  echo '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Sync check: you just edited a pattern file. Check ALL consumer components listed in the pattern spec to ensure they still comply."}}'
+fi

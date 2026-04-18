@@ -1,4 +1,4 @@
-# Density Spec
+# Density 設計原則
 
 Density 透過 `data-density` attribute 統一控制 UI Size 和 Layout Space，提供 md / lg 兩種密度模式。
 

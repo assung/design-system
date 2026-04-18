@@ -241,8 +241,7 @@ function NativeCombobox({
             />
           </span>
         )}
-        <ChevronDown size={iconSize} className="shrink-0 text-fg-muted cursor-pointer pointer-events-auto"
-          onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }} aria-hidden />
+        <ChevronDown size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
       </div>
     </div>
   )
@@ -349,11 +348,13 @@ function CustomCombobox({
 
 // ── Public component ────────────────────────────────────────────────────────
 
-function Combobox(props: ComboboxProps) {
-  const isMobile = useIsMobile()
-  if (isMobile) return <NativeCombobox {...props} />
-  return <CustomCombobox {...props} />
-}
+const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
+  (props, _ref) => {
+    const isMobile = useIsMobile()
+    if (isMobile) return <NativeCombobox {...props} />
+    return <CustomCombobox {...props} />
+  }
+)
 Combobox.displayName = 'Combobox'
 
 export { Combobox, ComboboxDisplay }

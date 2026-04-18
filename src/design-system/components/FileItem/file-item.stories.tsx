@@ -13,19 +13,19 @@ export default meta
 const noop = () => {}
 
 // FileItem 不用 field-height，24px/37px = 65% ≤ 75% → Button
-// detail 用 sm，compact 用 xs
+// rich 用 sm，compact 用 xs
 const deleteBtn = <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={noop} />
 const deleteBtnXs = <Button variant="text" size="xs" iconOnly startIcon={Trash2} aria-label="刪除" onClick={noop} />
 
-export const Detail = {
-  name: 'Detail（上傳狀態）',
+export const Rich = {
+  name: 'Rich（上傳狀態）',
   render: () => (
     <div className="flex flex-col max-w-md">
-      <FileItem mode="detail" name="Alan Profile.png" status="uploading" progress={40}
+      <FileItem mode="rich" name="Alan Profile.png" status="uploading" progress={40}
         description="5.7 MB of 7.5MB" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
-      <FileItem mode="detail" name="Alan Profile.png" status="completed"
+      <FileItem mode="rich" name="Alan Profile.png" status="completed"
         description="5.7 MB" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
-      <FileItem mode="detail" name="Alan Profile.png" status="error" progress={65}
+      <FileItem mode="rich" name="Alan Profile.png" status="error" progress={65}
         description="There's something wrong" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
     </div>
   ),
@@ -46,9 +46,9 @@ export const Clickable = {
   name: '已上傳（點擊下載）',
   render: () => (
     <div className="flex flex-col max-w-md border border-divider rounded-lg overflow-hidden">
-      <FileItem mode="detail" name="報告.pdf" description="2.3 MB"
+      <FileItem mode="rich" name="報告.pdf" description="2.3 MB"
         thumbnailSrc="https://i.pravatar.cc/80?u=doc" onClick={noop} actions={deleteBtn} />
-      <FileItem mode="detail" name="合約附件.docx" description="1.1 MB"
+      <FileItem mode="rich" name="合約附件.docx" description="1.1 MB"
         thumbnailSrc="https://i.pravatar.cc/80?u=contract" onClick={noop} actions={deleteBtn} />
       <FileItem mode="compact" name="data.csv" onClick={noop} actions={deleteBtnXs} />
       <FileItem mode="compact" name="backup.json" onClick={noop} actions={deleteBtnXs} />

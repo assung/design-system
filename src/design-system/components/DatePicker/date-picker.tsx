@@ -139,7 +139,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             action={{ icon: X, label: '清除日期', onClick: () => onChange?.('') }}
           />
         )}
-        <Calendar size={iconSize} className="shrink-0 text-fg-muted cursor-pointer" onClick={openPicker} aria-hidden />
+        <Calendar size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
       </div>
     )
   }

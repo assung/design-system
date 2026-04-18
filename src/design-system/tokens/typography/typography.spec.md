@@ -1,4 +1,4 @@
-# Typography Token Spec
+# Typography 設計原則
 
 Typography 定義字體尺寸與行高的 token 系統，確保全系統文字層級一致。
 

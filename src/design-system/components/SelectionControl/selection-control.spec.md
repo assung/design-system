@@ -6,6 +6,8 @@ SelectionControl 是 **Checkbox 和 RadioGroup 共用的 item 佈局 primitive**
 
 **實作基礎**：自建 internal primitive——純視覺佈局 + padding 公式，無 external primitive base。
 
+**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「List item layout」章節的 reading-mode 規格。SelectionItem 是 Family 2 的 SelectionItem variant：prefix 放 Checkbox/Radio indicator 而非 icon/avatar。
+
 ---
 
 ## 何時用 / 何時不用

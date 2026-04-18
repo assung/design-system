@@ -4,6 +4,8 @@
 
 MenuItem 是所有 menu 類元件的**共用視覺佈局層**——處理 prefix 對齊、尺寸、狀態。SelectMenu、DropdownMenu、未來的 ContextMenu 等都消費它。它只負責 layout（padding、gap、prefix alignment、typography），互動行為由各 menu 的 Radix primitive 外層控制。
 
+**Layout Family**：CLAUDE.md 4-Family Model **Family 1（Menu item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「Menu item layout」章節的 scanning-mode 規格。
+
 ---
 
 ## 結構

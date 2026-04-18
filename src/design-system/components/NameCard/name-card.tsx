@@ -11,7 +11,7 @@ import { DescriptionList, DescriptionItem } from '@/design-system/components/Des
  * px-4 (16px) py-2 (8px) 固定——compact hover card 不需要大 padding。
  *
  * ── Avatar 對齊 ──
- * 跟 FileItem detail 統一：右側 text column 用 justify-center + minHeight=avatar。
+ * 跟 FileItem rich 統一：右側 text column 用 justify-center + minHeight=avatar。
  * 短文字置中於 avatar，長文字（多行名字）自然撐高。
  *
  * ── View more ──

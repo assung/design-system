@@ -818,4 +818,4 @@ StepContent.displayName = 'StepContent'
 
 // ── Exports ──────────────────────────────────────────────────────────────
 
-export { Steps, StepItem, StepLabel, StepDescription, StepContent }
+export { Steps, StepItem, StepLabel, StepDescription, StepContent, stepsRootVariants, stepItemVariants }

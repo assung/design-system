@@ -12,7 +12,7 @@ import {
 } from './command'
 
 const meta: Meta = {
-  title: 'Design System/Components/Command/設計規格',
+  title: 'Design System/Internal/Command/設計規格',
   parameters: { layout: 'padded' },
 }
 export default meta

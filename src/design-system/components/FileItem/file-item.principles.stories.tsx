@@ -28,11 +28,11 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 )
 
 export const ModeRule: Story = {
-  name: 'Mode 選擇（detail vs compact）',
+  name: 'Mode 選擇（compact vs rich）',
   render: () => (
     <div>
       <Rule
-        title="detail — 需要縮圖預覽的檔案（圖片、文件）"
+        title="rich — 需要縮圖預覽的檔案（圖片、文件）"
         note="左側 Avatar 56px 顯示縮圖或檔案類型 icon,右側檔名 + 大小 + 進度 bar。閱讀模式(text-body 14px),資訊容量較高"
       >
         <FileItem
@@ -40,12 +40,12 @@ export const ModeRule: Story = {
           description="2.4 MB · 上傳中 75%"
           status="uploading"
           progress={75}
-          mode="detail"
+          mode="rich"
         />
         <FileItem
           name="beach-photo.jpg"
           description="4.8 MB"
-          mode="detail"
+          mode="rich"
           thumbnailSrc="https://i.pravatar.cc/112?img=3"
         />
         <Label>↑ 設計 / 影音類檔案、需要視覺辨識的場景</Label>
@@ -80,9 +80,9 @@ export const ModeRule: Story = {
 
       <Rule
         title="判斷法：「檔案需要視覺預覽,還是清單掃視？」"
-        note="需要預覽 → detail(圖文並列)/ 需要快速掃視多個 → compact(單行列表)"
+        note="需要預覽 → rich(圖文並列)/ 需要快速掃視多個 → compact(單行列表,預設)"
       >
-        <Label>圖片類 / 需要縮圖用 detail;logs / data export / batch 用 compact</Label>
+        <Label>圖片類 / 需要縮圖用 rich;logs / data export / batch 用 compact（預設）</Label>
       </Rule>
     </div>
   ),
@@ -101,7 +101,7 @@ export const StatusProgressRule: Story = {
           description="128 MB · 上傳中 42%"
           status="uploading"
           progress={42}
-          mode="detail"
+          mode="rich"
         />
       </Rule>
 
@@ -113,7 +113,7 @@ export const StatusProgressRule: Story = {
           name="users-export.csv"
           description="1.2 MB"
           status="completed"
-          mode="detail"
+          mode="rich"
         />
       </Rule>
 
@@ -125,7 +125,7 @@ export const StatusProgressRule: Story = {
           name="broken-file.pdf"
           description="檔案損毀,請重新上傳"
           status="error"
-          mode="detail"
+          mode="rich"
           actions={<Button variant="tertiary" size="sm" iconOnly startIcon={RotateCw} aria-label="重試" />}
         />
       </Rule>
@@ -137,7 +137,7 @@ export const StatusProgressRule: Story = {
         <FileItem
           name="final-contract.pdf"
           description="已簽署 · 2.1 MB"
-          mode="detail"
+          mode="rich"
           onClick={() => {}}
           actions={<Button variant="tertiary" size="sm" iconOnly startIcon={Download} aria-label="下載" />}
         />
@@ -159,7 +159,7 @@ export const ActionsRule: Story = {
           description="450 MB · 上傳中 12%"
           status="uploading"
           progress={12}
-          mode="detail"
+          mode="rich"
           actions={<Button variant="tertiary" size="sm" iconOnly startIcon={X} aria-label="取消上傳" />}
         />
       </Rule>
@@ -172,7 +172,7 @@ export const ActionsRule: Story = {
           name="failed-upload.pdf"
           description="網路中斷,請重試"
           status="error"
-          mode="detail"
+          mode="rich"
           actions={
             <div className="flex gap-1">
               <Button variant="tertiary" size="sm" iconOnly startIcon={RotateCw} aria-label="重試" />
@@ -190,7 +190,7 @@ export const ActionsRule: Story = {
           name="report-final.pdf"
           description="上傳完成 · 3.2 MB"
           status="completed"
-          mode="detail"
+          mode="rich"
           actions={<Button variant="tertiary" size="sm" iconOnly startIcon={Download} aria-label="下載" />}
         />
       </Rule>

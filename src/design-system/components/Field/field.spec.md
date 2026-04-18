@@ -8,6 +8,8 @@ Field 是**表單欄位的佈局容器**。只負責排版（label / control / d
 
 **實作基礎**：自建——本 DS 的 form layout 設計。shadcn 的 `Form` 元件走 react-hook-form + Zod + 自己的 Field primitive（含 Controller），本 DS 不採用這套耦合設計：Field 只做 layout + context，驗證由 consumer 自選（本 DS 建議 zod，見 `form-validation.spec.md`），保持更輕量、更獨立的定位。
 
+**Layout Family**：Field **不屬於** 4-Family Model 的 element layout families——它是 form composition pattern（包 Family 4 control + label + description）。見 CLAUDE.md「系統內部 Layout — 4-Family Model」→「Field Composition」段落。
+
 ---
 
 ## 與 Field Controls 的職責切分

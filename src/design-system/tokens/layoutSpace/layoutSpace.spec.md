@@ -1,4 +1,4 @@
-# Layout Space Spec
+# LayoutSpace 設計原則
 
 Layout Space 定義頁面與容器的巨觀間距 token，隨 density 自動縮放。
 

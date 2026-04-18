@@ -214,4 +214,5 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 - `../Select/select.spec.md` — 單選下拉（Radio vs Select SSOT 在 Select spec）
 - `../Combobox/combobox.spec.md` — 多選下拉（Checkbox stack vs Combobox 對照在 Combobox spec）
 - `../RadioGroup/radio-group.spec.md` — Radio 的 group 容器（共用規則在本 spec）
+- `../SelectionControl/selection-control.spec.md` — Checkbox / Radio 共用的 SelectionItem 佈局 primitive（本 spec 的 Clamp 政策為其 SSOT）
 - `../Field/field-controls.spec.md` — Field Control 共用規則

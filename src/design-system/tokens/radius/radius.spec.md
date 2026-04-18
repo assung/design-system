@@ -1,4 +1,4 @@
-# Radius Token Spec
+# Radius 設計原則
 
 圓角系統提供三個語意層級，對應不同元件類型。
 

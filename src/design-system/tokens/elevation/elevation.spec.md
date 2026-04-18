@@ -1,4 +1,4 @@
-# Elevation Spec
+# Elevation 設計原則
 
 Elevation 定義陰影層級，區分內容層（Card）和浮層（Modal/Popover）的視覺深度。
 

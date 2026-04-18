@@ -52,7 +52,8 @@ LinkInputDisplay.displayName = 'LinkInputDisplay'
 // ── Component ───────────────────────────────────────────────────────────────
 
 export interface LinkInputProps
-  extends Omit<VariantProps<typeof fieldWrapperStyles>, 'mode'> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'value' | 'onChange'>,
+    Omit<VariantProps<typeof fieldWrapperStyles>, 'mode'> {
   mode?: FieldMode
   error?: boolean
   value?: string | null
@@ -76,6 +77,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
       className,
       disabled,
       label,
+      ...props
     },
     ref
   ) => {
@@ -205,6 +207,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
           placeholder={placeholder}
           aria-invalid={error || undefined}
           className={bareInputStyles}
+          {...props}
         />
       </div>
     )

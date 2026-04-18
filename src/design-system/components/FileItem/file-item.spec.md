@@ -4,13 +4,17 @@
 
 **實作基礎**：組合元件——Icon + Text + Progress + Button，無 external primitive base。
 
+**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「List item layout」章節的 reading-mode 規格。FileItem 在 rich mode 用 avatar 作 item boundary。
+
+**命名 rationale**：`compact / rich` 表達精簡 vs 完整內容呈現（對齊 Discord embed type='rich' / Slack rich preview / Notion rich text 世界級 idiom）。不叫 `lg/sm`——兩者是資訊量不同的展示策略，不是同一結構的尺寸縮放。
+
 ---
 
 ## 何時用
 
 - **檔案上傳清單**：drag-drop upload、multiple file selector 的選中檔案列表
-- **附件展示**：email / comment / ticket 的附件列表（detail mode 顯示縮圖 + 檔名）
-- **批次處理進度**：CSV / JSON 匯入的逐檔進度追蹤（compact mode）
+- **附件展示**：email / comment / ticket 的附件列表（rich mode 顯示縮圖 + 檔名）
+- **批次處理進度**：CSV / JSON 匯入的逐檔進度追蹤（compact mode，預設）
 - **上傳錯誤回報**：顯示哪些檔案失敗 + 重試按鈕
 
 ## 何時不用
@@ -28,21 +32,30 @@
 
 | Mode | Prefix | Typography | 適用場景 |
 |---|---|---|---|
-| `detail` | Avatar 48px square | 閱讀模式（ListItem md） | 需要縮圖預覽的檔案（圖片、文件） |
-| `compact` | Paperclip icon 16px | 掃描模式 | 批次上傳的一般檔案（CSV、JSON） |
+| `compact`（預設） | Paperclip icon 16px | 掃描模式 | 批次上傳的一般檔案（CSV、JSON） |
+| `rich` | Avatar 48px square | 閱讀模式（ListItem md） | 需要縮圖預覽的檔案（圖片、文件） |
 
-不叫 lg/sm——兩者是資訊量不同的展示策略，不是同一結構的尺寸縮放。
+compact 為預設——多數 upload 清單是「快速掃視多檔」場景，只有需要縮圖預覽才升級為 rich。
 
 ## Typography（對齊 item-layout 兩種閱讀模式）
 
-| | detail（閱讀模式） | compact（掃描模式） |
+| | compact（掃描模式，預設） | rich（閱讀模式，完整呈現） |
 |---|---|---|
-| label | text-body (14px) 預設行高 (1.5), font-medium | text-body (14px) leading-compact (1.3) |
-| description | text-body (14px) 預設行高 (1.5), fg-secondary | text-caption (12px) leading-compact, fg-secondary |
+| label | text-body (14px) leading-compact (1.3) | text-body (14px) 預設行高 (1.5), font-medium |
+| description | text-caption (12px) leading-compact, fg-secondary | text-body (14px) 預設行高 (1.5), fg-secondary |
 
 ## 結構
 
-### detail
+### compact（預設）
+
+```
+[📎]  [ label + desc?   suffix ]
+      [ ██████████░░░░░░░░░░░░ ]
+```
+
+標準 item-layout row（icon prefix）。content 和 bar 之間 gap-2（8px）。
+
+### rich（完整呈現）
 
 ```
 [Avatar 48px]  [ label + desc        suffix ]
@@ -55,23 +68,14 @@ Progress bar 底部對齊 avatar 底部。justify-between 自動分配 gap（有
 
 **Avatar 尺寸約束**：48px ≥ label(21) + desc(21) + bar(4) = 46px ✓
 
-### compact
-
-```
-[📎]  [ label + desc?   suffix ]
-      [ ██████████░░░░░░░░░░░░ ]
-```
-
-標準 item-layout row（icon prefix）。content 和 bar 之間 gap-2（8px）。
-
 ## Padding
 
 | Mode | py | px | prefix↔content gap |
 |---|---|---|---|
-| detail | `py-2`（8px 固定） | `px-3`（12px） | `gap-3`（12px） |
-| compact | item-layout formula | `px-3` | `gap-2`（8px） |
+| compact（預設） | item-layout formula | `px-3` | `gap-2`（8px） |
+| rich | `py-2`（8px 固定） | `px-3`（12px） | `gap-3`（12px） |
 
-detail 的 py 固定——高度由 avatar 決定，不走 row 公式。
+rich 的 py 固定——高度由 avatar 決定，不走 row 公式。
 
 ## Progress bar
 
@@ -100,13 +104,13 @@ Consumer 自行組合：
 
 | Mode | 最大 suffix 元素 | 有 desc 時 | alignment |
 |---|---|---|---|
-| detail | Button sm = 28px > 24px | block | `h-[calc(1lh+2px+desc_lh)]` |
-| compact | Button xs = 24px ≤ 24px | — | `h-[1lh]` inline |
+| compact（預設） | Button xs = 24px ≤ 24px | — | `h-[1lh]` inline |
+| rich | Button sm = 28px > 24px | block | `h-[calc(1lh+2px+desc_lh)]` |
 
 ## 相關
 
-- `../../patterns/item-layout/item-layout.spec.md` — 閱讀模式（detail / compact）
-- `../Avatar/avatar.spec.md` — Avatar shape（detail mode 的 icon 容器）
+- `../../patterns/item-layout/item-layout.spec.md` — 閱讀模式（compact / rich）
+- `../Avatar/avatar.spec.md` — Avatar shape（rich mode 的 icon 容器）
 - `../LinkInput/link-input.spec.md` — 純連結（非 upload 流程）替代
 - `../TreeView/tree-view.spec.md` — 階層 file structure 場景
 - `../../tokens/color/color.spec.md` — Track 底色（`bg-secondary` 使用原則）

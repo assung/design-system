@@ -268,7 +268,7 @@ export const Overview = {
                 ['variant', "'primary'|'secondary'|'tertiary'|'text'|'link'", "'primary'", '視覺強調等級'],
                 ['danger', 'boolean', 'false', '套用紅色，與 variant 正交'],
                 ['pressed', 'boolean', '—', 'Toggle 按下狀態（aria-pressed + data-state），僅 secondary/tertiary/text 有視覺效果'],
-                ['size', "'xs'|'sm'|'md'|'lg'", "'md'", '尺寸，xs 固定不縮放'],
+                ['size', "'xs'|'sm'|'md'|'lg'", "'md'", 'xs=icon-only toolbar utility（24px 固定）; sm/md/lg 配對 Field'],
                 ['startIcon', 'LucideIcon', '—', '左側 icon，loading 時替換為 spinner'],
                 ['endIcon', 'LucideIcon', '—', '右側 icon（方向指示，如 ChevronDown）'],
                 ['badge', 'ReactNode', '—', '右側 badge（通知計數）'],

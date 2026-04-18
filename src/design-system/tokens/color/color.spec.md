@@ -1,4 +1,4 @@
-# Color Token Spec
+# Color 設計原則
 
 ## 架構流派定位
 

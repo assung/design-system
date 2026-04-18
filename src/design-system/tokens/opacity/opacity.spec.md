@@ -1,4 +1,4 @@
-# Opacity Token Spec
+# Opacity 設計原則
 
 Opacity 定義元件停用狀態的透明度，確保全系統 disabled 視覺一致。
 

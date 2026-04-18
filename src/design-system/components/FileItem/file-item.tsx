@@ -8,14 +8,17 @@ import { Avatar } from '@/design-system/components/Avatar/avatar'
  *
  * Typography: 閱讀模式 — text-body (14px) 預設行高 (1.5)
  *
- * detail: Avatar 56px square 在左。右側 content + bar。
- *   有 bar → justify-between（bar 底部對齊 avatar）
- *   無 bar → justify-center（文字垂直置中對齊 avatar）
+ * 兩種 mode（精簡 vs 完整內容呈現）:
  *
- * compact: Paperclip 16px 在左。右側 content + bar。
+ * compact（★ default）: Paperclip 16px 在左。右側 content + bar。
  *   py = gap = 4px (gap-1)，對稱。
  *   description 只有 error 才顯示。
  *   bar 跟文字左邊對齊（在 icon 右邊的 column 內）。
+ *
+ * rich: Avatar 56px square 在左（顯示檔案內容縮圖）。右側 content + bar。
+ *   多行 description（size / status message）。
+ *   有 bar → justify-between（bar 底部對齊 avatar）
+ *   無 bar → justify-center（文字垂直置中對齊 avatar）
  *
  * status 可選。不傳 = 已上傳檔案（無 bar，可點擊下載）。
  * onClick → hover:bg-neutral-hover + cursor-pointer。
@@ -36,14 +39,19 @@ const AVATAR_SIZE = 56
 const ICON_PX = 16
 
 const BAR_H = 4          // progress bar 高度，跟 Slider track 對齊
-const COMPACT_BAR_H = 2  // compact bar 高度（absolute 裝飾，比 detail 更細）
+const COMPACT_BAR_H = 2  // compact bar 高度（absolute 裝飾，比 rich 更細）
 
 export interface FileItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   name: string
-  mode?: 'detail' | 'compact'
+  /**
+   * 兩種呈現 mode（精簡 vs 完整）：
+   * - `compact`（預設）：paperclip + filename 單行 inline
+   * - `rich`：縮圖 + 檔名 + size + status + progress 的完整 card 呈現
+   */
+  mode?: 'compact' | 'rich'
   status?: 'uploading' | 'completed' | 'error'
   progress?: number
-  /** detail: 檔案大小、狀態訊息。compact: 只有 error 才顯示。 */
+  /** rich mode: 檔案大小、狀態訊息。compact: 只有 error 才顯示。 */
   description?: string
   thumbnailSrc?: string
   actions?: React.ReactNode
@@ -54,7 +62,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
   (
     {
       name,
-      mode = 'detail',
+      mode = 'compact',
       status,
       progress = 0,
       description,
@@ -66,17 +74,17 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     },
     ref,
   ) => {
-    const isDetail = mode === 'detail'
+    const isRich = mode === 'rich'
     const hasStatus = !!status
     const statusConfig = status && status !== 'uploading' ? STATUS_ICON[status] : null
     const progressWidth = status === 'completed' ? 100 : progress
 
     // compact 只有 error 才顯示 description
-    const showDesc = isDetail ? !!description : (status === 'error' && !!description)
+    const showDesc = isRich ? !!description : (status === 'error' && !!description)
 
     const hoverClass = onClick ? 'cursor-pointer hover:bg-neutral-hover' : ''
 
-    const barH = isDetail ? BAR_H : COMPACT_BAR_H
+    const barH = isRich ? BAR_H : COMPACT_BAR_H
     const progressBar = hasStatus ? (
       <div className="rounded-full bg-secondary" style={{ height: barH }}>
         <div
@@ -87,13 +95,13 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     ) : null
 
     // suffix
-    const suffixAlign = isDetail && showDesc
+    const suffixAlign = isRich && showDesc
       ? 'h-[calc(1lh+2px+var(--font-body-size)*1.5)]'
       : 'h-[1lh]'
 
     const suffix = (
       <div className={cn('flex items-center gap-2 shrink-0', suffixAlign)}>
-        {status === 'uploading' && isDetail && (
+        {status === 'uploading' && isRich && (
           <span className="text-fg-secondary tabular-nums">{progress}%</span>
         )}
         {statusConfig && (
@@ -118,8 +126,8 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       </div>
     )
 
-    // ── detail ──
-    if (isDetail) {
+    // ── rich（含縮圖完整呈現）──
+    if (isRich) {
       return (
         <div
           ref={ref}

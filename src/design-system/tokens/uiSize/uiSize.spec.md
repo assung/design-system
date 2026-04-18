@@ -1,4 +1,4 @@
-# Component Size Spec
+# UiSize 設計原則
 
 元件高度的語義 token，rem 單位。透過 `data-density`（或 `data-ui-size`）切換。
 

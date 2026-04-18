@@ -103,7 +103,6 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
       if (typeof ref === 'function') ref(el)
       else if (ref) (ref as React.MutableRefObject<HTMLSelectElement | null>).current = el
     }, [ref])
-    const openSelect = () => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }
 
     if (resolvedMode !== 'edit') {
       return <ReadonlyDisplay mode={resolvedMode} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} />
@@ -133,7 +132,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
       </span>
     ) : null
 
-    const chevronEl = <ChevronDown size={iconSize} className="shrink-0 text-fg-muted cursor-pointer relative z-10" onClick={openSelect} aria-hidden />
+    const chevronEl = <ChevronDown size={iconSize} className="shrink-0 text-fg-muted pointer-events-none relative z-10" aria-hidden />
     const selectedOpt = options?.find(o => o.value === value)
     const label = selectedOpt?.label ?? value
     const nativeTagVariant = selectedOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined

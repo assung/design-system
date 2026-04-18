@@ -1,4 +1,4 @@
-# Horizontal Overflow
+# Horizontal Overflow 設計原則
 
 **水平 overflow 的 canonical primitives + helper**——給任何「一排水平 items 可能塞不下容器」的元件(Tabs、ChipGroup、未來的 Steps horizontal、SegmentedControl overflow 等)共用。
 

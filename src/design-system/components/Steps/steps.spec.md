@@ -4,6 +4,8 @@
 
 **實作基礎**：組合元件——Icon / number indicator + Text 有序序列，無 external primitive base。Radix / shadcn 無對應 Steps primitive。
 
+**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「List item layout」章節的 reading-mode 規格。Steps 有明文例外：indicator inline 對齊 label 第一行（不走 24px 閾值）。
+
 > 命名選 `Steps`(複數)而非 `Stepper`——`stepper` 在 web 有 HTML `<input type="number">` 計數器的歷史包袱(spinbutton 也叫 stepper),`Steps` 更精確地表達「一組有序步驟」。對齊 Ant Design 的命名慣例。
 
 ---

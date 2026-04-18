@@ -102,7 +102,17 @@ SegmentedControl 必須能塞進 `Field` 容器（就像 `Input` / `Button` / `S
 
 **在 Field 內自動讀 size**：透過 `useFieldContext()`，SegmentedControl 在 Field 內時 size 跟著 Field 的 size 走，不需 consumer 重複指定——機制與 Button 完全相同。
 
-**Icon size**：sm/md = 16、lg = 20、xs = 14，跟 Button 一致。
+**Icon size**：sm/md = 16、lg = 20、xs = 14（SegmentedControl xs 專用，14px 比 16px 更平衡極小空間）。
+
+### xs 的專屬用途：icon-only toolbar utility
+
+跟 Button xs 相同約束——`xs` size 主要用在 **toolbar 的 icon-only compact** 場景（text editor / design canvas / 極密集空間）：
+- **24px 固定**，不隨 density 縮放
+- **主要 iconOnly 模式**（無 label 或 極短 label）
+- **不配對 Field**（Field 家族用 sm/md/lg）
+- 有 label 的 compact SegmentedControl 建議直接用 `sm`（28px）
+
+詳見 `button.spec.md`「Pill Layout → xs 的專屬用途」（兩者共用 Family 3 action trigger 規格）。
 
 ---
 
