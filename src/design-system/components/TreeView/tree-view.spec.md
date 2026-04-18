@@ -15,6 +15,25 @@ TreeView 本身只負責三件事:
 
 ---
 
+## 何時用
+
+- **階層結構資料**：檔案管理器資料夾樹、部門組織架構、專案 / 子專案 / 任務、權限群組
+- **Sidebar 內的分層導覽**：workspace > channel > thread、product > category > item
+- **可展開收合的清單**：FAQ（但多個可同時展開,非 Accordion 互斥）、程式碼 tree、JSON viewer
+- **任意多層**：從 1 層到 N 層深度都由同一個 TreeView 承載
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 平面資料（無階層）| `DataTable` / 自訂 list | TreeView 為階層而設計，沒 children 的平面用 list |
+| 同時只能展開一個（互斥）| `Accordion`（TBD）| TreeView 允許任意多個展開,互斥模式語意不同 |
+| 簡單 2 層 nav（主分類 + 子分類）| `Sidebar` + SidebarMenuSubButton | 輕量 2 層用 Sidebar 的內建結構,不需遞迴 |
+| 選單式展開（點完就關）| `DropdownMenu` + sub-menu | DropdownMenu 的 sub menu 是 temporary,TreeView 是 persistent |
+| 階層選擇但需要搜尋 / 快速找 | 自訂 tree + search filter（未來 TreeView 可加 search prop）| 基本 TreeView 不含 search |
+
+---
+
 ## 結構
 
 ```tsx
@@ -485,3 +504,12 @@ TreeItem 透過 props 提供 slots,讓不同 consumer 決定 node 的視覺:
 - ❌ 不得用 Accordion 取代 TreeView——Accordion 是「同時只開一個」的互斥模式,tree 是「任意多個都可以開」
 - ❌ 不得省略 chevron / icon placeholder——同層 siblings 有元素差異時必須佔位,否則 label 不對齊(佔位由 TreeView 自動處理,consumer 不需介入)
 - ❌ 不得用非 gap-2(8px)的值作為 indent 內部 gap——indentStep 必須等於 `chevronSize + gap-2`,跟 item-layout 的 prefix-content gap 一致
+
+---
+
+## 相關
+
+- `../Sidebar/sidebar.spec.md` — 常見的 TreeView 消費者（導覽場景）
+- `../DataTable/data-table.spec.md` — 平面資料的對應元件
+- `../DropdownMenu/dropdown-menu.spec.md` — 彈出式 sub-menu（TreeView 是 persistent）
+- `../../patterns/item-layout/item-layout.spec.md` — TreeItem 內部佈局共用規則
