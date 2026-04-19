@@ -5,7 +5,7 @@ import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
-import { Calendar } from './calendar'
+import { Calendar } from '@/design-system/components/Calendar/calendar'
 
 // ── Format ──────────────────────────────────────────────────────────────────
 
@@ -182,4 +182,4 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
 )
 DatePicker.displayName = 'DatePicker'
 
-export { DatePicker, DatePickerDisplay, Calendar, formatDate }
+export { DatePicker, DatePickerDisplay, formatDate }

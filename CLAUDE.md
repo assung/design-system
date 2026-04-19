@@ -379,7 +379,7 @@ src/
 │   │   ├── elevation/                 ← elevation.spec.md + elevation.stories.tsx
 │   │   ├── radius/                    ← radius.spec.md + radius.stories.tsx
 │   │   └── opacity/                   ← opacity.css + opacity.spec.md
-│   ├── components/                    ← 以實際目錄內容為準（目前 49 個元件資料夾）
+│   ├── components/                    ← 以實際目錄內容為準（目前 50 個元件資料夾）
 │   │   │
 │   │   │  ⚙ internal primitive（不直接使用，由其他元件消費）
 │   │   ├── Menu/                      ← menu item 共用佈局層（→ SelectMenu / DropdownMenu）
@@ -406,16 +406,17 @@ src/
 │   │   │   └── form-validation.spec.md ← 表單驗證標準
 │   │   │
 │   │   │  其餘為 public-facing 元件，各有獨立資料夾
-│   │   │  （DatePicker/ 內含 calendar.tsx —— react-day-picker 包裝成本 DS token Calendar primitive）
+│   │   │  （Calendar 是獨立月曆 primitive — react-day-picker 包裝 + 本 DS token;
+│   │   │   DatePicker 消費 Calendar 作為選日 popup,Calendar 也可 inline 在 dashboard 用）
 │   │   │  （FileUpload 是拖放上傳區塊;FileItem 是已上傳 row 顯示,兩者配對使用;
 │   │   │   FileUpload 預設 children 直接消費 <Empty> 元件,共用 icon+title+desc SSOT）
 │   │   └── ...                        ← Accordion, Alert, Avatar, Badge, Breadcrumb, Button,
-│   │                                     Chart, Checkbox, Chip, Combobox, DataTable, DatePicker,
-│   │                                     DescriptionList, Dialog, DropdownMenu, Empty, FileItem,
-│   │                                     FileUpload, Input, LinkInput, NameCard, NumberInput,
-│   │                                     PeoplePicker, RadioGroup, SegmentedControl, Select, Sidebar,
-│   │                                     Slider, Spinner, Steps, Switch, Tabs, Tag, Textarea, Toast,
-│   │                                     Tooltip, TreeView
+│   │                                     Calendar, Chart, Checkbox, Chip, Combobox, DataTable,
+│   │                                     DatePicker, DescriptionList, Dialog, DropdownMenu, Empty,
+│   │                                     FileItem, FileUpload, Input, LinkInput, NameCard,
+│   │                                     NumberInput, PeoplePicker, RadioGroup, SegmentedControl,
+│   │                                     Select, Sidebar, Slider, Spinner, Steps, Switch, Tabs,
+│   │                                     Tag, Textarea, Toast, Tooltip, TreeView
 │   │
 │   └── patterns/                      ← 跨元件共用的佈局 / 互動公式
 │       ├── item-layout/               ← row primitive 共用規則（prefix + content 佈局）

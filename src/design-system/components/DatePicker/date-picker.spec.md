@@ -11,7 +11,7 @@ DatePicker 是**單一日期**的輸入與顯示元件。Edit 用**本 DS 自建
 **實作基礎**：
 - Trigger：`<button>` 包 `fieldWrapperStyles`(視覺仍是 Input wrapper,只是改為可點擊觸發浮層)
 - Popup：`Popover`(消費 overlay-surface pattern 外殼)
-- Calendar 主體：`react-day-picker@9` + 本 DS token 覆寫預設視覺（見 `./calendar.tsx`）
+- Calendar 主體：消費獨立的 `Calendar` 元件（見 `../Calendar/calendar.spec.md`;react-day-picker 包裝成本 DS token)
 
 ---
 
