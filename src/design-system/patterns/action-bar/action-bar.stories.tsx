@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/design-system/components/Button/button'
 import { ButtonGroup, ButtonDivider } from '@/design-system/components/Button/button-group'
-import { ItemInlineAction, type InlineActionConfig } from '@/design-system/patterns/item-layout/item-layout'
+import { ItemInlineAction, type InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 const meta: Meta = {
   title: 'Design System/Patterns/Action Bar',

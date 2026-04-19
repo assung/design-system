@@ -92,7 +92,7 @@ grep -rhnE '<ScrollArea\b' {target} | wc -l
 grep -rhnE '<AspectRatio\b' {target} | wc -l
 
 # item-layout (MenuItem etc.)
-grep -rhnE '<(MenuItem|TreeItem|ItemLayout|SidebarMenuButton)\b' {target} | wc -l
+grep -rhnE '<(MenuItem|TreeItem|SidebarMenuButton|ItemIcon|ItemAvatar|ItemLabel|ItemSuffix)\b' {target} | wc -l
 
 # overlay-surface (Dialog/Popover auto consume)
 grep -rhnE '<(DialogHeader|DialogBody|DialogFooter|PopoverHeader|PopoverBody|PopoverFooter)\b' {target} | wc -l

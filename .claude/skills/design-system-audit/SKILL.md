@@ -1,9 +1,9 @@
 ---
 name: design-system-audit
-description: Systematic audit of this design system for world-class quality. Runs 18 audits covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
+description: Systematic audit of this design system for world-class quality. Runs 20 audits covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
 ---
 
-# Design System Audit (18 dimensions, world-class)
+# Design System Audit (20 dimensions, world-class)
 
 Purpose: catch every bug class this project has shipped historically PLUS structural gaps relative to Polaris / Material / Atlassian / Ant / Carbon / Apple HIG. Each audit has a clear rubric tied to CLAUDE.md rules. The skill reports findings and **explicitly stops at checkpoints** for user decisions before large-scope fixes.
 
@@ -34,7 +34,7 @@ Purpose: catch every bug class this project has shipped historically PLUS struct
 
 ---
 
-## The 18 audits
+## The 20 audits
 
 Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
@@ -98,7 +98,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
 ### Phase 1 — Parallel audit execution
 
-Launch all 18 audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
+Launch all 20 audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
 
 Each audit reports:
 - Violations only (skip confirmations)
@@ -201,7 +201,7 @@ Per CLAUDE.md `## 命名必過三重 test`, when proposing ANY new naming (varia
 
 After all commits:
 - Update `memory/project_audit_progress.md`:
-  - Date + audit coverage (which of the 18)
+  - Date + audit coverage (which of the 20)
   - Findings + resolved counts
   - Known remaining gaps (deferred P2)
 - Short final report:
@@ -230,6 +230,6 @@ After all commits:
 
 ## References
 
-- [references/audit-prompts.md](references/audit-prompts.md) — Exact subagent prompts for all 18 audits
+- [references/audit-prompts.md](references/audit-prompts.md) — Exact subagent prompts for all 20 audits
 - [references/historical-bugs.md](references/historical-bugs.md) — Bug classes indexed by audit
 - [references/checkpoints.md](references/checkpoints.md) — Detailed examples of each MUST-ASK scenario

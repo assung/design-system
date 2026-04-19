@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import type { FieldMode, InlineActionConfig } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
-import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
+import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 // ── Types ───────────────────────────────────────────────────────────────────
 

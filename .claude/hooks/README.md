@@ -1,0 +1,70 @@
+# .claude/hooks/ Charter
+
+## 這裡只收:pre/post tool event 的機械化自動檢查
+
+每個 hook 是一個 shell / python script,在 Claude Code tool event 上自動觸發:
+- **PreToolUse**:tool 執行前(可 block 或 inject context)
+- **PostToolUse**:tool 執行後(通常 inject 提醒 / warning)
+
+**核心特徵**:**不依賴 AI 自律**,tool 層強制執行;規則可用 `grep` / 條件判斷自動驗證。
+
+## 當前居民
+
+| Hook | Event | 做什麼 |
+|------|-------|--------|
+| `pre_edit_spec_check.sh` | PreToolUse(Edit/Write/MultiEdit) | 編輯元件 tsx 前提醒讀對應 spec |
+| `check_sync_update.sh` | PostToolUse | 改 spec.md 後提醒連動更新 stories |
+| `check_token_hygiene.sh` | PostToolUse | grep 硬寫 shadow / shadcn compat alias / overflow raw class |
+| `block_prototype_imports.py` | PostToolUse | 產品 code 禁止 import `explorations/` |
+| `enforce_home_charter.sh` | PreToolUse(Write) | 寫新檔到 classification-sensitive dir 前強制看 charter README;hooks/commands/agents 的 flat-file 慣例自動豁免 |
+| `pre_new_component_spec.sh` | PreToolUse(Write) | 建新 component spec.md 時強制 Layout Family 宣告 + 建議走 `/component-quality-gate` |
+| `check_cva_default_sync.sh` | PostToolUse(Edit/Write/MultiEdit) | 動到 cva `defaultVariants` 時 grep spec / docblock / anatomy 三方,警告不一致(SegmentedControl bug class 預防) |
+
+## Task ↔ Hook 對照表(世界級設計任務觸發)
+
+| 任務檔案事件 | 觸發的 hook | 效果 |
+|------------|-----------|------|
+| 建新 component spec.md | `pre_new_component_spec.sh` + `enforce_home_charter.sh` | Layout Family 必宣告 + charter gate(新 subdir 情況) |
+| 改 cva `defaultVariants` | `check_cva_default_sync.sh` + `pre_edit_spec_check.sh` | 三方同步提醒 + spec 讀取提醒 |
+| 建新 pattern / skill subdir / tokens subdir | `enforce_home_charter.sh` | 強制看對應 charter README,通過三題 verification |
+| 建 hooks/commands/agents 新檔 | `enforce_home_charter.sh`(豁免 flat) | 靜默通過(flat 是慣例) |
+| 編輯元件 .tsx | `pre_edit_spec_check.sh`(讀 spec)+ `check_cva_default_sync.sh`(若動 defaults) | |
+| Write/Edit spec.md | `check_sync_update.sh` | 連動 stories 更新提醒 |
+| Write/Edit 任何 .tsx/.spec.md | `check_token_hygiene.sh` | 硬寫 shadow / shadcn alias / raw overflow 抓違規 |
+| Write/Edit 產品 code(非 explorations) | `block_prototype_imports.py` | 擋 `import ... explorations/` |
+
+## 這裡**不收**(反例)
+
+| 疑似要放這但其實不是 | 實際應去 | 為什麼 |
+|-------------------|---------|--------|
+| 需要 AI 走流程才能判斷的規則 | `.claude/skills/` | hook 只能機械判斷,複雜 workflow 屬 skill |
+| 每 session signal rule | `CLAUDE.md` | hook 是 tool-level,不是 session-level |
+| 單一元件的 lint rule | 該元件 spec + code | hook 是跨元件系統級,單元件屬 spec |
+
+## 新 hook 的 criteria(必須全部通過)
+
+1. **規則可機械判斷**(grep / 條件邏輯,不需人類 judgment)
+2. **觸發 event 清楚**(PreToolUse / PostToolUse + matcher)
+3. **已有明確 tech debt 或 bug class**(不做預防性空守衛)
+4. **失敗模式安全**(hook 掛掉不會 block 合法操作 / 誤殺)
+
+## 接線到 settings.json
+
+新 hook 必須在 `.claude/settings.json` 的 `hooks.PreToolUse` 或 `hooks.PostToolUse` 陣列註冊,並用 `$CLAUDE_PROJECT_DIR` 作為路徑前綴。範例:
+
+```json
+{
+  "type": "command",
+  "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/your-hook.sh\""
+}
+```
+
+## Hook 退出碼約定(Claude Code 協議)
+
+- `exit 0` — 正常,不 inject context
+- `exit 2` + stderr — **blocking**,AI 看到 stderr 訊息後必須處理
+- `stdout` with `{"hookSpecificOutput":{"hookEventName":"...","additionalContext":"..."}}` — non-blocking context injection
+
+## 建立前必 Read
+
+本 README + 最接近的既有 hook 當範本 + CLAUDE.md `# 規則分層` 的 Hook 章節。

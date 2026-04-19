@@ -12,12 +12,12 @@ import type { InlineActionConfig } from "@/design-system/components/Field/field-
 /**
  * Item Layout — 共用工具與常數
  *
- * 這個檔案不是元件,是 `item-layout.spec.md` 的 code-level 實作。
+ * 這個檔案不是元件,是 `item-anatomy.spec.md` 的 code-level 實作。
  * 所有 row primitives(`MenuItem` / `TreeItem` / `SidebarMenuButton` /
  * `SelectionItem`)**必須 import 本 module 的 ICON_SIZE 和 helpers**,
  * 不要各自複製常數或 wrapper className——單一 source of truth,避免不一致。
  *
- * 詳細規則見 `item-layout.spec.md`。
+ * 詳細規則見 `item-anatomy.spec.md`。
  */
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ export type RowSize = "sm" | "md" | "lg"
  * `>` 直接子選擇器會失效,Lucide icon 會 fallback 到預設 24px。
  *
  * ```tsx
- * import { ICON_SIZE } from "@/design-system/patterns/item-layout/item-layout"
+ * import { ICON_SIZE } from "@/design-system/patterns/element-anatomy/item-anatomy"
  *
  * const iconPx = ICON_SIZE[size]  // size: RowSize
  * <MyLucideIcon size={iconPx} />
@@ -63,7 +63,7 @@ export const ICON_SIZE: Record<RowSize, number> = {
  * 硬寫會讓 sm 變體的 avatar 尺寸錯誤、跟 ICON_SIZE 對齊規則脫鉤。
  *
  * ```tsx
- * import { AVATAR_SIZE } from "@/design-system/patterns/item-layout/item-layout"
+ * import { AVATAR_SIZE } from "@/design-system/patterns/element-anatomy/item-anatomy"
  *
  * const { size } = useSidebar()  // RowSize
  * <Avatar size={AVATAR_SIZE.inline[size]} />
@@ -101,7 +101,7 @@ export function getUniformPrefixSlotStyle(size: RowSize): React.CSSProperties {
 /**
  * Inline action(suffix 裡的 hover-action icon button)hover 背景尺寸(px)。
  * 規則:icon size + 2px(每邊 +1px,用 absolute positioning 溢出不影響排版)。
- * 對齊 `item-layout.spec.md`「Inline Action 設計規格」節。
+ * 對齊 `item-anatomy.spec.md`「Inline Action 設計規格」節。
  */
 export const INLINE_ACTION_HOVER_BG_SIZE: Record<RowSize, number> = {
   sm: 18,
@@ -148,7 +148,7 @@ export const ItemPrefix = React.forwardRef<
       // Row-primitive 頂層容器(例如 `<SidebarProvider uniformPrefix>` 的 wrapper)
       // 若設定這個 var,小尺寸 prefix(icon 16px)會在固定寬槽(24px @ md)內置中,
       // 與大尺寸 prefix(app logo 24px)對齊,達成 label 齊左。
-      // 詳見 item-layout.spec.md「Uniform prefix slot」節。
+      // 詳見 item-anatomy.spec.md「Uniform prefix slot」節。
       "min-w-[var(--item-prefix-slot,auto)] justify-center",
       className
     )}
@@ -214,7 +214,7 @@ export function useRowSize(fallback: RowSize = "md"): RowSize {
 // wrapper + 自動查 ICON_SIZE / AVATAR_SIZE。
 //
 // **asChild consumer 必須用這兩個元件,禁止手動寫 `<Avatar size={N} />`**。
-// 禁令理由見 item-layout.spec.md「Avatar 尺寸選擇」節。
+// 禁令理由見 item-anatomy.spec.md「Avatar 尺寸選擇」節。
 
 export interface ItemIconProps
   extends Omit<React.SVGAttributes<SVGSVGElement>, "children"> {
@@ -255,7 +255,7 @@ export interface ItemAvatarProps extends Omit<AvatarProps, "size"> {
    * 預設 inline——大宗情境(扁平 row、footer user、主清單)都用這個。
    * 只有 avatar 是 item 主體(人物卡、顯著身份辨識)才用 block。
    *
-   * 詳見 `item-layout.spec.md`「Avatar 尺寸選擇」節,含 24px 對齊模式閾值規則。
+   * 詳見 `item-anatomy.spec.md`「Avatar 尺寸選擇」節,含 24px 對齊模式閾值規則。
    */
   mode?: "inline" | "block"
 }
@@ -284,10 +284,10 @@ ItemAvatar.displayName = "ItemAvatar"
 // ── Inline action (suffix slot) ───────────────────────────────────────────
 //
 // 共用 row-primitive 的 suffix inline action 渲染——消除過去 Input / NumberInput /
-// Tag / LinkInput / Combobox 各自複製 18 行 JSX 的狀況(見 `item-layout.spec.md`
+// Tag / LinkInput / Combobox 各自複製 18 行 JSX 的狀況(見 `item-anatomy.spec.md`
 // 「Inline Action 設計規格」節)。
 //
-// 規格(完全對齊 item-layout.spec.md「Inline Action 設計規格」節):
+// 規格(完全對齊 item-anatomy.spec.md「Inline Action 設計規格」節):
 // - Icon 尺寸 = ICON_SIZE[rowSize]      (16/16/20)
 // - Hover bg 尺寸 = icon + 2            (18/18/22,INLINE_ACTION_HOVER_BG_SIZE)
 // - Hover bg 圓角 = rounded-md (sm/md)/ rounded-md (lg)
@@ -409,7 +409,7 @@ ItemInlineAction.displayName = "ItemInlineAction"
 // `<ItemSuffix>` — row primitive 的 suffix 容器。對齊 item-layout spec:
 // - `h-[1lh]`:suffix 永遠對齊第一行 label(跟 prefix 解耦)
 // - `ml-auto`:靠右
-// - `gap-2`:多個 inline action 之間的標準間距(item-layout.spec.md「Inline Action 設計規格」節)
+// - `gap-2`:多個 inline action 之間的標準間距(item-anatomy.spec.md「Inline Action 設計規格」節)
 // - `hoverReveal` opt-in:opacity 0→1 on 父層 `group/menu-item` hover(TreeView 模式)
 
 export interface ItemSuffixProps extends React.HTMLAttributes<HTMLSpanElement> {

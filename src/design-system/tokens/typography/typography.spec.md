@@ -105,4 +105,4 @@ Typography 由三個獨立維度組成，分開疊加：
 
 ## 跨元件參考
 
-行高在 row 類元件中的應用（scanning vs reading 模式）詳見 `patterns/item-layout/item-layout.spec.md`「兩種閱讀模式」節。
+行高在 row 類元件中的應用（scanning vs reading 模式）詳見 `patterns/element-anatomy/item-anatomy.spec.md`「兩種閱讀模式」節。

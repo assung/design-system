@@ -3,7 +3,7 @@ import { X, Calendar as CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
+import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
 import { Calendar } from '@/design-system/components/Calendar/calendar'
 

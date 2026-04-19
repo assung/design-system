@@ -268,7 +268,7 @@ const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, descriptio
         {description && (
           <p
             className={cn('mt-0.5 text-fg-secondary break-words', lineClampClass(descMaxLines))}
-            // ── 規則(item-layout.spec.md 閱讀模式) ──
+            // ── 規則(item-anatomy.spec.md 閱讀模式) ──
             // ListItem 是 reading mode:description 字體**最小 14px**(spec「14→14px, 16→14px」)。
             // sm/md/lg 全部 14px,行高跟 label 同(預設 1.5,不套 leading-compact)。
             //

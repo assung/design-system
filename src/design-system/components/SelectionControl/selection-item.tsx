@@ -3,12 +3,12 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
-import { ICON_SIZE, AVATAR_SIZE } from '@/design-system/patterns/item-layout/item-layout'
+import { ICON_SIZE, AVATAR_SIZE } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 // ── Selection Item Styles ───────────────────────────────────────────────────
 // Checkbox 和 RadioGroup 共用的 item 佈局。
 //
-// 結構(item-layout.spec.md 4-slot 模型):
+// 結構(item-anatomy.spec.md 4-slot 模型):
 //   [control] [optional prefix(icon|avatar)] [content(label/desc)] [optional suffix]
 //
 // padding 公式：py = (field-height - 1lh) / 2
@@ -203,7 +203,7 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
                 descClampClass,
                 disabled ? 'text-fg-disabled' : 'text-fg-secondary',
               )}
-              // ── 規則(item-layout.spec.md 閱讀模式) ──
+              // ── 規則(item-anatomy.spec.md 閱讀模式) ──
               // - Description 字體:**最小 14px**(spec「14→14px, 16→14px」)
               //   sm/md/lg 全部 14px,跟 label 不一定同字級,但永遠 ≥ 14px
               // - Description 行高:跟 label 同(reading mode 預設 1.5,**不套 leading-compact**)

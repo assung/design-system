@@ -144,7 +144,7 @@ export const ColorMatrix: Story = {
           <H3>Row 四態色彩 Token</H3>
           <Desc>
             TreeItem row 色彩對齊 item-layout 的「選擇 / 狀態視覺規則」(見
-            `patterns/item-layout/item-layout.spec.md`)——tree、menu、sidebar 用同一套 state tokens。
+            `patterns/element-anatomy/item-anatomy.spec.md`)——tree、menu、sidebar 用同一套 state tokens。
           </Desc>
           <div className="overflow-x-auto mb-4">
             <table className="text-caption border-collapse">

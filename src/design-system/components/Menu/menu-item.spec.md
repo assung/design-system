@@ -4,7 +4,7 @@
 
 MenuItem 是所有 menu 類元件的**共用視覺佈局層**——處理 prefix 對齊、尺寸、狀態。SelectMenu、DropdownMenu、未來的 ContextMenu 等都消費它。它只負責 layout（padding、gap、prefix alignment、typography），互動行為由各 menu 的 Radix primitive 外層控制。
 
-**Layout Family**：CLAUDE.md 4-Family Model **Family 1（Menu item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「Menu item layout」章節的 scanning-mode 規格。
+**Layout Family**：CLAUDE.md 4-Family Model **Family 1（Menu item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「Menu item layout」章節的 scanning-mode 規格。
 
 ---
 
@@ -19,7 +19,7 @@ prefix                       content               suffix
 - **Content**：label + 可選 description
 - **Suffix**：tag（ml-auto 靠右）
 
-prefix icon 跟 label 同色（foreground），不是 fg-muted。詳見 item-layout.spec.md 的 Icon 色彩原則。
+prefix icon 跟 label 同色（foreground），不是 fg-muted。詳見 item-anatomy.spec.md 的 Icon 色彩原則。
 
 ---
 
@@ -83,7 +83,7 @@ description 降一級：sm/md 的 label 14px → description 12px；lg 的 label
 
 ## Suffix 對齊(實作限制)
 
-依 `item-layout.spec.md` 的對齊規則,suffix 應該套用 24px 閾值公式(跟 prefix 同公式但獨立判斷)。但 **MenuItem 的實作把 suffix 寫死成 `h-[1lh]` inline 對齊**——只支援 ≤24px 的小 suffix(Tag、ChevronRight、Badge、計數)。
+依 `item-anatomy.spec.md` 的對齊規則,suffix 應該套用 24px 閾值公式(跟 prefix 同公式但獨立判斷)。但 **MenuItem 的實作把 suffix 寫死成 `h-[1lh]` inline 對齊**——只支援 ≤24px 的小 suffix(Tag、ChevronRight、Badge、計數)。
 
 ### 為什麼 hardcode
 
@@ -98,7 +98,7 @@ description 降一級：sm/md 的 label 14px → description 12px；lg 的 label
 需要大塊 suffix 的場景應該:
 
 1. **重新評估這個東西是不是 menu item**——如果 suffix 是大塊內容,可能需要 ListItem(列表行)而非 menu item
-2. **包一個 wrapper 元件**——consumer 自己組合 prefix + content + 大塊 suffix,套用 item-layout.spec.md 的完整 4-slot 規則
+2. **包一個 wrapper 元件**——consumer 自己組合 prefix + content + 大塊 suffix,套用 item-anatomy.spec.md 的完整 4-slot 規則
 3. 不要 hack `endContent` 塞大東西進去——layout 會壞
 
 ---
@@ -158,7 +158,7 @@ disabled 時所有元素（icon、checkbox、文字）統一 `fg-disabled`。
 
 Menu item 的 prefix icon 跟 label 同色（foreground），不是 fg-muted。Prefix icon 是 label 的視覺延伸。
 
-詳見 `item-layout.spec.md` 的 Icon 色彩原則。
+詳見 `item-anatomy.spec.md` 的 Icon 色彩原則。
 
 ---
 
@@ -216,7 +216,7 @@ Menu item 的 prefix icon 跟 label 同色（foreground），不是 fg-muted。P
 
 ## 相關
 
-- `../../patterns/item-layout/item-layout.spec.md` — MenuItem 的 row primitive 繼承規則（prefix / label / suffix 對齊）
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — MenuItem 的 row primitive 繼承規則（prefix / label / suffix 對齊）
 - `../Avatar/avatar.spec.md` — Prefix 的 Avatar 尺寸
 - `../Checkbox/checkbox.spec.md` — CheckboxItem 的視覺規則（DropdownMenu 使用）
 - `../SelectMenu/select-menu.spec.md` — 主要消費者之一

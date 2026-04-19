@@ -17,7 +17,7 @@ import {
   SidebarMenuButton,
 } from './sidebar'
 import { TreeView, TreeItem } from '@/design-system/components/TreeView/tree-view'
-import { ItemAvatar } from '@/design-system/patterns/item-layout/item-layout'
+import { ItemAvatar } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 const meta: Meta = {
   title: 'Design System/Components/Sidebar/設計原則',

@@ -9,7 +9,7 @@ import { Command as CommandPrimitive } from 'cmdk'
 import { MenuItem, MenuFooter } from '@/design-system/components/Menu/menu-item'
 import { Empty } from '@/design-system/components/Empty/empty'
 import { getMenuListMinHeight } from '@/design-system/components/Field/field-types'
-import { RowSizeProvider } from '@/design-system/patterns/item-layout/item-layout'
+import { RowSizeProvider } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * SelectMenu — Popover + Command 組成的完整下拉選單

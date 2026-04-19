@@ -37,7 +37,7 @@ const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
         <Loader2
           className="animate-spin"
           // 直接傳 size 到 Lucide — 在某些 wrapper 內 CSS selector 會失效,
-          // 顯式傳 prop 才可靠(對齊 item-layout.spec.md 的 ICON_SIZE 規則)
+          // 顯式傳 prop 才可靠(對齊 item-anatomy.spec.md 的 ICON_SIZE 規則)
           size={size}
           aria-hidden
         />

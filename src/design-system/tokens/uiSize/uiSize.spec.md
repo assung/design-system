@@ -149,7 +149,7 @@ Tailwind：`h-tab-sm` / `h-tab-md` / `h-tab-lg`。
 
 ## Inline Action
 
-詳見 `patterns/item-layout/item-layout.spec.md`「Inline Action 設計規格」節。
+詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Inline Action 設計規格」節。
 
 ---
 

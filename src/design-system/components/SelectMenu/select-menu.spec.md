@@ -110,4 +110,4 @@ Popover（浮動容器，handle 展開 / 定位）
 - `../Select/select.spec.md` — 主要消費者之一（searchable 時切換到 SelectMenu）
 - `../Combobox/combobox.spec.md` — 主要消費者之一（searchable 多選時切換到 SelectMenu）
 - `../PeoplePicker/people-picker.spec.md` — 永遠使用 SelectMenu 的消費者
-- `../../patterns/item-layout/item-layout.spec.md` — item-layout pattern（MenuItem 繼承）
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — item-layout pattern（MenuItem 繼承）

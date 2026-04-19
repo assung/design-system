@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
-import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
+import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 import { useIsMobile } from '@/design-system/hooks/use-is-mobile'
 

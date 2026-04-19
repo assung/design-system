@@ -124,7 +124,7 @@ Spinner 的 stroke 顏色是 `currentColor`(繼承父層的 text color)。消費
 
 ## Row primitive consumer 的將來
 
-未來任何 row primitive(Sidebar / TreeView / SelectMenu / DropdownMenu / Steps)若需要 loading state,請在 `patterns/item-layout/item-layout.tsx` 開 `<ItemSpinner>` helper——自動從 `RowSizeContext` 讀 `ICON_SIZE[size]` 傳給 `<Spinner />`,消費者寫 `<ItemSpinner />` 就好。跟 `<ItemIcon>` / `<ItemAvatar>` 同一個 pattern。
+未來任何 row primitive(Sidebar / TreeView / SelectMenu / DropdownMenu / Steps)若需要 loading state,請在 `patterns/element-anatomy/item-anatomy.tsx` 開 `<ItemSpinner>` helper——自動從 `RowSizeContext` 讀 `ICON_SIZE[size]` 傳給 `<Spinner />`,消費者寫 `<ItemSpinner />` 就好。跟 `<ItemIcon>` / `<ItemAvatar>` 同一個 pattern。
 
 **但現在 YAGNI**——沒真實消費者就不做 ItemSpinner helper,等第一個 row primitive 需要 loading state 時再加。
 
@@ -149,5 +149,5 @@ Spinner 的 stroke 顏色是 `currentColor`(繼承父層的 text color)。消費
 ## 相關
 
 - **Avatar 自由 size 策略** — `components/Avatar/avatar.tsx`(同一個 pattern 的先例)
-- **Row primitive 的 RowSizeContext** — `patterns/item-layout/item-layout.tsx`(未來 `ItemSpinner` helper 的基礎)
+- **Row primitive 的 RowSizeContext** — `patterns/element-anatomy/item-anatomy.tsx`(未來 `ItemSpinner` helper 的基礎)
 - **Button loading prop** — `components/Button/button.tsx`(當前唯一消費者)

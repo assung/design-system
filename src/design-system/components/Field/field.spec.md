@@ -420,5 +420,5 @@ Field 內的資料輸入控件（Input / NumberInput / DatePicker / Select / Com
 - `./field-controls.spec.md` — Field Controls（Input/Select/etc.）共用規則：三 mode、size、focus、endAction、Display
 - `./form-validation.spec.md` — 表單驗證標準（blur 驗證、zod schema、error 顯示）
 - `../DescriptionList/description-list.spec.md` — 唯讀資訊展示（非表單）
-- `../../patterns/item-layout/item-layout.spec.md` — SelectionItem 佈局（Checkbox / Radio 放進 Field 時 block 模式的參照）
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — SelectionItem 佈局（Checkbox / Radio 放進 Field 時 block 模式的參照）
 - CLAUDE.md「元件 Props 命名原則」— Field 的 orientation / block control 宣告規則

@@ -4,7 +4,7 @@
 
 **實作基礎**：組合元件——Icon + Text + Progress + Button，無 external primitive base。
 
-**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「List item layout」章節的 reading-mode 規格。FileItem 在 rich mode 用 avatar 作 item boundary。
+**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「List item layout」章節的 reading-mode 規格。FileItem 在 rich mode 用 avatar 作 item boundary。
 
 **命名 rationale**：`compact / rich` 表達精簡 vs 完整內容呈現（對齊 Discord embed type='rich' / Slack rich preview / Notion rich text 世界級 idiom）。不叫 `lg/sm`——兩者是資訊量不同的展示策略，不是同一結構的尺寸縮放。
 
@@ -155,7 +155,7 @@ Passive status icon(16 px)置中於 button-sized 容器,hover 時 active Button 
 
 ## 相關
 
-- `../../patterns/item-layout/item-layout.spec.md` — 閱讀模式（compact / rich）
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — 閱讀模式（compact / rich）
 - `../Avatar/avatar.spec.md` — Avatar shape（rich mode 的 icon 容器）
 - `../FileUpload/file-upload.spec.md` — **配對元件**:FileUpload 是拖放 / 點擊上傳區塊,FileItem 是已上傳檔案 row 顯示;兩者構成完整 file-handling 元件組
 - `../LinkInput/link-input.spec.md` — 純連結（非 upload 流程）替代

@@ -8,7 +8,7 @@ Notice 是純視覺 primitive，不是獨立使用的元件。消費者：
 - **Toast**：浮動 + 自動消失（Sonner）
 - **Alert**：inline / fixed 持久通知
 
-**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「List item layout」章節的 reading-mode 規格。Notice 語意為 notification（非 row collection），但視覺排版遵循 Family 2 確保跨元件視覺一致。
+**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「List item layout」章節的 reading-mode 規格。Notice 語意為 notification（非 row collection），但視覺排版遵循 Family 2 確保跨元件視覺一致。
 
 **尺寸偏離（documented exception）**：Notice / Alert / Toast **單一固定 size**，**不**實作 Family 2 baseline 的 sm/md/lg。世界級共識（Material Banner/Snackbar、Polaris Banner、Atlassian InlineMessage、GitHub Flash）都是**單一 prominent size**——通知的使命是「搶注意」而非「在密度選擇裡協調」，提供 size 選項反而會讓 consumer 糾結（該用哪個 size？）而稀釋元件的目的性。同理 padding 也不隨 density 變（`px-4 py-3` 固定）——通知是跨 density 一致的訊息載體。
 
@@ -89,6 +89,6 @@ CSS `color` 從 body 繼承的是**已解析的計算值**，不是 `var(--foreg
 
 - `../Alert/alert.spec.md` — 主要消費者（持久通知）
 - `../Toast/toast.spec.md` — 主要消費者（短暫通知）
-- `../../patterns/item-layout/item-layout.spec.md` — Notice 的 layout 共用規則
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — Notice 的 layout 共用規則
 - `../../tokens/color/color.spec.md` — color tokens 和 variant × theme 策略
 - `../../tokens/color/primitives.css` — primitives nested theme（`:root, [data-theme]` pattern）

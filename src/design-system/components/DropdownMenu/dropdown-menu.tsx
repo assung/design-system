@@ -10,7 +10,7 @@ import {
   useRowSize,
   ICON_SIZE as ROW_ICON_SIZE,
   type RowSize,
-} from "@/design-system/patterns/item-layout/item-layout"
+} from "@/design-system/patterns/element-anatomy/item-anatomy"
 
 /**
  * DropdownMenu — Radix DropdownMenu + MenuItem visual layer
@@ -62,7 +62,7 @@ const DropdownMenuTrigger = React.forwardRef<
 DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 // DropdownMenuGroup — 對齊 MenuGroup 的 group separation 設計語言
 //
-// 設計語言(跨 Menu-like 元件統一,SSOT 見 item-layout.spec.md
+// 設計語言(跨 Menu-like 元件統一,SSOT 見 item-anatomy.spec.md
 // 「Group auto-separation」):
 //   每個 group 上下各 8px padding,相鄰 group 之間用 border-divider 分隔
 //   兩個 group 之間視覺 gap = 8px(上一個 bottom)+ 8px(下一個 top)= 16px + border

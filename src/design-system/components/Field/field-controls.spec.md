@@ -115,7 +115,7 @@ Field 內部所有不會觸發獨立 action 的元素必須 `pointer-events-none
 
 ## Icon 色彩原則
 
-跨元件統一規則（詳見 `item-layout.spec.md`）：**icon 代表內容/類別 → 與 label 同色；icon 純指示方向 → fg-muted（neutral-7）。**
+跨元件統一規則（詳見 `item-anatomy.spec.md`）：**icon 代表內容/類別 → 與 label 同色；icon 純指示方向 → fg-muted（neutral-7）。**
 
 Field 內的具體套用：
 
@@ -170,8 +170,8 @@ tagPadding 只在有 Tag 時才套用。Placeholder/空值狀態使用 fieldWrap
 
 Field 內部用 `<ItemInlineAction>`(`item-layout.tsx` 共用元件)渲染 — 跟 Sidebar / TreeView / DropdownMenu 的 inline action **完全同一套** canonical 實作,不再有「每個 host 自己複製 18 行 button JSX」的漂移。
 
-- 共用規則見 `patterns/item-layout/item-layout.spec.md`「Inline Action 設計規格」節
-- Helper 規格與 API 見 `item-layout.spec.md` 的「Inline action 共用元件」節
+- 共用規則見 `patterns/element-anatomy/item-anatomy.spec.md`「Inline Action 設計規格」節
+- Helper 規格與 API 見 `item-anatomy.spec.md` 的「Inline action 共用元件」節
 - Field host 必須傳 `size={size}` 給 `<ItemInlineAction>`(field 不在 `RowSizeContext` 內,需明確覆寫)
 
 Icon 色彩遵循 Inline Action 統一規則:預設 `fg-muted`,hover 時 `foreground`。

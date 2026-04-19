@@ -15,7 +15,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from './sidebar'
-import { ItemAvatar } from '@/design-system/patterns/item-layout/item-layout'
+import { ItemAvatar } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 const meta: Meta = {
   title: 'Design System/Components/Sidebar/設計規格',

@@ -5,7 +5,7 @@
 DropdownMenu 是按鈕觸發的**動作選單**——使用者從中選擇一個動作並立即執行。
 基於 Radix DropdownMenu（shadcn 包裝），item 佈局消費 MenuItem primitive。
 
-**Layout Family**：CLAUDE.md 4-Family Model **Family 1（Menu item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「Menu item layout」章節的 scanning-mode 規格。
+**Layout Family**：CLAUDE.md 4-Family Model **Family 1（Menu item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「Menu item layout」章節的 scanning-mode 規格。
 
 **與 SelectMenu 的區別**：SelectMenu 是**選值**（選完後值留在 field 裡），DropdownMenu 是**執行**（選完後觸發動作，選單關閉）。判斷標準：「選完之後，畫面上是否需要保留選中狀態？」需要 → SelectMenu；不需要 → DropdownMenu。
 
@@ -53,7 +53,7 @@ DropdownMenu                    ← Radix Root，管理開關狀態
 
 `DropdownMenuGroup` 對齊 `MenuGroup` 的 group separation 設計語言——相鄰的 Group 自動透過 `border-divider` 分隔，**consumer 不需要自己加 `DropdownMenuSeparator`**。
 
-**設計語言**（跨 Menu-like 元件統一，SSOT 見 `../../patterns/item-layout/item-layout.spec.md`「Group auto-separation」）：
+**設計語言**（跨 Menu-like 元件統一，SSOT 見 `../../patterns/element-anatomy/item-anatomy.spec.md`「Group auto-separation」）：
 - 每個 group 上下各 **8px padding**
 - 相鄰 group 之間用 **border-divider** 分隔
 - 兩個 group 之間視覺 gap = 8（上一 bottom）+ 8（下一 top）= **16px + border**

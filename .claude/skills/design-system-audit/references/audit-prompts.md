@@ -1,4 +1,4 @@
-# Audit Subagent Prompts (18 audits)
+# Audit Subagent Prompts (20 audits)
 
 Each prompt is self-contained — designed to paste into an `Agent` call with `run_in_background: true` and `subagent_type: general-purpose`.
 
@@ -315,7 +315,7 @@ Your job: audit the codebase against CLAUDE.md `# 命名與語言一致性` (Met
 Checks:
 1. Component folder = PascalCase (e.g., `DatePicker/`)
 2. Component file = kebab-case (e.g., `date-picker.tsx`)
-3. Pattern folder + file = kebab-case (e.g., `item-layout/item-layout.spec.md`)
+3. Pattern folder + file = kebab-case (e.g., `item-layout/item-anatomy.spec.md`)
 4. Hook file = kebab-case (e.g., `use-is-mobile.ts`)
 5. Token folder: single word lowercase / multi camelCase (`color/` / `uiSize/`)
 6. Spec H1 = `# {元件名} 設計原則` pattern
@@ -438,4 +438,61 @@ Grep `src/design-system/components/**/*.tsx` (exclude .stories/.anatomy/.princip
 Report: `file:line — shadcn alias found — migrate to: [direct token]`
 
 End: `N tsx files checked, M alias leakage, typically 0 in clean state`. Under 400 words. Don't fix.
+```
+
+# Group G — Home governance (session-learned 2026-04-20)
+
+## 19. Home-name-vs-scope 一致性
+
+```
+Your job: verify each classification home folder's NAME still accurately reflects the scope of content it contains. Session 2026-04-20 learned this the hard way — `item-layout/` absorbed 4-family taxonomy (including Family 3 Pill + Family 4 Field pointers), becoming misleadingly named. Renamed to `item-anatomy/` to match scope.
+
+Targets (folders governed by charter READMEs):
+- `src/design-system/patterns/*/`
+- `src/design-system/components/*/`(PascalCase folders)
+- `src/design-system/tokens/*/`
+- `.claude/skills/*/`
+
+For each folder `F`:
+1. Read `F/*.spec.md` or `F/SKILL.md` or the primary doc first paragraph (「定位」or frontmatter description)
+2. Extract the declared scope in one sentence
+3. Compare declared scope with folder name:
+   - Is folder name a substring of or semantically aligned with the scope?
+   - Does folder name UNDER-represent the scope (e.g., `item-layout/` containing 4-family taxonomy)?
+   - Does folder name OVER-represent the scope (e.g., `item-anatomy/` containing only Menu item stuff)?
+
+Flag mismatches: `folder/ declared scope = X, name implies Y, suggest rename to Z`.
+
+Also flag "layout" word collisions:
+- `patterns/*layout*/` at element-level scope MUST use「anatomy」not「layout」(CLAUDE.md 命名鐵律;「layout」保留 page-level)
+- Exception: primitive file name matching folder name (e.g., `item-anatomy/item-anatomy.tsx` exporting slot components `<ItemIcon>` / `<ItemAvatar>` / etc. following Material/Polaris/Radix compound-component idiom) — allowed and encouraged
+
+Report: `F: scope "..." vs name "..." — rename candidate: Z`
+
+End: `N folders audited, M rename candidates, top 3: [list]`. Under 400 words. Don't rename.
+```
+
+## 20. Spec 硬寫機械化值檢查
+
+```
+Your job: grep spec.md files for mechanical values that should live in .tsx, not spec. Per CLAUDE.md 「spec 只記錄設計原則,可程式化規則寫 .tsx」.
+
+Forbidden in spec.md(should migrate to tsx/cva):
+- Hardcoded px values: `\d+px` outside of「藍圖」/「尺寸對照表」/ pattern explanation contexts
+- Literal Tailwind utility classes: `className="..."` / `w-\d` / `h-\d` / `p-\d` / `gap-\d` blocks outside code fences showing WHY the value exists
+- CVA variant object literals(those belong in tsx)
+
+OK in spec(these are 判斷性 explanations):
+- Token names: `--field-height-md`, `h-field-sm` (referring to the token, not instructing concrete code)
+- Approximate size ranges in design reasoning: "roughly 16-20px"
+- Code examples within ``` fences showing intended usage
+
+Report per hit: `spec.md:line — hardcoded [value] — should live in [component-name].tsx`.
+
+Don't flag:
+- `tokens/*.spec.md` (token specs legitimately declare values)
+- `patterns/element-anatomy/item-anatomy.spec.md`「Inline Action 設計規格」(documents why 16/20/24 size tiers — pattern rationale, belongs here)
+- Historical bug anchors(「曾發生 padding 8px 錯位」is narrative, not instruction)
+
+End: `N specs checked, M hardcoded violations, top 5: [list]`. Under 400 words. Don't fix.
 ```

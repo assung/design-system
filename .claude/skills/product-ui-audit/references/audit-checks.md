@@ -73,7 +73,7 @@ grep -nE 'flex.*items-center.*gap-2' {target}
 - 單列 row with icon/avatar 左 + content 中 + action 右
 - 且是 menu / list / tree / file 類項目
 
-**Severity**: P1。**Fix**: 消費 `MenuItem` / `TreeItem` / `ItemLayout` 等既有 row primitive。
+**Severity**: P1。**Fix**: 消費 `MenuItem` / `TreeItem` / `SidebarMenuButton` 等既有 row primitive(或組合 item-anatomy 的 slot components `<ItemIcon>` / `<ItemLabel>` / `<ItemSuffix>` 等)。
 
 ### Check 2.3: overlay Header/Body/Footer → 應消費 overlay-surface
 

@@ -3,7 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { ItemInlineActionButton } from "@/design-system/patterns/item-layout/item-layout"
+import { ItemInlineActionButton } from "@/design-system/patterns/element-anatomy/item-anatomy"
 import { SurfaceHeader, SurfaceBody, SurfaceFooter } from "@/design-system/patterns/overlay-surface/overlay-surface"
 
 /**

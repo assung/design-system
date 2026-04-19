@@ -109,7 +109,7 @@ Tabs trigger 對標 **item-layout pattern 的橫向變體**，但有三處刻意
 - Icon size 查表（sm/md=16, lg=20）
 - suffix wrapper `gap-1`
 
-> **結論**：Tabs 不完全屬於 item-layout，也不完全屬於 Button，而是「item-layout 的橫向 inline 變體 + Button 的高度系統」。未來若有人在 row primitive 和 Tabs 之間發現設計漂移，以 **item-layout.spec.md 為主**；若在 inline 高度 / icon size / suffix 結構發現漂移，以 **button.tsx 為主**。
+> **結論**：Tabs 不完全屬於 item-layout，也不完全屬於 Button，而是「item-layout 的橫向 inline 變體 + Button 的高度系統」。未來若有人在 row primitive 和 Tabs 之間發現設計漂移，以 **item-anatomy.spec.md 為主**；若在 inline 高度 / icon size / suffix 結構發現漂移，以 **button.tsx 為主**。
 
 ---
 
@@ -274,5 +274,5 @@ Size 建議在這些容器內用 `sm`（32/40），避免 header 過高。
 
 - SegmentedControl（`segmented-control.spec.md`）——切 value 的 radio 群組
 - Button `pressed`（`button.spec.md`）——單一按鈕的 on/off toggle
-- item-layout pattern（`item-layout.spec.md`）——gap-2 slot 間距的來源
+- item-layout pattern（`item-anatomy.spec.md`）——gap-2 slot 間距的來源
 - Accordion（`../Accordion/accordion.spec.md`）——多段獨立收合（非互斥切換）

@@ -35,7 +35,7 @@ import {
   getUniformPrefixSlotStyle,
   type RowSize,
   type InlineActionConfig,
-} from "@/design-system/patterns/item-layout/item-layout"
+} from "@/design-system/patterns/element-anatomy/item-anatomy"
 
 /**
  * Sidebar

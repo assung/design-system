@@ -2,7 +2,7 @@ import * as React from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
-import { useRowSize } from '@/design-system/patterns/item-layout/item-layout'
+import { useRowSize } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * Empty — 空狀態視覺元件

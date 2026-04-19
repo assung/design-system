@@ -140,4 +140,4 @@ Empty 只管**水平居中**。垂直定位由 consumer 的容器決定:
 - `../FileUpload/file-upload.spec.md` — **本元件 consumer**:FileUpload 預設 children 直接渲染 `<Empty icon={Upload} title description />`,共用 icon+title+desc SSOT
 - `../../tokens/typography/typography.spec.md` — Typography tier
 - `../../tokens/layoutSpace/layoutSpace.spec.md` — Layout-space token
-- `../../patterns/item-layout/item-layout.spec.md` — label → desc gap `mt-0.5`
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — label → desc gap `mt-0.5`

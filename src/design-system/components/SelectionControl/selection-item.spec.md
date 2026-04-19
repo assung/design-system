@@ -8,7 +8,7 @@ SelectionItem 是 **Checkbox 和 RadioGroup 共用的 item 佈局 primitive**—
 
 **實作基礎**：自建 internal primitive——純視覺佈局 + padding 公式，無 external primitive base。
 
-**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/item-layout/item-layout.spec.md`「List item layout」章節的 reading-mode 規格。SelectionItem 是 Family 2 的 SelectionItem variant：prefix 放 Checkbox/Radio indicator 而非 icon/avatar。
+**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「List item layout」章節的 reading-mode 規格。SelectionItem 是 Family 2 的 SelectionItem variant：prefix 放 Checkbox/Radio indicator 而非 icon/avatar。
 
 ---
 
@@ -72,5 +72,5 @@ Checkbox 和 Radio 視覺幾乎完全一致（差異只在形狀 `rounded-md` vs
 
 - `../Checkbox/checkbox.spec.md` — 主要消費者之一，含 Clamp 政策 SSOT
 - `../RadioGroup/radio-group.spec.md` — 另一消費者
-- `../../patterns/item-layout/item-layout.spec.md` — 4-slot 結構的 pattern 來源
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — 4-slot 結構的 pattern 來源
 - `../../tokens/uiSize/uiSize.spec.md` — `--field-height-*` token
