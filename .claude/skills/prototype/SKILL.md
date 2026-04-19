@@ -95,13 +95,25 @@ User approves the problem framing OR clarifies. Do NOT skip to benchmarking with
 
 **Process**: Scan 5+ world-class references. See `references/benchmark-sources.md` for the canonical list of DS + world-class SaaS + industry-specific references.
 
-For each:
+For each reference,收集**兩類資訊**:
+
+**A. 視覺 / 互動(表層)**:
 - How do they solve this problem?
 - Screenshot(WebFetch or user provides)
 - Key mechanics:layout / interaction pattern / states / a11y
 - 1-2 line summary of approach
 
-**Output**: Markdown scan table(component / UX pattern / visible screenshots OR link-only):
+**B. OOUX 層(資訊架構深度對標)**:
+- **Core objects** identified(名詞清單 + attributes)
+- **Relationships**(object 間如何連,NOM highlights)
+- **CTAs per role**(key actions each role 對每 object 可做什麼)
+- **UI shape observed**(同一 object 在 list / card / detail / inline 多種 shape 下 attributes 怎麼 progressive disclose)
+
+**為什麼加 OOUX 欄**:視覺只看外型會抄到形式,object model 才是 IA 深度。做完 5 家 benchmark 後,你會發現哪些 object 是業界共識 / 哪些命名是該產品獨有 — 這是 Phase 3 自己建 Object Map 的原料。
+
+詳細 OOUX 分析方法與範本見 [`references/ooux-template.md`](references/ooux-template.md)「Phase 1 用法」節(內含 Linear issue tracking 完整範例)。
+
+**Output**: Markdown scan table(視覺 + OOUX 兩 section):
 
 ```
 | Reference | Approach | Key mechanics | Screenshot |
@@ -149,11 +161,30 @@ Narrative 必含:
 
 **絕對不可**憑 AI 自己評分就挑 shortlist。這是設計決策,stakeholder 要參與。
 
+### Phase 3.0 — Build Object Map(ORCA,design 前強制)
+
+**Input**: shortlist + Phase 1 benchmark 的 OOUX 分析
+
+**Process**: 在寫任何 candidate story 之前,**先做 Object Map**(全體 candidate 共享同一個)。ORCA 4 步:
+
+1. **O** Objects:feature 的核心名詞(2-7 個理想;命名三重 test)
+2. **R** Relationships(NOM):object 間關聯(1:1 / 1:many / optional)
+3. **C** CTAs per role:每角色對每 object 的動作清單
+4. **A** Attributes per object:core / metadata / identifying
+
+**Output**:`src/explorations/{topic-slug}/notes.md` 增補 OOUX section(見 `references/ooux-template.md`「Phase 3.0」範本 + Step 5 UI Shape → DS 元件映射表)。
+
+**為什麼共享同一 Object Map**:3 個 candidate 差異應在 **UI shape + progressive disclosure + CTA ordering**,不在 object 定義本身。若 A candidate 把 Task 拆成 Task + Subtask、B candidate 只有 Task,stakeholder 比稿會變成「比 data model」失焦。除非該 feature 本質就是 data model 辯論,否則 object 定義應一致。
+
+**何時跳過**:極小 feature(單一 button / 1-object 開關)可跳過 Phase 3.0,在 notes.md 明文標示「feature 範圍小,跳過 ORCA」。
+
+---
+
 ### Phase 3 — Design each shortlisted candidate
 
-**Input**: shortlist(2-3 items)
+**Input**: shortlist(2-3 items)+ Phase 3.0 產出的 Object Map
 
-**Process**: 每個 candidate 建一個 exploration story。see `references/proposal-template.md` for structure。
+**Process**: 每個 candidate 建一個 exploration story,**各 candidate 共享 Object Map 但差異在 UI shape + CTAs 順序**。see `references/proposal-template.md` for structure。
 
 目錄結構:
 ```
@@ -272,7 +303,8 @@ User / stakeholder 決定採用某 candidate 後:
 
 ## References
 
-- [references/benchmark-sources.md](references/benchmark-sources.md) — 世界級對標清單 + 研究步驟
+- [references/benchmark-sources.md](references/benchmark-sources.md) — 世界級對標清單 + 研究步驟(含 OOUX 深層分析)
+- [references/ooux-template.md](references/ooux-template.md) — Object-Oriented UX(ORCA 流程 / Object Map / NOM / CTA Inventory / DS 元件映射)Sophia V. Prater 方法論
 - [references/evaluation-matrix.md](references/evaluation-matrix.md) — 4 軸評分表範本 + 決策規則
 - [references/proposal-template.md](references/proposal-template.md) — explorations/ folder + Storybook story 結構
 - [references/checkpoints.md](references/checkpoints.md) — 5 個 MUST ASK 時機的範本 + 歷史 failure mode
