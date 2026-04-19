@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Paperclip, CircleCheck, XCircle, Download, RotateCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
-import { ItemInlineActionButton } from '@/design-system/patterns/item-layout/item-layout'
+import { Button } from '@/design-system/components/Button/button'
 
 /**
  * FileItem — 檔案顯示 / 上傳進度
@@ -114,36 +114,47 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       ? 'h-[calc(1lh+2px+var(--font-body-size)*1.5)]'
       : 'h-[1lh]'
 
-    // Status slot:completed + onDownload / error + onRetry 時 row-hover 換成 action button。
-    // 幾何(ICON_PX × ICON_PX)與 ItemInlineActionButton 相同,視覺中心與右側 actions 自然對齊。
+    // Status slot 幾何:與 consumer 的 delete Button **同尺寸**
+    //   rich  → Button sm(h-field-sm,density-variable 28/32)
+    //   compact → Button xs(24 固定)
+    // 這樣 `gap-2`(8px) 是兩個「同 size button」之間的距離,真 8px gap 不被溢出覆蓋。
+    // Passive icon 16px 置中於 button-sized 容器(視覺 framing 與 hover-swap 一致)。
+    const deleteBtnSize = isRich ? 'sm' : 'xs'
+    const slotHw = isRich ? 'var(--field-height-sm)' : 'var(--field-height-xs)'
+
     const hoverAction =
       status === 'completed' && onDownload ? { icon: Download, onClick: onDownload, label: '下載' } :
       status === 'error' && onRetry        ? { icon: RotateCw, onClick: onRetry,    label: '重試' } :
       null
 
     const statusSlot = statusConfig ? (
-      hoverAction ? (
-        <span className="relative inline-flex shrink-0" style={{ width: ICON_PX, height: ICON_PX }}>
-          <statusConfig.icon
-            size={ICON_PX}
-            className={cn(
-              'absolute inset-0 shrink-0 transition-opacity',
-              statusConfig.color,
-              'group-hover/row:opacity-0',
-            )}
-            aria-hidden
-          />
-          <ItemInlineActionButton
-            icon={hoverAction.icon}
+      <span
+        className="relative inline-flex items-center justify-center shrink-0"
+        style={{ width: slotHw, height: slotHw }}
+      >
+        {/* Passive 狀態 icon:預設可見;若有 hover-swap,row-hover 時淡出 */}
+        <statusConfig.icon
+          size={ICON_PX}
+          className={cn(
+            'shrink-0 transition-opacity',
+            statusConfig.color,
+            hoverAction && 'group-hover/row:opacity-0',
+          )}
+          aria-hidden
+        />
+        {/* Active action Button:row-hover 時淡入(僅 hoverAction 存在時渲染) */}
+        {hoverAction && (
+          <Button
+            variant="text"
+            size={deleteBtnSize}
+            iconOnly
+            startIcon={hoverAction.icon}
             aria-label={hoverAction.label}
             onClick={(e) => { e.stopPropagation(); hoverAction.onClick() }}
-            size="md"
             className="absolute inset-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
           />
-        </span>
-      ) : (
-        <statusConfig.icon size={ICON_PX} className={cn('shrink-0', statusConfig.color)} aria-hidden />
-      )
+        )}
+      </span>
     ) : null
 
     const suffix = (

@@ -110,7 +110,13 @@ Consumer 自行組合：
 | `error` | `XCircle` 紅 ✗ | `RotateCw ⟲` | `onRetry` |
 | `uploading` | *(progress %)* | *(無 swap)* | — |
 
-**幾何一致性**:status slot 固定 `ICON_PX × ICON_PX`(16 × 16),與右側 `actions`(typically 刪除按鈕,`ItemInlineActionButton` 同 16 px)**中心點自動對齊** — 幾何相同所以 hover swap 不位移。
+**幾何一致性(修正 2026-04-19)**:status slot 容器大小 **= consumer 的 delete Button 尺寸**:
+- `mode="rich"` → `var(--field-height-sm)` (density-variable:28 md / 32 lg,與 Button sm 同)
+- `mode="compact"` → `var(--field-height-xs)` (24 固定,與 Button xs 同)
+
+Passive status icon(16 px)置中於 button-sized 容器,hover 時 active Button 填滿同一容器。這讓 flex `gap-2`(8 px)測量的是**兩個同尺寸 button slot 之間的真 8 px gap**,不被 hover bg overflow 吃掉(原本用 `ItemInlineActionButton` 16 px container + 24 px hover bg overflow,實際視覺 gap 只剩 4 px 違反 8 px 規格)。
+
+世界級 DS 的幾何鐵律:**同一 flex 列的互動元素必須有統一 box 尺寸**,gap token 才能如實呈現。
 
 **Backward compat**:consumer 若沒傳 `onDownload` / `onRetry`,status icon 永遠保持 passive(不響應 hover)——既有使用者無感。
 
