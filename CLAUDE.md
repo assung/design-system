@@ -97,11 +97,21 @@
 ### 執行與狀態層（DS 設計之外的知識）
 
 **Level 5 — Skill (`.claude/skills/*/SKILL.md` + `references/`)**
-- **Audit / 稽核協議**（如 `design-system-audit` 的 18 個 audits）
+- **Audit / 稽核協議**（如 `design-system-audit` 的 18 個 audits / `product-ui-audit` 的 6 維度檢核）
 - **AI↔user 對話 protocol**（checkpoint 範本:「先不管」vs tech debt / 新 rule 提議 / 分類模糊等）
 - **特定工作流 playbook**（only-when-invoked 的多步驟流程）
 - **判斷法**:這條規則是否「只在某個 invoke 情境才需要」? 是 → Skill;否（每次都要）→ CLAUDE.md
 - **不適合**:設計規則（放 CLAUDE.md / spec）、session 狀態（放 memory）
+
+**當前 4 skills 生態**(`.claude/skills/`):
+| Skill | 何時 invoke | scope |
+|-------|------------|-------|
+| `/design-system-audit` | 稽核 DS 本身(spec/cva/SSOT 漂移 18 audits) | design-system/ 內部 |
+| `/prototype` | user 明言「做 prototype / MVP / 原型」 | 建 exploration candidates(Phase 3.5 強制 audit gate) |
+| `/product-ui-audit` | 「audit X feature」「DS 用對了嗎」 / prototype Phase 3.5 自動 invoke | consumer UI code(非 DS 本身) 6 維檢核 |
+| `/delivery-handoff` | 產品 final 後「要交付 / handoff」 | 產 figma-like 交付包(Storybook + UI flow + inventory + spec) |
+
+**不走 skill 的情境**:user 日常對話「比幾個版本 / 世界級怎麼做」等模糊語,AI 先 clarify 再決定走 skill 還是直接口頭討論。
 
 **Level 6 — Memory (`~/.claude/projects/.../memory/*.md`)**
 - **跨 session 狀態**（audit progress、tech debt 清單、決策紀錄）

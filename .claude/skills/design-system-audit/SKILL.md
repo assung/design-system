@@ -7,6 +7,17 @@ description: Systematic audit of this design system for world-class quality. Run
 
 Purpose: catch every bug class this project has shipped historically PLUS structural gaps relative to Polaris / Material / Atlassian / Ant / Carbon / Apple HIG. Each audit has a clear rubric tied to CLAUDE.md rules. The skill reports findings and **explicitly stops at checkpoints** for user decisions before large-scope fixes.
 
+## Skill 生態位
+
+本 skill audit **DS 本身**(`src/design-system/` 內部的 spec / cva / SSOT / layout primitives 等)。若要 audit **consumer 層 UI code**(`src/app/` / `src/explorations/` 用 DS 的地方是否正確),走 `/product-ui-audit`。兩 skill scope 正交,不重疊。
+
+```
+/design-system-audit    audit DS 本身(本 skill)
+/product-ui-audit       audit consumer UI 對 DS 的消費
+/prototype              建 exploration(Phase 3.5 強制 product-ui-audit gate)
+/delivery-handoff       產品 final 後的交付文件包
+```
+
 ## When to run
 
 - User asks to audit / re-audit / 檢查 / verify design system
