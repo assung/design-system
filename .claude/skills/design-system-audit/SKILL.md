@@ -83,8 +83,15 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 | # | Audit | What it catches |
 |---|-------|-----------------|
 | 16 | **Layout Family 宣告** | 每個 component spec 第一段必須宣告「Layout Family: 1/2/3/4」或明示「非 family（self-contained / composite）」; 缺漏代表元件遊離於系統 |
-| 17 | **Prop value 跨元件認知衝突** | 同字 literal 在不同元件作 prop value 但語義衝突(`text` 是 Button `variant="text"` 文字樣式,若 FileItem `mode="text"` 變成「文字為主呈現」= 雙語義,consumer 混淆)——本 session 命名三 test 第 3 條強制檢查 |
+| 17 | **Prop value 跨元件認知衝突** | 同字 literal 在不同元件作 prop value 但語義衝突(`text` 是 Button `variant="text"` 文字樣式,若 FileItem `mode="text"` 變成「文字為主呈現」= 雙語義,consumer 混淆)——命名三 test 第 3 條強制檢查 |
 | 18 | **shadcn compat alias 回流檢查** | grep `bg-popover / text-popover-foreground / text-muted-foreground / bg-accent / text-accent-foreground / bg-destructive / bg-background` 等在我們的元件 code——這些是 shadcn copy-paste 安全網,我們元件應用 direct token。每次 audit 重新 grep 防 `npx shadcn add X` 新生成的 code 留下 alias |
+
+### Group G — Home governance + spec hygiene (P1 priority)
+
+| # | Audit | What it catches |
+|---|-------|-----------------|
+| 19 | **Home-name-vs-scope 一致性** | classification folder 名稱若與實際 scope 偏離(item-layout 裝 4-family taxonomy → rename item-anatomy 的學到的教訓);charter README 說的「這裡收 X」與實際內容是否一致 |
+| 20 | **Spec 硬寫機械化值檢查** | spec.md 不該有 `5.5px` / 完整 Tailwind class lists / cva object literals — 這些屬 tsx;spec 只記錄「為什麼」的判斷性描述 |
 
 ---
 
@@ -106,8 +113,15 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
 Launch all 20 audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
 
+**Every audit prompt declares three metadata lines at top**:
+- **Type**: `Absolute` or `Consistency` (per CLAUDE.md「Consistency Audit 原則」)
+- **Canonical source**: where correct behavior is defined
+- **Rationale home**: where deviation justification should live (`N/A` for Absolute)
+
+Sub-agents applying a **Consistency** dim **must** search the Rationale home for each apparent deviation before reporting as VIOLATION. A documented rationale paragraph = `deviation ✓` (not a violation). Absolute dims apply strict `actual == canonical` check.
+
 Each audit reports:
-- Violations only (skip confirmations)
+- Violations only (skip confirmations); for Consistency dims, also list `deviation ✓` items with rationale location as evidence the framework caught-and-cleared them
 - file:line for every finding
 - Suggested fix direction
 - Count + top offenders

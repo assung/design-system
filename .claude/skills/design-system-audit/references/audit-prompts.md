@@ -7,11 +7,31 @@ All prompts start with:
 Working directory: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
 ```
 
+## Dimension Type Taxonomy (CLAUDE.md「Consistency Audit 原則」)
+
+Every dimension below is tagged **Absolute** or **Consistency** so sub-agents apply the right formula:
+
+| Type | Meaning | Audit formula |
+|------|---------|---------------|
+| **Absolute** | Violation = bug regardless of context. No rationale exempts. Fix required. | `actual == canonical` else VIOLATION |
+| **Consistency** | Canonical behavior defined; deviation allowed IF documented rationale in designated home. | `actual == canonical OR (actual != canonical AND rationale present)` else VIOLATION |
+
+**Sub-agent protocol**: Before reporting a finding as VIOLATION on a Consistency dim, you **must** search the designated rationale home (usually element `spec.md`). Finding a rationale paragraph referencing the deviation = NOT a violation; report as "deviation with rationale ✓" instead.
+
+Every dimension header below has three lines:
+- **Type**: Absolute / Consistency
+- **Canonical source**: the document segment that defines correct behavior
+- **Rationale home**: where to look for deviation justification (`N/A` for Absolute)
+
 ---
 
 # Group A — Correctness (P0 priority)
 
 ## 1. cva defaultVariants 三方漂移
+
+**Type**: Absolute
+**Canonical source**: component .tsx `cva(...)` is the source of truth; spec.md prop table + anatomy SIZE_SPECS must mirror exactly
+**Rationale home**: N/A — three-way drift is always a bug (SegmentedControl precedent)
 
 ```
 Your job: audit cva `defaultVariants` three-way consistency (code vs spec.md vs anatomy story) across ALL variant keys.
@@ -30,6 +50,10 @@ End: `N components checked, M mismatches.` Under 400 words. Don't fix.
 
 ## 2. SSOT dead link
 
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# Spec 規則` SSOT anchors list; every pointer must resolve to an actual `##`/`###` heading
+**Rationale home**: N/A — dead link is never acceptable
+
 ```
 Your job: verify all SSOT pointers in .spec.md / .tsx files resolve to real headings.
 
@@ -46,6 +70,10 @@ End: `N pointers checked, M dead, K soft-matches.` Under 300 words. Don't fix.
 ```
 
 ## 3. SSOT reciprocal
+
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# Spec 規則` → "reciprocal 必須存在,不可單向"
+**Rationale home**: N/A — single-direction SSOT is a bug
 
 ```
 Your job: verify every cross-spec SSOT pointer has a reciprocal pointer back.
@@ -76,6 +104,10 @@ End: `N pointers checked, M non-reciprocal.` Under 400 words. Don't fix.
 
 ## 4. Tailwind v4 / tailwind-merge grep
 
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# Tailwind 使用規則` → "Tailwind v4 任意值" + "tailwind-merge 自訂 utility 註冊" bug patterns
+**Rationale home**: N/A — these are technical bugs (Sidebar `[--foo]` / `text-body` misclassification)
+
 ```
 Your job: grep for known Tailwind-related bug patterns.
 
@@ -98,6 +130,10 @@ End: `N .tsx files checked, M violations.` Under 400 words. Don't fix.
 ```
 
 ## 5. Token 消費紀律
+
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# UI 開發規則` + `# Tailwind 使用規則` → 禁止清單 (hex / rgb / shadow-md/sm / raw px 等)
+**Rationale home**: N/A — tokens bypass breaks dark mode / density / brand-swap
 
 ```
 Your job: grep src/design-system/components/*.tsx for hardcoded color values, pixel values, or magic numbers that should use tokens.
@@ -125,6 +161,10 @@ End: `N component .tsx files checked, M violations.` Under 500 words. Don't fix.
 
 ## 6. Spec Rule A 文字品質
 
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# Spec 規則` → Spec 文字品質 (不描述視覺形狀 / 實作細節 / 術語一致)
+**Rationale home**: N/A — visual metaphors / raw px / Tailwind class dumps in spec are always defects
+
 ```
 Your job: audit all .spec.md under src/design-system/ against Rule A in CLAUDE.md `# Spec 規則`.
 
@@ -143,6 +183,10 @@ End: `N specs checked, V violations, top offenders: [list]` Under 500 words. Don
 ```
 
 ## 7. Spec Rule B 邊界案例
+
+**Type**: Consistency
+**Canonical source**: CLAUDE.md `# Spec 規則` → 邊界案例覆蓋 + Scope 預設 (Field family delegates to field-controls, Separator/Skeleton/Spinner claim 無互動狀態, etc.)
+**Rationale home**: element .spec.md —「本元件無 X 狀態」/「由 {family} spec 繼承」 one-liner acceptable
 
 ```
 Your job: audit all .spec.md against Rule B in CLAUDE.md `# Spec 規則` → 邊界案例覆蓋 (apply Scope 預設).
@@ -164,6 +208,10 @@ End: `N specs checked, M genuine gaps, L scope-N/A accepted.` Under 500 words. D
 ```
 
 ## 8. 7-維度 對標覆蓋
+
+**Type**: Consistency
+**Canonical source**: CLAUDE.md `# Spec 規則` → 對標世界級 DS 七維度 (何時用 / 不用 / 近親分界 / 誤解 / 相關 / 空值 / 驗證時機 / Loading / a11y)
+**Rationale home**: element .spec.md — 某維度 N/A 時須一行說明 (「本元件為純版面 primitive,無驗證時機」)
 
 ```
 Your job: for each .spec.md, verify coverage of the 7 world-class DS dimensions (CLAUDE.md `# Spec 規則` → 對標世界級 DS).
@@ -192,6 +240,10 @@ End: `N specs checked, average dimensions covered: X/7. Specs needing most atten
 
 ## 9. shadcn passthrough 完整度
 
+**Type**: Consistency
+**Canonical source**: CLAUDE.md `# shadcn 元件規範` — forwardRef / displayName / ...props / cva / Radix data-attrs / asChild
+**Rationale home**: element .spec.md — internal helper / non-Slot primitives may skip asChild with documented reason
+
 ```
 Your job: check every component .tsx in src/design-system/components/ for shadcn structural completeness.
 
@@ -214,6 +266,10 @@ Report: `N components checked, M with holes.` Under 500 words. Don't fix.
 ```
 
 ## 10. a11y 基本覆蓋
+
+**Type**: Consistency (mostly Absolute)
+**Canonical source**: WCAG + CLAUDE.md `# UI 開發規則` (keyboard handlers / aria-label on icon-only / form labels)
+**Rationale home**: element .spec.md — decorative/internal primitives may document aria-hidden or omitted role with reason
 
 ```
 Your job: audit src/design-system/components/ for a11y basics.
@@ -240,6 +296,10 @@ End: `N files checked, M a11y gaps, top offenders: [list]`. Under 500 words. Don
 
 ## 11. Story 三層齊全
 
+**Type**: Consistency
+**Canonical source**: CLAUDE.md `# Story` 三層定位 (Components: 展示 + anatomy + principles;Internal: 展示 + anatomy)
+**Rationale home**: Storybook title classification (`Internal/` → principles optional by design). Components missing a layer without Internal classification = violation
+
 ```
 Your job: verify every public Components/ folder has all 3 stories:
 - {name}.stories.tsx (showcase)
@@ -259,6 +319,10 @@ End: `N component folders checked, M missing layers.` Under 400 words. Don't fix
 ```
 
 ## 12. Story 人話範例
+
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# Story` → 範例最高準則 + 禁止清單 (「人」test + 舉一反三 test)
+**Rationale home**: N/A — Lorem ipsum / Option A/B / Variant X / ASCII art have no legitimate use
 
 ```
 Your job: audit all .stories.tsx + .principles.stories.tsx for placeholder / abstract text per CLAUDE.md `# Story` → 範例選擇原則 → 明確禁止.
@@ -280,6 +344,10 @@ End: `N files checked, V violations.` Under 600 words. Don't fix.
 ```
 
 ## 13. Anatomy Figma-inspect 完整度 + Canonical `export const` 命名
+
+**Type**: Consistency
+**Canonical source**: `/story-writing` anatomy-standard.md → canonical 5 件套 (`Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior`)
+**Rationale home**: element .spec.md — replacing/omitting a canonical 5 section requires a rationale paragraph explaining why (e.g., "Chart 色彩來自 ChartConfig 注入,無 ColorMatrix 表格"). Renaming is never allowed.
 
 ```
 Your job: audit .anatomy.stories.tsx against `/story-writing` anatomy-standard.md, enforcing CLAUDE.md 「Consistency Audit 原則」 (canonical + rationale-for-deviation).
@@ -328,6 +396,10 @@ End: `N checked, V canonical violations (no-rationale or renamed), I content iss
 
 ## 14. 命名一致性
 
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# 命名與語言一致性` 各表格 (PascalCase/kebab-case/camelCase 規則 + suffix 鐵律)
+**Rationale home**: N/A — naming rules are meta-rules with no legit exemption
+
 ```
 Your job: audit the codebase against CLAUDE.md `# 命名與語言一致性` (Meta 規則).
 
@@ -349,6 +421,10 @@ End: `N files checked, M violations across C categories.` Under 600 words. Don't
 
 ## 15. CLAUDE.md 自身一致性
 
+**Type**: Absolute
+**Canonical source**: CLAUDE.md 自身 (內部 consistency)
+**Rationale home**: N/A — duplicated / contradictory / dead-link sections are always bugs
+
 ```
 Your job: audit CLAUDE.md for internal consistency.
 
@@ -368,9 +444,9 @@ End: `Total issues found: M. Categories: [breakdown]`. Under 500 words. Don't fi
 
 ---
 
-## Running all 18 in parallel
+## Running all 20 in parallel
 
-Single message with 18 `Agent` tool calls, each with `run_in_background: true`. Expected wall time: 3-5 minutes for all to complete (they process in parallel server-side).
+Single message with 20 `Agent` tool calls, each with `run_in_background: true`. Expected wall time: 3-5 minutes for all to complete (they process in parallel server-side).
 
 After all return:
 - Consolidate findings per file with line numbers
@@ -383,6 +459,10 @@ After all return:
 # Group F — Architecture compliance (session-learned)
 
 ## 16. Layout Family 宣告
+
+**Type**: Consistency
+**Canonical source**: CLAUDE.md `# 系統內部 Layout — 4-Family Model`
+**Rationale home**: element .spec.md — 聲明「本元件不屬於 4-Family Model」+ reason (self-contained / composite) is an acceptable rationale
 
 ```
 Your job: verify every component spec.md under src/design-system/components/ has a「Layout Family」declaration in its first section (after 定位/實作基礎, before 何時用).
@@ -409,6 +489,10 @@ End: `N component specs checked, M missing Family declaration, top 5: [list]`. U
 
 ## 17. Prop value 跨元件認知衝突
 
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `## 命名必過三重 test` → test #3 (跨元件認知衝突)
+**Rationale home**: N/A — same string with materially different semantic = cognitive dissonance bug (text/rich/picture precedent)
+
 ```
 Your job: find cross-component prop value collisions that create cognitive dissonance (CLAUDE.md `## 命名必過三重 test` test #3).
 
@@ -428,6 +512,10 @@ End: `N cva/prop definitions scanned, M genuine collisions found. Historical: te
 ```
 
 ## 18. shadcn compat alias 回流檢查
+
+**Type**: Absolute
+**Canonical source**: CLAUDE.md `# Tailwind 使用規則` → 「shadcn compat aliases — 不給我們元件用」
+**Rationale home**: N/A — aliases are migration safety net only; human-edited / new code must use direct tokens
 
 ```
 Your job: grep component .tsx files for shadcn compat aliases that should have been migrated to our direct tokens. This is a **recurring check** — future `npx shadcn add X` may introduce these and we must catch them early.
@@ -463,6 +551,10 @@ End: `N tsx files checked, M alias leakage, typically 0 in clean state`. Under 4
 
 ## 19. Home-name-vs-scope 一致性
 
+**Type**: Consistency
+**Canonical source**: each folder's charter README (`patterns/*/README.md`, `components/README.md`, `tokens/README.md`, `.claude/skills/*/SKILL.md` description)
+**Rationale home**: charter README —「這裡收 X / 不收 Y」明文即可,不符合就 rename folder 或修 charter
+
 ```
 Your job: verify each classification home folder's NAME still accurately reflects the scope of content it contains. Session 2026-04-20 learned this the hard way — `item-layout/` absorbed 4-family taxonomy (including Family 3 Pill + Family 4 Field pointers), becoming misleadingly named. Renamed to `item-anatomy/` to match scope.
 
@@ -492,6 +584,10 @@ End: `N folders audited, M rename candidates, top 3: [list]`. Under 400 words. D
 ```
 
 ## 20. Spec 硬寫機械化值檢查
+
+**Type**: Consistency
+**Canonical source**: CLAUDE.md `# Spec 規則` →「spec 只記錄設計原則,可程式化規則寫 .tsx」
+**Rationale home**: element/pattern .spec.md — token spec 本身 / pattern rationale 節 / historical bug anchor 可合法保留具體數值,需有一行說明為何在此
 
 ```
 Your job: grep spec.md files for mechanical values that should live in .tsx, not spec. Per CLAUDE.md 「spec 只記錄設計原則,可程式化規則寫 .tsx」.
