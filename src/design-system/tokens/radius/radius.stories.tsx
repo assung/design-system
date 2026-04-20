@@ -9,9 +9,9 @@ const meta: Meta = {
     docs: {
       description: {
         component: `
-圓角系統。只有三個選項，對應三種使用情境。
+圓角系統。四個選項,對應四種尺寸情境。
 
-完整規則：\`src/design-system/tokens/radius/radius.spec.md\`
+完整規則:\`src/design-system/tokens/radius/radius.spec.md\`
         `,
       },
     },
@@ -26,6 +26,20 @@ export const Overview: Story = {
   name: 'Overview',
   render: () => (
     <div className="max-w-2xl space-y-8">
+      {/* rounded-xs */}
+      <div>
+        <div className="flex items-baseline gap-3 mb-3">
+          <code className="text-caption font-medium">rounded-xs</code>
+          <span className="text-caption text-fg-muted">2px — 極小 indicator(≤ 10px)</span>
+        </div>
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="rounded-xs bg-primary h-2 w-2" aria-label="Chart legend dot" />
+          <div className="rounded-xs bg-success h-2 w-2" />
+          <div className="rounded-xs bg-error h-2 w-2" />
+          <span className="text-caption text-fg-muted ml-2">Chart legend swatch(8×8 色塊):md 4px 在 8×8 上接近 50% 圓,xs 2px 保留「色塊」而非「膠囊」語意</span>
+        </div>
+      </div>
+
       {/* rounded-md */}
       <div>
         <div className="flex items-baseline gap-3 mb-3">

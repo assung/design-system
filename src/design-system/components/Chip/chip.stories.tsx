@@ -43,10 +43,10 @@ export const States: Story = {
     <div className="flex flex-col gap-4">
       <div>
         <div className="text-caption text-fg-muted mb-2">Default / hover / selected / disabled</div>
-        <ChipGroup type="multiple" defaultValue={['selected']}>
-          <Chip value="default">Label</Chip>
-          <Chip value="selected">Label selected</Chip>
-          <Chip value="disabled" disabled>Label disabled</Chip>
+        <ChipGroup type="multiple" defaultValue={['typescript']}>
+          <Chip value="react">React</Chip>
+          <Chip value="typescript">TypeScript</Chip>
+          <Chip value="deprecated" disabled>Deprecated</Chip>
         </ChipGroup>
       </div>
     </div>

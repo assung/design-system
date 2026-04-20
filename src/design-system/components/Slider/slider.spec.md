@@ -10,6 +10,8 @@
 
 使用者沿著一條軌道拖曳 thumb 選擇一個數值(single)或一段範圍(range)。適合**連續或密集離散的數值選取**,當使用者在意「相對位置」勝過「精確數字」時使用。
 
+**Layout Family**:非上述 family — self-contained primitive(track + thumb + range,非 row / pill / field 結構)。高度對齊 Field family 僅為視覺整齊(`size` prop 映射 `h-field-*`),並非消費 Field layout 的 slot 結構。
+
 ---
 
 ## 何時用
@@ -72,7 +74,7 @@ Slider 接收 `size?: 'sm' | 'md' | 'lg'` prop(預設 `md`),**這個 prop 只決
 
 ### 為什麼 thumb 是**白底 + 邊框**,不是**實心 primary**
 
-實心 primary thumb 在 range mode(兩個 thumb)與 primary range 共存時邊界無法分離。白底 + 邊框讓 thumb 與 range 視覺可區分——thumb 作為位置指示器,必須能從 range 中辨別。這是 Material 3 / iOS / Linear 的共同解法。
+實心 primary thumb 會讓 thumb fill 與 range fill 使用同一 token → 失去位置辨識語意(特別是 range mode 兩個 thumb 與 primary range 共存時)。白底 + 邊框讓 thumb 與 range 視覺可區分——thumb 作為位置指示器,必須能從 range 中辨別。這是 Material 3 / iOS / Linear 的共同解法。
 
 ### 為什麼 Track 永遠是 `bg-muted`,不跟 state 變動
 
@@ -167,7 +169,7 @@ track (muted, n-2) < range = thumb border (border, n-5) < text (n-7+)
 **三階**,不是四階。Range 和 Thumb border 刻意用同一個 token(見前面「Range 色 ↔ Thumb border 色的綁定規則」),不拆成兩階。
 
 - **Track n-2**:最底的凹槽底線
-- **Range + Thumb border n-5**:同層——thumb border 是 range 的連續視覺,兩者融為一體,thumb 的白底是「被 range 圍住的空心洞」
+- **Range + Thumb border n-5**:同層——thumb border 是 range 的連續視覺,兩者融為一體;thumb 的 fill 保持 surface 色,與 range fill 對比,位置由 range 的長度段決定
 - **Text n-7+**:label / description 在所有視覺元件之上
 
 ### 為什麼 range disabled 不用 `--fg-disabled`
@@ -192,7 +194,7 @@ track (muted, n-2) < range = thumb border (border, n-5) < text (n-7+)
 
 | 元件 | 顏色的角色 | State 載體 | Disabled 策略 |
 |---|---|---|---|
-| **Switch** | `bg-primary` vs `bg-border` 是 on/off 的**唯一視覺差異**(track 和 thumb 形狀在 on/off 之間完全相同,只有顏色變)| **顏色本身就是 state** | **`opacity-disabled`** — 必須保留色彩身分,否則灰階後看不出 on/off |
+| **Switch** | `bg-primary` vs `bg-border` 是 on/off 的**唯一視覺差異**(track 和 thumb 形狀在 on/off 之間完全相同,只有顏色變)| **顏色本身就是 state** | **`opacity-disabled`** — 必須保留色彩身分,否則灰階後失去狀態區辨 |
 | **Checkbox** | 勾了有 checkmark,沒勾沒 checkmark——**形狀**決定 state,顏色只是美學 | **形狀(checkmark)** | **灰階 swap**(`bg-disabled`)— 灰色框裡的 checkmark 仍清楚可辨 |
 | **Button** | Primary 色是品牌美學,不是 state | — | **灰階 swap** |
 | **Slider** | Range 藍色是「已選長度」的美學視覺,**位置 + 長度是 state**,顏色只是裝飾 | **位置(thumb)+ 長度(range 佔比)** | **灰階 swap** — 灰色 range 跟灰色 thumb 的位置/長度仍然完全可辨 |
@@ -264,8 +266,8 @@ Slider 的 `readonly` 等同於 `disabled`——一個不能操作的 slider 本
 - 用 Slider 選離散少量選項(用 SegmentedControl / RadioGroup)
 - 用 Slider 表達「多/少」的 boolean(用 Switch)
 - 硬寫 thumb / track 尺寸——單一視覺規格,跟 size 無關
-- 用實心 primary thumb(看不出 thumb 跟 range 邊界)
-- 做「按住 thumb 色變」這種 button-style hover(破壞「這是位置指示器」的 mental model)
+- 用實心 primary thumb(thumb fill 與 range fill 使用同一 token → 失去位置辨識語意)
+- thumb hover-fill 切換色(破壞「這是位置指示器」的 mental model,hover 應透過陰影表達而非色變)
 - 給 Slider 加 error 紅色——用 min/max 限制輸入範圍,不讓錯誤發生
 
 ---

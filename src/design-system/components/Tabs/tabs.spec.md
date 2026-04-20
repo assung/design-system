@@ -265,7 +265,7 @@ Size 建議在這些容器內用 `sm`（32/40），避免 header 過高。
 - ❌ `endIcon` 不得放動詞性 icon（Download、Trash2）——tab 是視圖切換，不是觸發動作
 - ❌ Dialog / Sidebar header 內不得同時有 header `border-b` 和 TabsList `border-b`——會出現雙線
 - ❌ 不得把 trigger 改成等分 / fullWidth——等寬互斥切換是 SegmentedControl 的身份特徵，Tabs 是 navigation anchor，兩者不同層級。需要等寬改用 SegmentedControl
-- ❌ Trigger 不得使用 `border-b-2` 實作 selected underline——會與 TabsList 的 `border-b` 形成上下雙線；必須用 `::after` 絕對定位覆蓋
+- ❌ Trigger 不得使用 `border-b-2` 實作 selected underline——會與 TabsList 的 `border-b` 形成上下雙線;selected underline 必須與 TabsList border 同層渲染(見 `tabs.tsx`)
 - ❌ 不得自行改寫 Radix Tabs 的 `role` / `aria-*` 屬性
 
 ---

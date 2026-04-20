@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { zhTW } from 'date-fns/locale/zh-TW'
 import type { DateRange } from 'react-day-picker'
 import { Calendar } from './calendar'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Calendar/設計規格',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Steps, StepItem, StepLabel, StepDescription } from './steps'
-import { H3, Desc, Td, Th, TokenCell, Swatch } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell, Swatch } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Steps/設計規格',

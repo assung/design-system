@@ -43,14 +43,14 @@ const COLOR_MAP: Record<VariantKey, Record<ColorKey, { bg: string; text: string 
   },
   solid: {
     neutral:   { bg: 'var(--color-neutral-9)',      text: 'var(--inverse-fg)' },
-    blue:      { bg: 'var(--color-blue-6)',         text: '#fff' },
-    red:       { bg: 'var(--color-deep-orange-6)',  text: '#fff' },
-    green:     { bg: 'var(--color-green-6)',        text: '#fff' },
+    blue:      { bg: 'var(--color-blue-6)',         text: 'var(--on-emphasis)' },
+    red:       { bg: 'var(--color-deep-orange-6)',  text: 'var(--on-emphasis)' },
+    green:     { bg: 'var(--color-green-6)',        text: 'var(--on-emphasis)' },
     yellow:    { bg: 'var(--color-yellow-6)',       text: 'var(--warning-foreground)' },
-    turquoise: { bg: 'var(--color-turquoise-6)',    text: '#fff' },
-    purple:    { bg: 'var(--color-purple-6)',       text: '#fff' },
-    magenta:   { bg: 'var(--color-magenta-6)',      text: '#fff' },
-    indigo:    { bg: 'var(--color-indigo-6)',       text: '#fff' },
+    turquoise: { bg: 'var(--color-turquoise-6)',    text: 'var(--on-emphasis)' },
+    purple:    { bg: 'var(--color-purple-6)',       text: 'var(--on-emphasis)' },
+    magenta:   { bg: 'var(--color-magenta-6)',      text: 'var(--on-emphasis)' },
+    indigo:    { bg: 'var(--color-indigo-6)',       text: 'var(--on-emphasis)' },
   },
 }
 

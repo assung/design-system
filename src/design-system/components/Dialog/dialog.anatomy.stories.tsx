@@ -12,7 +12,7 @@ import {
 import { Button } from '@/design-system/components/Button/button'
 import { Input } from '@/design-system/components/Input/input'
 import { Field, FieldLabel, FieldGroup } from '@/design-system/components/Field/field'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Dialog/設計規格',

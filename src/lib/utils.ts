@@ -36,6 +36,7 @@ const twMerge = extendTailwindMerge({
         'text-fg-muted',
         'text-fg-disabled',
         'text-inverse-fg',
+        'text-on-emphasis',  // 白字於飽和色底(Avatar color variants / Steps filled indicator)
 
         // Status 基色(base)
         'text-primary',

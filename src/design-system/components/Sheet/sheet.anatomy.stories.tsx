@@ -9,7 +9,7 @@ import {
   SheetFooter,
 } from './sheet'
 import { Button } from '@/design-system/components/Button/button'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Sheet/設計規格',

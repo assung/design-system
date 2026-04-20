@@ -18,7 +18,7 @@ md tier，固定不隨 density 變：
 - title: `text-body`（14px）`leading-compact`（1.3）— 有 description 時加 `font-medium`
 - description: `text-body`（14px）`leading-compact` + `text-fg-secondary`（neutral-8）
 
-14px 配 14px — 視覺層級靠 font-weight + color 區分。
+相同 body 字級,層級靠 font-weight / color 區分。
 
 ## Padding（固定）
 
@@ -82,6 +82,17 @@ CSS `color` 從 body 繼承的是**已解析的計算值**，不是 `var(--foreg
 
 - `../Alert/alert.spec.md` — inline / fixed 持久通知
 - `../Toast/toast.spec.md` — 浮動非阻斷短暫通知
+
+---
+
+## 為何無 SizeMatrix / ColorMatrix
+
+Notice 是 **Toast / Alert 共用的 layout primitive**,刻意不擁有尺寸與色彩變體:
+
+- **無 SizeMatrix**:Notice / Alert / Toast **單一固定 size**(見本 spec「尺寸偏離」段),不實作 Family 2 baseline 的 sm/md/lg——通知的使命是「搶注意」而非「在密度選擇裡協調」。padding 固定 `px-4 py-3`,typography 固定 md tier(14px),不隨 density 變。
+- **無 ColorMatrix**:Notice 本身**不設 bg / text color**(見本 spec「Theme 策略」段),色彩完全由 consumer(Alert / Toast)透過 `data-theme` + `text-foreground` 控制。Notice 層級的色彩矩陣沒有意義——視覺對照屬於 consumer 的職責,應查 `alert.anatomy.stories.tsx` 與 `toast.anatomy.stories.tsx` 的 ColorMatrix。
+
+對應 anatomy story:保留 `Overview` / `Inspector` / `StateBehavior`,額外追加元件特有的 `VariantIconMap`(展示 5 種 variant 對應的 status icon + 語意)。
 
 ---
 

@@ -67,6 +67,27 @@
 
 ---
 
+## 禁止事項
+
+- ❌ 不要把 DescriptionList 拿來做 Form field label——表單需要編輯的 label + control 對應關係由 `Field`(含 `FieldLabel`)承載;DL 是唯讀 `<dl>` 語意,沒有 `<label for>` 對 input 的綁定
+- ❌ 不要在同一資料卡內混用 Field 和 DescriptionList——同一 section 的 label / value 語意必須一致,否則 screen reader 會讀出混淆的 term/description 對話。要編輯用全 Field,要唯讀全 DL
+- ❌ 不要用 DescriptionList 展示多筆同結構資料(使用者清單、訂單清單)——DL 是單實體屬性列表,多筆用 `DataTable`
+- ❌ 不要在 `<dt>` / `<dd>` 內嵌互動元件(Button / Input)——DL 是 `<dl>` 唯讀語意,塞互動會破壞 SR 敘事流;需要互動改用 Field 或 action row
+- ❌ 不要覆寫 label / value typography token(例改 `<dt>` 成 `text-heading-sm`)——DL 層級靠色彩區分不靠 size,改 size 會破壞「屬性-值」對應感
+
+---
+
+## 無障礙
+
+- **語意 HTML**:外層 `<dl>`,每組內 `<dt>` 為 term、`<dd>` 為 description——screen reader 會讀成「term X, description Y」對話,明確表達屬性-值關係
+- **DT / DD 配對**:每個 `<dt>` 必須有對應的 `<dd>`(不可孤立),否則 SR 敘事會中斷;元件內建一組 `DescriptionItem` 強制配對,不分開暴露 `<dt>` / `<dd>` primitive
+- **空值呈現**:value 空時以 `—` 占位(由 consumer 填入或於 DL 內 normalize),`text-fg-muted` 降低視覺重量;SR 會讀出「長破折號」,比空 `<dd>` 更明確
+- **多欄 `cols > 1`**:視覺為 grid 欄位,但 DOM 順序為 item 順序——SR 仍依 DOM 敘事(term1 → desc1 → term2 → desc2),不依視覺欄位;設計時確保 DOM 順序符合語意分組
+- **長值換行**:value 內長字串(URL / ID)以 `break-words` 處理,避免撐破 grid;不強制單行 truncate,長內容保留可讀完整性
+- **列表識別**:預設 `<dl>` 有部分瀏覽器 SR 不視為 list,若需明確 list 語意,DL 根容器可搭配 `role="list"` + `<div role="listitem">`(目前預設不加,保留標準 `<dl>` 語意,consumer 可自行加 role 覆蓋)
+
+---
+
 ## 為何無 Inspector / ColorMatrix / SizeMatrix
 
 DescriptionList 是**唯讀 label / value 資料呈現**(非互動 / 非 variant 驅動):

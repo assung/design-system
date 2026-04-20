@@ -84,6 +84,12 @@ startIcon 不隨 value 變化——它描述的是 input 的用途，不是 valu
 
 ---
 
+## Mode / Validation / a11y
+
+詳見 `../Field/field-controls.spec.md`(Mode / Validation)+ `../Field/form-validation.spec.md`(驗證時機)。
+
+---
+
 ## 相關
 
 - `../NumberInput/number-input.spec.md` — 數值資料

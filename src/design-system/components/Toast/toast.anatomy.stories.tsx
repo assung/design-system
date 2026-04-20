@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { toast } from './toast'
 import { Button } from '@/design-system/components/Button/button'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Toast/設計規格',

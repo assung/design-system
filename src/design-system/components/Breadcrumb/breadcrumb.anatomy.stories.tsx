@@ -8,7 +8,7 @@ import {
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
 } from './breadcrumb'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Breadcrumb/設計規格',

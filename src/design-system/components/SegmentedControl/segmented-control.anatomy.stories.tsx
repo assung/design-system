@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { AlignLeft, AlignCenter, AlignRight, List, LayoutGrid, Calendar } from 'lucide-react'
 import { SegmentedControl, SegmentedControlItem } from './segmented-control'
 import { Badge } from '@/design-system/components/Badge/badge'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/SegmentedControl/設計規格',

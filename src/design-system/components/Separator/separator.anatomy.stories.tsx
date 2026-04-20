@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Separator } from './separator'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 /**
  * Separator 是最薄的語意 primitive——Radix Separator 的 shadcn passthrough。

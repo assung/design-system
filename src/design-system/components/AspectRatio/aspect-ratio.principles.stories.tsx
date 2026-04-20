@@ -270,9 +270,9 @@ export const Prohibitions: Story = {
       >
         <div className="w-[400px] border border-dashed border-error rounded-md p-4">
           <AspectRatio ratio={4 / 1} className="bg-muted rounded-md flex items-center justify-around">
-            <div className="text-caption">項目一</div>
-            <div className="text-caption">項目二</div>
-            <div className="text-caption">項目三</div>
+            <div className="text-caption">Nike Pegasus 41</div>
+            <div className="text-caption">Adidas UltraBoost</div>
+            <div className="text-caption">New Balance 990</div>
           </AspectRatio>
         </div>
         <Label warn>↑ 用 AspectRatio 當橫排容器是誤用 → 用 flex gap-2</Label>

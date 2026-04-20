@@ -1,4 +1,6 @@
-# Checkbox & Radio 設計原則
+# Checkbox 設計原則
+
+(Radio 共用本規格,詳見 `../RadioGroup/radio-group.spec.md`;本文件通用於兩者視覺與行為,名稱保留 Checkbox 為主體)
 
 ## 定位
 

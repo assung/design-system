@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Rating } from './rating'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Rating/設計規格',

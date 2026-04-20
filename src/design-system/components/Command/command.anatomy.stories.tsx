@@ -9,7 +9,7 @@ import {
   CommandItem,
   CommandSeparator,
 } from './command'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Internal/Command/設計規格',

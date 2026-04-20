@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Skeleton } from './skeleton'
-import { H3, Desc } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 /**
  * Skeleton 是極簡 animation primitive——單一 div + pulse animation,

@@ -64,9 +64,9 @@ sm 與 md 視覺相同（純命名 mapping，對齊 Field family）。
 
 ---
 
-## Mode（edit / readonly / disabled）
+## Mode / Validation / a11y
 
-共用規則見 `../Field/field-controls.spec.md`「Mode」段——三 mode 的色彩 / 互動 / aria 規則 Textarea 全部對齊。
+詳見 `../Field/field-controls.spec.md`(Mode / Validation)+ `../Field/form-validation.spec.md`(驗證時機)。三 mode 的色彩 / 互動 / aria 規則 Textarea 全部對齊。
 
 ### Readonly 特例
 

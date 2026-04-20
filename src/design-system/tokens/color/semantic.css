@@ -163,6 +163,15 @@
   --fg-muted:             var(--color-neutral-7);
   --fg-disabled:          var(--color-neutral-6);
 
+  /* On-emphasis:飽和色底的對比文字(white on filled surface)
+     消費者:Avatar color variants(blue/red/green/... fill + on-emphasis text)
+           Steps filled indicator(completed/active 的 icon 色)
+     為什麼獨立 token:foreground 是 neutral 文字色,warning-foreground 是 warning
+     子場景 amber 底的對比,都不是「任何飽和色底的通用對比」。Polaris 叫 text-onEmphasis,
+     Material 叫 on-primary/on-secondary family。我們用 on-emphasis 保持通用。
+     Dark mode 不反轉(白字在飽和色底永遠白) */
+  --on-emphasis:          oklch(1 0 0);
+
   /* Brand / Action — 品牌主操作色
      --primary-text 為 SOP 規定的 5 件套之一，目前無消費者
      （Button 直接用 text-white, Tag 用 primitive --color-blue-7） */
@@ -377,6 +386,7 @@
 
   /* Foreground */
   --color-foreground:            var(--foreground);
+  --color-on-emphasis:           var(--on-emphasis);
 
   /* Primary */
   --color-primary:               var(--primary);

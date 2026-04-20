@@ -206,6 +206,10 @@ export const Text: Story = {
       <SwatchText className="text-fg-secondary" label="text-fg-secondary" desc="次要資訊、helper text" />
       <SwatchText className="text-fg-muted"     label="text-fg-muted"     desc="placeholder、caption、弱化 icon" />
       <SwatchText className="text-fg-disabled"  label="text-fg-disabled"  desc="disabled 文字" />
+      <div className="mt-4 flex items-center gap-3 px-3 py-2 rounded-md" style={{ backgroundColor: 'var(--primary)' }}>
+        <span style={{ color: 'var(--on-emphasis)' }} className="text-body font-medium">text-on-emphasis</span>
+        <span style={{ color: 'var(--on-emphasis)' }} className="text-caption opacity-80">Avatar color variant / Steps filled indicator 等飽和色底的對比文字</span>
+      </div>
     </div>
   ),
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { AspectRatio } from './aspect-ratio'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 /**
  * AspectRatio 設計規格——固定長寬比容器 primitive。

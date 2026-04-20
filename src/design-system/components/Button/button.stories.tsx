@@ -231,14 +231,14 @@ export const Disabled: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="mb-2 text-caption text-fg-muted">全 variants</p>
+        <p className="mb-2 text-caption text-fg-muted">全 variants(form footer 情境)</p>
         <div className="flex flex-wrap gap-3">
-          <Button variant="primary" disabled>Primary</Button>
-          <Button variant="secondary" disabled>Secondary</Button>
-          <Button variant="tertiary" disabled>Tertiary</Button>
-          <Button variant="text" disabled>Text</Button>
-          <Button variant="text" pressed disabled>Text pressed</Button>
-          <Button variant="link" disabled>Link</Button>
+          <Button variant="primary" disabled>儲存</Button>
+          <Button variant="secondary" disabled>取消</Button>
+          <Button variant="tertiary" disabled>預覽</Button>
+          <Button variant="text" disabled>查看版本紀錄</Button>
+          <Button variant="text" pressed disabled>已啟用自動儲存</Button>
+          <Button variant="link" disabled>了解更多</Button>
         </div>
       </div>
       <div>
@@ -301,27 +301,27 @@ export const Loading: Story = {
 
       {/* 全 variants — with startIcon */}
       <div>
-        <p className="mb-2 text-caption text-fg-muted">全 variants — with startIcon</p>
+        <p className="mb-2 text-caption text-fg-muted">全 variants — with startIcon(匯出 / 同步情境)</p>
         <div className="flex flex-wrap items-center gap-3">
-          <Button startIcon={Download} loading>Primary</Button>
-          <Button variant="secondary" startIcon={Download} loading>Secondary</Button>
-          <Button variant="tertiary" startIcon={Download} loading>Tertiary</Button>
-          <Button variant="text" startIcon={Download} loading>Text</Button>
-          <Button variant="text" pressed startIcon={Download} loading>Text pressed</Button>
-          <Button variant="primary" danger startIcon={Trash2} loading>Danger</Button>
+          <Button startIcon={Download} loading>匯出報表</Button>
+          <Button variant="secondary" startIcon={Download} loading>同步 Stripe</Button>
+          <Button variant="tertiary" startIcon={Download} loading>重新整理</Button>
+          <Button variant="text" startIcon={Download} loading>取消</Button>
+          <Button variant="text" pressed startIcon={Download} loading>下載中</Button>
+          <Button variant="primary" danger startIcon={Trash2} loading>刪除專案</Button>
         </div>
       </div>
 
       {/* 全 variants — without startIcon */}
       <div>
-        <p className="mb-2 text-caption text-fg-muted">全 variants — without startIcon</p>
+        <p className="mb-2 text-caption text-fg-muted">全 variants — without startIcon(匯出 / 同步情境)</p>
         <div className="flex flex-wrap items-center gap-3">
-          <Button loading>Primary</Button>
-          <Button variant="secondary" loading>Secondary</Button>
-          <Button variant="tertiary" loading>Tertiary</Button>
-          <Button variant="text" loading>Text</Button>
-          <Button variant="text" pressed loading>Text pressed</Button>
-          <Button variant="primary" danger loading>Danger</Button>
+          <Button loading>匯出報表</Button>
+          <Button variant="secondary" loading>同步 Stripe</Button>
+          <Button variant="tertiary" loading>重新整理</Button>
+          <Button variant="text" loading>取消</Button>
+          <Button variant="text" pressed loading>處理中</Button>
+          <Button variant="primary" danger loading>刪除專案</Button>
         </div>
       </div>
 

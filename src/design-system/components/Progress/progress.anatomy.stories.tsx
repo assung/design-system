@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { CircleCheck, XCircle, X } from 'lucide-react'
 import { Progress } from './progress'
 import { Button } from '@/design-system/components/Button/button'
-import { H3, Desc, Th, Td, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Th, Td, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Progress/設計規格',

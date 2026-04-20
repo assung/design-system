@@ -1,4 +1,4 @@
-# Overlay Surface Pattern
+# Overlay Surface 設計原則
 
 ## 定位
 
@@ -14,18 +14,18 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 
 ### SurfaceHeader
 - `border-b border-divider`(上下分隔）
-- `px-[--layout-space-loose] py-[--layout-space-tight]`
+- `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
 - `flex items-center gap-2 shrink-0`(不被 flex-grow 壓縮)
 
 ### SurfaceBody
-- `px-[--layout-space-loose] py-[--layout-space-tight]`
+- `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
 - **無額外 flex 屬性**——consumer 依浮層類型決定:
   - **Popover**:多數 bare consume,padding 即是總 padding
-  - **Dialog**:consumer 外層疊 `flex-1 overflow-y-auto pb-[--layout-space-bottom]`(viewport-fill 專用)
+  - **Dialog**:consumer 外層疊 `flex-1 overflow-y-auto pb-[var(--layout-space-bottom)]`(viewport-fill 專用)
 
 ### SurfaceFooter
 - `border-t border-divider`
-- `px-[--layout-space-loose] py-[--layout-space-tight]`
+- `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
 - `flex items-center justify-end gap-2 shrink-0`(右對齊按鈕列,不被壓縮)
 
 ---
@@ -34,7 +34,7 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 
 - **Close 按鈕**:Dialog modal 特有(一定要 X 關閉),Popover 預設無(click-outside 關閉)。Dialog 自己包 `ItemInlineActionButton` 在 Header 內,不污染 SurfaceHeader。
 - **viewport-fill 高度邏輯**:Dialog 特有(填滿 viewport - inset),由 DialogContent 自行計算 `height: calc(100vh - inset*2)`,與 Body 協作 `flex-1 overflow-y-auto`。
-- **radius / border / shadow / bg**:浮層外殼職責,由 Dialog / Popover 的 Content 自己套(都套同一組 token:`bg-surface-raised` / `border-border` / `rounded-lg` / `shadow-[--elevation-200]`——這部分 CLAUDE.md 已經寫明對齊規則,不另外抽 primitive)。
+- **radius / border / shadow / bg**:浮層外殼職責,由 Dialog / Popover 的 Content 自己套(都套同一組 token:`bg-surface-raised` / `border-border` / `rounded-lg` / `shadow-[var(--elevation-200)]`——這部分 CLAUDE.md 已經寫明對齊規則,不另外抽 primitive)。
 
 ---
 

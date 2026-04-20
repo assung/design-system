@@ -2,9 +2,11 @@
 
 ## 定位
 
-OverflowIndicator 是 **`+N` 溢出指示器 + HoverCard 顯示隱藏內容**——當 row / container 中的項目無法全部顯示時，剩餘項目以 `+N` 形式提示，hover 展開完整清單。
+OverflowIndicator 是 **`+N` 溢出指示器 + HoverCard 顯示隱藏內容**——當 row / container 中的項目無法全部顯示時,剩餘項目以 `+N` 形式提示,hover 展開完整清單。
 
-**實作基礎**：自建 internal primitive——消費 HoverCard + tagVariants，無直接 external primitive base。
+**實作基礎**:自建 internal primitive——消費 HoverCard + tagVariants,無直接 external primitive base。
+
+**Layout Family**:非上述 family — self-contained Tag-like primitive(自帶 `+N` 計數、單一 trigger pill + hover 展開 popover,無 prefix / content / suffix 的 slot 結構;視覺尺寸對齊 Tag family 但不屬 Family 1-4 的任何 row 結構)。
 
 ---
 
@@ -58,6 +60,17 @@ sm / md 跟 Tag 同階（20/24px），lg 對齊 md（尺寸需求一致，不需
 - ❌ trigger 用 Tag 元件——Tag 內建 Tooltip 會跟 HoverCard 衝突
 - ❌ 省略 `+N` 指示器（直接截斷隱藏）——使用者無法知道「還有多少被隱藏」
 - ❌ 在 HoverCard 內再嵌 Tooltip——tooltip 是資訊終點，不可巢狀
+
+---
+
+## 為何無 ColorMatrix / StateBehavior
+
+OverflowIndicator 是**承載 count + HoverCard 的 trigger primitive**,無獨立色彩與互動狀態變體:
+
+- **無 ColorMatrix**:trigger 只有 neutral 一種色彩(`circle` 用 `bg-muted` / `tag` 用 `tagVariants` 的 neutral),無 variant 色彩選項——OverflowIndicator 是結構 primitive,色彩屬於 consumer 決策(若需要色相,trigger 的外框 / 內容由 consumer 包)。
+- **無 StateBehavior**:trigger 只有 passive display(`cursor-default`),hover 只觸發 HoverCard 開啟,本身無 hover / active / disabled / selected 變化——互動狀態屬於 HoverCard trigger 行為(見 `hover-card.spec.md`),不屬 OverflowIndicator 層級。
+
+對應 anatomy story:保留 `Overview` / `Inspector` / `SizeMatrix`,額外追加元件特有的 `ShapeMatrix`(取代 ColorMatrix 展示 circle vs tag 兩種形狀變體)。
 
 ---
 

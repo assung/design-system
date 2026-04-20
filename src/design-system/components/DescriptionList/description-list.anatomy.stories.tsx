@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { DescriptionList, DescriptionItem } from './description-list'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/DescriptionList/設計規格',

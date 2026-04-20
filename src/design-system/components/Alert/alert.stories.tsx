@@ -60,10 +60,10 @@ export const Fixed = {
         <span className="text-caption text-fg-muted font-medium">Subtle Fixed</span>
         <div className="border border-divider rounded-lg overflow-hidden">
           <div className="px-4 py-2 bg-surface border-b border-divider">
-            <span className="text-body font-medium">Header</span>
+            <span className="text-body font-medium">專案設定</span>
           </div>
           {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" placement="fixed" title={`${L[v]} — 全域警告`} />)}
-          <div className="p-4 text-fg-muted text-caption">Page content...</div>
+          <div className="p-4 text-fg-muted text-caption">調整此專案的權限與通知偏好。變更會立刻套用到所有成員。</div>
         </div>
       </div>
 
@@ -71,10 +71,10 @@ export const Fixed = {
         <span className="text-caption text-fg-muted font-medium">Solid Fixed</span>
         <div className="border border-divider rounded-lg overflow-hidden">
           <div className="px-4 py-2 bg-surface border-b border-divider">
-            <span className="text-body font-medium">Header</span>
+            <span className="text-body font-medium">專案設定</span>
           </div>
           {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" placement="fixed" title={`${L[v]} — 全域警告`} />)}
-          <div className="p-4 text-fg-muted text-caption">Page content...</div>
+          <div className="p-4 text-fg-muted text-caption">調整此專案的權限與通知偏好。變更會立刻套用到所有成員。</div>
         </div>
       </div>
     </div>

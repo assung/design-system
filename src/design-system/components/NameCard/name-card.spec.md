@@ -4,6 +4,8 @@
 
 **實作基礎**：組合元件——Avatar + Text + Button 配 HoverCard 浮層。NameCard 本身不含觸發或定位邏輯（那是 HoverCard 的職責），只是 HoverCard content 的標準人員模板。
 
+**Layout Family**:非上述 family — composite(Avatar prefix + text block + action suffix,組合自 HoverCard content 內部;跨 section 垂直堆疊由 `border-t border-divider` 分隔,不屬 Family 1-4 的任何單行結構)。
+
 ---
 
 ## 何時用
@@ -64,6 +66,28 @@ NameCard 固定 **320px 寬**（見 `.tsx` 的 `w-[320px]`）——HoverCard 浮
 - **固定寬度而非 min/max**：HoverCard 內容量可預期，固定寬度避免不同人員 card 寬度跳動
 - **Section 用 border-t 分隔**：清晰的資訊分區，每個 section 獨立存在或不存在
 - **Status badge 用 muted 而非 interactive 色**：狀態是展示資訊，不可點擊，不應暗示互動性
+
+---
+
+## 禁止事項
+
+- ❌ 不要在 HoverCard 外直接用 NameCard 當 standalone card——它不是獨立 Card primitive,是 HoverCard content 模板,缺少浮層外殼(radius / border / shadow)與定位邏輯。需要 card 佈局時用專屬元件或自組 Surface
+- ❌ 不要硬寫內部 Avatar size——NameCard Profile Header 的 avatar 尺寸由元件內部規格決定,consumer 覆寫會破壞 text column 對齊公式
+- ❌ 不要 override HoverCard `z-index` / `sideOffset` / `collisionPadding`——浮層行為由 `../HoverCard/hover-card.spec.md` + `../../patterns/overlay-surface/overlay-surface.spec.md` 管理,單獨 override 會破壞跨浮層的一致 stacking
+- ❌ 不要把非人員資料塞進 NameCard(例如檔案預覽、物件資訊)——NameCard 是人員專屬模板,語意不可挪用;其他 hover 詳情請自組 HoverCard content
+- ❌ Status section 的狀態點不要自訂色——`available=success / away=warning / busy=error / offline=fg-muted` 是 canonical 映射,與 Avatar status 同源,改色會跨元件漂移
+- ❌ Action button 不要放動詞性 icon-only(例 Trash2 刪除)——NameCard actions 是關係型快速動作(Message / Invite / Follow),破壞性操作應走 Dialog confirm flow
+
+---
+
+## 無障礙
+
+- **Trigger 整合**:Avatar 作為 HoverCard trigger 時,`onFocus` / `onBlur` 與 mouseenter/leave 同時觸發由 Radix HoverCard 管理——鍵盤使用者 Tab 到 avatar 可自動顯示 card,Escape 關閉
+- **Focus 順序**:NameCard 內若有 Action button,Tab 順序為 trigger(Avatar)→ 第一個 action → 後續 action → view more;不抓取 focus 進入浮層(保留 Radix `HoverCard` 預設語意,與 Popover 的 focus trap 不同)
+- **Live region 語意**:NameCard 是展示內容,非 announcement,不套 `aria-live`
+- **DL 語意**:Info Fields 使用 DescriptionList(`<dl>/<dt>/<dd>`),screen reader 會讀成「term X, description Y」對話;詳見 `../DescriptionList/description-list.spec.md`「無障礙」段
+- **CTA button aria-label**:icon-only action button 必須帶 `aria-label`(「傳訊息給 {name}」「加入 {name} 為好友」),不只是 icon 視覺
+- **色彩對比**:Status badge `bg-muted` + `text-foreground` / Avatar status 圓點均通過 WCAG AA,不依賴單一色彩載體(搭配文字標籤)
 
 ---
 

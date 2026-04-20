@@ -214,7 +214,7 @@ Modal header 用 **padding-based**（`py-3` + content），因為 modal 是 ephe
 
 ### Chrome 內的 text element:統一 typography
 
-所有住在 chrome header / footer 裡的 text element(workspace brand、page title、user name)**一律使用 `text-body-lg font-medium`**(16px + 500)。
+所有住在 chrome header / footer 裡的 text element(workspace brand、page title、user name)**一律使用 `text-body-lg font-medium`**。
 
 **原則:chrome 元素是 sibling,不用 size/weight 製造假階層**
 - 不同 size → 會造成假階層,好像「A 是 B 的副標題」;chrome elements 實際上是並排的結構槽位,沒有從屬關係
@@ -230,7 +230,7 @@ Modal header 用 **padding-based**（`py-3` + content），因為 modal 是 ephe
 | Discord | 16px semibold | 同 size 同 weight |
 | Figma | 13px regular | 同 size 同 weight |
 
-我們選 **16px medium 統一**,是世界級 chrome typography 的中庸做法——比 Linear 舒服、比 Slack 節制、對齊 Discord。
+我們選 **`text-body-lg font-medium` 統一**,是世界級 chrome typography 的中庸做法——比 Linear 舒服、比 Slack 節制、對齊 Discord。
 
 ---
 

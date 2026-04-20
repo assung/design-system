@@ -669,16 +669,16 @@ function MdLgIndicator({
   switch (state) {
     case 'error':
       fillBg = 'var(--error)'
-      contentColor = '#fff'
+      contentColor = 'var(--on-emphasis)'
       break
     case 'completed':
       fillBg = 'var(--primary)'
-      contentColor = '#fff'
+      contentColor = 'var(--on-emphasis)'
       break
     case 'current':
       if (linear) {
         fillBg = 'var(--primary)'
-        contentColor = '#fff'
+        contentColor = 'var(--on-emphasis)'
       } else {
         fillBg = 'var(--secondary)'
         contentColor = 'var(--foreground)'
@@ -686,7 +686,7 @@ function MdLgIndicator({
       break
     case 'reachable':
       fillBg = 'var(--primary)'
-      contentColor = '#fff'
+      contentColor = 'var(--on-emphasis)'
       break
     default: // upcoming
       if (linear) {

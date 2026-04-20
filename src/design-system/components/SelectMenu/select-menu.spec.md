@@ -101,6 +101,16 @@ Popover（浮動容器，handle 展開 / 定位）
 
 ---
 
+## 為何無 ColorMatrix
+
+SelectMenu 是**多區塊 composite primitive**,不擁有獨立色彩決策:
+
+- **無 ColorMatrix**:視覺完全繼承既有 DS primitive 的 token(`MenuItem` row / `Command` search / `Empty` layout / `Popover` surface),無自己的 bg / border / hover 決策。色彩漂移由 primitive layer 控制——SelectMenu 層級若加 ColorMatrix 會重複 MenuItem / Popover 的矩陣。
+
+對應 anatomy story:保留 `Overview` / `Inspector` / `SizeMatrix` / `StateBehavior`,額外追加元件特有的 `ModeMatrix`(single / multi / searchable / creatable / grouped 等功能組合矩陣,這是 SelectMenu 真正的決策面向——取代 ColorMatrix)。
+
+---
+
 ## 相關
 
 - `../Menu/menu-item.spec.md` — 選項 row 的 item-layout 共用規則（SelectMenu 消費 MenuItem）

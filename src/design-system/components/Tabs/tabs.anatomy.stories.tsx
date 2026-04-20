@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Users, Settings, Bell, FileText } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
 import { Badge } from '@/design-system/components/Badge/badge'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Tabs/設計規格',

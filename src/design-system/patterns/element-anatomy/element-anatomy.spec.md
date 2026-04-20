@@ -1,4 +1,4 @@
-# Element Anatomy — 4-Family Model Taxonomy
+# Element Anatomy 設計原則(4-Family Model Taxonomy)
 
 本檔是 design system 中 **element-level 結構分類系統**的頂層 governance doc——跨 pattern / cross-component,不屬任何單一 folder。每個元件 spec 第一段**必須聲明 Layout Family**(1/2/3/4 或「非 family,self-contained / composite」)。
 

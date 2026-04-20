@@ -68,6 +68,17 @@ Checkbox 和 Radio 視覺幾乎完全一致（差異只在形狀 `rounded-md` vs
 
 ---
 
+## 為何無 ColorMatrix / StateBehavior
+
+SelectionItem 是**純 layout primitive**,只處理 4-slot 結構 + padding 公式,無獨立色彩與互動狀態:
+
+- **無 ColorMatrix**:SelectionItem 本身**不設** bg / border color,也**不擁有** control 視覺(Checkbox 方框 / Radio 圓圈)——control 由 consumer 傳入(`control` prop 接 ReactNode)。色彩決策屬於 Checkbox / Radio 層級,其 `.anatomy.stories.tsx` 負責 ColorMatrix(如 Checkbox 的 unchecked / checked / indeterminate × default / hover / disabled 矩陣)。
+- **無 StateBehavior**:SelectionItem 只有 `disabled` 影響 label 顏色(`text-fg-disabled`),無 selected / checked / hover / active——這些狀態屬於傳入的 `control`。Disabled 行為在 `Inspector` 的 props 已足夠展示,不需獨立 story。
+
+對應 anatomy story:保留 `Overview` / `Inspector` / `SizeMatrix`,額外追加元件特有的 `PrefixAlignment`(展示 24px 閾值下 icon/avatar 的 inline vs block 對齊行為——這是 SelectionItem 最重要的結構規則,取代 ColorMatrix)。
+
+---
+
 ## 相關
 
 - `../Checkbox/checkbox.spec.md` — 主要消費者之一，含 Clamp 政策 SSOT

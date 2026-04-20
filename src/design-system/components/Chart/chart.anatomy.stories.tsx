@@ -18,7 +18,7 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from './chart'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Chart/設計規格',
@@ -162,7 +162,7 @@ export const ColorMatrix: Story = {
               <tr><Td>整體文字</Td><Td mono>text-caption</Td><Td>所有 chart 內部文字(axis / legend / tooltip)預設 caption 大小</Td></tr>
               <tr><Td>Tooltip bg</Td><Td><TokenCell token="--surface-raised" display="bg-surface-raised" /></Td><Td>浮層底色(與 Popover / Dialog 同源)</Td></tr>
               <tr><Td>Tooltip border</Td><Td><TokenCell token="--border" display="border-border" /></Td><Td>標準邊框</Td></tr>
-              <tr><Td>Tooltip shadow</Td><Td mono>shadow-[--elevation-200]</Td><Td>浮層 elevation(與 Popover / Dialog 同級)</Td></tr>
+              <tr><Td>Tooltip shadow</Td><Td mono>shadow-[var(--elevation-200)]</Td><Td>浮層 elevation(與 Popover / Dialog 同級)</Td></tr>
               <tr><Td>Tooltip label</Td><Td mono>font-medium</Td><Td>上方 label(系列名 / x 軸值)</Td></tr>
               <tr><Td>Tooltip 值</Td><Td mono>font-mono font-medium tabular-nums</Td><Td>數字用 mono + tabular-nums 對齊</Td></tr>
               <tr><Td>Tooltip 類別</Td><Td><TokenCell token="--fg-secondary" display="text-fg-secondary" /></Td><Td>類別名稱(Desktop / Mobile...)</Td></tr>

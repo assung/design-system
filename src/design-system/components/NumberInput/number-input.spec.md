@@ -63,6 +63,12 @@ col.accessor('price', {
 
 ---
 
+## Mode / Validation / a11y
+
+詳見 `../Field/field-controls.spec.md`(Mode / Validation)+ `../Field/form-validation.spec.md`(驗證時機)。
+
+---
+
 ## 相關
 
 - `../Input/input.spec.md` — 純文字（含電話 / 郵遞區號等「看起來像數字」的資料）

@@ -7,7 +7,7 @@ import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Switch } from '@/design-system/components/Switch/switch'
 import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { Slider } from '@/design-system/components/Slider/slider'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Field/設計規格',

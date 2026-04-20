@@ -20,7 +20,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from './chart'
-import { Desc, H3 } from '@/design-system/components/_anatomy/anatomy-utils'
+import { Desc, H3 } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Chart/展示',

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Bot, Sparkles, Users } from 'lucide-react'
 import { Coachmark } from './coachmark'
 import { Button } from '@/design-system/components/Button/button'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Coachmark/設計規格',
@@ -169,11 +169,11 @@ export const Inspector: Story = {
                 <tr><Td>Width</Td><Td mono>w-80(320px)</Td></tr>
                 <tr><Td>Media 背景</Td><Td><TokenCell token="--muted" display="bg-muted" /></Td></tr>
                 <tr><Td>Media 比例</Td><Td mono>aspect-video(16:9)</Td></tr>
-                <tr><Td>Body padding</Td><Td mono>px-[--layout-space-loose] py-[--layout-space-tight]</Td></tr>
+                <tr><Td>Body padding</Td><Td mono>px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</Td></tr>
                 <tr><Td>Body gap</Td><Td mono>gap-1(Title / Description 間)</Td></tr>
                 <tr><Td>Title typography</Td><Td mono>text-body-lg font-medium text-foreground</Td></tr>
                 <tr><Td>Description typography</Td><Td mono>text-body text-fg-secondary</Td></tr>
-                <tr><Td>Footer padding</Td><Td mono>px-[--layout-space-loose] py-[--layout-space-tight]</Td></tr>
+                <tr><Td>Footer padding</Td><Td mono>px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</Td></tr>
                 <tr><Td>Footer layout</Td><Td mono>justify-between(左 step / 右 actions)</Td></tr>
                 <tr><Td>Footer actions gap</Td><Td mono>gap-2</Td></tr>
                 <tr><Td>Step typography</Td><Td mono>text-caption text-fg-secondary tabular-nums</Td></tr>

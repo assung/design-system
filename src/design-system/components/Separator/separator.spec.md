@@ -26,8 +26,8 @@ Consumer 在 JSX 裡明確放置分隔線的場景：
 ### 元件自動分隔相鄰群組 → CSS `[&+&]`
 
 元件內部自動在相鄰同類群組間產生分隔線：
-- `MenuGroup`：`[&+&]:border-t border-divider`
-- `SidebarGroup`：`[&+&]::before` pseudo-element
+- `MenuGroup`:相鄰同類群組之間自動出現 `border-divider` 分隔(見 `menu.tsx`)
+- `SidebarGroup`:相鄰群組之間自動產生分隔線(見 `sidebar.tsx`)
 
 為什麼：Consumer 只需要思考「分組」，不需要記得放分隔線。CSS 相鄰選擇器無法用元件替代（無處插入 DOM node）。
 

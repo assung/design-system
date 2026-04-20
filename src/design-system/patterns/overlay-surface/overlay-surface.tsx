@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
  * 由 Dialog 額外包裝,不污染 primitive。
  *
  * ── Token 規則 ──
- * padding: px-[--layout-space-loose] py-[--layout-space-tight]
+ * padding: px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]
  * 分隔線: border-{b|t} border-divider
  * Header / Footer 為 shrink-0 維持高度固定,中間 Body 負責 flex-grow（consumer 決定）
  */

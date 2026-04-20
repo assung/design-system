@@ -413,21 +413,21 @@ export const MixedDescription: Story = {
             size={size}
           >
             <StepItem value="step-1">
-              <StepLabel>只有 label</StepLabel>
+              <StepLabel>建立帳號</StepLabel>
             </StepItem>
             <StepItem value="step-2">
-              <StepLabel>Label + 單行 description</StepLabel>
-              <StepDescription>這是一行說明</StepDescription>
+              <StepLabel>驗證 Email</StepLabel>
+              <StepDescription>發送確認信至你的信箱</StepDescription>
             </StepItem>
             <StepItem value="step-3">
-              <StepLabel>Label + 長 description</StepLabel>
+              <StepLabel>設定團隊</StepLabel>
               <StepDescription>
-                這是一段比較長的說明文字,會自動換行到第二行,驗證 indicator 對齊
-                行為不受影響
+                命名你的工作區、選擇方案、匯入現有專案;這個步驟結束後可隨時在設定頁
+                調整
               </StepDescription>
             </StepItem>
             <StepItem value="step-4">
-              <StepLabel>最後一步</StepLabel>
+              <StepLabel>邀請成員</StepLabel>
             </StepItem>
           </Steps>
         </div>

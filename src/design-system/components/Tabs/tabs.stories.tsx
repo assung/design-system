@@ -35,12 +35,12 @@ export const Sizes: Story = {
       {(['sm', 'md', 'lg'] as const).map((size) => (
         <div key={size}>
           <div className="text-caption text-fg-muted mb-2">size = {size}</div>
-          <Tabs defaultValue="a">
+          <Tabs defaultValue="detail">
             <TabsList size={size}>
-              <TabsTrigger value="a">Label</TabsTrigger>
-              <TabsTrigger value="b">Label</TabsTrigger>
-              <TabsTrigger value="c">Label</TabsTrigger>
-              <TabsTrigger value="d">Label</TabsTrigger>
+              <TabsTrigger value="detail">詳情</TabsTrigger>
+              <TabsTrigger value="comments">留言</TabsTrigger>
+              <TabsTrigger value="history">歷史紀錄</TabsTrigger>
+              <TabsTrigger value="attachments">附件</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>

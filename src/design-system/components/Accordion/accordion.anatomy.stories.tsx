@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from './accordion'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Accordion/設計規格',

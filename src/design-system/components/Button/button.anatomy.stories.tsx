@@ -106,7 +106,7 @@ const VARIANT_DESC: Record<VariantKey, string> = {
    Shared UI Components
 
    NOTE: This file keeps local H3 / Desc / Th / Td / Swatch because its visual
-   style diverges from the shared canonical in `@/design-system/components/_anatomy/anatomy-utils`:
+   style diverges from the shared canonical in `@/design-system/stories-helpers/anatomy/anatomy-utils`:
    - H3 uses `text-h6 font-semibold` (shared: `text-body font-bold mb-2`)
    - Desc has no bottom margin / `leading-relaxed` (shared adds both)
    - Th/Td use `p-2 border-b border-divider` row style (shared: boxed cells)

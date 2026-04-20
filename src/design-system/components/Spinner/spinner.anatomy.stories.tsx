@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Spinner } from './spinner'
 import { Button } from '@/design-system/components/Button/button'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 /**
  * Spinner 是最薄的 animation primitive——單一 SVG + 旋轉動畫。**刻意只有

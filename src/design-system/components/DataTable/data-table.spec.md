@@ -59,7 +59,7 @@ DataTable 有三種尺寸（`sm`、`md`、`lg`），透過 `size` prop 控制。
 
 **Size 不等於 density。** Size 是這張表格的結構決策（需要多緊湊），density 是全域的使用者偏好。同一頁可以有不同 size 的表格，density 全頁一致。
 
-水平 padding 統一 12px，不隨 size 或 density 變化。垂直方向由行高模式決定（見第四節）。
+水平 padding 固定,不隨 size 或 density 變化(具體 token 見 `data-table.tsx`);垂直方向由行高模式決定(見第四節)。
 
 ### 二、高度模式
 
@@ -78,17 +78,12 @@ DataTable 有三種尺寸（`sm`、`md`、`lg`），透過 `size` prop 控制。
 
 ### 三、三區域架構（AG Grid 模式）
 
-```
-table
-├── header（固定頂部，不在 scroll 內）
-│   ├── left-header（shrink-0, overflow:hidden）
-│   ├── center-header（flex-1, overflow:hidden, JS sync scrollLeft）
-│   └── right-header（shrink-0, overflow:hidden）
-└── body-viewport（overflow-y:auto, display:flex, items-start）
-    ├── left-body（shrink-0, overflow:hidden）
-    ├── center-body（flex-1, overflow-x:auto, overflow-y:hidden）
-    └── right-body（shrink-0, overflow:hidden）
-```
+Table 分三層:
+- **Header**(固定頂部,不在 scroll 容器內):含 left / center / right 三區,center 區與 body center 的水平捲動 JS 同步 scrollLeft
+- **Body viewport**(垂直可捲,橫向由 center 區負責):含 left / center / right 三區,只有 center 可水平捲動,left / right 不隨水平捲動
+- **Left / Right 區**:寬度由凍結欄加總,不吃水平捲動;**Center 區**:flex-1,水平 overflow 自行處理
+
+完整 class / overflow 規則見 `data-table.tsx`。
 
 **Header 在 scroll 容器外面。** 不用 CSS sticky——header 結構性地在 body 上方，永遠固定在頂部。Header bg 用 `neutral-2-opaque`（不透明），不受底層色影響。
 

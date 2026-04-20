@@ -10,7 +10,18 @@ const meta: Meta = {
 export default meta
 
 const VARIANTS: NoticeVariant[] = ['neutral', 'success', 'warning', 'error']
-const LABELS: Record<string, string> = { neutral: 'Info/neutral', success: 'Success', warning: 'Warning', error: 'Error' }
+const LABELS: Record<string, string> = {
+  neutral: '檔案已複製到剪貼簿',
+  success: '專案已儲存',
+  warning: '即將到期的訂閱',
+  error: '無法連線伺服器',
+}
+const ACTIONS: Record<string, string> = {
+  neutral: '復原',
+  success: '查看',
+  warning: '續訂',
+  error: '重試',
+}
 
 /**
  * 靜態 Toast 展示——完全複製 Toast.tsx 的三層結構:
@@ -25,7 +36,7 @@ function StaticToast({ variant, title, description, pageTheme }: {
 }) {
   const inverse = pageTheme === 'light' ? 'dark' : 'light'
   const isInverse = variant === 'neutral' || variant === 'success'
-  const actionBtn = <Button variant="tertiary" size="xs">Label</Button>
+  const actionBtn = <Button variant="tertiary" size="xs">{ACTIONS[variant]}</Button>
 
   // ── inverse: bg + theme 同層 ──
   if (isInverse) {
@@ -101,7 +112,7 @@ export const WithDescription = {
           {VARIANTS.map((v) => (
             <div key={v} className="flex items-center gap-4">
               <span className="text-caption text-fg-muted w-24 shrink-0">元素 {modeLabel(v, 'light')} mode</span>
-              <StaticToast variant={v} title={LABELS[v]} description="description" pageTheme="light" />
+              <StaticToast variant={v} title={LABELS[v]} description="變更會立即套用到所有成員" pageTheme="light" />
             </div>
           ))}
         </div>
@@ -112,7 +123,7 @@ export const WithDescription = {
           {VARIANTS.map((v) => (
             <div key={v} className="flex items-center gap-4">
               <span className="text-caption text-fg-muted w-24 shrink-0">元素 {modeLabel(v, 'dark')} mode</span>
-              <StaticToast variant={v} title={LABELS[v]} description="description" pageTheme="dark" />
+              <StaticToast variant={v} title={LABELS[v]} description="變更會立即套用到所有成員" pageTheme="dark" />
             </div>
           ))}
         </div>
@@ -127,10 +138,10 @@ export const Interactive = {
     <div className="flex flex-col gap-4">
       <span className="text-caption text-fg-muted">點按鈕觸發 Toast</span>
       <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" onClick={() => toast({ title: 'Info/neutral', action: { label: 'Label', onClick: () => {} } })}>Neutral</Button>
-        <Button variant="secondary" onClick={() => toast({ variant: 'success', title: '操作成功', description: '已儲存變更', action: { label: 'Label', onClick: () => {} } })}>Success</Button>
-        <Button variant="secondary" onClick={() => toast({ variant: 'warning', title: '注意', description: '即將到期', action: { label: 'Label', onClick: () => {} } })}>Warning</Button>
-        <Button variant="secondary" onClick={() => toast({ variant: 'error', title: '操作失敗', description: '請稍後重試', action: { label: 'Label', onClick: () => {} } })}>Error</Button>
+        <Button variant="secondary" onClick={() => toast({ title: '檔案已複製到剪貼簿', action: { label: '復原', onClick: () => {} } })}>Neutral</Button>
+        <Button variant="secondary" onClick={() => toast({ variant: 'success', title: '專案已儲存', description: '變更已同步到所有成員', action: { label: '查看', onClick: () => {} } })}>Success</Button>
+        <Button variant="secondary" onClick={() => toast({ variant: 'warning', title: '即將到期的訂閱', description: '7 天後將停用,請前往結算頁續訂', action: { label: '續訂', onClick: () => {} } })}>Warning</Button>
+        <Button variant="secondary" onClick={() => toast({ variant: 'error', title: '無法連線伺服器', description: '請檢查網路後再試一次', action: { label: '重試', onClick: () => {} } })}>Error</Button>
       </div>
       <Toaster />
     </div>

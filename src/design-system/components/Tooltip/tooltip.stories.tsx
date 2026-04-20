@@ -108,7 +108,7 @@ export const LongText: Story = {
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        這是一段較長的提示文字，用來展示超過最大寬度時的自動換行行為。
+        API key 會授權第三方應用存取你的工作區資料,請勿公開分享或提交到公開 repo。
       </TooltipContent>
     </Tooltip>
   ),
