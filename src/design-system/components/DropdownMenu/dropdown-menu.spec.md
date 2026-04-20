@@ -7,7 +7,9 @@ DropdownMenu 是按鈕觸發的**動作選單**——使用者從中選擇一個
 
 **Layout Family**：CLAUDE.md 4-Family Model **Family 1（Menu item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「Menu item layout」章節的 scanning-mode 規格。
 
-**與 SelectMenu 的區別**：SelectMenu 是**選值**（選完後值留在 field 裡），DropdownMenu 是**執行**（選完後觸發動作，選單關閉）。判斷標準：「選完之後，畫面上是否需要保留選中狀態？」需要 → SelectMenu；不需要 → DropdownMenu。
+### 與 SelectMenu 的區別
+
+SelectMenu 是**選值**(選完後值留在 field 裡),DropdownMenu 是**執行**(選完後觸發動作,選單關閉)。判斷標準:「選完之後,畫面上是否需要保留選中狀態?」需要 → SelectMenu;不需要 → DropdownMenu。
 
 ---
 

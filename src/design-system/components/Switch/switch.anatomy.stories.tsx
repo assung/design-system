@@ -133,7 +133,7 @@ export const StateMatrix: Story = {
       <div>
         <H3>Disabled 策略:opacity 而非灰階 swap</H3>
         <Desc>Switch 的 on/off 視覺差異**唯一載體是顏色**(track bg-primary vs bg-border)——track 和 thumb 在 on/off 之間形狀完全相同。若用灰階 swap(把 primary 換成 border),disabled 的 ON 和 OFF 會看起來一模一樣,使用者無法分辨當前狀態。必須保留顏色。</Desc>
-        <p className="text-footnote text-fg-muted">對照 Checkbox / Slider 用灰階 swap(形狀/位置承載 state,不依賴顏色)——詳見 switch.spec.md「Disabled 用 opacity」段落。</p>
+        <p className="text-footnote text-fg-muted">對照 Checkbox / Slider 用灰階 swap(形狀/位置承載 state,不依賴顏色)——詳見 switch.spec.md「Disabled 用 opacity」。</p>
       </div>
     </div>
   ),

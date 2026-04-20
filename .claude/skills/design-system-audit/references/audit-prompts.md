@@ -4,7 +4,7 @@ Each prompt is self-contained — designed to paste into an `Agent` call with `r
 
 All prompts start with:
 ```
-Working directory: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+Working directory: /Users/alanchen/我的雲端硬碟/my-project
 ```
 
 ## Dimension Type Taxonomy (CLAUDE.md「Consistency Audit 原則」)

@@ -560,9 +560,9 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 
 中性互動背景分成**兩個獨立的 family**，對應兩種本質不同的狀態。
 
-### active vs selected 語意區分（重要）
+### active vs selected
 
-`--neutral-active` 和 `--neutral-selected` 目前**數值相同**（都是 neutral-2），但**語意獨立**，不可互用：
+**語意獨立,不可互用**。`--neutral-active` 和 `--neutral-selected` 目前**數值相同**(都是 neutral-2),但語意承載不同的「態」:
 
 | Token | 語意 | 生命週期 | 典型場景 |
 |---|---|---|---|

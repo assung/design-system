@@ -184,9 +184,9 @@ track (muted, n-2) < range = thumb border (border, n-5) < text (n-7+)
 
 ---
 
-## Disabled 策略:為什麼 Slider 用灰階不用 opacity
+## Disabled 策略
 
-這是系統內重要的判準,反覆確認後的結論。系統有兩個 disabled 處理派別,Slider 屬於**灰階派**(跟 Button / Checkbox 同家族)。判準比「多色彩 vs 單色彩」更精準,是:
+**Slider 用灰階不用 opacity**。這是系統內重要的判準,反覆確認後的結論——系統有兩個 disabled 處理派別,Slider 屬於**灰階派**(跟 Button / Checkbox 同家族)。判準比「多色彩 vs 單色彩」更精準,是:
 
 ### 判準:**顏色是否是 semantic state 的唯一載體?**
 

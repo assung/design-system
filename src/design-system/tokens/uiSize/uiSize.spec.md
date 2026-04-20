@@ -163,11 +163,13 @@ Tailwind：`h-tab-sm` / `h-tab-md` / `h-tab-lg`。
 padding-inline = (field-height - icon-size) / 2
 ```
 
-### 為什麼用 calc 而不是 aspect-square
+### calc 不用 aspect-square
 
-- **純 icon**：`width = 2 * padding + icon = field-height` → 自然正方形，不需要 `aspect-square`
-- **Icon + suffix**（badge、endIcon）：`width = 2 * padding + icon + gap + suffix > field-height` → 自然長方形，startIcon 到左邊距離不變
-- `aspect-square` 會強制正方形，加 suffix 時必須放棄或另寫覆蓋邏輯；calc padding 讓形狀由內容自然決定
+**讓形狀由內容自然決定,不強制正方形**:
+
+- **純 icon**:`width = 2 * padding + icon = field-height` → 自然正方形,不需要 `aspect-square`
+- **Icon + suffix**(badge、endIcon):`width = 2 * padding + icon + gap + suffix > field-height` → 自然長方形,startIcon 到左邊距離不變
+- `aspect-square` 會強制正方形,加 suffix 時必須放棄或另寫覆蓋邏輯;calc padding 讓形狀由內容自然決定
 
 ### Density-aware
 
