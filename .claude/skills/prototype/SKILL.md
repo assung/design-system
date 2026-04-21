@@ -220,28 +220,46 @@ Storybook title 慣例(不與 Components/ 衝突):
 
 **絕對不可**在 explorations/ 階段就偷偷 add 到 Components/,會污染 DS。
 
-### Phase 3.5 — Self-audit(強制 gate)
+### Phase 3.5 — Self-audit(stakeholder-gate,強制 code + visual 雙層)
 
 **Input**: Phase 3 完成 + Checkpoint 3 資源決策完畢的 exploration stories
 
-**Process**: **強制** invoke `/product-ui-audit` skill 對 `src/explorations/{topic-slug}/` 目錄執行 audit。理由:Phase 3 寫的 exploration code 不該直接進 Phase 4 給 stakeholder 看——先 AI 自己掃「有沒元件亂用 / 原則亂用」,世界級設計師本人也會自我 review 才對外 present。
+**核心原則**:Phase 3 寫的 exploration code 不該直接進 Phase 4 給 stakeholder 看——先 AI 自己掃 code + visual,世界級設計師本人也會自我 review 才對外 present。對齊 **CLAUDE.md 稽核三級 Tier 1 stakeholder-gate**(code + visual 雙層 mandatory)。
 
-**product-ui-audit 掃 6 維度**:
+**Process(兩層同時跑)**:
+
+#### Phase 3.5a — Code audit(強制 invoke `/product-ui-audit`)
+
+對 `src/explorations/{topic-slug}/` 目錄執行 audit,掃 6 維度:
 1. **Token 紀律** — 有沒硬寫 hex / rgb / shadow-sm / shadcn alias
 2. **Layout primitive 消費** — 該用 Empty / item-layout / overlay-surface / ScrollArea / AspectRatio 的地方是否用對
 3. **元件使用正確性** — Button / Input 等 variant / size / props 合理;Field wrapper 對用;icon-only 有 aria-label
 4. **Mindset adherence** — 沒 Option A/B/C placeholder / 有對標世界級註明 / 沒憑直覺造 pattern
-5. **視覺幾何** — flex 行 box 同尺寸(gap token 不被 overflow 吃)
+5. **視覺幾何(code 層)** — flex 行 box 同尺寸(gap token 不被 overflow 吃)
 6. **A11y** — aria-label / role / keyboard / color contrast
 
-**Output**: audit report(per candidate)P0 / P1 / P2 findings。
+#### Phase 3.5b — Visual audit(強制 chain `/visual-audit`)
 
-**Gate 規則**:
-- P0 有 → **必修**,不修不進 Phase 4(P0 = token alias / 硬色 / 幾何違反等明確 bug)
-- P1 > 3 筆 → 建議修,user 可決定先 present 或先修
-- P1 ≤ 3 筆 + 無 P0 → 可進 Phase 4
+對每個 candidate 的 exploration stories 跑:
+1. **Auto invoke**:`npm run visual-audit -- --scope=component:{topic-slug}`(scope 到本 prototype exploration)
+2. Layer A mechanical(WCAG 對比度 + DOM 幾何 + retina screenshot)
+3. Layer B chain `/visual-audit` skill:讀 `snapshots/*.png`,AI 做設計合理性判斷(每 candidate 的視覺品質、世界級對照、跨 candidate 視覺一致性)
 
-詳情見 `.claude/skills/product-ui-audit/SKILL.md` 與 `references/audit-checks.md`。
+**Output**:
+- Code report(per candidate)P0 / P1 / P2 findings(from /product-ui-audit)
+- Visual report(per candidate)contrast / geometry violations + AI 視覺 finding(from /visual-audit)
+- 合併成一份 Phase 3.5 gate report
+
+**Gate 規則(嚴格)**:
+- **Code P0 有** → 必修,不修不進 Phase 4(P0 = token alias / 硬色 / 幾何違反)
+- **Visual Layer A violation 有** → 必修,contrast AA 不過 / geometry assertion fail 視同 P0
+- **Visual Layer B 判斷有明顯設計問題** → 必修或在 notes.md 明文 rationale(「本 candidate 故意違反 X 以探索 Y」)
+- Code P1 > 3 筆 → 建議修,user 可決定先 present 或先修
+- Code P1 ≤ 3 + 無 P0 + Layer A 乾淨 → 可進 Phase 4
+
+**為什麼 mandatory**:比稿本質是「給 stakeholder 選視覺方向」,視覺沒 audit 好就 present = 讓 stakeholder 看了有視覺 bug 的 candidate,比稿品質失準。
+
+詳情見 `.claude/skills/product-ui-audit/SKILL.md` + `.claude/skills/visual-audit/SKILL.md` + `references/audit-checks.md`。
 
 ### Phase 4 — Present & stakeholder decision
 

@@ -14,6 +14,12 @@
  *   讀 snapshots/ PNG 做「設計合理性」判斷(箭頭不壓文字 / Badge 位置合理 / typography 選對 level)——
  *   這類 pattern recognition mechanical 做不到。
  *
+ * ── Scope(對齊 CLAUDE.md 稽核三級 policy)──
+ *   --scope=changed       (default) 讀 git diff 自動掃動到的 component + direct consumer
+ *   --scope=component:NAME          單一元件全 story(e.g. component:DatePicker)
+ *   --scope=all                     full DS-wide(release / token 大改 / 季度健檢)
+ *   --urls=<csv>                    跑外部 URL(產品 app route,非 Storybook)
+ *
  * ── 使用 ──
  *   npm run visual-audit               # 自動啟 storybook + 跑 Layer A + 關閉(headless)
  *   npm run visual-audit:headed        # 同上但帶 browser UI(debug)
@@ -29,7 +35,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { spawn } from 'node:child_process'
+import { spawn, execSync } from 'node:child_process'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = join(__dirname, '..')
@@ -37,9 +43,19 @@ const OUT_DIR = join(PROJECT_ROOT, 'snapshots')
 const ASSERTIONS_PATH = join(PROJECT_ROOT, 'scripts/visual-assertions.json')
 const STORYBOOK_URL = 'http://localhost:6006'
 
-const ARGS = new Set(process.argv.slice(2))
-const AUTO_START = ARGS.has('--auto-start')
-const HEADED = ARGS.has('--headed')
+// ── Args parse(支援 --flag 和 --key=value)─────────────────────────────────
+const ARG_LIST = process.argv.slice(2)
+const ARGS_SET = new Set(ARG_LIST.filter((a) => !a.includes('=')))
+const ARGS_KV = Object.fromEntries(
+  ARG_LIST.filter((a) => a.includes('=')).map((a) => {
+    const eq = a.indexOf('=')
+    return [a.slice(0, eq), a.slice(eq + 1)]
+  }),
+)
+const AUTO_START = ARGS_SET.has('--auto-start')
+const HEADED = ARGS_SET.has('--headed')
+const SCOPE = ARGS_KV['--scope'] ?? 'changed' // changed | all | component:<name>
+const URLS = ARGS_KV['--urls'] // CSV of URLs,overrides scenario mode
 
 // ── 主 scenario 清單 ────────────────────────────────────────────────────────
 // 先讀 assertions.json 取 scenario,fallback 到 hardcoded
@@ -254,7 +270,10 @@ async function auditScenario(browser, scenario) {
     deviceScaleFactor: 2,
   })
   const page = await context.newPage()
-  const url = `${STORYBOOK_URL}/iframe.html?id=${scenario.id}&viewMode=story`
+  // scenario 可有 .url(任意 URL,for product app routes)或 .id(Storybook story id)
+  const url = scenario.url
+    ? scenario.url
+    : `${STORYBOOK_URL}/iframe.html?id=${scenario.id}&viewMode=story`
 
   try {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 45_000 })
@@ -268,16 +287,86 @@ async function auditScenario(browser, scenario) {
     const geometry = await runGeometryAssertions(page, scenario.assertions)
 
     return {
-      id: scenario.id,
+      id: scenario.id ?? scenario.url,
       file: scenario.file,
       contrast,
       geometryViolations: geometry,
     }
   } catch (err) {
-    return { id: scenario.id, file: scenario.file, error: err.message }
+    return { id: scenario.id ?? scenario.url, file: scenario.file, error: err.message }
   } finally {
     await context.close()
   }
+}
+
+// ── Scope resolution ───────────────────────────────────────────────────────
+// 依 --scope / --urls 過濾 ASSERTIONS.scenarios 或產生 ad-hoc scenarios
+
+function getChangedComponents() {
+  // 讀 git diff 找動到的 src/design-system/components/<Name>/ 目錄
+  try {
+    // 相比 main:用 `git diff main...HEAD --name-only` + working tree
+    const committedFiles = execSync('git diff main...HEAD --name-only 2>/dev/null || echo ""', {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+    }).trim().split('\n').filter(Boolean)
+    const workingFiles = execSync('git diff --name-only HEAD 2>/dev/null || echo ""', {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+    }).trim().split('\n').filter(Boolean)
+    const stagedFiles = execSync('git diff --cached --name-only 2>/dev/null || echo ""', {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf-8',
+    }).trim().split('\n').filter(Boolean)
+    const all = new Set([...committedFiles, ...workingFiles, ...stagedFiles])
+    const components = new Set()
+    for (const f of all) {
+      const m = /^src\/design-system\/components\/([^/]+)\//.exec(f)
+      if (m) components.add(m[1])
+    }
+    return components
+  } catch {
+    return new Set()
+  }
+}
+
+function filterScenarios(allScenarios) {
+  // --urls mode:完全覆蓋,產生 ad-hoc scenarios 跑外部 URL
+  if (URLS) {
+    return URLS.split(',').map((u, i) => ({
+      url: u.trim(),
+      file: `url-${i}-${u.replace(/[^a-z0-9]/gi, '_').slice(0, 40)}.png`,
+    }))
+  }
+
+  // Storybook scenario filtering by --scope
+  if (SCOPE === 'all') {
+    return allScenarios
+  }
+
+  if (SCOPE.startsWith('component:')) {
+    const compName = SCOPE.slice('component:'.length).toLowerCase()
+    return allScenarios.filter((s) =>
+      s.id && s.id.toLowerCase().includes(`-${compName}-`)
+    )
+  }
+
+  if (SCOPE === 'changed') {
+    const changed = getChangedComponents()
+    if (changed.size === 0) {
+      console.log('[visual-audit] git diff 無動到 component,scope=changed 無 scenario 可跑')
+      return []
+    }
+    const names = [...changed].map((n) => n.toLowerCase())
+    console.log(`[visual-audit] scope=changed,動到的 component: ${[...changed].join(', ')}`)
+    return allScenarios.filter((s) => {
+      if (!s.id) return false
+      return names.some((n) => s.id.toLowerCase().includes(`-${n}-`))
+    })
+  }
+
+  console.warn(`[visual-audit] 未知 scope=${SCOPE},fallback 到 all`)
+  return allScenarios
 }
 
 async function main() {
@@ -308,13 +397,22 @@ async function main() {
     }
   }
 
+  // Scope resolution
+  const scopedScenarios = filterScenarios(ASSERTIONS.scenarios)
+  if (scopedScenarios.length === 0) {
+    console.log('[visual-audit] 0 scenario 符合 scope,跳過(exit 0)')
+    if (storybookProc) storybookProc.kill()
+    process.exit(0)
+  }
+  console.log(`[visual-audit] scope=${URLS ? 'urls' : SCOPE},跑 ${scopedScenarios.length} scenario`)
+
   const browser = await chromium.launch({ headless: !HEADED })
   const results = []
   let totalContrastViolations = 0
   let totalGeometryViolations = 0
 
-  for (const scenario of ASSERTIONS.scenarios) {
-    console.log(`[visual-audit] 稽核 ${scenario.id}`)
+  for (const scenario of scopedScenarios) {
+    console.log(`[visual-audit] 稽核 ${scenario.id ?? scenario.url}`)
     const r = await auditScenario(browser, scenario)
     results.push(r)
     if (r.contrast?.violations?.length) totalContrastViolations += r.contrast.violations.length

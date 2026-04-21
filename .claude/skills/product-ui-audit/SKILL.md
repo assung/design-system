@@ -162,6 +162,29 @@ P2(需討論):K 項
 - `npx tsc --noEmit` 通過
 - re-run 本 skill(縮窄到原 findings)確認 zero regression
 
+### Phase 5 — Visual audit(stakeholder-gate,mandatory on stakeholder-visible work)
+
+對齊 **CLAUDE.md 稽核三級 Tier 1 stakeholder-gate**:產品 UI 要給 stakeholder / end-user 看之前,**code + visual 雙層都要過**。Phase 1-4 是 code 層;本 Phase 補視覺層。
+
+**Input**:Phase 4 verify 過關的產品 UI(screens / routes / embedded widgets)
+
+**Process**:
+1. 確認 user 有提供 **URL 清單**(產品 app routes)或 **Storybook scenario id**(若產品 stories 在 Storybook):
+   - URL mode:`npm run visual-audit -- --urls=<csv>`(例:`--urls=http://localhost:3000/inbox,http://localhost:3000/settings`)
+   - Storybook mode:`npm run visual-audit -- --scope=component:<topic>`
+2. **Layer A mechanical**(auto):WCAG 對比度 + DOM 幾何 assertion + retina screenshot → `snapshots/`
+3. **Layer B AI judgement**(chain `/visual-audit` skill):讀 `snapshots/*.png`,判斷設計合理性(視覺對齊 / 覆蓋限制 / 世界級對照 / typography hierarchy)
+4. Violation 分級:
+   - Contrast AA 不過 → **P0**(a11y 強制)
+   - Geometry assertion fail → **P0**(機械規則違反)
+   - Layer B AI 視覺判斷 finding → 按嚴重度 P0 / P1 / P2
+
+**Gate 規則**:P0 有 → 停下修,不放給 stakeholder;P1 / P2 走跟 Phase 2 Report 同樣 user-decision 流程。
+
+**何時可跳**:內部 UI(只給 engineer / admin 看,非 stakeholder / end-user)→ user 明示 skip,但建議跑一次 Layer A 抓 a11y P0。
+
+**為什麼 mandatory**:code audit 對 + spec 對,視覺仍可能錯(對比不夠、overlay 疊到文字、跨 OS 捲軸跑版)——這類 bug 只有視覺層抓得到。產品給 stakeholder / user 看時 = stakeholder-visible artifact,必過 Tier 1 gate。
+
 ---
 
 ## 呼叫時的回答格式

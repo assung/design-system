@@ -324,35 +324,9 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 
 # Token 系統運作方式
 
-**所有 token 均為純 CSS（不需 JavaScript）：**
-- `color/primitives.css`：原始色票
-- `color/semantic.css`：語義色彩，用 CSS selector 處理 dark mode
-- `typography/typography.css`：字體尺寸 utilities
-- `uiSize/uiSize.css`：元件尺寸，用 `[data-ui-size="lg"]` 處理模式切換
-- `layoutSpace/layoutSpace.css`：版面間距，用 `[data-layout-space="lg"]` 處理模式切換
-- `opacity/opacity.css`：opacity 值
-- radius 透過 `globals.css` 的 `@theme inline` 定義
+**純 CSS token(無 JS 需求)**:`color/` `typography/` `uiSize/` `layoutSpace/` `opacity/` `radius`。初始狀態 `<html data-theme="light" data-density="md">` 在 `index.html` 設;動態切換操作 `documentElement.setAttribute('data-theme', 'dark')` 即可。JS 端用 `var(--token-name)` 字串。
 
-**初始狀態在 `index.html` 設定，無需 JavaScript：**
-
-```html
-<html data-theme="light" data-density="md">
-```
-
-**動態切換**（例如使用者切換 dark mode）直接操作 attribute：
-
-```ts
-document.documentElement.setAttribute('data-theme', 'dark')
-document.documentElement.setAttribute('data-density', 'lg')  // 同時切換 uiSize + layoutSpace
-// 若需單獨控制，可直接用 data-ui-size / data-layout-space（逃生艙）
-```
-
-**JS 端使用色彩**（inline style、canvas 等場景）直接用 CSS 變數字串：
-
-```ts
-element.style.color = 'var(--color-neutral-4)'
-element.style.backgroundColor = 'var(--primary)'
-```
+**完整檔案清單 + dark mode selector + density 切換機制** → `src/design-system/tokens/README.md`(charter)。
 
 
 # Spec 規則
@@ -431,6 +405,29 @@ element.style.backgroundColor = 'var(--primary)'
 - 能在 CLAUDE.md / spec.md / skill 某處清楚指一段當 canonical?→ 可以寫成規則
 - 偏離的元件能在自己 spec.md 說清楚為什麼?→ 可以寫成規則
 - 兩者任一做不到 → 這不是 canonical，是風格偏好，不要寫進 governance
+
+
+# 稽核三級 policy(stakeholder-gate / daily dev / periodic deep)
+
+**核心原則**:任何 stakeholder-visible artifact(prototype 比稿 / 元件 merge / 產品 demo)**必須已過 code + visual 雙層 audit**。日常 dev 用 scoped 高效稽核;DS-wide full audit 僅 release / token 大改 / 季度健檢才跑。
+
+| Tier | Trigger | Scope | 實作 |
+|------|---------|-------|------|
+| **1. Stakeholder-gate**(mandatory,code + visual) | prototype 比稿前 / 元件 ready for merge / 產品 demo 前 | scoped to 該 artifact(單元件 / candidate stories / 產品 URL) | `/prototype` Phase 3.5 / `/component-quality-gate` Phase 4 Ship / `/product-ui-audit` Phase 5 三個 skill 的 stakeholder gate 強制 chain `/visual-audit` |
+| **2. Daily dev**(高效 scoped) | 日常改動(spec wording / 單元件 tsx / 小 refactor) | `git diff` 動到的 component + direct consumer | `scripts/visual-audit.mjs --scope=changed`(default);所有 audit skill 預設此 scope |
+| **3. Periodic deep**(偶爾全掃) | Release cut / token 改動 / 大 refactor / 季度健檢 | full DS-wide code + visual | `/design-system-audit --deep`(或 CLI `--scope=all`);年度 2-4 次 |
+
+**實作對照**:
+- Scope CLI:`scripts/visual-audit.mjs` 支援 `--scope=changed | component:<name> | all` 和 `--urls=<csv>`(產品 app route)
+- Skill 強制 chain:`/prototype` `/component-quality-gate` `/product-ui-audit` 在 stakeholder-gate phase 必 auto invoke `/visual-audit`,不能跳
+- Daily 不阻塞:working tree 乾淨 + 無動 component → `--scope=changed` 返回 0 scenario,exit 0 不擋流程
+
+**禁止**:
+- ❌ Stakeholder-facing artifact 沒過 visual audit 就給 review(違反 Tier 1 鐵律)
+- ❌ 日常改動硬跑 full DS audit(浪費時間 + 真正要 gate 時 developer 會跳過)
+- ❌ 週期性 deep audit 被無限期推遲(季度至少 1 次,寫進 team ritual)
+
+**世界級對照**:Figma、Google Material、Shopify Polaris 都走相同三級 — stakeholder gate 強制、daily 高效、release 前 full sweep。
 
 
 # 建立 UI 前必讀
@@ -739,43 +736,24 @@ Badge 在不同 anchor 有兩種截然不同的視覺 / 語意型態,prop 名要
 
 # shadcn 元件規範
 
-元件位置：`src/design-system/components/{ComponentName}/`
+**檔案結構**(每元件一資料夾):`{name}.tsx` / `{name}.spec.md` / `{name}.stories.tsx` / `{name}.anatomy.stories.tsx` / `{name}.principles.stories.tsx`。
 
-每個元件一個資料夾：
-- `{name}.tsx` — 元件本體
-- `{name}.spec.md` — 使用原則與設計規範
-- `{name}.stories.tsx` — 展示（設計規格的便利瀏覽版）
-- `{name}.anatomy.stories.tsx` — 設計規格（完整技術規格）
-- `{name}.principles.stories.tsx` — 設計原則（do/don't 使用判斷）
+**基本結構**:forwardRef + cva + VariantProps + cn() + `{ Component, componentVariants }` export。讀既有元件(`Button/button.tsx` / `Input/input.tsx`)當範本,不重寫結構說明。
 
-新增 shadcn 元件:`npx shadcn add {name}`(Button / Input / Card 等),**裝完立刻 grep 移除 shadcn compat alias**(見 `# Tailwind 使用規則`)。
+**Import 路徑**:`@/design-system/components/{Name}/{name}`(無 barrel file)。
 
-**元件基本結構**:forwardRef + cva + VariantProps + cn() + `{ Component, componentVariants }` export。直接讀既有元件(`Button/button.tsx` / `Input/input.tsx`)當範本,不重寫結構說明。
+**新增 shadcn 元件**:`npx shadcn add {name}`,**裝完立刻 grep 移除 shadcn compat alias**(見 `# Tailwind 使用規則`)。
 
-Import 路徑:`@/design-system/components/{Name}/{name}`(無 barrel file,直接指到檔案)。
+## cva 適用範圍(何時用、何時不用)
 
-## cva 的適用範圍（何時用、何時不用）
+**判斷法**:
+- 變體差異只有 className(同 JSX 樹) → **cva**
+- 變體要 inline style 物件 → **object map + `style={{ ... }}`**(例:Avatar color variants)
+- 變體是不同 JSX 樹(不同 layout) → **conditional rendering**(例:FileItem compact / rich mode)
 
-`cva()` 是系統管理 **className 變體**的標準工具,但**不是所有變體都該用 cva**。合法的**非 cva** 實作模式：
+**禁止**:為「一律用 cva」硬塞 style prop 變體(無法優雅產 style object),或把不同結構 mode 壓同棵 JSX 配 className 切換(會長滿 `{mode === 'x' && ...}` hacks)。
 
-| 變體類型 | 實作方式 | 範例 |
-|---------|---------|------|
-| className 變體（bg / text / border / size / state） | **`cva()`** | Button / SegmentedControl / Chip / Tag / Field Controls 等絕大多數 |
-| **Style prop 驅動的 variant**（需要 `style={{ backgroundColor: 'var(--...)' }}`）| **Object map / lookup table**（world-class:Material / Ant / Polaris 同樣做法） | **Avatar** 的 color variants 驅動 inline style;cva 無法產 style object |
-| **結構性變體**（不同 mode 是不同 layout,不只 class swap） | **Conditional rendering / sub-components** | **FileItem** 的 `compact / rich` mode 有不同 flex 結構 |
-
-**判斷法**：
-- 變體差異只有 className（同一棵 JSX 樹）→ cva
-- 變體差異要 inline style 物件 → object map + `style={{ ... }}`
-- 變體差異是不同 JSX 樹（不同 children layout / 不同 wrapper）→ conditional rendering
-
-**禁止**：
-- ❌ 為了「一律用 cva」硬把 style prop 變體塞進 cva(無法優雅產出 style object)
-- ❌ 為了「一律用 cva」把不同結構的 mode 強制壓到同一棵 JSX 配 className 切換(code 會長滿 `{mode === 'rich' && ...}` hacks)
-
-**當前系統 documented 例外**：
-- `Avatar`: color variants 用 object map(原因:inline style prop)
-- `FileItem`: mode variants 用 if-branches(原因:結構性差異,不是 class swap)
+**完整對照表 + documented 例外清單** → `.claude/references/cva-patterns.md`
 
 ## 元件不得自包 Provider
 
