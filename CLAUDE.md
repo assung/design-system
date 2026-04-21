@@ -233,7 +233,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | 7 | Hook(`.claude/hooks/*.sh`) | 可機械化的 pre/post tool 自動檢查 |
 | 8 | Slash Command(`.claude/commands/*.md`) | 一次性單步 action(目前無 commands) |
 
-當前 6 skills:`/design-system-audit` / `/product-ui-audit` / `/prototype` / `/delivery-handoff` / `/component-quality-gate` / `/story-writing`。當前 5 hooks:`pre_edit_spec_check` / `check_sync_update` / `check_token_hygiene` / `block_prototype_imports` / `enforce_home_charter`。
+當前 9 skills:`/design-system-audit` / `/product-ui-audit` / `/prototype` / `/delivery-handoff` / `/component-quality-gate` / `/story-writing` / `/visual-audit` / `/performance-audit` / `/ux-audit`。當前 13 hooks:`pre_edit_spec_check` / `pre_new_component_spec` / `enforce_home_charter` / `check_ssot_consultation` / `check_story_anatomy` / `check_third_party_dom_verified` / `check_sync_update` / `check_token_hygiene` / `check_cva_default_sync` / `check_anatomy_section_numbering` / `check_sideoffset_canonical` / `block_prototype_imports` / `stop_tsc_sanity`。
 
 各 home 完整 scope / 「收什麼、不收什麼」細節 / 未採納能力(sub-agent / MCP / output-style)評估 → `.claude/skills/design-system-audit/references/rule-placement.md`。
 

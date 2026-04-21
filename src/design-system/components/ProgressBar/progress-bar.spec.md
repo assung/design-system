@@ -93,8 +93,8 @@ export interface ProgressBarProps {
   /** 右側附加:value=顯示 `{value}%` / status-icon=顯示狀態圖示 / ReactNode=客製 */
   affix?: 'value' | 'status-icon' | React.ReactNode
   /**
-   * Track 高度 px override(**非 consumer API**,預設 4)。
-   * 僅 FileItem 的 compact mode 內部使用(壓到 2px 匹配極密集 row)。
+   * Track 高度 override(**非 consumer API**)。
+   * 僅 FileItem 的 compact mode 內部使用,匹配極密集 row 的視覺比例。
    * Consumer 不要傳此 prop;若有新需求應先討論是否開新 variant,而非濫用此逃生艙。
    */
   height?: number
@@ -116,9 +116,9 @@ export interface ProgressBarProps {
 本元件**不提供 size 選項**,track 固定 `4px`——對齊 Material 3 / Carbon / Ant Design 慣例(皆固定單一高度)。
 
 **為什麼不分 size**:
-- 前身 `sm(2) / md(4) / lg(6)` 刻度差太小,3px 以內的視覺差異使用者幾乎無法區分,形同冗餘 API
+- 過往分 size 的刻度差太小,視覺差異使用者幾乎無法區分,形同冗餘 API
 - 分 size 反而讓 consumer 每次要「判斷該選哪個」,增加認知負擔
-- 世界級 canonical:Material LinearProgress = 4dp 固定、Carbon ProgressBar = 4px 固定、Ant Progress line = 8px 但無 size variant
+- 世界級 canonical:Material LinearProgress / Carbon ProgressBar / Ant Progress 皆固定單一高度,無 size variant
 - 若需要視覺強調(hero level progress),改用 full-width 排版 + 放大百分比文字 / swap 為 CircularProgress 大尺寸,不靠 size 階梯撐
 
 ### 與 FileItem 的分界(consumer 選哪個)
@@ -170,7 +170,7 @@ export interface ProgressBarProps {
 - **Loading**:ProgressBar 本身就是 loading 的視覺,不再疊加 CircularProgress
 - **Empty / 0%**:value=0 時仍 render 整條 track(灰底 + 無填充),不做特殊 empty state
 - **Dark mode**:fill 色透過 semantic token(`--primary` / `--success` / `--error`)自動反轉,詳見 `color.spec.md`
-- **Density**:本元件不隨 density 縮放(高度固定 4px)
+- **Density**:本元件不隨 density 縮放(track 單一高度,見 tsx)
 
 ---
 
