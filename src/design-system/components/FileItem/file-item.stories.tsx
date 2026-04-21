@@ -2,6 +2,7 @@ import type { Meta } from '@storybook/react'
 import { Trash2 } from 'lucide-react'
 import { FileItem } from './file-item'
 import { Button } from '@/design-system/components/Button/button'
+import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 const meta: Meta<typeof FileItem> = {
   title: 'Design System/Components/FileItem/展示',
@@ -12,13 +13,16 @@ export default meta
 
 const noop = () => {}
 
-// FileItem row dedicated action region(2026-04-22 canonical):Button size-pair row tier
-// (rich=sm, compact=xs)。Delete 屬 dismiss 視覺類,用 `dismiss` prop 自動套:
-//   - variant="text" + iconOnly(強制)
-//   - Icon 色 override fg-muted → hover foreground(跟 Inline Action dismiss 視覺一致)
-// 詳 button.spec.md「Dismiss 視覺類」+ patterns/element-anatomy/item-anatomy.spec.md
-const deleteBtn = <Button size="sm" dismiss startIcon={Trash2} aria-label="刪除" onClick={noop} />
-const deleteBtnXs = <Button size="xs" dismiss startIcon={Trash2} aria-label="刪除" onClick={noop} />
+// FileItem row dedicated action(2026-04-22 canonical):
+// **Row action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。依 row 高度分兩種實作:
+//   - Rich(row 56)→ Button size="xs" iconOnly(24 固定,≤ cap)
+//   - Compact(row 24)→ ItemInlineActionButton(因 Button xs 24 會填滿 compact row,
+//     失去呼吸;Inline Action icon 16 + hover-bg 22 剛好)
+// Trash/Delete 非 dismiss 語意(dismiss 嚴格 = X close overlay),不套 `dismiss` prop——
+// Button variant="text" / Inline Action 本來就 fg-muted,視覺已弱化。
+// 詳 item-anatomy.spec.md「Predicate」+「Row action 絕對值 cap」
+const deleteBtn = <Button size="xs" iconOnly variant="text" startIcon={Trash2} aria-label="刪除" onClick={noop} />
+const deleteBtnXs = <ItemInlineActionButton icon={Trash2} size="sm" aria-label="刪除" onClick={noop} />
 
 export const Rich = {
   name: 'Rich（上傳狀態）',
@@ -65,7 +69,7 @@ export const HoverSwap = {
       </div>
       <div>
         <div className="text-caption text-fg-muted mb-2">
-          同樣 pattern 在 compact mode:幾何(16×16)與刪除按鈕一致,center 自動對齊
+          同樣 pattern 在 compact mode:status slot 幾何與 Inline Action(16×16 icon)一致,center 自動對齊
         </div>
         <div className="flex flex-col border border-divider rounded-lg overflow-hidden">
           <FileItem mode="compact" name="data-2024-q1.csv" status="completed"

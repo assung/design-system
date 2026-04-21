@@ -54,6 +54,14 @@ Sheet 是**側邊滑入 modal 容器**,關鍵決策維度是 `side`(top / right 
 
 ---
 
+## 關閉按鈕
+
+永遠存在於 SheetHeader 右側(對齊 DialogHeader canonical)。使用 `<Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />`,不可移除——使用者永遠需要明確的關閉手段。
+
+**Canonical 來源**:Sheet 是 overlay chrome,corner close X 屬 action group region,必用 Button(非 Inline Action / 非自刻 button)。詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical」+ `patterns/overlay-surface/overlay-surface.spec.md`「Close X canonical」。
+
+---
+
 ## 空值 / 驗證 / a11y
 
 Sheet 為容器,內容由 consumer 決定;focus trap + Escape close + `aria-labelledby` 由 Radix Dialog primitive 提供。

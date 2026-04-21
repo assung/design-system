@@ -1,6 +1,8 @@
 import type { Meta } from '@storybook/react'
+import { RefreshCw, Share2, X as XIcon } from 'lucide-react'
 import { Alert } from './alert'
 import { Button } from '@/design-system/components/Button/button'
+import { Separator } from '@/design-system/components/Separator/separator'
 import type { NoticeVariant } from '@/design-system/components/Notice/notice'
 
 const meta: Meta = {
@@ -61,6 +63,40 @@ export const SolidWithDescription = {
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
       {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" title={L[v]} description={D[v]} endContent={actionBtn} />)}
+    </div>
+  ),
+}
+
+export const CornerActionGroup = {
+  name: 'Chrome corner action group',
+  render: () => (
+    <div className="flex flex-col gap-4 max-w-lg">
+      <span className="text-caption text-fg-muted">
+        Chrome corner 是 action group region(Cat 3)。Close X 左側可並排 refresh / share 等
+        額外 action + Separator,全部同 size Button iconOnly sm。目前 Alert API 只渲染單一
+        close X,多 action 時 consumer 暫時以 wrapper 疊 overlay 呈現(future work:`cornerActions` slot)。
+      </span>
+
+      <div className="relative">
+        <Alert
+          variant="warning"
+          appearance="subtle"
+          title="部署管線偵測到新的 commit"
+          description="點「重新整理」同步最新狀態,或忽略此訊息繼續目前作業。"
+          dismissible={false}
+        />
+        <div className="absolute top-3 right-4 flex items-center gap-1">
+          <Button iconOnly size="sm" startIcon={RefreshCw} aria-label="重新整理" />
+          <Button iconOnly size="sm" startIcon={Share2} aria-label="分享連結" />
+          <Separator orientation="vertical" className="h-4" />
+          <Button iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉通知" />
+        </div>
+      </div>
+
+      <span className="text-caption text-fg-muted">
+        ✅ Close X 跟 refresh / share 同 Button iconOnly sm,Separator 分群(refresh/share 一群、close 一群)。
+        ❌ 禁止混 Inline Action + Button iconOnly(違反 same-row consistency)。
+      </span>
     </div>
   ),
 }

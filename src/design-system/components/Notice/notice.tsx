@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { X, Info, CircleCheck, TriangleAlert, XCircle, type LucideIcon } from 'lucide-react'
+import { X as XIcon, Info, CircleCheck, TriangleAlert, XCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/design-system/components/Button/button'
 
 /**
  * Notice — Toast / Alert 共用的視覺佈局層
@@ -19,7 +20,13 @@ import { cn } from '@/lib/utils'
  *
  * ── Icon: md tier ──
  * icon size: 16px（ICON_SIZE.md）
- * dismiss X: 16px icon, 18px hover bg, rounded-md
+ *
+ * ── Dismiss X(chrome corner close,Cat 3 Action group region)──
+ * 用 Button iconOnly dismiss size="sm" — 非 Inline Action、非自刻 button。
+ * Rationale:Alert / Toast 右上 X 屬 action group region(實務上 close 左側可加 refresh / share
+ * + Separator),統一 Button iconOnly。`dismiss` prop 自動套 variant="text" + fg-muted override。
+ * SSOT:patterns/element-anatomy/item-anatomy.spec.md「Dismiss canonical — X close only」
+ *      + components/Alert/alert.spec.md「Chrome corner close X canonical」。
  */
 
 export type NoticeVariant = 'neutral' | 'info' | 'success' | 'warning' | 'error'
@@ -104,20 +111,14 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
           <div className="flex items-center gap-2 shrink-0 h-[1lh]">
             {endContent}
             {dismissible && (
-              <button
-                type="button"
-                onClick={onDismiss}
+              <Button
+                iconOnly
+                dismiss
+                size="sm"
+                startIcon={XIcon}
                 aria-label="關閉通知"
-                className="group/action relative grid place-content-center shrink-0 cursor-pointer text-fg-muted hover:text-foreground active:text-foreground transition-colors"
-                style={{ width: 16, height: 16 }}
-              >
-                <span
-                  aria-hidden
-                  className="absolute pointer-events-none rounded-md bg-transparent group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active transition-colors"
-                  style={{ width: 18, height: 18, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-                />
-                <X size={16} className="relative" aria-hidden />
-              </button>
+                onClick={onDismiss}
+              />
             )}
           </div>
         )}

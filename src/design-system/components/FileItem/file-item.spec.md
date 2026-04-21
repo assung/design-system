@@ -108,23 +108,34 @@ ProgressBar 底部對齊 avatar 底部。justify-between 自動分配 gap(有 de
 
 ## Actions（suffix,row dedicated region canonical）
 
-Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」,FileItem actions 位於 row dedicated region(右側獨立 slot),用 **Button iconOnly size-pair row tier**:
+Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」+「Row action 絕對值 cap」,**row dedicated action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。依 row 高度分兩種實作:
 
-- `mode="rich"` → Button `size="sm"`(28/32 pair row)
-- `mode="compact"` → Button `size="xs"`(24 pair row)
-
-**Delete 屬 dismiss 視覺類**(callback `onRemove` / 語意 delete),用 `dismiss` prop 自動套 variant="text" + icon fg-muted → foreground(跟 Inline Action dismiss 視覺一致,cross-implementation dimming canonical):
+| Mode | Row 高度 | 實作 | 尺寸 |
+|------|---------|------|------|
+| `rich` | 56 (≥ 28) | **Button iconOnly `size="xs"`**(24 固定,不隨 row 放大) | 24 |
+| `compact` | 24 | **ItemInlineActionButton**(row 太小容不下 Button xs 24,會填滿 row 無呼吸) | icon 16, hover-bg 22 |
 
 ```tsx
-<FileItem actions={<>
-  <Button variant="text" size="sm" iconOnly startIcon={Download} aria-label="下載" onClick={dl} />
-  <Button size="sm" dismiss startIcon={Trash2} aria-label="刪除" onClick={del} />
-</>} />
+// Rich(row 56)→ Button xs iconOnly 固定 24(≤ 24 cap)
+<FileItem actions={
+  <Button size="xs" iconOnly variant="text" startIcon={Trash2} aria-label="刪除" onClick={del} />
+} />
+
+// Compact(row 24)→ Inline Action(因 Button xs 24 會填滿 row)
+<FileItem actions={
+  <ItemInlineActionButton icon={Trash2} size="sm" aria-label="刪除" onClick={del} />
+} />
 ```
 
-**為什麼 Button 非 Inline Action**:FileItem action region 位於 row 內獨立 slot(跟 content 視覺並列),按 predicate「row dedicated action region」→ Button size-pair row tier。Inline Action 保留給 host chrome 內 / row inline suffix(Menu/TreeView suffix ⋯)。詳 item-anatomy.spec.md 完整 predicate。
+**為什麼 Row ≥ 28 用 Button xs 固定**:row 放大不代表 action 要放大——世界級 DS(Material DataGrid / Polaris / Atlassian / Apple HIG)row action 都是固定小 icon button(20–24),row 高度變化只影響 row padding 與 content,不影響 action 尺寸。
 
-**Dismiss 視覺弱化**:不管實作走 Button(如本 case)還是 Inline Action(如 Dialog close),dismiss icon 色都弱化。Button `dismiss` prop 自動 override;Inline Action 本來就 fg-muted。
+**為什麼 Row ≤ 24 用 Inline Action**:compact row 高度 24 裝不下 Button xs(24)——Button 會填滿整個 row,失去 row padding 與 icon 呼吸空間。Inline Action(icon 16 + hover-bg 22)剛好符合「action ≤ row - padding」的呼吸需求。
+
+**Trash/Delete 不是 dismiss 語意**:`dismiss` 嚴格保留給「X close overlay session」(Dialog / Sheet / Popover / Alert close X)。Row 的 Trash/Delete 語意是 `onRemove`(從集合移除一個 item,見 CLAUDE.md `# 元件 Props 命名原則`「onRemove」),**不套 Button `dismiss` prop**:
+- Rich mode Button `variant="text"` 預設 icon 已是 fg-muted → foreground,hover 弱化視覺自然呈現
+- Compact mode ItemInlineActionButton 本來就 fg-muted → foreground(Inline Action default)
+
+參見 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」+「Real case 表」+「Row action 絕對值 cap」。
 
 ## Status ↔ Action hover-swap（passive → active affordance）
 
@@ -136,11 +147,11 @@ Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Pr
 | `error` | `XCircle` 紅 ✗ | `RotateCw ⟲` | `onRetry` |
 | `uploading` | *(progress %)* | *(無 swap)* | — |
 
-**幾何一致性(修正 2026-04-19)**:status slot 容器大小 **= consumer 的 delete Button 尺寸**:
-- `mode="rich"` → `var(--field-height-sm)` (density-variable:28 md / 32 lg,與 Button sm 同)
-- `mode="compact"` → `var(--field-height-xs)` (24 固定,與 Button xs 同)
+**幾何一致性(2026-04-22 canonical · row action ≤ 24 cap)**:status slot 容器大小 **= consumer 的 delete action 尺寸**:
+- `mode="rich"` → `var(--field-height-xs)`(24 固定,與 Button xs iconOnly 同)
+- `mode="compact"` → 16px(與 ItemInlineActionButton icon 同)
 
-Passive status icon 置中於 button-sized 容器,hover 時 active Button 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 button slot 之間的真實 gap**,不被 hover bg overflow 吃掉——icon slot 尺寸 = 同 size Button slot,gap token 才能如實呈現;歷史 bug 細節見 CLAUDE.md `# 失敗記憶索引`。
+Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 action slot 之間的真實 gap**,不被 hover bg overflow 吃掉——status slot 尺寸 = 同 size delete slot,gap token 才能如實呈現;歷史 bug 細節見 CLAUDE.md `# 失敗記憶索引`。
 
 世界級 DS 的幾何鐵律:**同一 flex 列的互動元素必須有統一 box 尺寸**,gap token 才能如實呈現。
 
@@ -153,18 +164,20 @@ Passive status icon 置中於 button-sized 容器,hover 時 active Button 填滿
 
 ```tsx
 <FileItem
+  mode="rich"
   name="report.pdf"
   status="completed"
   onDownload={() => downloadFile(id)}   // hover ✓ → ↓
-  actions={<Button size="sm" dismiss startIcon={Trash2} onClick={del} aria-label="刪除" />}
+  actions={<Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" />}
 />
 
 <FileItem
+  mode="compact"
   name="backup.json"
   status="error"
   description="There's something wrong."
   onRetry={() => retryUpload(id)}        // hover ✗ → ⟲
-  actions={<Button size="sm" dismiss startIcon={Trash2} onClick={del} aria-label="刪除" />}
+  actions={<ItemInlineActionButton icon={Trash2} size="sm" onClick={del} aria-label="刪除" />}
 />
 ```
 

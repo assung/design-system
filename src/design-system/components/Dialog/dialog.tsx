@@ -1,9 +1,9 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { X } from "lucide-react"
+import { X as XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { ItemInlineActionButton } from "@/design-system/patterns/element-anatomy/item-anatomy"
+import { Button } from "@/design-system/components/Button/button"
 import { SurfaceHeader, SurfaceBody, SurfaceFooter } from "@/design-system/patterns/overlay-surface/overlay-surface"
 
 /**
@@ -114,7 +114,7 @@ const DialogHeader = React.forwardRef<
   >
     <div className="flex-1 min-w-0">{children}</div>
     <DialogPrimitive.Close asChild>
-      <ItemInlineActionButton icon={X} aria-label="關閉" size="md" />
+      <Button iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
     </DialogPrimitive.Close>
   </SurfaceHeader>
 ))

@@ -1,8 +1,9 @@
+// @anatomy-exempt: Item Anatomy pattern spec 的教學 story,使用 raw <table> 呈現 token/align/primitive 對照表(類似 Figma inspect)。DataTable 的密度 / row 交互行為不適合純文件靜態對照;此為 pattern 自身 anatomy 檔,屬合理例外。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import {
   Mail, Bell, Settings, Star, ChevronRight, Globe, Lock,
-  Trash2,
+  Trash2, X, MoreVertical, Download, RotateCw, Share2, RefreshCw,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { MenuItem } from '@/design-system/components/Menu/menu-item'
@@ -10,6 +11,9 @@ import { SelectionItem } from '@/design-system/components/SelectionControl/selec
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
+import { Button } from '@/design-system/components/Button/button'
+import { Separator } from '@/design-system/components/Separator/separator'
+import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { cn } from '@/lib/utils'
 
 const meta: Meta = {
@@ -1390,6 +1394,202 @@ export const IconColorsAndPresets = {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  ),
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. Icon Action Primitive 決策樹（canonical 2026-04-22）
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const IconActionPrimitiveDecision = {
+  name: '5. Icon Action Primitive 決策',
+  render: () => (
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-1">
+        <H3>Icon 相關動作用哪個 primitive?(3 步決策)</H3>
+        <Desc>
+          DS 跨元件 icon action 的 canonical。接到「要放一個 icon 可點擊」的需求,跑下方 3 步決策樹——
+          不要直覺寫 <code className="font-mono">&lt;button&gt;&lt;X /&gt;&lt;/button&gt;</code>。Primitive 選錯會造成 same-row 幾何不一致、gap token 被吃掉、
+          或 chrome corner close 無法跟 refresh / share 並排分群。
+        </Desc>
+      </div>
+
+      {/* Decision tree visual */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-foreground">決策樹</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse text-caption">
+            <thead>
+              <tr>
+                <Th>步驟</Th>
+                <Th>問題</Th>
+                <Th>結果</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <Td mono>Q1</Td>
+                <Td>Icon 點了要做事嗎?</Td>
+                <Td>
+                  <strong>否</strong> → Decorative indicator(<code className="font-mono">&lt;Icon aria-hidden pointer-events-none /&gt;</code>)
+                  <br /><strong>是</strong> → 繼續 Q2
+                </Td>
+              </tr>
+              <tr>
+                <Td mono>Q2</Td>
+                <Td>位置在哪?</Td>
+                <Td>
+                  Host 內部(chrome padding / content flow / row inline suffix)→ <strong>Inline Action</strong>
+                  <br />Row 獨立 action slot → 看 Q3
+                  <br />Action group region(toolbar / chrome corner / standalone)→ <strong>Button</strong>
+                </Td>
+              </tr>
+              <tr>
+                <Td mono>Q3</Td>
+                <Td>Row 多大?</Td>
+                <Td>
+                  &le; 24(compact / xs row)→ <strong>Inline Action</strong>(Button xs 24 會填滿 row,失去呼吸)
+                  <br />&ge; 28(sm / md / lg row)→ <strong>Button iconOnly size="xs"(24 固定,不放大)</strong>
+                </Td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-fg-muted max-w-[780px] leading-relaxed">
+          <strong>核心原則:Row dedicated action 永遠 &le; 24px cap</strong>,不隨 row tier 放大——超過 24 的 action
+          會搶 content 視覺焦點,違反「資料 &gt; 行動」的視覺階層(世界級對照:Linear / Notion / Figma 全部 &le; 24)。
+        </p>
+      </div>
+
+      {/* Real case table */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-foreground">實戰情境對照</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse text-caption">
+            <thead>
+              <tr>
+                <Th>情境</Th>
+                <Th>位置</Th>
+                <Th>Primitive</Th>
+                <Th>理由</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><Td>Input / Combobox clear X</Td><Td>Field chrome padding</Td><Td mono>Inline Action</Td><Td>Embedded in host</Td></tr>
+              <tr><Td>Tag dismiss X</Td><Td>Pill body</Td><Td mono>Inline Action</Td><Td>Colored host,繼承顏色</Td></tr>
+              <tr><Td>Menu / TreeView suffix action</Td><Td>Row inline flow</Td><Td mono>Inline Action</Td><Td>Inline with content</Td></tr>
+              <tr><Td>SidebarGroup header chevron</Td><Td>Aux toggle</Td><Td mono>Inline Action</Td><Td>Inline header toggle</Td></tr>
+              <tr><Td><strong>FileItem compact</strong>(row 24)</Td><Td>Row slot</Td><Td mono>Inline Action</Td><Td>Row 太小容不下 Button xs 24</Td></tr>
+              <tr><Td><strong>FileItem rich</strong>(row 56)</Td><Td>Row slot</Td><Td mono>Button xs iconOnly</Td><Td>&le; 24 cap,不放大</Td></tr>
+              <tr><Td><strong>DataTable row action</strong></Td><Td>Row dedicated column</Td><Td mono>Button xs iconOnly</Td><Td>&le; 24 cap(跨 tier 固定)</Td></tr>
+              <tr><Td><strong>Dialog / Sheet chrome corner close</strong></Td><Td>Action group region</Td><Td mono>Button sm iconOnly dismiss</Td><Td>corner 屬 action group,可與 refresh / share 並排</Td></tr>
+              <tr><Td><strong>Alert / Toast / Coachmark close</strong></Td><Td>Action group region</Td><Td mono>Button sm iconOnly dismiss</Td><Td>同上</Td></tr>
+              <tr><Td><strong>Popover close</strong></Td><Td>Action group region</Td><Td mono>Button sm iconOnly dismiss</Td><Td>同上</Td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Dismiss X canonical */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-foreground">Dismiss 嚴格定義 — X close only</span>
+        <Desc>
+          <code className="font-mono">dismiss</code> prop 僅屬 <strong>X(close)</strong>icon——
+          「關閉 surface / 忽略訊息」的語意。Trash / Delete / Clear / Remove 都<strong>不算 dismiss</strong>,
+          即使視覺上也是 icon-only button,callback 用 <code className="font-mono">onDelete</code> / <code className="font-mono">onRemove</code> / <code className="font-mono">onClear</code>。
+          世界級對照:Material IconButton close / Polaris Banner.onDismiss / Apple HIG window close — 全部 icon = X。
+        </Desc>
+        <div className="overflow-x-auto">
+          <table className="border-collapse text-caption">
+            <thead>
+              <tr>
+                <Th>語意</Th>
+                <Th>Icon</Th>
+                <Th>Callback</Th>
+                <Th>Primitive</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><Td>Dismiss(關閉 surface)</Td><Td mono>X</Td><Td mono>onClose / onDismiss</Td><Td>Button `dismiss` prop(chrome corner)或 Inline Action(chrome padding)</Td></tr>
+              <tr><Td>Delete(刪除資料)</Td><Td mono>Trash2</Td><Td mono>onDelete</Td><Td>依 Q2/Q3 決策,<strong>不套 dismiss prop</strong></Td></tr>
+              <tr><Td>Clear(清空欄位)</Td><Td mono>X</Td><Td mono>onClear</Td><Td>Inline Action(Field chrome padding)</Td></tr>
+              <tr><Td>Remove(從集合移除)</Td><Td mono>X / Trash2</Td><Td mono>onRemove</Td><Td>依 Q2/Q3 決策</Td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Live case: Alert chrome corner action group */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-foreground">Live case — Alert chrome corner action group 佈局</span>
+        <Desc>
+          Chrome corner close 屬 <strong>action group region</strong>——實務上 close 左側可加 refresh / share 等
+          輔助動作(用 Separator 分群),所以必須用 Button iconOnly(與群內其他 action 同 primitive),不可用 Inline Action。
+        </Desc>
+        <div className="flex items-start gap-3 p-4 rounded-md border border-border bg-surface-raised max-w-lg">
+          <div className="flex-1 flex flex-col gap-1">
+            <span className="text-body font-semibold text-foreground">新版本可用</span>
+            <span className="text-caption text-fg-muted">點擊重新整理載入最新版。</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="text" size="sm" iconOnly startIcon={RefreshCw} aria-label="重新整理" />
+            <Button variant="text" size="sm" iconOnly startIcon={Share2} aria-label="分享" />
+            <Separator orientation="vertical" className="h-5 mx-1" />
+            <Button variant="text" size="sm" dismiss startIcon={X} aria-label="關閉" />
+          </div>
+        </div>
+        <p className="text-[11px] text-fg-muted max-w-[780px] leading-relaxed">
+          ✅ refresh / share / close 都是 Button sm iconOnly,Separator 分群(action 群 vs dismiss 群)。close 套
+          <code className="font-mono"> dismiss</code> prop 自動弱化(icon fg-muted → hover foreground)。
+          <br />❌ 禁止把 close 改寫成 Inline Action(會造成 same-row primitive 混用,gap 視覺斷裂)。
+        </p>
+      </div>
+
+      {/* Same-row consistency */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-foreground">Same-row consistency — 同 row 所有 icon action 必同一類</span>
+        <Desc>
+          同一 action row(suffix slot / chrome corner)<strong>所有 icon action 必用相同 primitive</strong>——
+          不混 Inline Action + Button iconOnly。混用會造成 box 尺寸不一致,gap token 視覺被吃掉(參考
+          <code className="font-mono"> # UI 開發規則 </code>「同 flex 列的互動 slot 幾何鐵律」)。
+        </Desc>
+        <div className="flex flex-col gap-3 max-w-xl">
+          <div className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-surface">
+            <span className="flex-1 text-caption text-fg-secondary">✅ 都用 Button xs iconOnly(24 固定,gap-1 穩定)</span>
+            <div className="flex items-center gap-1">
+              <Button variant="text" size="xs" iconOnly startIcon={RotateCw} aria-label="重試" />
+              <Button variant="text" size="xs" iconOnly startIcon={Download} aria-label="下載" />
+              <Button variant="text" size="xs" iconOnly startIcon={MoreVertical} aria-label="更多" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-surface">
+            <span className="flex-1 text-caption text-fg-secondary">✅ compact row:都用 Inline Action(icon 16,hover-bg 22)</span>
+            <div className="flex items-center gap-1">
+              <ItemInlineActionButton icon={RotateCw} size="sm" aria-label="重試" />
+              <ItemInlineActionButton icon={Download} size="sm" aria-label="下載" />
+              <ItemInlineActionButton icon={MoreVertical} size="sm" aria-label="更多" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3 px-3 py-2 rounded-md border border-error bg-surface">
+            <span className="flex-1 text-caption text-error-text">❌ 禁止混 Inline Action + Button(box 尺寸不一致)</span>
+            <div className="flex items-center gap-1">
+              <ItemInlineActionButton icon={RotateCw} size="sm" aria-label="重試" />
+              <Button variant="text" size="xs" iconOnly startIcon={Download} aria-label="下載" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Overflow menu icon canonical */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-foreground">Overflow menu icon — <code className="font-mono">MoreVertical</code>,禁用 <code className="font-mono">MoreHorizontal</code></span>
+        <Desc>
+          Overflow menu(「更多動作」下拉)一律用 <strong>MoreVertical</strong>(縱向三點)。
+          <code className="font-mono"> MoreHorizontal</code>(橫向三點)只保留給 Breadcrumb path ellipsis 語意
+          (「沿路徑省略中間項」),不得用於 overflow menu。世界級對照:Linear / Notion / GitHub / Figma 全部如此。
+        </Desc>
       </div>
     </div>
   ),

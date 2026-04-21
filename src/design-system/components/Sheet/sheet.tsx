@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
+import { X as XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -9,7 +9,7 @@ import {
   SurfaceBody,
   SurfaceFooter,
 } from "@/design-system/patterns/overlay-surface/overlay-surface"
-import { ItemInlineActionButton } from "@/design-system/patterns/element-anatomy/item-anatomy"
+import { Button } from "@/design-system/components/Button/button"
 
 /**
  * Sheet — **右側 Dialog primitive**(給消費者的 canonical)。
@@ -116,7 +116,7 @@ const SheetHeader = React.forwardRef<
   >
     <div className="flex-1 min-w-0">{children}</div>
     <SheetPrimitive.Close asChild>
-      <ItemInlineActionButton icon={X} aria-label="關閉" size="md" />
+      <Button iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
     </SheetPrimitive.Close>
   </SurfaceHeader>
 ))

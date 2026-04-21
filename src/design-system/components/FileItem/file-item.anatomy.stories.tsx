@@ -50,8 +50,8 @@ export const Overview: Story = {
                 ['description', 'string', '—', 'rich 任意場景 / compact 只有 error 才顯示'],
                 ['thumbnailSrc', 'string', '—', 'rich mode 的縮圖 URL(圖片類檔案)'],
                 ['actions', 'ReactNode', '—', 'suffix actions(例:delete / cancel button)'],
-                ['onDownload', '() => void', '—', "hover-swap:status='completed' 時,row hover ✓ 換成 Download ↓ button(幾何=Button sm/xs,與 actions 對齊)"],
-                ['onRetry', '() => void', '—', "hover-swap:status='error' 時,row hover ✗ 換成 RotateCw ⟲ button(幾何同上)"],
+                ['onDownload', '() => void', '—', "hover-swap:status='completed' 時,row hover ✓ 換成 Download ↓。幾何=rich → Button xs 24(row action ≤ 24 cap)/ compact → ItemInlineAction 16"],
+                ['onRetry', '() => void', '—', "hover-swap:status='error' 時,row hover ✗ 換成 RotateCw ⟲(幾何同上 — rich xs / compact Inline Action)"],
                 ['onClick', '() => void', '—', '傳入後整個 item 變可點擊(hover bg + cursor-pointer)'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -248,7 +248,7 @@ export const SizeMatrix: Story = {
               <tr><Td>Typography</Td><Td mono>text-body leading-compact(掃描模式)</Td><Td mono>text-body 預設行高(閱讀模式)</Td></tr>
               <tr><Td>Description</Td><Td>僅 error 才顯示</Td><Td>任何場景都可顯示</Td></tr>
               <tr><Td>Progress bar</Td><Td mono>絕對定位 2px 在底</Td><Td mono>inline 4px,bar 底部對齊 avatar</Td></tr>
-              <tr><Td>Actions</Td><Td>右側 sm iconOnly</Td><Td>右側 sm iconOnly(多 action 橫排)</Td></tr>
+              <tr><Td>Actions</Td><Td>右側 ItemInlineAction(row 24 容不下 Button xs)</Td><Td>右側 Button xs iconOnly(24 固定,row action ≤ 24 cap;多 action 橫排)</Td></tr>
               <tr><Td>使用場景</Td><Td>批次上傳、log 列表、CSV/JSON</Td><Td>圖片上傳、文件附件、需預覽的檔案</Td></tr>
             </tbody>
           </table>
@@ -295,10 +295,10 @@ export const StateBehavior: Story = {
       <div>
         <H3>所有狀態對照</H3>
         <div className="flex flex-col gap-2">
-          <FileItem name="uploading.pdf" description="2.4 MB · 上傳中 60%" status="uploading" progress={60} mode="rich" actions={<Button variant="tertiary" size="sm" iconOnly startIcon={X} aria-label="取消" />} />
-          <FileItem name="completed.pdf" description="2.4 MB · 已上傳" status="completed" mode="rich" actions={<Button variant="tertiary" size="sm" iconOnly startIcon={Download} aria-label="下載" />} />
-          <FileItem name="error.pdf" description="網路中斷,請重試" status="error" mode="rich" actions={<div className="flex gap-1"><Button variant="tertiary" size="sm" iconOnly startIcon={RotateCw} aria-label="重試" /><Button variant="tertiary" size="sm" iconOnly startIcon={X} aria-label="移除" /></div>} />
-          <FileItem name="static.pdf" description="已儲存 · 1.2 MB" mode="rich" onClick={() => {}} actions={<Button variant="tertiary" size="sm" iconOnly startIcon={Download} aria-label="下載" />} />
+          <FileItem name="uploading.pdf" description="2.4 MB · 上傳中 60%" status="uploading" progress={60} mode="rich" actions={<Button variant="text" size="xs" iconOnly startIcon={X} aria-label="取消" />} />
+          <FileItem name="completed.pdf" description="2.4 MB · 已上傳" status="completed" mode="rich" actions={<Button variant="text" size="xs" iconOnly startIcon={Download} aria-label="下載" />} />
+          <FileItem name="error.pdf" description="網路中斷,請重試" status="error" mode="rich" actions={<div className="flex gap-1"><Button variant="text" size="xs" iconOnly startIcon={RotateCw} aria-label="重試" /><Button variant="text" size="xs" iconOnly startIcon={X} aria-label="移除" /></div>} />
+          <FileItem name="static.pdf" description="已儲存 · 1.2 MB" mode="rich" onClick={() => {}} actions={<Button variant="text" size="xs" iconOnly startIcon={Download} aria-label="下載" />} />
         </div>
       </div>
 

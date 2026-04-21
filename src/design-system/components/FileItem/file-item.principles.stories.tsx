@@ -126,7 +126,7 @@ export const StatusProgressRule: Story = {
           description="檔案損毀,請重新上傳"
           status="error"
           mode="rich"
-          actions={<Button variant="tertiary" size="sm" iconOnly startIcon={RotateCw} aria-label="重試" />}
+          actions={<Button variant="text" size="xs" iconOnly startIcon={RotateCw} aria-label="重試" />}
         />
       </Rule>
 
@@ -139,7 +139,7 @@ export const StatusProgressRule: Story = {
           description="已簽署 · 2.1 MB"
           mode="rich"
           onClick={() => {}}
-          actions={<Button variant="tertiary" size="sm" iconOnly startIcon={Download} aria-label="下載" />}
+          actions={<Button variant="text" size="xs" iconOnly startIcon={Download} aria-label="下載" />}
         />
       </Rule>
     </div>
@@ -160,7 +160,7 @@ export const ActionsRule: Story = {
           status="uploading"
           progress={12}
           mode="rich"
-          actions={<Button variant="tertiary" size="sm" iconOnly startIcon={X} aria-label="取消上傳" />}
+          actions={<Button variant="text" size="xs" iconOnly startIcon={X} aria-label="取消上傳" />}
         />
       </Rule>
 
@@ -175,8 +175,8 @@ export const ActionsRule: Story = {
           mode="rich"
           actions={
             <div className="flex gap-1">
-              <Button variant="tertiary" size="sm" iconOnly startIcon={RotateCw} aria-label="重試" />
-              <Button variant="tertiary" size="sm" iconOnly startIcon={X} aria-label="移除" />
+              <Button variant="text" size="xs" iconOnly startIcon={RotateCw} aria-label="重試" />
+              <Button variant="text" size="xs" iconOnly startIcon={X} aria-label="移除" />
             </div>
           }
         />
@@ -191,7 +191,7 @@ export const ActionsRule: Story = {
           description="上傳完成 · 3.2 MB"
           status="completed"
           mode="rich"
-          actions={<Button variant="tertiary" size="sm" iconOnly startIcon={Download} aria-label="下載" />}
+          actions={<Button variant="text" size="xs" iconOnly startIcon={Download} aria-label="下載" />}
         />
       </Rule>
 

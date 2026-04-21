@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 import { ProgressBar } from '@/design-system/components/ProgressBar/progress-bar'
+import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * FileItem — 檔案顯示 / 上傳進度
@@ -115,13 +116,13 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       ? 'h-[calc(1lh+2px+var(--font-body-size)*1.5)]'
       : 'h-[1lh]'
 
-    // Status slot 幾何:與 consumer 的 delete Button **同尺寸**
-    //   rich  → Button sm(h-field-sm,density-variable 28/32)
-    //   compact → Button xs(24 固定)
-    // 這樣 `gap-2`(8px) 是兩個「同 size button」之間的距離,真 8px gap 不被溢出覆蓋。
-    // Passive icon 16px 置中於 button-sized 容器(視覺 framing 與 hover-swap 一致)。
-    const deleteBtnSize = isRich ? 'sm' : 'xs'
-    const slotHw = isRich ? 'var(--field-height-sm)' : 'var(--field-height-xs)'
+    // Status slot 幾何:與 consumer 的 delete action **同尺寸**(row action ≤ 24 cap canonical)
+    //   rich  → Button xs iconOnly(24 固定,不隨 row 放大)
+    //   compact → ItemInlineActionButton(icon 16,row 24 容不下 Button xs)
+    // 這樣 `gap-2`(8px) 是兩個「同 size slot」之間的距離,真 8px gap 不被溢出覆蓋。
+    // Passive icon 16px 置中於 action-sized 容器(視覺 framing 與 hover-swap 一致)。
+    const deleteBtnSize = 'xs' as const
+    const slotHw = isRich ? 'var(--field-height-xs)' : '16px'
 
     const hoverAction =
       status === 'completed' && onDownload ? { icon: Download, onClick: onDownload, label: '下載' } :
@@ -143,8 +144,10 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
           )}
           aria-hidden
         />
-        {/* Active action Button:row-hover 時淡入(僅 hoverAction 存在時渲染) */}
-        {hoverAction && (
+        {/* Active action:row-hover 時淡入(僅 hoverAction 存在時渲染)
+            Rich → Button xs iconOnly(24 固定,同 delete)
+            Compact → ItemInlineActionButton(16 icon,同 delete;Button xs 24 會爆 row) */}
+        {hoverAction && (isRich ? (
           <Button
             variant="text"
             size={deleteBtnSize}
@@ -154,7 +157,15 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
             onClick={(e) => { e.stopPropagation(); hoverAction.onClick() }}
             className="absolute inset-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
           />
-        )}
+        ) : (
+          <ItemInlineActionButton
+            icon={hoverAction.icon}
+            size="sm"
+            aria-label={hoverAction.label}
+            onClick={(e) => { e.stopPropagation(); hoverAction.onClick() }}
+            className="absolute inset-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
+          />
+        ))}
       </span>
     ) : null
 

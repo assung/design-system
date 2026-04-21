@@ -25,6 +25,7 @@
 | **M5** | **視覺 canonical 必 spec 聲明所有 state 疊加組合**。單一 state(today / selected / hover / disabled)有視覺定義不夠;**所有兩兩疊加、三疊加組合也要在 spec 有明文**。 | DatePicker `today + selected` bar 色隱形(藍 bar 在藍底)/ `hover + disabled` ring 仍顯示 / `range + today` 指示器重疊 / 未來任何新 state 上線 |
 | **M6** | **Stakeholder-visible 產出 → 強制進階稽核才出稿**(不是 merge 後補)。任何「有視覺可以給 stakeholder 看」的產出(新元件 / 元件新功能 / 新產品頁 / 比稿)**必過進階完整稽核**(6 維 + 全截圖視覺驗證)。日常 dev 可用高效模式,stakeholder gate 不可。 | FileViewer 初版不看 action-bar spec / button 間距錯 / dismiss 用 Button / header 沒 token / 視覺不整齊上給人看 |
 | **M7** | **新 protocol / skill / rule 寫完,必反向 cross-check 既有 Meta-Principle 是否該套用**。尤其:consistency-class 的 protocol 必走「一致性類稽核必先全掃再判」(本章節);audit skill 必加「Self-improvement capture」Phase F step;Rule 觸及「canonical」「SSOT」「rationale」keyword → 必明示 substantive vs 表達層分權。 | 2026-04-21 principle-audit-protocol.md v1 寫完未套 Phase 0 全掃到 D6b/D6c,被 user 抓到「這也是跟一致性有關」才補。典型:AI 寫新東西時套用既有原則時有盲點 |
+| **M8** | **訂立 / 修改 cross-component canonical 前必 world-class benchmark**。任何 predicate / decision tree / taxonomy 類 spec,**必先 grep 至少 3 家世界級 DS**(Polaris / Material / Atlassian / Ant Design / Carbon / Apple HIG / VS Code / Figma 等)列對照表,再訂 rule。**絕對禁止**憑直覺開場寫 predicate,user 問才補對照。每個 category / variant / case 必附世界級 reference(實作名或 API 指向),沒有對照的 rule 視同未成熟,走 Checkpoint 3。 | 2026-04-22 item-anatomy Inline Action vs Button predicate 疊代 4 次(position-based → density 分界 → fixed-small → chrome corner exception),每次 user 拉回才補世界級對照。若 M8 存在,第一次就該先 benchmark Material IconButton / Polaris Button plain / Atlassian IconButton / Ant Button type=text 的位置規則再訂 rule |
 
 **判斷 meta-principle 是否漏寫的 test**:
 - 同類 bug 一年內被糾正 3 次 → meta-principle 漏寫或沒執行,檢討本清單
@@ -1042,6 +1043,46 @@ Provider 是**應用層配置**（delay、theme、portal target、toast position
 - Context 是**行為狀態**（open / close / size / current item） → **可包**（這是元件的狀態管理）
   - 例如 `SidebarProvider.open` / `DropdownMenuContext.size`——這些是元件自己擁有的狀態,**不是**禁止包的 app-level 配置 Provider。
 - Context 是**全域外觀配置**（delay / theme / portal / variant defaults） → **禁止包**（屬於應用層）
+
+
+# Primitive Exposure Layer(3 層暴露 canonical)
+
+設計系統的 primitive 按**暴露對象**分 3 層。建新元件 / 新 API 時先決定層級,錯置會造成 consumer 選用困擾(例:Button 太複雜卻當 embedded action 用)。
+
+## 3 層定義
+
+| Layer | 對象 | 例 | API 形式 |
+|-------|------|----|---------|
+| **L1 — User-facing primitive** | App code + stories + consumer(所有人)| `Button` / `Input` / `Select` / `MenuItem` / `FileItem` / `DataTable` / `Tag` / `Badge` | 完整 variant / size prop / ReactNode slot |
+| **L2 — Host slot API**(config-based)| 消費 L1 host 元件的 app code | `Input.endAction: InlineActionConfig` / `MenuItem.inlineActions: InlineActionConfig[]` / `SidebarMenuButton.inlineActions` | 宣告式 config `{ icon, label, onClick }`,host 內部負責渲染 |
+| **L3 — Internal primitive**(**不暴露給 app**)| 建**新 row primitive / host 元件**的 DS 作者(非 app code)| `ItemInlineAction` / `ItemInlineActionButton` / `ItemIcon` / `ItemAvatar` / `ItemLabel` / `ItemSuffix` / `RowSizeProvider` | 低階 building block,只 export for composition |
+
+## 判斷新 primitive 放哪層(3 題)
+
+1. **App code 需要直接 import 嗎?**
+   - 是 → L1(e.g. `Button`)
+   - 否 → 看 Q2
+2. **它是「host 內部 embedded action」的 config API 嗎?**
+   - 是 → L2(e.g. `InlineActionConfig` + host slot prop)
+   - 否 → 看 Q3
+3. **它是「建新 host 元件時的低階 building block」嗎?**
+   - 是 → L3(e.g. `ItemInlineActionButton`)
+   - 否 → **不該是新 primitive**(可能是舊元件的 feature,走 feature prop)
+
+## 規則
+
+- **L3 primitive 的 stories / docs 必明示「internal; app 請走 host slot API」**
+- **L1 上不做 L3 該做的事**(例:Button 不該加「embedded=true」density 維度;embedded 情境走 L2 host slot)
+- **L2 config-based 比 ReactNode slot 更 opinionated**(防 consumer drift),新 host 元件優先 config
+- **新 L1 primitive 要經 Checkpoint 3**(classification ambiguity);L2 / L3 可 AUTO
+
+## Icon action primitive 的 3 層分佈(範例)
+
+- **L1**:`<Button iconOnly />` — 獨立 action(toolbar / chrome corner / standalone)
+- **L2**:`Input.endAction` / `MenuItem.inlineActions` / 未來 `FileItem.actions / DataTable.rowActions`(config API,host 內部渲染 L3 primitive)
+- **L3**:`ItemInlineAction`(config wrapper)/ `ItemInlineActionButton`(raw button)— 不直接暴露給 app
+
+完整 Inline Action vs Button predicate 見 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」。
 
 
 # 系統內部 Layout — 4-Family Model

@@ -212,22 +212,24 @@ export interface ButtonProps
   /** Icon-only 模式：移除 padding，變為正方形（必須同時設定 aria-label） */
   iconOnly?: boolean
   /**
-   * Dismiss 視覺類(cross-implementation dimming canonical)。用於 row dedicated region 的 close / delete /
-   * remove / clear 按鈕(callback 語意為 onClose / onDismiss / onRemove / onClear)。
+   * Dismiss 視覺類(X close only canonical)。專用於 **X(close)icon 的 dismiss 語意** —
+   * 「關閉 surface / 忽略訊息」。**不適用 Trash / Delete / Clear / Remove 等 destructive / clear 操作**。
    *
    * 自動套用:
-   * - `variant="text"`(強制,即使傳其他 variant 也 override)
+   * - `variant="text"`(強制 override 其他 variant)
    * - `iconOnly=true`(強制)
-   * - Icon 色 override 為 `fg-muted` → hover `foreground`(跟 Inline Action dismiss 視覺一致)
+   * - Icon 色 override:`fg-muted` → hover `foreground`(跟 Inline Action dismiss 視覺一致)
    *
-   * 目的:dismiss 視覺弱化不管實作(Inline Action 或 Button),cross-implementation 一致 —
-   * user 不該感受到 dismiss 視覺差異。
+   * 典型 case:Dialog / Sheet / Popover / Alert / Toast / Coachmark 的 **chrome corner close X**
+   * (action group region — corner 可多 action,close 左側加 Separator + refresh / share 等)。
    *
-   * 典型 case:FileItem / DataTable row 內的 delete / remove(row dedicated region 用 Button,
-   * 非 Inline Action)。
+   * 非 dismiss(**不套此 prop**):
+   * - Trash / Delete → destructive action,Button 用一般 variant 或 Inline Action(按 row size 判)
+   * - Clear → 欄位清空,用 Inline Action
+   * - Remove → collection 移除,用一般 Button / Inline Action
    *
    * 詳見 button.spec.md「Dismiss 視覺類」段 + patterns/element-anatomy/item-anatomy.spec.md
-   * 「Dismiss 按鈕 canonical」段。
+   * 「Dismiss canonical — X close only」段。
    */
   dismiss?: boolean
   /** 載入中狀態：startIcon 替換為 spinner，自動 disabled；badge / endIcon 維持顯示以避免 layout shift */

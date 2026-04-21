@@ -1,10 +1,10 @@
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
-import { X } from "lucide-react"
+import { X as XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { SurfaceHeader, SurfaceBody, SurfaceFooter } from "@/design-system/patterns/overlay-surface/overlay-surface"
-import { ItemInlineActionButton } from "@/design-system/patterns/element-anatomy/item-anatomy"
+import { Button } from "@/design-system/components/Button/button"
 
 /**
  * Popover — Radix Popover + 設計系統 token
@@ -73,7 +73,7 @@ const PopoverHeader = React.forwardRef<HTMLDivElement, PopoverHeaderProps>(
       <div className="flex-1 min-w-0">{children}</div>
       {!hideClose && (
         <PopoverPrimitive.Close asChild>
-          <ItemInlineActionButton icon={X} aria-label="關閉" size="md" />
+          <Button iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
         </PopoverPrimitive.Close>
       )}
     </SurfaceHeader>

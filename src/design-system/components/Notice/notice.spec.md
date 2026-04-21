@@ -38,7 +38,7 @@ item-layout 4-slot：
 ```
 
 - Icon: 16px，`h-[1lh]` inline 對齊 first line
-- Dismiss X: inline action pattern（16px icon / 18px hover bg / rounded-md）
+- Dismiss X: `<Button iconOnly dismiss size="sm" />` — chrome corner action group region(Cat 3),詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical — X close only」+ `components/Alert/alert.spec.md`「Chrome corner close X canonical」
 - endContent: 通常放 `<Button variant="tertiary" size="xs">`
 
 ## Variant

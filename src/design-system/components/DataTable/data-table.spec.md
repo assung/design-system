@@ -163,17 +163,19 @@ Header 的對齊永遠與該欄 body cell 一致。
 
 每列最右側可配置操作（編輯、刪除、複製等）。位於 right-pinned region，不參與水平捲動。
 
-**元件 canonical(2026-04-22 精化)**:Row actions 位於 row 的 **dedicated action region**(frozen column + `border-divider` 分隔),按 `patterns/element-anatomy/item-anatomy.spec.md` predicate 屬「row dedicated region」→ **Button iconOnly, variant="text", size 對稱 row tier**:
+**元件 canonical(2026-04-22)**:Row actions **一律 Button iconOnly, variant="text", size="xs"(固定 24px)**,不隨 row tier 放大,**不套 `dismiss` prop**。
 
-| Row size | Button size |
-|----------|-------------|
-| `sm`(28px) | `sm`(28 box,16 icon) |
-| `md`(32px,預設) | `md`(32 box,16 icon) |
-| `lg`(40px) | `lg`(36 box,20 icon) |
+**為什麼固定 size="xs"**:row actions 屬「dense utility affordance」——存在於每一 row 末端,常駐但不搶焦點,是輔助操作不是資料本體。固定小尺寸讓 action region 視覺輕量,資料 cell 為視覺重心。對照 `patterns/element-anatomy/item-anatomy.spec.md` 的「Predicate」+「Real case 表」:row-dedicated action region 屬「高頻小尺寸 utility」家族。
 
-**為什麼 size-pair row tier**:row 內其他元件(InputDisplay / Badge / 自訂 cell render)都是按 row size 用 sm/md/lg 變體,action button 尺寸需同步對稱,row 視覺連貫一致。**過去固定用 `size="xs"` 不論 row size 不對**。
+**世界級對照**:
+- **Material DataGrid**——row action 固定 24px(`GridActionsCellItem` 用 `IconButton size="small"`,不隨 rowHeight 放大)
+- **Polaris DataTable / IndexTable**——row actions 在 hover 顯示,固定 20-24px icon button
+- **Atlassian Dynamic Table**——row actions 固定 small iconOnly,不跟 table density 連動
+- **Apple HIG(macOS Finder / Mail list row)**——inline actions 固定 ≤24px,不隨 list density 放大
 
-**Dismiss action 特殊樣式**:若 action callback 是 `onRemove` / `onDelete` / 語意是 dismiss,依 Button `## 狀態` 的「Dismiss 視覺類」節:variant="text" + icon 色 override `fg-muted → foreground`(弱化,跟 Inline Action dismiss 一致)。
+**為什麼不隨 row tier 放大**:row height 變化反映的是「資料密度」(sm / md / lg row 高度 tier),action 不是資料本體,不該跟資料密度同步縮放——否則 lg row 的 action 會變成搶焦點的主要互動元素,violate「action 輔助、data 本體」的資訊層級。
+
+**不套 `dismiss` prop**:`dismiss` 語意是「關閉此訊息 / 忽略此提示」(見 Button spec「Dismiss 視覺類」+ `# 元件 Props 命名原則` callback 命名 canonical — `onDismiss` 指 toast / alert 被暫時忽略),Trash / Delete 是**資料破壞性動作**,語意是 `onRemove`(從集合移除 item),不是 dismiss。視覺用 `variant="text"` 標準 icon button 表達,不套 dismiss 的 icon 色弱化 treatment(dismiss 弱化是為了「訊息關閉不搶焦點」,row delete 需要正常 icon 可讀性)。
 
 **常駐顯示。** Row actions 有獨立的 frozen right region，不佔資料欄位空間，永遠可見。Region 邊界用全高度 `border-divider` 標示。
 
@@ -181,12 +183,12 @@ Header 的對齊永遠與該欄 body cell 一致。
 
 | 數量 | 顯示方式 |
 |------|----------|
-| 1-2 | icon buttons 並排(size 同 row tier)|
-| 3+ | 前 1-2 個 inline + MoreVertical dropdown(同 size) |
+| 1-2 | icon buttons 並排(全 size="xs")|
+| 3+ | 前 1-2 個 inline + MoreVertical dropdown(全 size="xs") |
 
 MoreVertical dropdown 包含所有操作，確保鍵盤可存取全部。
 
-**Header/body 寬度同步：** Header 渲染 invisible buttons 佔位(同 size),確保 header 和 body 的 right region 同寬。
+**Header/body 寬度同步：** Header 渲染 invisible buttons 佔位(同 size="xs"),確保 header 和 body 的 right region 同寬。
 
 ### 十、與 Toolbar 的關係
 

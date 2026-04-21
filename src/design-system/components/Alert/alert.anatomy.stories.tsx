@@ -194,14 +194,14 @@ export const StateBehavior: Story = {
       <div>
         <H3>Close button 互動狀態</H3>
         <Desc>
-          Close icon 使用 Inline Action pattern(16px icon + 24px hover bg)——對齊 `item-anatomy.spec.md`「Inline Action 設計規格」。hover 時 bg `neutral-hover`,focus 時 ring。
+          Chrome corner close 用 **Button iconOnly `dismiss` size="sm"**(非 Inline Action)——對齊 `item-anatomy.spec.md`「Dismiss canonical — X close only」。corner 屬 action group region,實務上可與 refresh / share 等 Button 並排(用 Separator 分群),必須統一 Button primitive。`dismiss` prop 自動套 `variant="text"` + icon `fg-muted` 弱化,hover 時恢復 foreground。
         </Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>視覺</Th><Th>Token</Th></tr></thead>
             <tbody>
-              <tr><Td>default</Td><Td>16px X icon, fg-muted</Td><Td mono>text-fg-muted</Td></tr>
-              <tr><Td>hover</Td><Td>24px bg circle + icon fg 變 foreground</Td><Td mono>bg-neutral-hover / text-foreground</Td></tr>
+              <tr><Td>default</Td><Td>Button sm iconOnly(28×28),X icon 16,fg-muted</Td><Td mono>text-fg-muted(`dismiss` override)</Td></tr>
+              <tr><Td>hover</Td><Td>Button bg 套 neutral-hover,icon 升 foreground</Td><Td mono>bg-neutral-hover / text-foreground</Td></tr>
               <tr><Td>focus</Td><Td>2px ring(鍵盤導航)</Td><Td mono>ring-ring ring-offset-1</Td></tr>
               <tr><Td>solid appearance</Td><Td>icon 用白字(繼承 data-theme foreground)</Td><Td mono>text-foreground(inverse)</Td></tr>
             </tbody>
