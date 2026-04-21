@@ -12,11 +12,26 @@ Purpose: catch every bug class this project has shipped historically PLUS struct
 本 skill audit **DS 本身**(`src/design-system/` 內部的 spec / cva / SSOT / layout primitives 等)。若要 audit **consumer 層 UI code**(`src/app/` / `src/explorations/` 用 DS 的地方是否正確),走 `/product-ui-audit`。兩 skill scope 正交,不重疊。
 
 ```
-/design-system-audit    audit DS 本身(本 skill)
+/design-system-audit    audit DS 本身(本 skill)— Phase 1-4 統籌,Phase 3 chain 各維 skill
 /product-ui-audit       audit consumer UI 對 DS 的消費
-/prototype              建 exploration(Phase 3.5 強制 product-ui-audit gate)
+/prototype              建 exploration(Phase 3.5 強制進階 6 維)
 /delivery-handoff       產品 final 後的交付文件包
 ```
+
+## 對齊 CLAUDE.md `# 稽核 6 維 + 2 模式` — 本 skill 是 6 維的 D1 + D2 home
+
+CLAUDE.md 定義 6 維:D1 設計語言 / D2 程式語言 / D3 效能 / D4 UX / D5 視覺 / D6 原則自檢。本 skill 的 20 audits 覆蓋 **D1 + D2**(spec hygiene / code correctness / SSOT / cva / naming / tokens / patterns)。**D3-D5 由對應 skill 處理**:
+
+| 維度 | 對應 skill |
+|------|-----------|
+| D1 設計語言 | 本 skill Audits 1-20 |
+| D2 程式語言 | 本 skill(cva / types / imports 部分)+ tsc / lint |
+| D3 元件效能 | `/performance-audit`(render / memo / bundle) |
+| D4 UX 行為 | `/ux-audit`(keyboard / focus / ARIA / animation) |
+| D5 視覺品質 | `/visual-audit`(Layer A mechanical + Layer B AI) |
+| D6 原則自檢 | 本 skill Phase 4 報告含「提議討論」區(對齊 `# 稽核 vs 執行 分權 canonical`) |
+
+**進階模式 scope=all**(全 DS 健檢 / release cut):本 skill Phase 3 chain `/performance-audit --scope=all` + `/ux-audit --scope=all` + `/visual-audit` 完整 6 維 sweep。
 
 ## When to run
 

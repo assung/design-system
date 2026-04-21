@@ -220,46 +220,46 @@ Storybook title 慣例(不與 Components/ 衝突):
 
 **絕對不可**在 explorations/ 階段就偷偷 add 到 Components/,會污染 DS。
 
-### Phase 3.5 — Self-audit(stakeholder-gate,強制 code + visual 雙層)
+### Phase 3.5 — Self-audit(stakeholder-gate,強制進階 6 維)
 
 **Input**: Phase 3 完成 + Checkpoint 3 資源決策完畢的 exploration stories
 
-**核心原則**:Phase 3 寫的 exploration code 不該直接進 Phase 4 給 stakeholder 看——先 AI 自己掃 code + visual,世界級設計師本人也會自我 review 才對外 present。對齊 **CLAUDE.md 稽核三級 Tier 1 stakeholder-gate**(code + visual 雙層 mandatory)。
+**核心原則**:Phase 3 寫的 exploration code 不該直接進 Phase 4 給 stakeholder 看——先 AI 自己掃 6 維,世界級設計師本人也會自我 review 才對外 present。對齊 **CLAUDE.md `# 稽核 6 維 + 2 模式 + 觸發 canonical` M6**(stakeholder-visible 產出 → 強制進階模式)。
 
-**Process(兩層同時跑)**:
+**Process(6 維並行,對齊 6 維稽核 canonical)**:
 
-#### Phase 3.5a — Code audit(強制 invoke `/product-ui-audit`)
+| 維度 | Skill | Audit scope |
+|------|-------|-------------|
+| **D1 設計語言一致** | `/product-ui-audit` | 6 dim(token 紀律 / layout primitive / 元件使用 / mindset / 幾何 / a11y) |
+| **D2 程式語言一致** | `tsc --noEmit` + lint | exploration 目錄 |
+| **D3 元件效能** | `/performance-audit` | render / memo / bundle(per candidate) |
+| **D4 UX 行為** | `/ux-audit` | keyboard / focus / ARIA / animation |
+| **D5 視覺品質** | `/visual-audit` | Layer A mechanical + Layer B AI judgement |
+| **D6 設計原則自檢** | Phase F 報告「提議討論」區 | 對齊 `# 稽核 vs 執行 分權 canonical`(不自改原則) |
 
-對 `src/explorations/{topic-slug}/` 目錄執行 audit,掃 6 維度:
-1. **Token 紀律** — 有沒硬寫 hex / rgb / shadow-sm / shadcn alias
-2. **Layout primitive 消費** — 該用 Empty / item-layout / overlay-surface / ScrollArea / AspectRatio 的地方是否用對
-3. **元件使用正確性** — Button / Input 等 variant / size / props 合理;Field wrapper 對用;icon-only 有 aria-label
-4. **Mindset adherence** — 沒 Option A/B/C placeholder / 有對標世界級註明 / 沒憑直覺造 pattern
-5. **視覺幾何(code 層)** — flex 行 box 同尺寸(gap token 不被 overflow 吃)
-6. **A11y** — aria-label / role / keyboard / color contrast
+#### 執行順序
 
-#### Phase 3.5b — Visual audit(強制 chain `/visual-audit`)
+1. `npm run visual-audit -- --scope=component:{topic-slug}` 先跑(D5 Layer A,產出 snapshots)
+2. Chain `/product-ui-audit`(D1)scope 到 `src/explorations/{topic-slug}/`
+3. Chain `/performance-audit`(D3)scope 到該 exploration
+4. Chain `/ux-audit`(D4)scope 到該 exploration
+5. Chain `/visual-audit`(D5 Layer B AI judgement)讀 `snapshots/*.png`
+6. D6 彙整 — 若發現 DS canonical 本身有疑 → 寫「提議討論」區不自改
 
-對每個 candidate 的 exploration stories 跑:
-1. **Auto invoke**:`npm run visual-audit -- --scope=component:{topic-slug}`(scope 到本 prototype exploration)
-2. Layer A mechanical(WCAG 對比度 + DOM 幾何 + retina screenshot)
-3. Layer B chain `/visual-audit` skill:讀 `snapshots/*.png`,AI 做設計合理性判斷(每 candidate 的視覺品質、世界級對照、跨 candidate 視覺一致性)
-
-**Output**:
-- Code report(per candidate)P0 / P1 / P2 findings(from /product-ui-audit)
-- Visual report(per candidate)contrast / geometry violations + AI 視覺 finding(from /visual-audit)
-- 合併成一份 Phase 3.5 gate report
+**Output**:per candidate 的 6 維 report,彙整成一份 Phase 3.5 gate report
 
 **Gate 規則(嚴格)**:
-- **Code P0 有** → 必修,不修不進 Phase 4(P0 = token alias / 硬色 / 幾何違反)
-- **Visual Layer A violation 有** → 必修,contrast AA 不過 / geometry assertion fail 視同 P0
-- **Visual Layer B 判斷有明顯設計問題** → 必修或在 notes.md 明文 rationale(「本 candidate 故意違反 X 以探索 Y」)
+- **D1 / D2 P0** → 必修(token alias / 硬色 / 幾何違反 / tsc error)
+- **D5 Layer A violation** → 必修(contrast AA 不過 / geometry assertion fail 視同 P0)
+- **D3 / D4 高 impact finding** → 必修(render 爆 / keyboard 不通 / ARIA 缺)
+- **D5 Layer B 明顯設計問題** → 必修或在 notes.md 明文 rationale
+- **D6 canonical 疑點** → 不 block,列 STOP 區等 user sign-off
 - Code P1 > 3 筆 → 建議修,user 可決定先 present 或先修
-- Code P1 ≤ 3 + 無 P0 + Layer A 乾淨 → 可進 Phase 4
+- 無 P0 + Layer A 乾淨 + D3/D4 無高 impact → 可進 Phase 4
 
-**為什麼 mandatory**:比稿本質是「給 stakeholder 選視覺方向」,視覺沒 audit 好就 present = 讓 stakeholder 看了有視覺 bug 的 candidate,比稿品質失準。
+**為什麼 mandatory**:比稿本質是「給 stakeholder 選視覺方向」,6 維任一沒 audit 好就 present = 讓 stakeholder 看了有 bug 的 candidate,比稿品質失準。對齊 Meta-Pattern M6。
 
-詳情見 `.claude/skills/product-ui-audit/SKILL.md` + `.claude/skills/visual-audit/SKILL.md` + `references/audit-checks.md`。
+詳情見 `.claude/skills/product-ui-audit/SKILL.md` + `/performance-audit` + `/ux-audit` + `/visual-audit` + `references/audit-checks.md`。
 
 ### Phase 4 — Present & stakeholder decision
 
