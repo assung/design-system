@@ -14,7 +14,7 @@ import { Field, FieldLabel, FieldDescription } from '@/design-system/components/
 import { Input } from '@/design-system/components/Input/input'
 import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
-import { CheckboxGroup } from '@/design-system/components/CheckboxGroup/checkbox-group'
+import { CheckboxGroup } from '@/design-system/components/Checkbox/checkbox-group'
 
 const meta: Meta = {
   title: 'Design System/Components/Sheet/展示',

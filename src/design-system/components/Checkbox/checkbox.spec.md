@@ -207,11 +207,78 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 
 ---
 
+## 群組模式(CheckboxGroup)
+
+**`<CheckboxGroup>`** 是多選 Checkbox 的 layout primitive,跟 `<Checkbox>` **同資料夾**(合併於 2026-04-21,原單獨 `CheckboxGroup/` folder 併入)。對齊 Ant Design `Checkbox.Group` / Chakra `CheckboxGroup` / Mantine `Checkbox.Group` 世界級:standalone + group 家族同資料夾。
+
+### Canonical 鐵律:零外部 gap
+
+**垂直 CheckboxGroup item 之間沒有外部 gap**。間距完全靠每個 Checkbox 內部的 SelectionItem `py = (field-height - 1lh) / 2` 公式生成 — 單行高度對齊 field-height,多 row stacked 時 row-to-row 自然有 py × 2 的呼吸空間。
+
+**禁止**外層加 `gap-y-*` / `space-y-*` / margin → double padding,違反 canonical。
+
+### 為什麼 zero gap 也好看
+
+SelectionItem py 公式保證:
+1. 單行 checkbox 高度 = field-height(對齊 Input 高度,row align)
+2. 多行堆疊時相鄰 row 的 py 各自擴散 = 2×py 真實視覺呼吸空間
+3. Density 切換時 py 自動跟 field-height 縮放,間距等比例變化
+
+外加 gap → double-padding 視覺斷裂。
+
+### 世界級對照
+
+- **Atlassian / Radix**:row 間距由 item 自身 py 擁有,group 無 gap
+- **Ant Design / Chakra**:依賴 Checkbox 自帶 line-height,group 無 spacing 或預設 0
+- **流派:row 高度定義 gap,不加外部 gap** — 本 DS 採此
+
+### CheckboxGroupContext(隔離 fieldCtx)
+
+Group 內的 Checkbox 透過 `CheckboxGroupContext` 知道自己在 group 裡:
+- `insideGroup && insideField` → 保留 label(每個 Checkbox 是 group 內選項)
+- `insideField && !insideGroup` → 抑制 label(let FieldLabel 接管,solo-in-Field 場景)
+
+每個 Checkbox 自己的 `id` 透過 `useId` 生成(不共用 fieldCtx.id)→ 修了 2026-04-21「點擊只 toggle 第一個」bug。
+
+### Orientation
+
+| 值 | Layout | 典型場景 |
+|---|---|---|
+| `vertical`(預設) | `grid`(無 gap,靠 SelectionItem py) | 篩選條件、偏好設定、權限組 |
+| `horizontal` | `flex flex-wrap gap-4` | 短 label 並排(Email / Push / SMS) |
+
+Horizontal 需 `gap-4` 因 row 的 py 不擴散到左右。
+
+### Field 整合
+
+`<CheckboxGroup>` 有 `fieldLayout: 'block'` 屬性(跟 RadioGroup 一致),在 `<Field orientation="horizontal">` 內 control area 自動切 `items-start` + padding-top 對齊第一個 item 的 label 第一行。
+
+### 用法範例
+
+```tsx
+<CheckboxGroup>
+  <Checkbox label="待處理" defaultChecked />
+  <Checkbox label="進行中" defaultChecked />
+  <Checkbox label="已完成" />
+</CheckboxGroup>
+
+<Field orientation="horizontal">
+  <FieldLabel>通知方式</FieldLabel>
+  <CheckboxGroup orientation="horizontal">
+    <Checkbox label="Email" />
+    <Checkbox label="Push" />
+    <Checkbox label="SMS" />
+  </CheckboxGroup>
+</Field>
+```
+
+---
+
 ## 禁止事項
 
 - ❌ Radio 不可單獨使用——必須在 RadioGroup 內
 - ❌ Checkbox 不內建 label——label 組合用 SelectionItem
-- ❌ 垂直排列不加 gap——padding 已處理間距
+- ❌ 垂直 CheckboxGroup 加 `gap-y-*` / `space-y-*`——違反 zero-gap canonical
 - ❌ 多選一不用 Checkbox——用 Radio 或 Select
 - ❌ 即時套用的布林開關用 Checkbox——用 Switch（見「與 Switch 的分界」）
 - ❌ Form 內同意條款用 Switch——條款是「勾選送出才成立」的書面行為，用 Checkbox
@@ -223,6 +290,6 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 - `../Switch/switch.spec.md` — 即時套用的布林開關（Checkbox vs Switch SSOT 在本 spec「與 Switch 的分界」）
 - `../Select/select.spec.md` — 單選下拉（Radio vs Select SSOT 在 Select spec）
 - `../Combobox/combobox.spec.md` — 多選下拉（Checkbox stack vs Combobox 對照在 Combobox spec）
-- `../RadioGroup/radio-group.spec.md` — Radio 的 group 容器（共用規則在本 spec）
+- `../RadioGroup/radio-group.spec.md` — Radio 的 group 容器 + 結構對稱 reciprocal
 - `../SelectionControl/selection-item.spec.md` — Checkbox / Radio 共用的 SelectionItem 佈局 primitive（本 spec 的 Clamp 政策為其 SSOT）
 - `../Field/field-controls.spec.md` — Field Control 共用規則

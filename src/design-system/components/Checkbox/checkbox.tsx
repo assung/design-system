@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { useFieldContext } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
-import { CheckboxGroupContext } from "@/design-system/components/CheckboxGroup/checkbox-group"
+import { CheckboxGroupContext } from "./checkbox-group"
 
 // ── Variants ────────────────────────────────────────────────────────────────
 // 三種尺寸（sm/md=16px, lg=20px），對齊 icon 系統與 SelectionItem。
