@@ -45,17 +45,28 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
     onCapabilitiesChange({ zoom: true })
   }, [onCapabilitiesChange])
 
-  // 外部 zoom 變動(user 打字 / 按 preset)→ 同步到 TransformWrapper。
-  // react-zoom-pan-pinch v3 的 state 由 `state` (ReactZoomPanPinchRef['state']) 讀取,
-  // 不再是 `instance.transformState`。
+  // 外部 zoom 變動(user 打字 / 按 preset / ± 按鈕)→ 同步到 TransformWrapper。
+  // **zoom anchor 固定在 viewport center**:對齊 Figma / Photoshop / Google Slides 的 ± 按鈕
+  // 行為 — 沒 cursor 位置時,以 viewport center 為 anchor 保留視覺重心(內容不會跳飛)。
+  // 算法:保持「image 上 viewport-center 對應的那個點」在 zoom 後仍在 viewport center。
+  // (wheel zoom 不走本 useEffect,由 react-zoom-pan-pinch 內建 anchor-at-cursor 處理)
   React.useEffect(() => {
     const api = apiRef.current
-    if (!api) return
+    const container = containerRef.current
+    if (!api || !container) return
     const currentScale = api.state.scale
     const targetScale = zoom / 100
-    if (Math.abs(currentScale - targetScale) > 0.01) {
-      api.setTransform(api.state.positionX, api.state.positionY, targetScale, 200)
-    }
+    if (Math.abs(currentScale - targetScale) < 0.01) return
+
+    const rect = container.getBoundingClientRect()
+    const cx = rect.width / 2
+    const cy = rect.height / 2
+    const ratio = targetScale / currentScale
+    // 讓「圖上當前 viewport-center 對應的點」zoom 後仍在 (cx, cy):
+    //   newPanX = cx - (cx - oldPanX) * ratio
+    const newX = cx - (cx - api.state.positionX) * ratio
+    const newY = cy - (cy - api.state.positionY) * ratio
+    api.setTransform(newX, newY, targetScale, 200)
   }, [zoom])
 
   // Fit-to-* 指令處理 — 算 container / image 比例,emit 回 shell

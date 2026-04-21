@@ -6,6 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
+  SheetBody,
   SheetFooter,
   SheetClose,
 } from './sheet'
@@ -34,7 +35,7 @@ export const CreateProjectRight: Story = {
           <SheetTitle>建立新專案</SheetTitle>
           <SheetDescription>建立後可從專案列表開啟。所有欄位稍後都可修改。</SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-4">
+        <SheetBody className="flex flex-col gap-4">
           <Field>
             <FieldLabel>專案名稱</FieldLabel>
             <Input placeholder="例:Q2 產品路線圖" />
@@ -52,7 +53,7 @@ export const CreateProjectRight: Story = {
               <Checkbox label="每日摘要" />
             </div>
           </Field>
-        </div>
+        </SheetBody>
         <SheetFooter>
           <SheetClose asChild>
             <Button variant="tertiary">取消</Button>
@@ -76,7 +77,7 @@ export const EditUserRight: Story = {
           <SheetTitle>Ada Chen</SheetTitle>
           <SheetDescription>Design Engineer · 加入於 2024-08-12</SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-4">
+        <SheetBody className="flex flex-col gap-4">
           <Field>
             <FieldLabel>顯示名稱</FieldLabel>
             <Input defaultValue="Ada Chen" />
@@ -97,7 +98,7 @@ export const EditUserRight: Story = {
               <Checkbox label="可刪除專案" />
             </div>
           </Field>
-        </div>
+        </SheetBody>
         <SheetFooter>
           <SheetClose asChild>
             <Button variant="tertiary">取消</Button>
@@ -121,7 +122,7 @@ export const LeftNavigation: Story = {
           <SheetTitle>專案</SheetTitle>
           <SheetDescription>選擇要前往的工作區</SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto py-2 flex flex-col">
+        <SheetBody className="flex flex-col">
           {[
             { name: '產品路線圖', count: 12 },
             { name: '行銷活動', count: 5 },
@@ -140,7 +141,7 @@ export const LeftNavigation: Story = {
               )}
             </button>
           ))}
-        </div>
+        </SheetBody>
         <SheetFooter>
           <Button variant="tertiary" className="w-full">管理專案</Button>
         </SheetFooter>

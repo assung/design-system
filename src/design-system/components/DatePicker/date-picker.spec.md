@@ -63,7 +63,7 @@ DatePicker 使用**本 DS 自建 DateGrid** + Popover 而非瀏覽器原生 `<in
 | 正常(未 hover) | 黑字透明底 | `text-foreground` | base state |
 | **today** | 文字下方**藍色底線** | `underline decoration-primary decoration-2 underline-offset-4` | **非 ring circle**(避免與 hover 混淆,對齊 Ant / Google Calendar / macOS Calendar) |
 | **disabled** | **灰底圓圈** + 淺灰字 | `bg-neutral-2 rounded-full text-fg-disabled` | 對齊 user 附圖,與 outside month 視覺略有區隔 |
-| **selected**(single / range 端點) | **藍底白字圓** | `bg-primary text-on-emphasis rounded-full` | range_start / range_end 共用此視覺 |
+| **selected**(single / range 端點) | **藍底白字圓** | `bg-primary text-on-emphasis rounded-full` | range_start / range_end 共用此視覺。**為什麼 primary 非 neutral**:DatePicker 的 selected 是「**最終選定日期**」強 affordance,用 primary 顯示確定性(對齊 Google Calendar / Notion Calendar / Ant DatePicker 慣例)。**對照 TimePicker 選項 selected 用 `bg-neutral-selected`**(見 time-picker.spec.md),因為 TimePicker panel 是「**列表選中**」語意(user 在時分選項間切換),跟 SelectMenu 同流派。兩者差異 codified 在各 spec,不互調。 |
 | **range track**(中間日期) | **灰底矩形橫條** | `bg-neutral-2`(day 容器層,非 button 層) | 與端點圓接縫形成連續 bar |
 | **hover**(未選中) | **藍圈 outline**,無 fill | `hover:ring-1 hover:ring-primary hover:bg-transparent` | 非 filled 避免跟 selected 混淆 |
 

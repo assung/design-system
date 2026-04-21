@@ -227,7 +227,9 @@ const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
             }}
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        {/* data-theme="dark":DropdownMenuContent 走 Portal 到 document body 外,
+            不繼承 FileViewer 外層 data-theme="dark",需顯式打 dark 讓選單跟 chrome 一致 */}
+        <DropdownMenuContent align="end" className="w-56" data-theme="dark">
           {ZOOM_FIT_OPTIONS.map((opt) => (
             <DropdownMenuItem
               key={opt.value}
@@ -319,10 +321,17 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </span>
       </div>
 
-      {/* 按鈕順序 canonical:zoom → info → download → close(影響力遞增)*/}
+      {/* 按鈕順序 canonical:zoom → info → download → close(影響力遞增)
+          action-bar 三分區:zoom(data op)/ info+download(action group)/ close(dismiss)
+          dismiss 前分隔線 = action-bar「dismiss 跟動作分群」canonical */}
       <div className="flex items-center gap-1 shrink-0">
         {capabilities.zoom && (
-          <ZoomInput value={zoom} onChange={onZoomChange} onFit={onFit} />
+          <>
+            {/* Zoom group:-/%/+/▼ 屬同類「縮放」操作,群組並在右側加分隔線跟其他動作分群 */}
+            <ZoomInput value={zoom} onChange={onZoomChange} onFit={onFit} />
+            {/* zoom group → next action group divider(action-bar canonical) */}
+            <div className="h-6 w-px bg-divider mx-1" aria-hidden />
+          </>
         )}
         <Button
           variant="text"
@@ -343,6 +352,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
             onClick={onDownload}
           />
         )}
+        {/* action-bar canonical:dismiss 前加分隔線跟其他動作分群(info/download = action group,close = dismiss group) */}
+        <div className="h-6 w-px bg-divider mx-1" aria-hidden />
         {/* Close X 走 dismiss canonical(`ItemInlineActionButton`)——對齊 CLAUDE.md
             `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss 按鈕 canonical」:
             dismiss overlay session 必用 Inline Action,不用 label Button。 */}
@@ -722,6 +733,23 @@ const FileViewer: React.FC<FileViewerProps> = ({
     return () => window.removeEventListener('keydown', handler)
   }, [open, activeIndex, files.length, setIndex, capabilities.zoom, handleFit])
 
+  // Arrows idle auto-hide(世界級 lightbox canonical:Google Photos / Dropbox / PhotoSwipe)
+  // 滑鼠移入 viewport → 顯示箭頭;持續 2.5 秒無 mouse move → 自動淡出(對齊世界級行為)
+  const [armVisible, setArmVisible] = React.useState(false)
+  const idleTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const handleViewportMouseMove = React.useCallback(() => {
+    setArmVisible(true)
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
+    idleTimerRef.current = setTimeout(() => setArmVisible(false), 2500)
+  }, [])
+  const handleViewportMouseLeave = React.useCallback(() => {
+    setArmVisible(false)
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
+  }, [])
+  React.useEffect(() => () => {
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
+  }, [])
+
   if (!file || !Renderer) {
     // files 為空或 index 超界 — 不渲染
     return null
@@ -775,17 +803,22 @@ const FileViewer: React.FC<FileViewerProps> = ({
             />
 
             {/* 主區:Viewport + 可選 InfoPanel(右側)
-                group/viewer:讓內部 prev/next 箭頭 hover-only(對齊 Google Photos /
-                Dropbox lightbox / Carousel spec canonical — 常駐箭頭干擾 media 閱讀) */}
+                Arrows visibility = armVisible(state)控制:mouse move 顯示 / 2.5s idle 隱藏 / mouse leave 立即隱藏
+                對齊 Google Photos / Dropbox lightbox / PhotoSwipe world-class canonical */}
             <div className="flex-1 min-h-0 flex">
-              <div className="group/viewer relative flex-1 min-w-0 bg-canvas">
+              <div
+                className="relative flex-1 min-w-0 bg-canvas"
+                onMouseMove={handleViewportMouseMove}
+                onMouseLeave={handleViewportMouseLeave}
+              >
                 {showArrows && activeIndex > 0 && (
                   <div
                     className={cn(
                       'absolute left-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10',
-                      // hover-only:預設隱藏,group hover 或 focus-within 時淡入
-                      'opacity-0 transition-opacity duration-150',
-                      'group-hover/viewer:opacity-100 focus-within:opacity-100',
+                      'transition-opacity duration-150',
+                      // armVisible state 控制,或 focus-within 時 a11y 強制顯示
+                      armVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                      'focus-within:opacity-100 focus-within:pointer-events-auto',
                     )}
                   >
                     <Button
@@ -811,8 +844,9 @@ const FileViewer: React.FC<FileViewerProps> = ({
                   <div
                     className={cn(
                       'absolute right-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10',
-                      'opacity-0 transition-opacity duration-150',
-                      'group-hover/viewer:opacity-100 focus-within:opacity-100',
+                      'transition-opacity duration-150',
+                      armVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                      'focus-within:opacity-100 focus-within:pointer-events-auto',
                     )}
                   >
                     <Button

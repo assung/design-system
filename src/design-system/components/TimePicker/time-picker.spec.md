@@ -100,22 +100,26 @@ Panel 展開後的 column picker 結構:
 └───────────────────────────────┘
 ```
 
-### 欄內 item 狀態(對齊 DatePicker canonical)
+### 欄內 item 狀態(對齊 SelectMenu canonical,**非 DatePicker**)
 
 | State | 視覺 | Token |
 |-------|------|-------|
 | 正常 | 置中文字 | `text-foreground` |
-| hover | 藍圈 outline | `ring-1 ring-primary rounded-md` |
-| **selected** | 藍底白字 | `bg-primary text-inverse-fg rounded-md` |
+| hover | 灰底 | `hover:bg-neutral-hover` |
+| **selected** | **灰底**(非藍底) | `bg-neutral-selected text-foreground rounded-md` |
 | disabled(`disabledTime`) | 灰字 | `text-fg-disabled cursor-not-allowed` |
 
-**跟 DatePicker 的 date cell 狀態一致**—— consumer 學一次,date/time 通用。
+**為什麼 selected 走 neutral 非 primary**(2026-04-21 canonical):TimePicker panel 是「**列表選中**」語意 — user 在時 / 分 / 秒選項間切換,跟 `SelectMenu` / `MenuItem` 同流派(單選 list → `bg-neutral-selected`)。**DatePicker date cell selected 用 `bg-primary`** 是因為那是「**最終選定日期**」的強 affordance(確定性)。兩者不同語意,不互調。
 
-### Spacing
+對齊 SelectMenu / MenuItem 的好處:consumer 看 TimePicker 面板知道這是「選一個項目」,跟 Select 下拉選單認知一致(Ant Design TimePicker panel 同樣採 neutral selected)。
+
+### Spacing + 結構(2026-04-21 canonical)
 
 - Panel 內 padding = `--layout-space-tight`(12px @ md density)
-- 每欄固定 `w-16`(64px)+ 中間 `border-l border-divider`
-- scrollable list `h-64`(256px),每 item `h-8`(32px),highlight row 在容器垂直中心
+- **三欄(時 / 分 / 秒)`flex-1` 均分父層寬度**(Panel `w-56` = 224px,三欄各 ~66px),**不再 w-14 / w-16 固定**。分隔「:」shrink-0 w-3 不吃 slot 空間
+- Scrollable list 用 **`<ScrollArea>`**(對齊 DS 跨 OS 一致 overlay 捲軸 canonical);不 raw `overflow-y-auto`
+- 每 item **`h-9`(36px)對齊 DatePicker date cell**(跨 picker 視覺一致)
+- List 高 `h-[216px]`(容納 6 個 item 置中)
 
 ---
 

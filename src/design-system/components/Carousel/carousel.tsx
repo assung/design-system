@@ -234,6 +234,10 @@ const CarouselPrevious = React.forwardRef<HTMLButtonElement, ArrowProps>(
           aria-label="上一張"
           disabled={!canScrollPrev}
           onClick={scrollPrev}
+          // documented exception:視覺取向的 media carousel 箭頭用 rounded-full 圓形,
+          // 優於 DS default rounded-md。對齊 Instagram / Airbnb / Notion / Apple Photos
+          // 世界級慣例 — media carousel 箭頭圓形減少視覺方塊感壓迫內容。spec「箭頭視覺規格」有明示。
+          className="rounded-full"
         />
       </div>
     )
@@ -263,6 +267,8 @@ const CarouselNext = React.forwardRef<HTMLButtonElement, ArrowProps>(
           aria-label="下一張"
           disabled={!canScrollNext}
           onClick={scrollNext}
+          // documented exception:同 Previous,媒體導向 carousel 箭頭圓形
+          className="rounded-full"
         />
       </div>
     )

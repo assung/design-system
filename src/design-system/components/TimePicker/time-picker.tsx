@@ -11,6 +11,7 @@ import {
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
 import { Button } from '@/design-system/components/Button/button'
+import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 
 /**
  * TimePicker — 單一時間(時/分/秒)輸入與顯示元件
@@ -129,52 +130,57 @@ interface TimeColumnProps {
 function TimeColumn({ values, selected, disabledSet, label, onSelect }: TimeColumnProps) {
   const listRef = React.useRef<HTMLUListElement>(null)
 
-  // 打開時滾到 selected 位置
+  // 打開時滾到 selected 位置(在 ScrollArea viewport 中置中)
   React.useEffect(() => {
     const list = listRef.current
     if (!list) return
+    const viewport = list.parentElement
+    if (!viewport) return
     const idx = values.indexOf(selected)
     if (idx < 0) return
     const item = list.children[idx] as HTMLElement | undefined
     if (!item) return
-    // center selected in viewport
-    list.scrollTop = item.offsetTop - list.clientHeight / 2 + item.clientHeight / 2
+    viewport.scrollTop = item.offsetTop - viewport.clientHeight / 2 + item.clientHeight / 2
   }, [values, selected])
 
   return (
-    <ul
-      ref={listRef}
-      role="listbox"
-      aria-label={label}
-      className={cn(
-        'flex flex-col w-14 h-[180px] overflow-y-auto',
-        'scrollbar-thin',
-      )}
-    >
-      {values.map((v) => {
-        const isSelected = v === selected
-        const isDisabled = disabledSet?.has(v) ?? false
-        return (
-          <li key={v} role="option" aria-selected={isSelected}>
-            <button
-              type="button"
-              disabled={isDisabled}
-              onClick={() => onSelect(v)}
-              className={cn(
-                'w-full h-8 text-body',
-                'flex items-center justify-center',
-                'rounded-md cursor-pointer transition-colors',
-                'hover:bg-neutral-hover',
-                isSelected && 'bg-primary text-white hover:bg-primary',
-                isDisabled && 'text-fg-disabled cursor-not-allowed hover:bg-transparent',
-              )}
-            >
-              {String(v).padStart(2, '0')}
-            </button>
-          </li>
-        )
-      })}
-    </ul>
+    // flex-1 讓三欄均分父層寬度(不再 w-14 固定);ScrollArea 跨 OS 一致 overlay 捲軸
+    <ScrollArea className="flex-1 h-[216px]">
+      <ul
+        ref={listRef}
+        role="listbox"
+        aria-label={label}
+        className="flex flex-col px-1"
+      >
+        {values.map((v) => {
+          const isSelected = v === selected
+          const isDisabled = disabledSet?.has(v) ?? false
+          return (
+            <li key={v} role="option" aria-selected={isSelected}>
+              <button
+                type="button"
+                disabled={isDisabled}
+                onClick={() => onSelect(v)}
+                className={cn(
+                  // h-9 對齊 DatePicker date cell(36px),跨 picker 視覺一致
+                  'w-full h-9 text-body tabular-nums',
+                  'flex items-center justify-center',
+                  'rounded-md cursor-pointer transition-colors',
+                  'hover:bg-neutral-hover',
+                  // selected 走 bg-neutral-selected 對齊 SelectMenu canonical
+                  // (TimePicker 選項是「列表選中」語意 — 跟 SelectMenu / MenuItem 一致;
+                  // DatePicker 的 selected 是「最終選定日期」,語意不同故仍 bg-primary)
+                  isSelected && 'bg-neutral-selected text-foreground hover:bg-neutral-selected',
+                  isDisabled && 'text-fg-disabled cursor-not-allowed hover:bg-transparent',
+                )}
+              >
+                {String(v).padStart(2, '0')}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </ScrollArea>
   )
 }
 
@@ -377,9 +383,9 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div className="flex flex-col">
-            {/* Column picker */}
-            <div className="flex items-start gap-1 px-[var(--layout-space-tight)] pt-[var(--layout-space-tight)]">
+          <div className="flex flex-col w-56">
+            {/* Column picker:三欄 flex-1 均分父層寬度,: 分隔固定寬度不吃 slot */}
+            <div className="flex items-stretch px-[var(--layout-space-tight)] pt-[var(--layout-space-tight)]">
               <TimeColumn
                 label="hours"
                 values={hourValues}
@@ -387,7 +393,7 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
                 disabledSet={disabledSets.hours}
                 onSelect={(h) => commitDraft({ ...draft, h })}
               />
-              <span className="self-stretch flex items-center text-fg-muted text-body">:</span>
+              <span className="shrink-0 w-3 flex items-start justify-center pt-1 text-fg-muted text-body">:</span>
               <TimeColumn
                 label="minutes"
                 values={minuteValues}
@@ -397,7 +403,7 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
               />
               {showSeconds && (
                 <>
-                  <span className="self-stretch flex items-center text-fg-muted text-body">:</span>
+                  <span className="shrink-0 w-3 flex items-start justify-center pt-1 text-fg-muted text-body">:</span>
                   <TimeColumn
                     label="seconds"
                     values={secondValues}
