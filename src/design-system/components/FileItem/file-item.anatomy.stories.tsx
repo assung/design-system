@@ -1,8 +1,9 @@
+// @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
 import type { Meta, StoryObj } from '@storybook/react'
 import { X, Download, RotateCw } from 'lucide-react'
 import { FileItem } from './file-item'
 import { Button } from '@/design-system/components/Button/button'
-import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, Swatch } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/FileItem/設計規格',
@@ -91,8 +92,97 @@ export const Inspector: Story = {
   ),
 }
 
+export const ColorMatrix: Story = {
+  name: '3. 色彩對照表',
+  render: () => (
+    <div className="flex flex-col gap-10">
+      <div>
+        <H3>Status × 元素 色彩矩陣</H3>
+        <Desc>
+          FileItem 本身無色彩變體——text / background 走 item-anatomy row primitive 共用 token
+          (`--foreground` / `--fg-secondary` / `--bg-neutral-hover`),跟 MenuItem / TreeItem 共享。
+          Status 才驅動色彩:progress bar 色(inProgress / success / error)+ status icon 色(check / X)+ description 色(error 時升階)。
+        </Desc>
+        <div className="overflow-x-auto mb-4">
+          <table className="text-caption border-collapse min-w-[720px]">
+            <thead>
+              <tr>
+                <Th>Status</Th>
+                <Th>Filename text</Th>
+                <Th>Description text</Th>
+                <Th>Progress bar fill</Th>
+                <Th>Status icon</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <Td mono>無 status(已上傳)</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-secondary" size="sm" /><span className="font-mono">--fg-secondary</span></span></Td>
+                <Td>—(無 bar)</Td>
+                <Td>—</Td>
+              </tr>
+              <tr>
+                <Td mono>uploading</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-secondary" size="sm" /><span className="font-mono">--fg-secondary</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span className="font-mono">--primary(inProgress)</span></span></Td>
+                <Td>—(只顯示 bar)</Td>
+              </tr>
+              <tr>
+                <Td mono>completed</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-secondary" size="sm" /><span className="font-mono">--fg-secondary</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--success" size="sm" /><span className="font-mono">--success</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--success" size="sm" /><span className="font-mono">CircleCheck text-success</span></span></Td>
+              </tr>
+              <tr>
+                <Td mono>error</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span className="font-mono">--error(升階)</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span className="font-mono">--error</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span className="font-mono">XCircle text-error</span></span></Td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <H3>視覺對照(rich mode)</H3>
+        <div className="flex flex-col gap-2 max-w-lg">
+          <FileItem name="Q1-marketing-report.pdf" description="2.4 MB · 已上傳" mode="rich" />
+          <FileItem name="brand-guidelines.pdf" description="1.2 MB · 上傳中 45%" status="uploading" progress={45} mode="rich" />
+          <FileItem name="Q2-forecast.xlsx" description="上傳成功 · 3.8 MB" status="completed" progress={100} mode="rich" />
+          <FileItem name="legacy-data.csv" description="上傳失敗 · 網路中斷" status="error" mode="rich" />
+        </div>
+      </div>
+
+      <div>
+        <H3>Container background(hover / selected)</H3>
+        <Desc>
+          FileItem 的容器本身採 `--surface` 透明背景;`onClick` 時 hover → `--bg-neutral-hover`,selected → `--bg-neutral-selected`——共用 item-anatomy row SSOT,與 MenuItem / TreeItem 一致。
+        </Desc>
+        <div className="overflow-x-auto">
+          <table className="text-caption border-collapse">
+            <thead>
+              <tr><Th>State</Th><Th>Background</Th><Th>來源</Th></tr>
+            </thead>
+            <tbody>
+              <tr><Td mono>default</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--surface" size="sm" /><span className="font-mono">--surface</span></span></Td><Td>item-anatomy row SSOT</Td></tr>
+              <tr><Td mono>hover(可點擊)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--neutral-hover" size="sm" /><span className="font-mono">--neutral-hover</span></span></Td><Td>item-anatomy row SSOT</Td></tr>
+              <tr><Td mono>selected</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--neutral-selected" size="sm" /><span className="font-mono">--neutral-selected</span></span></Td><Td>item-anatomy row SSOT</Td></tr>
+              <tr><Td mono>error(不擴容器)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--surface" size="sm" /><span className="font-mono">--surface(不變)</span></span></Td><Td>只升階 description / bar / icon,不染容器——避免整 row 轉紅蓋過其他 metadata</Td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  ),
+}
+
 export const ModeMatrix: Story = {
-  name: '3. Mode 對照(compact vs rich)',
+  name: '4. Mode 對照(compact vs rich)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -133,7 +223,7 @@ export const ModeMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '5. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -199,7 +289,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '6. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-4 max-w-lg">
       <div>

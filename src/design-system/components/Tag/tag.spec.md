@@ -176,9 +176,9 @@ Field 內包含 Tag 時，Field 的 padding 改為 `(field-height - tag-height) 
 
 傳入 `onDismiss` callback 時，Tag 自動渲染 dismiss 按鈕。消費端不需要自行建構 dismiss 按鈕或知道 inline action 的尺寸規格。
 
-共用規則見 `uiSize.spec.md` 的 Inline Action 段落。
+尺寸 / 互動規則共用 SSOT 見 `../../patterns/element-anatomy/item-anatomy.spec.md`「Inline Action 設計規格」段落。
 
-Icon 色彩遵循 Inline Action 統一規則：預設 `fg-muted`，hover 時 `foreground`。
+**Icon 色彩特例（colored host)**：Tag dismiss icon **繼承 Tag 文字色**（非 `fg-muted`）— Tag 屬「colored host」分類。完整兩支規則（neutral host vs colored host）見上述 item-anatomy.spec.md SSOT。詳細每 variant 的 icon 色 + hover 背景見上面「Dismiss 行為」表（92-100 行）。
 
 | Tag size | Icon | Hover 背景 | 上下呼吸空間 |
 |---|---|---|---|

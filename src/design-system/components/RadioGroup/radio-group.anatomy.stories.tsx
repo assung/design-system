@@ -561,3 +561,108 @@ export const SizeMatrix = {
     </div>
   ),
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. 狀態行為 — Mutual Exclusion + Disabled Item Matrix
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const StateBehaviorInner = () => {
+  const [plan, setPlan] = useState('starter')
+  const [billing, setBilling] = useState('monthly')
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-1">
+        <H3>狀態行為</H3>
+        <Desc>
+          Radio 的關鍵行為來自 <span className="font-mono">RadioGroup</span> 層級——單選互斥(切 A 會同時清 B),
+          而非個別 item 的 toggle(那是 Checkbox)。本 story 展示 RadioGroup 特有行為,item 級別的
+          default / hover / active / checked / disabled 色彩對照見「3. 色彩對照表」。
+        </Desc>
+      </div>
+
+      {/* Mutual exclusion demo */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 1:單選互斥(Mutual Exclusion)</span>
+        <Desc>
+          點任一選項,其他選項自動清除——這是 Checkbox / Switch 沒有的核心差異。由 Radix Root 的 value / onValueChange 統一管理,consumer 不需自己實作互斥邏輯。
+        </Desc>
+        <div className="flex gap-6 items-start">
+          <div className="px-6 py-5 rounded-lg bg-canvas border border-divider min-w-[280px]">
+            <div className="text-[11px] text-fg-muted mb-3 font-mono">value = "{plan}"</div>
+            <RadioGroup value={plan} onValueChange={setPlan} className="flex flex-col gap-2">
+              <RadioGroupItem value="starter" label="Starter" description="個人使用 · 免費" />
+              <RadioGroupItem value="pro" label="Pro" description="小型團隊 · $12/月" />
+              <RadioGroupItem value="business" label="Business" description="企業級 · $49/月" />
+            </RadioGroup>
+          </div>
+          <div className="flex flex-col gap-2 text-[11px] text-fg-muted max-w-[280px]">
+            <div>切換任一選項,觀察其他選項的 dot 自動消失。</div>
+            <div className="pt-1 border-t border-divider">
+              對照 Checkbox:Checkbox 每項獨立 checked,可同時多選。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Individual disabled */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 2:個別 item disabled(不影響其他)</span>
+        <Desc>
+          單一選項 disabled 時其他仍可互動——disabled item 保留其 checked 視覺但 cursor-not-allowed,無法被選中。適用「功能尚未開放 / 方案不含」等情境。
+        </Desc>
+        <div className="flex gap-6 items-start">
+          <div className="px-6 py-5 rounded-lg bg-canvas border border-divider min-w-[280px]">
+            <RadioGroup value={billing} onValueChange={setBilling} className="flex flex-col gap-2">
+              <RadioGroupItem value="monthly" label="每月付款" description="可隨時取消" />
+              <RadioGroupItem value="yearly" label="每年付款" description="省 20%" />
+              <RadioGroupItem value="enterprise" label="企業年約" description="請聯繫業務" disabled />
+            </RadioGroup>
+          </div>
+          <div className="flex flex-col gap-2 text-[11px] text-fg-muted max-w-[280px]">
+            <div>第三項 disabled,選擇仍正常運作在前兩項。</div>
+            <div className="pt-1 border-t border-divider">Token:disabled item 邊框 transparent / 底色 `--bg-disabled`。</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Whole group disabled */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 3:整組 disabled(Field context 接管)</span>
+        <Desc>
+          整個 RadioGroup 放在 disabled 的 Field 內時,所有 item 繼承 disabled——consumer 不需逐 item 傳 disabled。
+        </Desc>
+        <div className="flex gap-6 items-start">
+          <div className="px-6 py-5 rounded-lg bg-canvas border border-divider min-w-[280px] opacity-60 pointer-events-none">
+            <RadioGroup defaultValue="b" className="flex flex-col gap-2">
+              <RadioGroupItem value="a" label="選項 A" disabled />
+              <RadioGroupItem value="b" label="選項 B(預設選中)" disabled />
+              <RadioGroupItem value="c" label="選項 C" disabled />
+            </RadioGroup>
+          </div>
+          <div className="flex flex-col gap-2 text-[11px] text-fg-muted max-w-[280px]">
+            <div>整組不可互動,已選中的項目維持 dot 視覺(但 dot 色走 `--fg-disabled`)。</div>
+            <div className="pt-1 border-t border-divider">
+              情境:表單審核中 / 已送出不可改;常配合 FormMessage 解釋「為什麼不能改」。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rule notes */}
+      <div className="flex flex-col gap-2 pt-4 border-t border-divider">
+        <span className="text-caption font-medium text-fg-secondary">行為規則</span>
+        <ul className="text-caption text-fg-secondary space-y-1.5 ml-4 list-disc">
+          <li>RadioGroup 必須提供 value(受控)或 defaultValue(非受控)——不給預設值 = 空狀態(無任何 dot)。</li>
+          <li>單一 disabled item 不影響 group 的 value / onValueChange——disabled item 不會被選中。</li>
+          <li>Keyboard:焦點進入 group 後,↑↓ 循環在非 disabled 選項間移動並自動 commit value(Radix 內建)。</li>
+          <li>不要用 RadioGroup 做「多選」——改用 Checkbox。RadioGroup 的核心語意是「N 選 1」。</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+export const StateBehavior = {
+  name: '5. 狀態行為',
+  render: () => <StateBehaviorInner />,
+}

@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import { Copy, Pencil, Trash2, Monitor, ChevronDown, ChevronRight, Check, type LucideIcon } from 'lucide-react'
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuSeparator,
+  DropdownMenuSeparator, DropdownMenuCheckboxItem,
+  DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
 } from './dropdown-menu'
 import { Button } from '@/design-system/components/Button/button'
 
@@ -765,4 +766,190 @@ export const SizeMatrix = {
       </div>
     </div>
   ),
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. 狀態行為 — Overlay Open/Close + Submenu + Checkbox Toggle
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+// Visual simulator of animation state frames
+const AnimationFrame = ({
+  label,
+  state,
+  desc,
+}: {
+  label: string
+  state: 'closed' | 'opening' | 'open' | 'closing'
+  desc: string
+}) => {
+  const opacity = state === 'closed' ? 0 : state === 'open' ? 1 : state === 'opening' ? 0.6 : 0.3
+  const scale = state === 'closed' ? 0.95 : state === 'open' ? 1 : state === 'opening' ? 0.98 : 0.97
+  const translate = state === 'closed' ? -8 : state === 'open' ? 0 : state === 'opening' ? -3 : -5
+  return (
+    <div className="flex flex-col gap-1.5 items-start">
+      <span className="text-[10px] text-fg-muted font-mono">{label}</span>
+      <div className="w-[180px] h-[140px] relative bg-canvas rounded-md border border-divider">
+        <Button variant="tertiary" size="sm" className="absolute top-3 left-3 pointer-events-none">
+          開啟
+        </Button>
+        <div
+          className="absolute bg-surface-raised border border-border rounded-lg shadow-md text-caption"
+          style={{
+            top: 48,
+            left: 12,
+            width: 140,
+            opacity,
+            transform: `scale(${scale}) translateY(${translate}px)`,
+            transformOrigin: 'top left',
+            transition: 'none',
+          }}
+        >
+          <div className="px-3 py-1.5 border-b border-divider text-fg-muted">複製</div>
+          <div className="px-3 py-1.5 border-b border-divider text-fg-muted">編輯</div>
+          <div className="px-3 py-1.5 text-error">刪除</div>
+        </div>
+      </div>
+      <span className="text-[10px] text-fg-secondary">{desc}</span>
+    </div>
+  )
+}
+
+const StateBehaviorInner = () => {
+  const [showMarketing, setShowMarketing] = useState(true)
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showBilling, setShowBilling] = useState(true)
+
+  return (
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-1">
+        <H3>狀態行為</H3>
+        <Desc>
+          DropdownMenu 層級特有的狀態:overlay open/close 動畫、submenu 展開 / 收起、CheckboxItem 多選 toggle。
+          Item 級別的 default / hover / focused / selected / disabled 色彩對照見「3. 色彩對照表」,由 MenuItem primitive SSOT 擁有。
+        </Desc>
+      </div>
+
+      {/* Overlay open/close animation */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 1:浮層 open / close 動畫(Radix data-state 驅動)</span>
+        <Desc>
+          Trigger 點擊 → `data-state="open"` → `animate-in fade-in-0 zoom-in-95 slide-in-from-top-2`。
+          外部點擊 / Esc / 選 item → `data-state="closed"` → `animate-out fade-out-0 zoom-out-95`。
+          Origin 由 `--radix-dropdown-menu-content-transform-origin` 自動跟著 trigger side/align 旋轉。
+        </Desc>
+        <div className="flex gap-6 pt-2">
+          <AnimationFrame label='data-state="closed"' state="closed" desc="menu 未渲染(opacity 0 / scale 95% / -8px)" />
+          <AnimationFrame label="opening" state="opening" desc="animate-in,~150ms duration" />
+          <AnimationFrame label='data-state="open"' state="open" desc="完全 render(opacity 1 / scale 100%)" />
+          <AnimationFrame label="closing" state="closing" desc="animate-out,~150ms duration" />
+        </div>
+        <div className="text-caption text-fg-muted pt-2 border-t border-divider">
+          觸發 `close` 的路徑:(a) 點擊 item(auto close)/ (b) Esc / (c) 外部點擊(onPointerDownOutside)/ (d) blur。
+          Trigger 會回到 focused 狀態,保留鍵盤流程。
+        </div>
+      </div>
+
+      {/* Submenu expansion */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 2:Submenu 展開(hover/focus 延遲 + sideways slide)</span>
+        <Desc>
+          SubTrigger hover 300ms 自動展開 submenu 向右側滑入(RTL 向左)。Submenu 是獨立 floating layer——與 parent 共存,parent 不 close。鍵盤用 ArrowRight 展開 / ArrowLeft 收起。
+        </Desc>
+        <div className="flex gap-6 items-start">
+          <div className="flex items-center justify-center px-6 py-8 rounded-lg bg-canvas border border-divider min-w-[280px]">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="sm" endIcon={ChevronDown}>分享檔案</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem startIcon={Copy}>複製連結</DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger startIcon={Monitor}>匯出為</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem>PDF</DropdownMenuItem>
+                    <DropdownMenuItem>Excel (.xlsx)</DropdownMenuItem>
+                    <DropdownMenuItem>CSV</DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem startIcon={Trash2} className="text-error">刪除</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="flex flex-col gap-2 text-[11px] text-fg-muted max-w-[280px]">
+            <div>點「分享檔案」打開主選單,hover「匯出為」看 submenu 向右滑入。</div>
+            <div className="pt-1 border-t border-divider">
+              ChevronRight suffix 是 SubTrigger 的視覺 affordance(消費 item-anatomy row SSOT,不自刻)。
+            </div>
+            <div className="pt-1 border-t border-divider">
+              鍵盤:焦點在 SubTrigger 時 ArrowRight 展開、ArrowLeft 回 parent。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CheckboxItem toggle */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 3:CheckboxItem toggle(多選維持 open)</span>
+        <Desc>
+          CheckboxItem 與一般 Item 的關鍵差異:點擊後 menu **不 close**(保留當前 filter 狀態讓使用者繼續勾 / 取消勾),直到 Esc / 外部點擊才關閉。對比 `<DropdownMenuItem>` 點擊即 close。
+        </Desc>
+        <div className="flex gap-6 items-start">
+          <div className="flex items-center justify-center px-6 py-8 rounded-lg bg-canvas border border-divider min-w-[280px]">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="sm" endIcon={ChevronDown}>
+                  欄位({[showMarketing, showAnalytics, showBilling].filter(Boolean).length})
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuCheckboxItem
+                  checked={showMarketing}
+                  onCheckedChange={setShowMarketing}
+                >
+                  Marketing spend
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={showAnalytics}
+                  onCheckedChange={setShowAnalytics}
+                >
+                  Analytics
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={showBilling}
+                  onCheckedChange={setShowBilling}
+                >
+                  Billing
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="flex flex-col gap-2 text-[11px] text-fg-muted max-w-[280px]">
+            <div>打開後逐項勾選——menu 不會 close,使用者看得到即時的選擇組合。</div>
+            <div className="pt-1 border-t border-divider">
+              世界級對照:Linear / Jira column toggle / Notion filter selector 全採此模式。對照 Select 單選下拉選一項即 close(那是 commit 語意)。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rule notes */}
+      <div className="flex flex-col gap-2 pt-4 border-t border-divider">
+        <span className="text-caption font-medium text-fg-secondary">行為規則</span>
+        <ul className="text-caption text-fg-secondary space-y-1.5 ml-4 list-disc">
+          <li>`DropdownMenuItem` 點擊即 close——這是「action 觸發即完成」語意。</li>
+          <li>`DropdownMenuCheckboxItem` 點擊**不 close**——多選語意,等使用者關 menu 才 commit。</li>
+          <li>`DropdownMenuSub` 永遠右側滑入,parent menu 保持展開——提供 breadcrumb 式認知流,使用者知道自己在哪層。</li>
+          <li>Escape 永遠 close 最內層 submenu(一次只收一層),對照 macOS native menu。</li>
+          <li>Portal render 到 body,`z-50` 確保不被 parent overflow 截斷。</li>
+          <li>Focus trap:menu open 時鍵盤焦點進入 menu,close 時自動 restore 到 trigger。</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+export const StateBehavior = {
+  name: '5. 狀態行為',
+  render: () => <StateBehaviorInner />,
 }

@@ -11,6 +11,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarTrigger,
+  Sidebar,
 } from './sidebar'
 import { ItemAvatar } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
@@ -470,11 +472,173 @@ export const ColorMatrix: Story = {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. 尺寸 / 寬度 token
+// 5. 狀態行為 — Collapse modes / Mobile offcanvas / Active restoration
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Static visual frame showing Sidebar at specific collapsible state */
+const CollapsedFrame = ({
+  variant,
+  label,
+  width,
+  collapsed,
+}: {
+  variant: 'expanded' | 'icon' | 'offcanvas'
+  label: string
+  width: number
+  collapsed?: boolean
+}) => {
+  return (
+    <div className="flex flex-col gap-2 items-start">
+      <span className="text-[11px] text-fg-muted font-mono">{label}</span>
+      <div className="relative border border-divider rounded-lg overflow-hidden bg-canvas" style={{ width: 420, height: 220 }}>
+        {/* Sidebar shell */}
+        <div
+          className="absolute top-0 bottom-0 left-0 border-r border-divider bg-surface transition-all duration-200"
+          style={{
+            width: collapsed && variant === 'offcanvas' ? 0 : width,
+            opacity: collapsed && variant === 'offcanvas' ? 0 : 1,
+          }}
+        >
+          <div className="h-10 border-b border-divider flex items-center px-3">
+            <div className="w-6 h-6 rounded-md bg-primary shrink-0" />
+            {!collapsed && variant !== 'icon' && <div className="ml-2 text-caption font-medium truncate">Acme Inc</div>}
+            {variant === 'icon' && !collapsed && <div className="ml-2 text-caption font-medium truncate">Acme Inc</div>}
+          </div>
+          <div className="flex flex-col px-2 py-2 gap-0.5">
+            {['Dashboard', 'Inbox', 'Team', 'Settings'].map((l, i) => (
+              <div key={l} className="flex items-center h-8 px-2 gap-2 rounded-md"
+                style={{
+                  backgroundColor: i === 0 ? 'var(--neutral-selected)' : 'transparent',
+                  color: i === 0 ? 'var(--foreground)' : 'var(--fg-secondary)',
+                }}
+              >
+                <div className="w-4 h-4 rounded bg-current opacity-60 shrink-0" />
+                {variant !== 'icon' && !collapsed && <span className="text-caption truncate">{l}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Main */}
+        <div
+          className="absolute top-0 bottom-0 right-0 left-0 px-4 py-3"
+          style={{ left: collapsed && variant === 'offcanvas' ? 0 : width }}
+        >
+          <div className="h-10 border-b border-divider mb-3 flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-neutral-hover shrink-0" />
+            <span className="text-caption text-fg-muted">page header</span>
+          </div>
+          <div className="text-[11px] text-fg-muted">主內容區域</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export const StateBehavior: Story = {
+  name: '5. 狀態行為',
+  render: () => (
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-1">
+        <H3>狀態行為</H3>
+        <Desc>
+          Sidebar 層級特有的狀態:collapse / expand 三種模式、mobile offcanvas、active item 跨 session 還原。
+          Item-level default / hover / active / selected / disabled **色彩**由 `ColorMatrix` 作為 state-driven 矩陣完整呈現(共用 item-anatomy row primitive SSOT);本 story 展示 container 層的結構狀態切換。
+        </Desc>
+      </div>
+
+      {/* Collapse modes */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 1:三種 collapsible 模式</span>
+        <Desc>
+          `collapsible` prop 控制收合策略:`offcanvas`(預設)= 整條 sidebar 滑出視窗外 / `icon` = 收縮到 48px 只留 icon / `none` = 永遠展開。選擇依使用情境:Linear / Figma / Notion 等「深度導覽」app 用 `icon`(使用者常切 section);Stripe Dashboard / Intercom 等「主內容為主」用 `offcanvas`(sidebar 只是啟動器)。
+        </Desc>
+        <div className="flex flex-wrap gap-6">
+          <CollapsedFrame variant="expanded" label='collapsible="icon" · expanded' width={240} collapsed={false} />
+          <CollapsedFrame variant="icon" label='collapsible="icon" · collapsed(icon mode)' width={48} collapsed />
+          <CollapsedFrame variant="offcanvas" label='collapsible="offcanvas" · collapsed(hidden)' width={272} collapsed />
+        </div>
+      </div>
+
+      {/* Live toggle demo */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 2:Cmd+B / SidebarTrigger 切換 open state</span>
+        <Desc>
+          SidebarProvider 內建 Cmd+B (Mac) / Ctrl+B (Win) 全域快捷鍵,同時 SidebarTrigger iconOnly Button 作為視覺 toggle。open state 寫入 cookie(7 天),跨 session 還原。
+        </Desc>
+        <div className="border border-divider rounded-lg overflow-hidden bg-surface" style={{ width: 480, height: 280 }}>
+          <SidebarProvider collapsible="icon" style={{ minHeight: 'auto', height: '100%' }}>
+            <div className="flex w-full h-full">
+              <Sidebar side="left" collapsible="icon">
+                <SidebarHeader>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-6 h-6 rounded-md bg-primary shrink-0" />
+                    <span className="text-body font-medium truncate">Acme Inc</span>
+                  </div>
+                </SidebarHeader>
+                <SidebarContent>
+                  <SidebarGroup>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {[
+                          { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                          { id: 'inbox', label: 'Inbox', icon: Inbox },
+                          { id: 'team', label: 'Team', icon: Users },
+                          { id: 'settings', label: 'Settings', icon: Settings },
+                        ].map((item) => (
+                          <SidebarMenuItem key={item.id}>
+                            <SidebarMenuButton id={item.id} startIcon={item.icon}>
+                              {item.label}
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        ))}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                </SidebarContent>
+              </Sidebar>
+              <div className="flex-1 flex flex-col">
+                <div className="h-10 border-b border-divider flex items-center px-3 gap-2">
+                  <SidebarTrigger />
+                  <span className="text-caption text-fg-muted">Dashboard</span>
+                </div>
+                <div className="flex-1 px-4 py-3 text-caption text-fg-muted">
+                  點 SidebarTrigger 或按 Cmd/Ctrl+B,觀察 sidebar 縮到 48px(icon mode)。再按一次展開。
+                </div>
+              </div>
+            </div>
+          </SidebarProvider>
+        </div>
+      </div>
+
+      {/* Icon mode — tooltip for item labels */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 3:Icon mode 時 label 隱藏 → Tooltip 代償</span>
+        <Desc>
+          collapse 到 icon mode 時 label 文字隱藏,滑鼠 hover menu button 自動出現 Tooltip(顯示 label)補償 — 對齊 Linear / GitHub 慣例,避免 icon-only 狀態讓使用者忘記每個 icon 的含義。SidebarMenuButton 內建此行為(`tooltip` prop)。
+        </Desc>
+      </div>
+
+      {/* Rule notes */}
+      <div className="flex flex-col gap-2 pt-4 border-t border-divider">
+        <span className="text-caption font-medium text-fg-secondary">行為規則</span>
+        <ul className="text-caption text-fg-secondary space-y-1.5 ml-4 list-disc">
+          <li>`collapsible="offcanvas"` 用於主內容為主的 app(sidebar 是啟動器,使用者常關);`collapsible="icon"` 用於深度導覽 app(sidebar 是常駐工作區)。</li>
+          <li>open state 寫 cookie `sidebar_state`(7 天 max-age),跨 session 還原——使用者上次關 = 下次也關。</li>
+          <li>Mobile(&lt;768px)一律走 Sheet overlay,不受 `collapsible` prop 影響——小螢幕 sidebar 永遠不佔固定空間。</li>
+          <li>Icon mode 下 active item 的 `bg-neutral-selected` 仍然顯示,但 label 不可見——提供最小視覺指引讓使用者知道「當前在哪」。</li>
+          <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發(input 內除外,避免干擾文字輸入)。</li>
+        </ul>
+      </div>
+    </div>
+  ),
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. 尺寸 / 寬度 token
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const ChromeTokens: Story = {
-  name: '5. 寬度與 Chrome Token',
+  name: '6. 寬度與 Chrome Token',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-2">

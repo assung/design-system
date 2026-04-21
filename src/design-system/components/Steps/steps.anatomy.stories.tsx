@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Steps, StepItem, StepLabel, StepDescription } from './steps'
 import { H3, Desc, Td, Th, TokenCell, Swatch } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
+import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
   title: 'Design System/Components/Steps/設計規格',
@@ -253,6 +255,155 @@ export const SizeMatrix: Story = {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  ),
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. 狀態行為 — Progress flow / Linear / Error interrupt
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const CHECKOUT_STEPS = [
+  { value: 'cart', label: '購物車' },
+  { value: 'shipping', label: '配送資訊' },
+  { value: 'payment', label: '付款' },
+  { value: 'review', label: '確認訂單' },
+  { value: 'done', label: '完成' },
+] as const
+
+const ProgressFlow = () => {
+  const [idx, setIdx] = useState(1)
+  const current = CHECKOUT_STEPS[idx]!.value
+  const completed = CHECKOUT_STEPS.slice(0, idx).map((s) => s.value)
+  return (
+    <div className="flex flex-col gap-3 min-w-[340px]">
+      <div className="border border-border rounded-lg p-4">
+        <Steps value={current} completedValues={completed} orientation="horizontal">
+          {CHECKOUT_STEPS.map((s) => (
+            <StepItem key={s.value} value={s.value}>
+              <StepLabel>{s.label}</StepLabel>
+            </StepItem>
+          ))}
+        </Steps>
+      </div>
+      <div className="flex gap-2">
+        <Button variant="tertiary" size="sm" disabled={idx === 0} onClick={() => setIdx((i) => Math.max(0, i - 1))}>
+          上一步
+        </Button>
+        <Button variant="primary" size="sm" disabled={idx >= CHECKOUT_STEPS.length - 1} onClick={() => setIdx((i) => Math.min(CHECKOUT_STEPS.length - 1, i + 1))}>
+          下一步
+        </Button>
+      </div>
+      <div className="text-[11px] text-fg-muted">observed:current = <span className="font-mono">{current}</span> · completed = <span className="font-mono">[{completed.join(', ')}]</span></div>
+    </div>
+  )
+}
+
+const LinearVsNonlinear = () => {
+  return (
+    <div className="flex gap-6">
+      <div className="flex flex-col gap-2 min-w-[240px]">
+        <span className="text-[11px] text-fg-muted font-mono">linear(預設)</span>
+        <div className="border border-border rounded-lg p-4">
+          <Steps value="shipping" completedValues={['cart']} orientation="vertical">
+            {CHECKOUT_STEPS.slice(0, 4).map((s) => (
+              <StepItem key={s.value} value={s.value}>
+                <StepLabel>{s.label}</StepLabel>
+              </StepItem>
+            ))}
+          </Steps>
+        </div>
+        <div className="text-[11px] text-fg-muted">僅 completed 可點回查,upcoming 不可達(cursor:not-allowed)。</div>
+      </div>
+      <div className="flex flex-col gap-2 min-w-[240px]">
+        <span className="text-[11px] text-fg-muted font-mono">linear={'{false}'}(自由跳轉)</span>
+        <div className="border border-border rounded-lg p-4">
+          <Steps value="shipping" completedValues={['cart']} reachableValues={['cart', 'shipping', 'payment', 'review']} linear={false} orientation="vertical">
+            {CHECKOUT_STEPS.slice(0, 4).map((s) => (
+              <StepItem key={s.value} value={s.value}>
+                <StepLabel>{s.label}</StepLabel>
+              </StepItem>
+            ))}
+          </Steps>
+        </div>
+        <div className="text-[11px] text-fg-muted">任一 reachable step 可點,適用「表單編輯器」「側邊導覽型 wizard」。</div>
+      </div>
+    </div>
+  )
+}
+
+const ErrorInterrupt = () => {
+  return (
+    <div className="flex flex-col gap-2 min-w-[300px]">
+      <div className="border border-border rounded-lg p-4">
+        <Steps value="payment" completedValues={['cart', 'shipping']} errorValues={['payment']} orientation="horizontal">
+          {CHECKOUT_STEPS.slice(0, 4).map((s) => (
+            <StepItem key={s.value} value={s.value}>
+              <StepLabel>{s.label}</StepLabel>
+            </StepItem>
+          ))}
+        </Steps>
+      </div>
+      <div className="text-[11px] text-fg-muted">payment step 發生錯誤:indicator 切 `bg-error` + X icon,label 轉 `--error`。對 focus ring 也從 primary-hover 切到 error-hover。</div>
+    </div>
+  )
+}
+
+export const StateBehavior: Story = {
+  name: '5. 狀態行為',
+  render: () => (
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-1">
+        <H3>狀態行為</H3>
+        <Desc>
+          Steps 的「狀態」分兩類:(a)<strong>內容狀態</strong>(completed / current / upcoming / error)已在 `ColorMatrix` 呈現,
+          (b)本 story 展示<strong>進度流轉行為</strong>——完成進程、linear vs nonlinear 導覽、error interrupt。
+          這些是 Steps 元件層級特有的行為,不存在於任何 item primitive。
+        </Desc>
+      </div>
+
+      {/* Progress advancement */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 1:進度流轉(current → completed 連鎖變化)</span>
+        <Desc>
+          當 consumer 把 cart 推入 completedValues 並把 shipping 設為 current,observe 三件事同時發生:
+          cart indicator 切 filled check、connector(cart→shipping)切 primary、shipping 切 hollow-ring。
+          對照 Linear 的 onboarding / Stripe Checkout。
+        </Desc>
+        <ProgressFlow />
+      </div>
+
+      {/* Linear vs nonlinear */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 2:linear 控制 upcoming step 可否點擊</span>
+        <Desc>
+          `linear=true`(預設)= 只能依序前進,回查僅限 completed(對應 checkout 這種「不可跳過」流程)。
+          `linear=false` + `reachableValues` = 自由跳轉,任何 reachable step 可點(對應「多 tab 表單編輯器」)。
+        </Desc>
+        <LinearVsNonlinear />
+      </div>
+
+      {/* Error interrupt */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">行為 3:Error interrupt(中斷流程)</span>
+        <Desc>
+          任何 step 加入 `errorValues` 時,該 step 轉 error state(紅底 + X icon),label 色轉 `--error`。
+          consumer 若要繼續流程,必須先解除 errorValues 再推進 current——避免靜默跳過錯誤。
+        </Desc>
+        <ErrorInterrupt />
+      </div>
+
+      {/* Rule notes */}
+      <div className="flex flex-col gap-2 pt-4 border-t border-divider">
+        <span className="text-caption font-medium text-fg-secondary">行為規則</span>
+        <ul className="text-caption text-fg-secondary space-y-1.5 ml-4 list-disc">
+          <li>`current` 只能有一個——value 是單值,不像 completedValues 是集合。</li>
+          <li>`error` 優先於 `completed`——同一 step 若同時在 completedValues + errorValues,一律渲染 error(紅底 X)。</li>
+          <li>Focus ring 顏色自動切換:current 走 `--primary-hover`(linear=false 時走 `--border-hover`)、error 走 `--error-hover`。</li>
+          <li>upcoming step 不可點(linear)或 reachable 判定為 false 時 cursor:not-allowed,鍵盤 Tab 跳過。</li>
+          <li>sm size(8px dot)無 indicator icon——太小畫不出 check / X;大 tier(md/lg)才有 icon 反饋。</li>
+        </ul>
       </div>
     </div>
   ),

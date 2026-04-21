@@ -1,3 +1,4 @@
+// @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { TimePicker } from './time-picker'
@@ -19,6 +20,131 @@ type Story = StoryObj<typeof TimePicker>
 export const Overview: Story = {
   name: '1. 元件總覽',
   render: () => <TimePicker value="09:00" onChange={() => {}} />,
+}
+
+/**
+ * ColorMatrix — Trigger(Field family)+ Panel item(MenuItem family) 色彩對照
+ * 兩層色彩分別繼承不同 SSOT,本 story 展示整合對照。
+ */
+export const ColorMatrix: Story = {
+  name: '3. 色彩對照表',
+  render: () => {
+    const Swatch = ({ value }: { value: string }) => (
+      <span className="inline-block w-3 h-3 rounded-sm border border-black/10 align-middle mr-1.5" style={{ backgroundColor: `var(${value})` }} />
+    )
+    return (
+      <div className="flex flex-col gap-10">
+        <div>
+          <div className="text-h6 font-semibold text-foreground mb-2">TimePicker 色彩分兩層</div>
+          <div className="text-caption text-fg-muted max-w-[720px]">
+            Trigger 層走 Field Controls family 色彩(與 Input / Select 共用);Panel 層 column item 走 SelectMenu / MenuItem family 色彩(與 Select dropdown / DropdownMenu 共用)。TimePicker 本身無色彩變體——色彩完全繼承上游 SSOT。
+          </div>
+        </div>
+
+        {/* Trigger layer */}
+        <div className="flex flex-col gap-2">
+          <div className="text-h6 font-semibold text-foreground">Layer 1:Trigger(Field family)</div>
+          <div className="text-caption text-fg-muted mb-2">SSOT:<span className="font-mono">components/Field/field-controls.spec.md</span></div>
+          <div className="overflow-x-auto">
+            <table className="text-caption border-collapse min-w-[640px]">
+              <thead>
+                <tr>
+                  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium">State</th>
+                  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium">Background</th>
+                  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium">Border</th>
+                  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium">Foreground</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">default</td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--surface" /><span className="font-mono">--surface</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--border" /><span className="font-mono">--border</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--foreground" /><span className="font-mono">--foreground</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">hover</td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--surface" /><span className="font-mono">--surface</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--border-hover" /><span className="font-mono">--border-hover</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--foreground" /><span className="font-mono">--foreground</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">focus / open</td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--surface" /><span className="font-mono">--surface</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--primary" /><span className="font-mono">--primary + ring-ring</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--foreground" /><span className="font-mono">--foreground</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">disabled</td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--bg-disabled" /><span className="font-mono">--bg-disabled</span></td>
+                  <td className="p-2 border-b border-divider"><span className="font-mono">transparent</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--fg-disabled" /><span className="font-mono">--fg-disabled</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">error</td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--surface" /><span className="font-mono">--surface</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--error" /><span className="font-mono">--error</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--foreground" /><span className="font-mono">--foreground</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="flex gap-3 mt-3">
+            <TimePicker value="09:00" onChange={() => {}} />
+            <TimePicker value="09:00" onChange={() => {}} error />
+            <TimePicker value="09:00" onChange={() => {}} disabled />
+          </div>
+        </div>
+
+        {/* Panel layer */}
+        <div className="flex flex-col gap-2">
+          <div className="text-h6 font-semibold text-foreground">Layer 2:Panel column item(SelectMenu family)</div>
+          <div className="text-caption text-fg-muted mb-2">
+            SSOT:<span className="font-mono">patterns/element-anatomy/item-anatomy.spec.md</span>「選擇 / 狀態視覺規則」
+          </div>
+          <div className="text-caption text-fg-secondary mb-3 max-w-[720px]">
+            <strong>關鍵決策:selected 走 neutral 非 primary</strong>(對齊 SelectMenu canonical)。TimePicker panel 是「列表選中」語意,跟 SelectMenu / MenuItem 同流派;DatePicker date cell 用 `--primary` 是因為那是「最終選定日期」的強 affordance(確定性),兩者不同語意,不互調。
+          </div>
+          <div className="overflow-x-auto">
+            <table className="text-caption border-collapse min-w-[640px]">
+              <thead>
+                <tr>
+                  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium">State</th>
+                  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium">Background</th>
+                  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium">Foreground</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">default(normal 數字)</td>
+                  <td className="p-2 border-b border-divider"><span className="font-mono">transparent</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--foreground" /><span className="font-mono">--foreground</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">hover</td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--neutral-hover" /><span className="font-mono">--neutral-hover</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--foreground" /><span className="font-mono">--foreground</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">selected</td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--neutral-selected" /><span className="font-mono">--neutral-selected(非 primary)</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--foreground" /><span className="font-mono">--foreground</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2 border-b border-divider font-mono">disabled(disabledTime)</td>
+                  <td className="p-2 border-b border-divider"><span className="font-mono">transparent</span></td>
+                  <td className="p-2 border-b border-divider"><Swatch value="--fg-disabled" /><span className="font-mono">--fg-disabled + cursor-not-allowed</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="text-caption text-fg-muted mt-3">
+            對照 DatePicker `ColorMatrix` 的 date cell selected 用 `--primary` — 那是「提交語意」;TimePicker 是「正在挑選」中的中間態,neutral-selected 與 Ant Design / Google Calendar TimePicker 一致。點開本頁 TimePicker trigger 可直接看到 Panel selected 的視覺效果。
+          </div>
+        </div>
+      </div>
+    )
+  },
 }
 
 /** 尺寸矩陣 sm / md(預設) / lg */

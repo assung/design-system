@@ -2,7 +2,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Star, Tag as TagIcon } from 'lucide-react'
 import { Chip, ChipGroup } from './chip'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell, Swatch } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 type InspectorArgs = {
   type: 'single' | 'multiple'
@@ -126,8 +126,110 @@ export const Inspector: InspectorStory = {
   },
 }
 
+export const ColorMatrix: Story = {
+  name: '3. 色彩對照表',
+  render: () => (
+    <div className="flex flex-col gap-10">
+      <div>
+        <H3>狀態 × 色彩 Token 矩陣</H3>
+        <Desc>
+          Chip 採 pill-canonical 選中規則(跟 SegmentedControl 共用):selected 時 `--primary-hover` 同時染 border 和 text,
+          **底色維持 `--surface` 不變**——不用 primary-subtle 底色(那是 Button subtle 的視覺語言,跟 filter chip 不同)。
+          視覺輕量是 filter 語意必要條件,避免 chip 群組喧賓奪主壓過資料表格。
+        </Desc>
+        <div className="overflow-x-auto mb-4">
+          <table className="text-caption border-collapse min-w-[640px]">
+            <thead>
+              <tr>
+                <Th>狀態</Th>
+                <Th>Background</Th>
+                <Th>Border</Th>
+                <Th>Text</Th>
+                <Th>Icon</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <Td mono>default(unselected)</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--surface" size="sm" /><span className="font-mono">--surface</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--border" size="sm" /><span className="font-mono">--border</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-secondary" size="sm" /><span className="font-mono">--fg-secondary</span></span></Td>
+                <Td mono>currentColor</Td>
+              </tr>
+              <tr>
+                <Td mono>hover(unselected)</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--surface" size="sm" /><span className="font-mono">--surface</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--border-hover" size="sm" /><span className="font-mono">--border-hover</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
+                <Td mono>currentColor</Td>
+              </tr>
+              <tr>
+                <Td mono>selected</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--surface" size="sm" /><span className="font-mono">--surface(不變)</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary-hover" size="sm" /><span className="font-mono">--primary-hover</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary-hover" size="sm" /><span className="font-mono">--primary-hover</span></span></Td>
+                <Td mono>currentColor</Td>
+              </tr>
+              <tr>
+                <Td mono>disabled</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--surface" size="sm" /><span className="font-mono">--surface</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--border" size="sm" /><span className="font-mono">--border(不升階)</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-disabled" size="sm" /><span className="font-mono">--fg-disabled</span></span></Td>
+                <Td mono>currentColor</Td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <H3>視覺並列對照</H3>
+        <Desc>左 default / 中 selected / 右 disabled,觀察 border 同時升階到 primary-hover 的視覺變化(非 bg 變化)。</Desc>
+        <div className="flex items-center gap-8 px-6 py-5 rounded-lg bg-canvas border border-divider">
+          <div className="flex flex-col gap-2 items-start">
+            <span className="text-[11px] text-fg-muted font-mono">default</span>
+            <ChipGroup type="multiple" defaultValue={[]}>
+              <Chip value="electronics">電子產品</Chip>
+            </ChipGroup>
+          </div>
+          <div className="flex flex-col gap-2 items-start">
+            <span className="text-[11px] text-fg-muted font-mono">selected</span>
+            <ChipGroup type="multiple" defaultValue={['electronics']}>
+              <Chip value="electronics">電子產品</Chip>
+            </ChipGroup>
+          </div>
+          <div className="flex flex-col gap-2 items-start">
+            <span className="text-[11px] text-fg-muted font-mono">disabled</span>
+            <ChipGroup type="multiple" defaultValue={[]}>
+              <Chip value="electronics" disabled>電子產品</Chip>
+            </ChipGroup>
+          </div>
+          <div className="flex flex-col gap-2 items-start">
+            <span className="text-[11px] text-fg-muted font-mono">selected + disabled</span>
+            <ChipGroup type="multiple" defaultValue={['electronics']}>
+              <Chip value="electronics" disabled>電子產品</Chip>
+            </ChipGroup>
+          </div>
+        </div>
+        <p className="text-footnote text-fg-muted mt-3">
+          世界級對照:Material 3 Filter Chip / Atlassian Chip / Polaris Filter 全部採「border + text 同步染 primary」而非 bg 染色——保持 filter row 的視覺輕量。
+        </p>
+      </div>
+
+      <div>
+        <H3>為什麼不用 primary-subtle 底色</H3>
+        <Desc>
+          `--primary-subtle` 的 bg 染色是 Button subtle variant 的視覺語言,適用於「行為選項」(如 pagination hover);
+          Chip 是「篩選條件」,多選時可能同時亮 5-10 個——若每個都填底色,filter row 會蓋過主內容表格,破壞資訊層次。
+          只染 border + text 保持背景通透,對齊 SegmentedControl / Tabs 未選 hover 的 pill-canonical。
+        </Desc>
+      </div>
+    </div>
+  ),
+}
+
 export const SelectionMatrix: Story = {
-  name: '3. Multi vs Single 選擇',
+  name: '6. Multi vs Single 選擇',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -264,7 +366,7 @@ export const StateBehavior: Story = {
 }
 
 export const LayoutMatrix: Story = {
-  name: '6. Layout(wrap / scroll / menu)',
+  name: '7. Layout(wrap / scroll / menu)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

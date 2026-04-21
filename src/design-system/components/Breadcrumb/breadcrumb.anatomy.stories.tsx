@@ -9,7 +9,7 @@ import {
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
 } from './breadcrumb'
-import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell, Swatch } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 type InspectorArgs = {
   size: 'sm' | 'md' | 'lg'
@@ -144,8 +144,108 @@ export const Inspector: InspectorStory = {
   },
 }
 
+export const ColorMatrix: Story = {
+  name: '3. 色彩對照表',
+  render: () => (
+    <div className="flex flex-col gap-10">
+      <div>
+        <H3>節點類型 × 狀態色彩對照</H3>
+        <Desc>
+          Breadcrumb 的色彩決定「你從哪來 / 你在這」的視覺階層——ancestor link 降低飽和度(fg-secondary)讓 current page(foreground)成為焦點。
+          互動高亮一律走 `--primary-hover`(canonical,與 Tabs / Chip 未選 hover 同 token)。
+        </Desc>
+        <div className="overflow-x-auto mb-4">
+          <table className="text-caption border-collapse min-w-[640px]">
+            <thead>
+              <tr>
+                <Th>節點類型</Th>
+                <Th>default</Th>
+                <Th>hover</Th>
+                <Th>focus</Th>
+                <Th>aria</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <Td mono>BreadcrumbLink(ancestor)</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-secondary" size="sm" /><span className="font-mono">--fg-secondary</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary-hover" size="sm" /><span className="font-mono">--primary-hover</span></span></Td>
+                <Td mono>ring-2 ring-ring</Td>
+                <Td>—</Td>
+              </tr>
+              <tr>
+                <Td mono>BreadcrumbPage(current)</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
+                <Td>—(non-interactive)</Td>
+                <Td>—</Td>
+                <Td mono>aria-current="page"</Td>
+              </tr>
+              <tr>
+                <Td mono>BreadcrumbSeparator</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-muted" size="sm" /><span className="font-mono">--fg-muted</span></span></Td>
+                <Td>—(decoration)</Td>
+                <Td>—</Td>
+                <Td mono>role="presentation"</Td>
+              </tr>
+              <tr>
+                <Td mono>BreadcrumbEllipsis</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-muted" size="sm" /><span className="font-mono">--fg-muted</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary-hover" size="sm" /><span className="font-mono">--primary-hover</span></span></Td>
+                <Td mono>ring-2 ring-ring</Td>
+                <Td mono>aria-label="顯示更多"</Td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <H3>視覺對照</H3>
+        <Desc>三種節點並列,觀察 fg-muted → fg-secondary → foreground 的階層性 — 越靠近 current 越實。</Desc>
+        <div className="border border-dashed border-divider rounded-md p-5">
+          <Breadcrumb>
+            <BreadcrumbList size="md">
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">團隊空間</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">行銷 OKR Q2</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbEllipsis />
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">Email 再行銷</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>5 月電子報 A/B 測試</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+        <p className="text-footnote text-fg-muted mt-3">
+          世界級對照:GitHub / Notion / Linear breadcrumb 皆採「ancestor 降飽和 + current 實」階層策略,避免整條 breadcrumb 視覺等權造成「不知道在哪」的混亂。
+        </p>
+      </div>
+
+      <div>
+        <H3>為什麼 current 不加粗</H3>
+        <Desc>
+          加粗會讓 breadcrumb 最右端視覺過重,破壞「你從哪來 → 你在這」的流動感。
+          改以 `--foreground` vs `--fg-secondary` 的色階區分——對齊 Notion / Figma 的輕量 current 呈現;
+          重要性反差由 font-color 處理,非 font-weight。
+        </Desc>
+      </div>
+    </div>
+  ),
+}
+
 export const SizeMatrix: Story = {
-  name: '3. 尺寸對照表',
+  name: '4. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -183,7 +283,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '5. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -258,7 +358,7 @@ export const StateBehavior: Story = {
 }
 
 export const UsageExamples: Story = {
-  name: '5. 真實場景',
+  name: '6. 真實場景',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -310,7 +410,8 @@ export const UsageExamples: Story = {
 }
 
 export const CollapseMatrix: Story = {
-  name: '6. 長路徑收合(Ellipsis)',
+  // renumbered to 7 (was 6) to accommodate ColorMatrix(3) + UsageExamples(6)
+  name: '7. 長路徑收合(Ellipsis)',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

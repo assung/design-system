@@ -202,6 +202,22 @@ user 若需「from-to」時間範圍,用**兩個 `<TimePicker>` 並列 + 中間 
 
 ---
 
+## ColorMatrix 說明(兩層 SSOT 整合展示)
+
+TimePicker 視覺分兩層,各自繼承不同 SSOT:
+- **Trigger 層**:走 Field Controls family 色彩(由 `../Field/field-controls.spec.md` 擁有,共用 Input / Select)
+- **Panel column item 層**:走 SelectMenu / MenuItem canonical `bg-neutral-selected`(由 `patterns/element-anatomy/item-anatomy.spec.md` 擁有,非 `bg-primary`——見本 spec「欄內 item 狀態」表)
+
+`ColorMatrix` story 整合展示兩層 token 對照,但不重複定義(各 token 來源明示指向上游 SSOT)。
+
+## 為何無 StateBehavior
+
+trigger 的互動狀態(focus / invalid / disabled / readonly)完全繼承 `../Field/field-controls.spec.md` SSOT「Mode 狀態」;panel 內 column item 的 hover / selected / disabled 走 `patterns/element-anatomy/item-anatomy.spec.md`「選擇 / 狀態視覺規則」。TimePicker 層級無自有 state 行為,panel 開 / 關由 Popover primitive 處理。重寫 StateBehavior = 與兩個 SSOT 同時漂移。
+
+對應 anatomy story:保留 `Overview` + `Inspector` + `ColorMatrix`(兩層整合展示) + `SizeMatrix` + 元件特有 `ModeMatrix` / `PrecisionMatrix`。Field-level state 見 Input `StateBehavior` + field-controls.spec.md;panel item-level state 見 SelectMenu / MenuItem 的對應 story。
+
+---
+
 ## 禁止事項
 
 - ❌ 不要在 TimePicker 內部直接顯示日期——那是 DatePicker 的語義

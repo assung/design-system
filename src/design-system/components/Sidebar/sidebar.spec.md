@@ -616,14 +616,13 @@ Collapsible：內容優先低頻導覽 → offcanvas；扁平高頻切換 → ic
 
 ---
 
-## 為何無 Inspector / StateBehavior
+## 為何無 Inspector
 
-Sidebar 是**主要應用導覽 shell**(composite),結構規格複雜(Header / Content / Footer / Group / MenuButton / Trigger / 持久化 / Collapsible / variant 5 項),非單一 prop 可試玩:
+Sidebar 的決策維度是「結構配置」(variant / collapsible / uniformPrefix / density)不是單一 prop——已由 `Overview`(結構樹)+ `SizeMatrix` + `ColorMatrix` + `StateBehavior` + `ChromeTokens` 五 story 完整覆蓋。互動 Inspector 切單一 prop 不如結構對照,且 Sidebar 外觀需要足夠的 nav 量才能展示——真實展示是 `Overview` 的 SidebarPreview 完整結構。
 
-- **無 Inspector**:Sidebar 的決策維度是「結構配置」(variant / collapsible / uniformPrefix / density)不是單一 prop——已由 `Overview`(結構樹)+ `SizeMatrix`(三 density 並排)+ `ColorMatrix`(row 狀態色)+ `ChromeTokens`(寬度 / header token)四 story 覆蓋結構規格。互動 Inspector 切單一 prop 不如結構對照,且 Sidebar 外觀需要足夠的 nav 量才能展示——真實展示是 `Overview` 的 SidebarPreview 完整結構。
-- **無 StateBehavior**:SidebarMenuButton 的互動狀態(default / hover / active / selected / disabled)**完全共用 item-anatomy row primitive**(`patterns/element-anatomy/item-anatomy.spec.md`),已在 `ColorMatrix` 用 5 個 state 的完整 token 對照表覆蓋(本身就是 state-driven 色彩表)。Sidebar 層級無自有 state 行為——collapse / icon-mode 切換屬結構變化(見「Collapsible」段),不是互動 state。
+## StateBehavior(Sidebar 層級特有)
 
-對應 anatomy story:保留 `Overview` + `SizeMatrix` + `ColorMatrix`(含完整 state 色矩陣) + 元件特有 `ChromeTokens`(寬度 / chrome-header-height 共用 token)。
+Item-level default / hover / active / selected / disabled **色彩**完全共用 item-anatomy row primitive(`patterns/element-anatomy/item-anatomy.spec.md`),由 `ColorMatrix` 用 5 個 state 的完整 token 對照表承載(state-driven 色彩表)。Sidebar 的 `StateBehavior` story 則展示 **container 層級的結構狀態切換**:三種 `collapsible` 模式(offcanvas / icon / none)、Cmd+B / SidebarTrigger toggle、icon mode 下 label 隱藏 + Tooltip 代償、跨 session cookie 還原——這些是 shell 層級特有的行為,不存在於 row item primitive。
 
 ---
 
