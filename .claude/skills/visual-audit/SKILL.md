@@ -62,6 +62,30 @@ node scripts/visual-audit.mjs   # 假設 storybook 已在 :6006 跑
 - **優先:`snapshots/` 已有 PNG + `report.json`**(user 先跑 `npm run visual-audit`)
 - 次要:user 臨時上傳 screenshot(本 skill 原始 fallback 模式仍可用)
 
+### Layer B 判斷必先讀 spec — canonical 優先順序(對齊 CLAUDE.md)
+
+**AI 判斷視覺問題之前,必須先讀被稽核元件的 `spec.md`**。世界級對照是 reference,**非 canonical**。順序:
+
+1. **WCAG floor**(a11y 底線,不可違反)—— 對比不夠 = P0
+2. **本 DS spec canonical**(spec.md / CLAUDE.md / references)—— 元件 documented rationale 偏離 = `deviation ✓`,不 flag
+3. **世界級 reference**(Polaris / Material / Ant / Apple HIG)—— 只在 spec 無明示時才 refer;spec 明示與世界級不同 + 有 rationale 時,**AI 不 override spec**
+
+**常見 Layer B 衝突 + 解法**:
+
+| 衝突 | 例 | 解法 |
+|---|---|---|
+| AI 想抄世界級 override 本 DS canonical | DatePicker today underline vs Material ring-circle | 讀 date-picker.spec.md「為什麼 today 改 underline 不 ring-circle」段,spec 有 rationale → 不 flag |
+| AI flag 刻意低對比 | FileViewer dark chrome / Disabled text | 讀元件 spec 的 dark mode / disabled 段落;spec 有 rationale(「chrome 低對比讓 media 為主」)→ 不 flag |
+| AI 跨元件比「不一致」 | Chip 固定 sm vs Button md 並排高度差 | 讀 uiSize.spec.md「單一尺寸消費者」段;Chip 有明文 rationale(Material 3 共識)→ `deviation ✓` |
+
+### 判 P 等級
+
+- WCAG 對比不過(非 disabled / 非 decorative)→ **P0**(無條件修)
+- Geometry assertion fail 無 rationale → **P0**
+- Layer B AI finding **且 spec 無 rationale** → **P1**(建議修 OR 補 rationale)
+- Layer B AI finding **且 spec 有 rationale** → **P2 info**(已說明,不 block)
+- 世界級對照 only 的 finding(無 DS canonical 衝突) → **P2 info** / suggestion
+
 ### 長期:Pixel regression 基建
 
 **Chromatic / Percy / reg-suit**接入為 post-Layer-A 增量,做跨 branch pixel diff。現階段 Layer A 夠 gate 99% 視覺 bug;pixel regression 等 DS 穩定再接(列 post-v1 tech debt)。

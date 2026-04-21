@@ -123,6 +123,11 @@ function parseRgb(str) {
 
 async function scanContrast(page) {
   // Page-side:蒐集所有文字節點的 computedStyle + 父層 bg(往上爬到第一個非透明 bg)
+  // WCAG 2.1 豁免(對齊 CLAUDE.md 稽核 canonical 優先順序):
+  //   - [aria-hidden="true"] 裝飾性元素
+  //   - [data-field-mode="disabled"] / [disabled] — disabled UI 豁免
+  //   - [data-decorative] / avatar fallback initials(incidental text)
+  //   - logo / brand mark(logotype 豁免)
   const samples = await page.evaluate(() => {
     /** @type {{text:string,color:string,bg:string,fontSize:number,fontWeight:number,selector:string}[]} */
     const out = []
@@ -133,6 +138,25 @@ async function scanContrast(page) {
       if (!text || text.length === 0) continue
       const parent = node.parentElement
       if (!parent) continue
+
+      // ── WCAG 2.1 豁免判定(walk ancestors 查標記) ──
+      let ancestor = parent
+      let exempt = false
+      while (ancestor) {
+        // aria-hidden = 裝飾性(screen reader 略過,對比豁免)
+        if (ancestor.getAttribute('aria-hidden') === 'true') { exempt = true; break }
+        // disabled UI(WCAG 2.1 明言豁免 1.4.3)
+        if (ancestor.hasAttribute('disabled')) { exempt = true; break }
+        if (ancestor.getAttribute('data-field-mode') === 'disabled') { exempt = true; break }
+        if (ancestor.getAttribute('aria-disabled') === 'true') { exempt = true; break }
+        // 裝飾性標記(DS convention)
+        if (ancestor.hasAttribute('data-decorative')) { exempt = true; break }
+        // logotype 豁免(WCAG 2.1 明言豁免)
+        if (ancestor.getAttribute('role') === 'img' && ancestor.hasAttribute('aria-label')) { exempt = true; break }
+        ancestor = ancestor.parentElement
+      }
+      if (exempt) continue
+
       const style = getComputedStyle(parent)
       // find effective background(走 DOM parent 至第一個非透明)
       let bgEl = parent

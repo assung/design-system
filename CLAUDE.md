@@ -429,6 +429,29 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 
 **世界級對照**:Figma、Google Material、Shopify Polaris 都走相同三級 — stakeholder gate 強制、daily 高效、release 前 full sweep。
 
+## 稽核 Canonical 優先順序(衝突解決 ladder)
+
+任何 audit(code / visual / mechanical / AI judgement)發現 finding,按以下優先順序判定是否違規:
+
+1. **WCAG mechanical floor**(最高,不可違反)
+   - a11y 法規硬底:對比度、keyboard navigation、ARIA 正確性
+   - **例外**:WCAG 2.1 自帶豁免條款(incidental text / disabled UI / logotype / decorative image),Layer A 掃描要實作這些豁免,不把 disabled text 誤報
+2. **本 DS spec + CLAUDE.md canonical**(次高)
+   - `spec.md` / `CLAUDE.md` / `.claude/references/` 明示的規則
+   - 元件有 documented rationale 偏離 = `deviation ✓`(見「Consistency Audit 原則」),不算違規
+3. **世界級對照**(reference,可參考但**非 canonical**)
+   - Polaris / Material / Atlassian / Ant / Apple HIG 做法
+   - 本 DS 決定**故意不跟**世界級是合法的(mindset #1 要求「對齊 or 說得出為什麼不同」)。spec 有 rationale → AI 不 flag
+
+**衝突解決流程**:
+- Mechanical assertion(`visual-assertions.json` 幾何檢查)發現偏離 → 查 assertion 的 `rationale` 欄位 OR 對應 spec → 有 rationale = `deviation ✓`,無 rationale = P0 violation
+- AI judgement(`/visual-audit` Layer B)發現視覺問題 → **必先讀被稽核元件 spec.md**,spec canonical 當 hard constraint;世界級當 reference,不 override spec
+
+**為什麼順序這樣定**:
+- WCAG 是法規 / a11y floor,任何設計不能違反
+- 本 DS spec 是我們的 design language,就是 canonical(這也是整個 DS 存在的意義)
+- 世界級是參考,不是命令;mindset #1 允許「對齊 or 說得出為什麼不同」,spec 的 rationale 就是這個「為什麼」
+
 
 # 建立 UI 前必讀
 

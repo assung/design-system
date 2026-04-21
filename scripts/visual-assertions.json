@@ -1,5 +1,5 @@
 {
-  "$schema-note": "scripts/visual-audit.mjs 消費此檔。每個 scenario 含 Storybook id / 輸出檔名 / 可選 assertions(DOM 幾何測量)。id 從 curl http://localhost:6006/index.json 取得真實值。",
+  "$schema-note": "scripts/visual-audit.mjs 消費此檔。每個 scenario 含:id(Storybook id)或 url(外部) / file(輸出 png 檔名) / 可選 assertions[](DOM 幾何測量陣列) / 可選 rationale(scenario-level 合理偏離說明,對齊 CLAUDE.md 稽核 canonical 優先順序 ladder)。assertion 內也可加 rationale 欄位讓個別檢查宣告合理偏離。id 從 curl http://localhost:6006/index.json 取得真實值。",
   "scenarios": [
     { "id": "design-system-components-datepicker-展示--basic", "file": "datepicker-basic.png" },
     { "id": "design-system-components-datepicker-展示--range-picker", "file": "datepicker-range.png" },
