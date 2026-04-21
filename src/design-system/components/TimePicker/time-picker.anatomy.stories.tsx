@@ -17,12 +17,13 @@ export default meta
 type Story = StoryObj<typeof TimePicker>
 
 export const Overview: Story = {
+  name: '1. 元件總覽',
   render: () => <TimePicker value="09:00" onChange={() => {}} />,
 }
 
 /** 尺寸矩陣 sm / md(預設) / lg */
 export const SizeMatrix: Story = {
-  name: 'SizeMatrix',
+  name: '4. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
@@ -43,7 +44,7 @@ export const SizeMatrix: Story = {
 
 /** Mode / error 狀態 matrix */
 export const ModeMatrix: Story = {
-  name: 'ModeMatrix',
+  name: '6. 模式對照',
   render: () => (
     <div className="flex flex-col gap-3 w-60">
       <TimePicker value="09:00" onChange={() => {}} placeholder="edit(預設)" />
@@ -58,7 +59,7 @@ export const ModeMatrix: Story = {
 
 /** Panel 精度:showSeconds 三欄 vs 兩欄 / minuteStep 粒度 */
 export const PrecisionMatrix: Story = {
-  name: 'PrecisionMatrix',
+  name: '7. 精度對照',
   render: () => (
     <div className="flex flex-col gap-3 w-80">
       <div>
@@ -87,7 +88,7 @@ export const PrecisionMatrix: Story = {
 
 /** Inspector — live props 調整驗規格 */
 export const Inspector: Story = {
-  name: 'Inspector',
+  name: '2. 元件檢閱器',
   args: {
     value: '09:00',
     size: 'md',
