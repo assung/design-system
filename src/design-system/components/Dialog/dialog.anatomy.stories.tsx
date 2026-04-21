@@ -144,7 +144,7 @@ export const Inspector: Story = {
 }
 
 export const HeightBehavior: Story = {
-  name: '3. 高度行為(預設填滿 vs autoHeight)',
+  name: '6. 高度行為(預設填滿 vs autoHeight)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -202,7 +202,7 @@ export const HeightBehavior: Story = {
 }
 
 export const DestructiveMatrix: Story = {
-  name: '4. 破壞性動作 Dialog',
+  name: '7. 破壞性動作 Dialog',
   render: () => (
     <div className="flex flex-col gap-8 max-w-md">
       <div>
@@ -231,7 +231,7 @@ export const DestructiveMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '5. 尺寸對照表',
+  name: '4. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -290,7 +290,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '6. 狀態行為',
+  name: '5. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -389,7 +389,7 @@ export const StateBehavior: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '7. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

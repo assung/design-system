@@ -129,7 +129,7 @@ export const Inspector: Story = {
 }
 
 export const ContainerArchitecture: Story = {
-  name: '3. Container 三層架構',
+  name: '6. Container 三層架構',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -159,7 +159,7 @@ export const ContainerArchitecture: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '4. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

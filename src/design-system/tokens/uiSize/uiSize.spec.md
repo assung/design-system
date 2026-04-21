@@ -38,7 +38,7 @@ Button、Input、Checkbox/Radio SelectionItem 等互動元件。
 | `TimePicker` | sm / md / lg | **`md`** | `--field-height-md`(Ant-style 時間選擇,對齊 DatePicker 家族) |
 | `Tag` | sm / md / lg | **`md`** | 自帶尺寸，透過 Field size 配對 |
 
-**單一尺寸消費者（不在 default-md 規則內）**：
+#### 單一尺寸消費者（不在 default-md 規則內）
 
 | 元件 | 固定 size | 理由 |
 |------|----------|------|

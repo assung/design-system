@@ -83,7 +83,7 @@ export const Inspector: InspectorStory = {
 }
 
 export const SizeMatrix: Story = {
-  name: '3. 尺寸對照表',
+  name: '4. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -118,7 +118,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '5. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -174,7 +174,7 @@ export const StateBehavior: Story = {
 }
 
 export const LabelIntegration: Story = {
-  name: '5. label / description 整合',
+  name: '6. label / description 整合',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

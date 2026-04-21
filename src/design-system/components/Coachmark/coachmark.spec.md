@@ -193,6 +193,12 @@ Previous(可選)→ Skip(可選)→ Next / Done。對齊 Ant Tour / Intercom con
 
 ---
 
+## 邊界狀態
+
+disabled / density 繼承 Popover(density 鎖 md,見 `../Popover/popover.spec.md`);empty(title + description 都不傳)則 Body 不渲染(已於「Props 結構」規定);loading 由 consumer 決定。
+
+---
+
 ## 相關
 
 - `../Popover/popover.spec.md` — Coachmark 的實作基礎,所有浮層視覺 SSOT

@@ -91,7 +91,7 @@ export const Inspector: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '3. 尺寸對照表',
+  name: '4. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -109,7 +109,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '4. Mode 對照(edit / readonly / disabled)',
+  name: '6. Mode 對照(edit / readonly / disabled)',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -149,7 +149,7 @@ export const ModeMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '5. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -238,7 +238,7 @@ export const ColorMatrix: Story = {
 }
 
 export const RowsResizeMatrix: Story = {
-  name: '6. Rows 與 Resize',
+  name: '7. Rows 與 Resize',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -250,8 +250,8 @@ export const RowsResizeMatrix: Story = {
             <Textarea rows={2} placeholder="短留言..." />
           </div>
           <div>
-            <div className="text-caption text-fg-muted mb-1 font-mono">rows=5(預設)</div>
-            <Textarea rows={5} placeholder="詳細描述..." />
+            <div className="text-caption text-fg-muted mb-1 font-mono">rows=3(預設)</div>
+            <Textarea rows={3} placeholder="詳細描述..." />
           </div>
         </div>
       </div>

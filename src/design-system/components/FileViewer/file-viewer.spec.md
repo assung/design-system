@@ -191,7 +191,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
   - **Wheel zoom** — anchor 固定在 **cursor pointer 位置**(react-zoom-pan-pinch default,對齊 Figma / Photoshop / 瀏覽器 cmd-scroll canonical)。user 滑鼠指哪,zoom 就以那點為中心,內容不會「跑掉」
   - **± button zoom / preset / fit / input 打字**(沒 cursor 位置時)— 走 library canonical `api.centerView(targetScale, 200)`,自動處理 scale + 置中 + animation + bounds。**不自算 `setTransform`**(動畫期間讀 stale positionX 會漂)
   - **Fit to width / page** — 算 scale emit 回 shell,經由 `centerView` 重新置中
-  - **100% 重設**(user 按 `0` 鍵 / double-click)— `centerZoomedOut: true` 讓 ≤100% 時自動 center,避免飄在角落
+  - **100% 重設**(user 按 `0` 鍵 / double-click)— `centerZoomedOut: true` 讓 ≤100% 時自動 center,避免內容停在容器角落
   - 結果:user 看哪,zoom 完 **看哪**,視覺焦點不漂移 — 世界級 media viewer 共識
 - Min scale 10%,max scale 400%
 - 雙擊重設 100%

@@ -166,7 +166,7 @@ export const Inspector: Story = {
 }
 
 export const OrientationMatrix: Story = {
-  name: '3. Orientation × Control 矩陣',
+  name: '6. Orientation × Control 矩陣',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -348,7 +348,7 @@ export const StateBehavior: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '6. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

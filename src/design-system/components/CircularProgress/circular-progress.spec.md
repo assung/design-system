@@ -184,7 +184,7 @@ Track 色鎖 `var(--secondary)`(= neutral-3,與 ProgressBar track 一致)。
   - size 64 → stroke 6
 - **Indeterminate arc**:固定 25%(`INDETERMINATE_ARC_RATIO=0.25`),外層 `animate-spin` 旋轉整個 span(Material 流派)
 - **旋轉規則單純**:indeterminate → 轉;determinate → 不轉;沒有 status 條件分支,因為沒有 status。完成時 consumer 把整個 CircularProgress swap 成其他內容(Check icon / 結果 / Empty),不靠元件本身做 spin-stop 動畫
-- **`align-middle` 鎖死**(SVG 對齊 adjacent text x-height 中線):外層 span 本體帶 `align-middle`,避免在 `inline-flex items-center` cell 裡出現 1-2px 基線下沉的「歪一點」視覺。consumer 若在文字旁放 CircularProgress,**不需**自己加 `align-middle` 或 `leading-none`
+- **`align-middle` 鎖死**(SVG 對齊 adjacent text x-height 中線):外層 span 本體帶 `align-middle`,避免在 inline-flex 容器內出現基線錯位。consumer 若在文字旁放 CircularProgress,**不需**自己加 `align-middle` 或 `leading-none`
 - **Determinate transition**:`transition-[stroke-dashoffset] duration-300`(value 變化時 smooth animation)
 
 ---
@@ -210,11 +210,11 @@ Track 色鎖 `var(--secondary)`(= neutral-3,與 ProgressBar track 一致)。
 CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維度變體:
 
 - **無 Inspector**:variant 只有 value 有無 + status 三狀態(lifecycle),互動切換式 Inspector 可展的決策點少。`UsageInButton` / `UsageInline` 已覆蓋真實 consumer context
-- **有 ColorMatrix(status × mode)**:status × determinate/indeterminate 的組合矩陣(3 status × 2 mode = 6 格),可保留作為色彩+模式對照表
-- **有 SizeMatrix(size × mode)**:雖然 size 是自由 number,但列常用 16 / 24 / 32 / 48 並示範兩模式對照仍有價值 — 視需要實作
+- **ColorMatrix N/A(只繼承 Progress color token)**:本元件 color 完全來自 `text-current`(繼承 host)+ Progress token(track / fill),無 own variant × state 色彩組合可 matrix 對照。status(running/success/error)已在 `UsageInButton` / `UsageInline` 真實 context 演示,獨立 ColorMatrix story 會是冗餘
+- **SizeMatrix 透過 Inspector 即可展示 — 無 separate SizeMatrix story**:size 是自由 number(非 sm/md/lg tier),Inspector 的 size slider 即可展示 16 / 24 / 32 / 48 等常用值的行為差異,比靜態 matrix 更貼近消費情境
 - **無 StateBehavior**:無 hover / focus / active,唯一「狀態」是 value 變化(已在 Determinate story 動態演示)
 
-對應 anatomy story:`Overview` + `UsageInButton` + `UsageInline` + 可選 `StatusMatrix`。缺 canonical 5 多數項的 rationale 即本段。
+對應 anatomy story:`Overview` + `UsageInButton` + `UsageInline`。缺 canonical 5 多數項的 rationale 即本段。
 
 ---
 

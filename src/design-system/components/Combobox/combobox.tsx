@@ -304,6 +304,7 @@ function CustomCombobox({
             trailing={searchable && searchIn === 'trigger' ? (
               <input value={search} onChange={(e) => setSearch(e.target.value)}
                 placeholder={items.length === 0 ? '搜尋…' : ''} onClick={(e) => { e.stopPropagation(); setOpen(true) }}
+                aria-label="搜尋選項"
                 className="flex-1 min-w-[60px] bg-transparent outline-none text-body leading-compact relative z-10" />
             ) : undefined} />
         ) : (

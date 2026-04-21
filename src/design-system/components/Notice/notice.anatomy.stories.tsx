@@ -358,7 +358,7 @@ text-body = 14px   leading-compact = 1.3
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const VariantIconMap: Story = {
-  name: '3. 變體 × icon 對照',
+  name: '6. 變體 × icon 對照',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -464,7 +464,7 @@ export const VariantIconMap: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '5. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

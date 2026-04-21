@@ -195,6 +195,13 @@ interface CalendarEvent {
 
 ---
 
+## Anatomy N/A rationale(偏離 canonical 5 的說明)
+
+- **無 `SizeMatrix`**:MVP 只支援 `view="month"` + 固定 `size="md"`,無多 size tier 可 matrix 對照。後續擴充 week / day view 時再補 SizeMatrix
+- **無 `StateBehavior`**:Calendar 是 page-composite canvas,本身無 `hover / focus / disabled` 狀態;互動狀態屬於內部 primitive(event tile / date cell),由 `<Button>` / `<DropdownMenu>` 等消費元件自己的 StateBehavior 負責
+
+---
+
 ## 相關
 
 - `../DatePicker/date-picker.spec.md` — 選日期的 form control,本元件姊妹概念(不同職責)

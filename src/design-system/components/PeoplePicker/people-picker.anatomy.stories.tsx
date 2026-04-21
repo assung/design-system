@@ -110,7 +110,7 @@ export const Inspector: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '3. Mode 對照',
+  name: '6. Mode 對照',
   render: () => (
     <div className="flex flex-col gap-4 max-w-md">
       <div>
@@ -183,7 +183,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '5. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -279,7 +279,7 @@ export const ColorMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '6. 狀態行為',
+  name: '5. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-10 max-w-md">
       <div>

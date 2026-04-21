@@ -124,7 +124,7 @@ export const Inspector: Story = {
 }
 
 export const OrientationMatrix: Story = {
-  name: '3. 方向',
+  name: '6. 方向',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -156,7 +156,7 @@ export const OrientationMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '4. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -237,7 +237,7 @@ export const ColorMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '5. 尺寸對照表',
+  name: '4. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -410,7 +410,7 @@ export const StateBehavior: Story = {
 }
 
 export const IndentAlignment: Story = {
-  name: '6. 欄位節奏',
+  name: '7. 欄位節奏',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

@@ -236,7 +236,7 @@ Switch 是**唯一需要 opacity 的特例**,因為它的 on/off 沒有任何形
 
 ### 常見錯誤(避免)
 
-**不要把 thumb 的 disabled bg 改成 `bg-muted`**——`--muted` 和 `--bg-disabled` 在這個系統都等於 `var(--color-neutral-2)`,同一個顏色。Thumb `bg-muted` 會跟 track `bg-muted` 完全融色,只剩 border 飄在空中(真實踩過的 bug)。**保留 `bg-surface` 白底**,只改 border 顏色即可達成降級。
+**不要把 thumb 的 disabled bg 改成 `bg-muted`**——`--muted` 和 `--bg-disabled` 在這個系統都等於 `var(--color-neutral-2)`,同一個顏色。Thumb `bg-muted` 會跟 track `bg-muted` 完全融色,只剩 border 可見,失去 thumb 形狀辨識(真實踩過的 bug)。**保留 `bg-surface` 白底**,只改 border 顏色即可達成降級。
 
 **不要同時套 opacity + 灰階 swap**——兩個策略互斥,同時用會導致「灰階 swap 後再打 opacity 一層」,視覺雙重降級,整個 slider 褪色過度。選一條路走到底。
 

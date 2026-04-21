@@ -74,9 +74,9 @@ node scripts/visual-audit.mjs   # 假設 storybook 已在 :6006 跑
 
 | 衝突 | 例 | 解法 |
 |---|---|---|
-| AI 想抄世界級 override 本 DS canonical | DatePicker today underline vs Material ring-circle | 讀 date-picker.spec.md「為什麼 today 改 underline 不 ring-circle」段,spec 有 rationale → 不 flag |
+| AI 想抄世界級 override 本 DS canonical | DatePicker today underline vs Material ring-circle | 讀 date-picker.spec.md「Cell state canonical(5 種語意視覺)」段(today = 文字下方藍色底線,非 ring circle,對齊 Ant / Google Calendar / macOS Calendar),spec 有 rationale → 不 flag |
 | AI flag 刻意低對比 | FileViewer dark chrome / Disabled text | 讀元件 spec 的 dark mode / disabled 段落;spec 有 rationale(「chrome 低對比讓 media 為主」)→ 不 flag |
-| AI 跨元件比「不一致」 | Chip 固定 sm vs Button md 並排高度差 | 讀 uiSize.spec.md「單一尺寸消費者」段;Chip 有明文 rationale(Material 3 共識)→ `deviation ✓` |
+| AI 跨元件比「不一致」 | Chip 固定 sm vs Button md 並排高度差 | 讀 uiSize.spec.md「單一尺寸消費者(不在 default-md 規則內)」段;Chip 有明文 rationale(Material 3 共識)→ `deviation ✓` |
 
 ### 判 P 等級
 

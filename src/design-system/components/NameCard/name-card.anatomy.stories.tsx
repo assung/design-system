@@ -195,7 +195,7 @@ export const Inspector: InspectorStory = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SectionMatrix: Story = {
-  name: '3. Section 組合(minimal → full)',
+  name: '6. Section 組合(minimal → full)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -289,7 +289,7 @@ export const SectionMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix: Story = {
-  name: '4. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -348,7 +348,7 @@ export const ColorMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const HoverCardIntegration: Story = {
-  name: '5. HoverCard 整合(觸發行為)',
+  name: '7. HoverCard 整合(觸發行為)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -416,7 +416,7 @@ export const HoverCardIntegration: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior: Story = {
-  name: '6. 狀態行為',
+  name: '5. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

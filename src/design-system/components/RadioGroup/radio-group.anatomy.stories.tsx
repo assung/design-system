@@ -289,16 +289,16 @@ const InspectorInner = () => {
               <SelectionItem
                 size={size}
                 control={<RadioGroupItem value="preview" id="preview-radio" size={size} disabled={state === 'disabled'} />}
-                label="選項 A"
-                description={withDescription ? '次要說明文字,給使用者更多 context' : undefined}
+                label="信用卡"
+                description={withDescription ? '支援 Visa / Mastercard / JCB,結帳時直接扣款' : undefined}
                 htmlFor="preview-radio"
                 disabled={state === 'disabled'}
               />
               <SelectionItem
                 size={size}
                 control={<RadioGroupItem value="other" id="preview-other" size={size} disabled={state === 'disabled'} />}
-                label="選項 B"
-                description={withDescription ? '另一個選項的補充說明' : undefined}
+                label="ATM 轉帳"
+                description={withDescription ? '取得虛擬帳號後 3 天內完成付款' : undefined}
                 htmlFor="preview-other"
                 disabled={state === 'disabled'}
               />
@@ -536,20 +536,20 @@ export const SizeMatrix = {
                 <SelectionItem
                   size={sz}
                   control={<RadioGroupItem value="a" id={`sz-${sz}-a`} size={sz} />}
-                  label="選項 A"
+                  label="即時"
                   htmlFor={`sz-${sz}-a`}
                 />
                 <SelectionItem
                   size={sz}
                   control={<RadioGroupItem value="b" id={`sz-${sz}-b`} size={sz} />}
-                  label="選項 B"
-                  description="附帶說明文字"
+                  label="每日摘要"
+                  description="每天晚上 9 點寄一次"
                   htmlFor={`sz-${sz}-b`}
                 />
                 <SelectionItem
                   size={sz}
                   control={<RadioGroupItem value="c" id={`sz-${sz}-c`} size={sz} disabled />}
-                  label="不可用"
+                  label="每週摘要"
                   htmlFor={`sz-${sz}-c`}
                   disabled
                 />
@@ -634,9 +634,9 @@ const StateBehaviorInner = () => {
         <div className="flex gap-6 items-start">
           <div className="px-6 py-5 rounded-lg bg-canvas border border-divider min-w-[280px] opacity-60 pointer-events-none">
             <RadioGroup defaultValue="b" className="flex flex-col gap-2">
-              <RadioGroupItem value="a" label="選項 A" disabled />
-              <RadioGroupItem value="b" label="選項 B(預設選中)" disabled />
-              <RadioGroupItem value="c" label="選項 C" disabled />
+              <RadioGroupItem value="a" label="個人版" disabled />
+              <RadioGroupItem value="b" label="團隊版(目前方案)" disabled />
+              <RadioGroupItem value="c" label="企業版" disabled />
             </RadioGroup>
           </div>
           <div className="flex flex-col gap-2 text-[11px] text-fg-muted max-w-[280px]">

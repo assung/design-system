@@ -157,7 +157,7 @@ export const Inspector: Story = {
 }
 
 export const ColumnTypes: Story = {
-  name: '3. Column Type 自動渲染',
+  name: '6. Column Type 自動渲染',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -202,7 +202,7 @@ export const ColumnTypes: Story = {
 }
 
 export const RowHeightMatrix: Story = {
-  name: '4. Row Height Tier(閱讀 vs 掃描模式)',
+  name: '7. Row Height Tier(閱讀 vs 掃描模式)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -240,7 +240,7 @@ export const RowHeightMatrix: Story = {
 }
 
 export const AlignmentRule: Story = {
-  name: '5. 對齊規則(跨產業共識)',
+  name: '8. 對齊規則(跨產業共識)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -278,7 +278,7 @@ export const AlignmentRule: Story = {
 }
 
 export const Features: Story = {
-  name: '6. 功能特性(排序 / 虛擬捲動)',
+  name: '9. 功能特性(排序 / 虛擬捲動)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -316,7 +316,7 @@ export const Features: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '7. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -451,7 +451,7 @@ export const ColorMatrix: Story = {
 }
 
 export const EmptyState: Story = {
-  name: '8. 空狀態',
+  name: '10. 空狀態',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -470,7 +470,7 @@ export const EmptyState: Story = {
 }
 
 export const BorderedProp: Story = {
-  name: '9. bordered prop(預設 true)',
+  name: '11. bordered prop(預設 true)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [

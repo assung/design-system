@@ -145,7 +145,7 @@ export const Inspector: Story = {
 }
 
 export const PlacementMatrix: Story = {
-  name: '3. 定位(side × align)',
+  name: '6. 定位(side × align)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -174,7 +174,7 @@ export const PlacementMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '4. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -202,7 +202,7 @@ export const ColorMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '5. 尺寸對照表',
+  name: '4. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -233,7 +233,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '6. 狀態行為',
+  name: '5. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

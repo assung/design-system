@@ -84,7 +84,7 @@ ProgressBar 底部對齊 avatar 底部。justify-between 自動分配 gap(有 de
 | **compact + 無 progress**(靜態檔案) | `bg-neutral-3 rounded-md` | 靜態清單(已上傳 / 歷史附件)背景色區隔出「檔案 row」邊界,跟純文字內容區分;hover 時 `bg-neutral-hover` 覆蓋 |
 
 **❌ 反例**:
-- Rich mode 無邊框 → 看起來像一般 list item,跟 MenuItem 混淆
+- Rich mode 無邊框 → 與一般 list item 無法區分,跟 MenuItem 混淆
 - Compact mode 靜態 item 無 bg → 純文字列,使用者不知這是「可點下載的檔案」
 - 外層 `<FileUpload list>` wrapper 加邊框 → 雙重邊框(list 邊框 + item 邊框)視覺干擾
 

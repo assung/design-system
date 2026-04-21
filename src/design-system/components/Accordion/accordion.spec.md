@@ -84,6 +84,12 @@ Consumer 無需額外處理,保留 Radix `data-state` 屬性即可。
 
 ---
 
+## 邊界狀態
+
+Empty state 由 consumer 處理(無 items 則不渲染);loading 狀態由 consumer 用 `<Skeleton />` 包;disabled state 詳 `../Field/field-controls.spec.md`;density 由 Radix 繼承。
+
+---
+
 ## 相關
 
 - `../Tabs/tabs.spec.md` — 互斥切換視圖（非收合）

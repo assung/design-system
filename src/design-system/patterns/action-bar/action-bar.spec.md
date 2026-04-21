@@ -7,6 +7,15 @@
 本文件定義：操作的語意角色、視覺 pattern、Variant 選擇、分群與分隔線、溢出機制。
 Button 元件層規則（variant、size、icon、狀態）見 `button.spec.md`。
 
+## 世界級對照(按 pattern 類型)
+
+| 我們的 canonical | 對照 world-class |
+|------------------|-----------------|
+| Toolbar(純工具按鈕群)| Material Toolbar / VS Code EditorToolbar / Figma ToolbarLeft / Atlassian Appbar |
+| Action bar(業務操作列,primary CTA 結尾)| Polaris `ActionList / PageActions` / Linear Cmd+K bar / GitHub `toolbar` + `Save` grouping |
+| Search + filter(左搜尋右操作)| Gmail inbox toolbar / Linear list toolbar / Notion DB toolbar |
+| Overflow rule(space 不足)| Material M3 menu anchor / Atlassian overflow menu |
+
 ---
 
 ## 一、角色系統

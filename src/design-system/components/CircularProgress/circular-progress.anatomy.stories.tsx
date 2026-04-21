@@ -9,10 +9,13 @@ import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatom
  * indeterminate(無 value,旋轉 arc)與 determinate(有 value,固定 arc + track)。
  *
  * 本 anatomy 僅保留 Overview + 兩 consumer context stories(Button loading / Inline 使用)。
- * 不再做 Status × Mode 對照——CircularProgress 無 status prop,完成 / 失敗 consumer 端 swap。
- * 省略 Inspector(size 為自由 number,互動決策點少)/ SizeMatrix(size 策略與
- * Avatar 同流派,不列枚舉)/ StateBehavior(無 hover/focus 狀態)。rationale
- * 詳見 spec.md「為何僅保留 Overview + 兩 consumer context stories」。
+ * 省略的 canonical 5 sections:
+ * - Inspector:size 為自由 number,互動決策點少
+ * - ColorMatrix:N/A — color 繼承 host(text-current)+ Progress token,無 own variant × state 色彩
+ * - SizeMatrix:透過 Inspector 即可展示,size 為自由 number 不列枚舉
+ * - StateBehavior:無 hover / focus / active 狀態
+ *
+ * rationale 詳見 spec.md「為何僅保留 Overview + 兩 consumer context stories」。
  */
 
 const meta: Meta = {

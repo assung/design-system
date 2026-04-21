@@ -1,4 +1,8 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+//
+// Canonical 5 偏離 rationale(見 calendar.spec.md「Anatomy N/A rationale」):
+// - 無 SizeMatrix:MVP 只支援 view="month" + 固定 size="md",無多 size tier
+// - 無 StateBehavior:page-composite 本身無 hover/focus/disabled,屬內部 primitive 的 StateBehavior
 import type { Meta, StoryObj } from '@storybook/react'
 import { Calendar, type CalendarEvent } from './calendar'
 import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
@@ -61,7 +65,7 @@ export const Inspector: Story = {
 }
 
 // ── 3. 色彩對照表(事件 color 類別 + Cell / Event tile token)─────────────────────
-// 跳過 4. SizeMatrix(rationale 見 calendar.spec.md「無 size variant」,MVP 只 md)
+// 跳過 4. SizeMatrix(rationale 見 calendar.spec.md「MVP vs 後續增量」,MVP 只 md;lg 為 tech debt)
 export const ColorMatrix: Story = {
   name: '3. 色彩對照表',
   render: () => {

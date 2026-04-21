@@ -216,20 +216,20 @@ cell: () => (
 )
 ```
 
-**內部實作細節**:DataTable 的 `renderCellContent` 對 consumer 自訂 render(`colType === undefined`)的回傳值做 compound 判斷——`React.isValidElement(content)` 為 true 時 bypass `TruncateCell`。理由:`TruncateCell` 的 `span.truncate` 強制 `white-space:nowrap` + inline baseline context,對 inline-flex / icon+text 自訂結構會拉歪(曾發生:sync cell spinner 視覺上移 1-2px,即使外層 cell `items-center` 也無效)。
+**內部實作細節**:DataTable 的 `renderCellContent` 對 consumer 自訂 render(`colType === undefined`)的回傳值做 compound 判斷——`React.isValidElement(content)` 為 true 時 bypass `TruncateCell`。理由:`TruncateCell` 的 `span.truncate` 強制 `white-space:nowrap` + inline baseline context,對 inline-flex / icon+text 自訂結構會造成基線錯位(曾發生:sync cell spinner 基線偏移,即使外層 cell `items-center` 也無效)。
 
 這跟 `isKnownCompound`(select / multiSelect / person / multiPerson / url)走同一條 bypass 分支——SelectDisplay 的 Tag、PersonDisplay 的 avatar+name 都是自帶 layout 的 compound,不該被 truncate wrapper 包。
 
 Primitive 回傳(string / number / `<>plain text</>`)仍走 TruncateCell,有單行省略 + hover tooltip。
 
-常見誤用 → 歪掉:
+常見誤用 → 基線錯位:
 - ❌ 在 consumer wrapper 加 `leading-none` 嘗試壓縮行高 → 壓縮 text line box 後,text baseline 與 inline 圖示互搶基線
 - ❌ 在 consumer wrapper 加 `h-full` → cell 沒設定明確高度,`h-full` 解為 0 或 auto,無效
 - ❌ 在 consumer wrapper 加 `align-middle` → cell 內是 flex context,`align-middle`(inline 屬性)無效
 
 **Debug 協議(cell 對齊任何問題的第一站)**:
 
-若使用者回報 cell 對齊歪(spinner / icon / tag baseline 不齊),**必先讀 `data-table.tsx` 的 `renderCellContent` + `TruncateCell`(大約 line 86-202)**,再看 cell 內容元件。理由:DataTable 內部有 consumer 看不見的 wrapper 層(TruncateCell 的 `span.truncate` 強制 inline baseline context),根因常在這裡,不在 consumer 元件。
+若使用者回報 cell 對齊錯位(spinner / icon / tag baseline 不齊),**必先讀 `data-table.tsx` 的 `renderCellContent` + `TruncateCell`(大約 line 86-202)**,再看 cell 內容元件。理由:DataTable 內部有 consumer 看不見的 wrapper 層(TruncateCell 的 `span.truncate` 強制 inline baseline context),根因常在這裡,不在 consumer 元件。
 
 過去吃過的虧:在 CircularProgress 加 `align-middle` / 在 consumer 加 `leading-none` 都是治標,真正的根因是 TruncateCell 包了 consumer 自訂結構 → 浪費幾輪才定位。現在已透過 `React.isValidElement` bypass 修掉(line ~199),新的 consumer element 自動不走 TruncateCell — 但此 debug 協議留著,因為未來任何 cell 對齊類 bug 都應優先查此 pipeline。
 

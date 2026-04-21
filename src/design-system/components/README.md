@@ -41,7 +41,7 @@
 
 進 `components/` 前:
 1. 走 `.claude/skills/component-quality-gate/`(完整 checklist)
-2. 聲明 Layout Family(第一段 spec 必含,見 `patterns/element-anatomy/item-anatomy.spec.md`「4-Family Model Taxonomy」)
+2. 聲明 Layout Family(第一段 spec 必含,見 `patterns/element-anatomy/element-anatomy.spec.md`「4-Family Model Taxonomy」)
 3. 對標至少 2 個世界級 DS 的相似元件
 4. spec 第一段寫明實作基礎(Radix X / cmdk / native / 自建+理由)
 

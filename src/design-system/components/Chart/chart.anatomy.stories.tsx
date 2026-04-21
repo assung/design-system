@@ -216,7 +216,7 @@ export const Inspector: Story = {
 }
 
 export const CategoryTokens: Story = {
-  name: '3. 類別配色 Token',
+  name: '6. 類別配色 Token',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -240,7 +240,7 @@ export const CategoryTokens: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '4. 色彩對照表',
+  name: '3. 色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

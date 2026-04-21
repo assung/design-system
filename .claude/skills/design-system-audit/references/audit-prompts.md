@@ -11,11 +11,12 @@ Working directory: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@g
 
 **sub-agent 最常見失誤:不讀 scope defaults + rationale 就判 violation,造成 ~60% false positive**。每個 prompt 執行前**強制**先讀:
 
-1. `CLAUDE.md` 的 `# Meta-Pattern 預警`(M1-M6 meta-principles)
+1. `CLAUDE.md` 的 `# Meta-Pattern 預警`(**M1-M9** meta-principles,含 M8 Benchmark-First / M9 Predicate Self-Test 2026-04-22)
 2. `CLAUDE.md` 的 `# SSOT 消費 canonical`(做 X 前必查 Y 對照表)
 3. `CLAUDE.md` 的 `# 稽核 vs 執行 分權 canonical`(flag 是提議,不是 auto-fix)
 4. `CLAUDE.md` 的 `# Spec 規則` 的「Scope 預設」節(Field 家族 / pure wrapper / semantic token 自動 scope 豁免)
 5. 每個 Consistency 類 dim:flag violation 前**必先 grep 元件 spec.md 整個檔案**找 rationale;有任何一段明文(`##`/`###`/「為什麼」/「rationale」/「對照」)觸及 deviation 原因 → 不是 violation 是 `deviation ✓`
+6. **Consistency 類 dim(含 D6b/D6c/D6e)必走 Phase 0 全掃再判**(CLAUDE.md `# 稽核 6 維` 規則 + `principle-audit-protocol.md` D6 scan)— 單元件看無法檢出系統性 drift / 跨 item 矛盾 / predicate membership drift
 
 ### 常見 false positive(記憶)
 
@@ -25,6 +26,8 @@ Working directory: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@g
 - **「7-dim 7 維度不足」** → scope defaults 豁免「Internal 類 / wrapper 類 / 互動極少類」;flag 前驗證 scope default 是否適用
 - **「anatomy 缺 Inspector / SizeMatrix」** → applicable-where-meaningful policy(見 `.claude/skills/story-writing/references/anatomy-standard.md`);AspectRatio 沒 Inspector / Badge 沒 SizeMatrix 都可能是 N/A + 有 rationale。**先 grep spec 是否有「無 X story,因為...」段**
 - **「ARIA / tabIndex 不對」** → Radix primitives 內建 roving-tabindex / focus management。flag 前驗證該元件是否 wrap Radix;wrap 就豁免
+- **「decorative indicator 被誤列入 action predicate」(D6e,2026-04-22)** → `pointer-events-none` + `aria-hidden` 的 icon 不該出現在 action example 表。Calendar / status dot / CircularProgress 等被誤收 = P0 flag。對照 CLAUDE.md M9 predicate 自測
+- **「Row action 尺寸 > 24」(D6e cap 違反,2026-04-22)** → row primitive 內 inline action 絕對值 cap = 24,row tier 放大不該讓 action 同步放大。違反 = P0 flag。對照 `patterns/element-anatomy/item-anatomy.spec.md`「Inline Action 設計規格」Row ≤ 24 cap
 
 ## Dimension Type Taxonomy (CLAUDE.md「Consistency Audit 原則」)
 
@@ -695,3 +698,65 @@ End: `N files checked, V violations by signal: A=?, B=?, C=?, D=?, E=?. Top 5 wo
 ---
 
 **後續待辦(已記 memory tech debt)**:pixel-level 視覺 regression 基建(Chromatic / Playwright screenshots)— 本 dim 只是**上游攔截**,不涵蓋「已用對 API 但視覺仍跑掉」的 pixel bug。真正視覺對齊 audit 需要視覺工具,不是 grep 能 cover 的維度。
+
+---
+
+# Group H — Principle self-audit (D6 子維,session-learned 2026-04-22)
+
+## 22. D6e Predicate coherence(對齊 CLAUDE.md Meta-Pattern M9)
+
+**Type**: Consistency
+**Canonical source**: `.claude/skills/design-system-audit/references/principle-audit-protocol.md` → D6e Predicate coherence scan;CLAUDE.md `# Meta-Pattern 預警` M9(Predicate Self-Test)
+**Rationale home**: spec.md — 若某 example 故意違反 predicate(教學反例),必在旁邊明示「反例」/「故意違反 X cap」;cap 值本身更動需在 spec 留 rationale + benchmark
+
+```
+Your job: audit spec.md 內「含 decision tree + example 表 + cap / predicate 定義」的 spec(典型:item-anatomy「Inline Action 設計規格」/ button「Dismiss canonical」/ action-bar predicate 等),走 D6e 4 題 coherence check 防 predicate drift。
+
+**Phase 0(必跑)**:grep 專案所有 `patterns/**/*.spec.md` + `components/**/*.spec.md` 找 predicate / decision tree / example 表位置,列清單。
+
+**Per predicate spec 4 題 scan**:
+
+Q1. **Membership drift** — example 表每一筆 literally 符合 predicate?
+   - `pointer-events-none` / `aria-hidden` icon 不該列入 action predicate(decorative indicator)
+   - Trash / Delete / Clear / Remove 不該列入 Dismiss predicate(Dismiss 嚴格 = X close only)
+   - 邊界 case(status dot / loading indicator / badge overlay)歸屬是否明示
+
+Q2. **Cap / size 違反** — example 的幾何值符合 predicate 定義的 cap?
+   - Row action 絕對值 cap = 24 — example 是否 row tier 放大就讓 action 同步放大(違反 cap)
+   - Dismiss 尺寸統一 — example 是否有 tier 自己另訂尺寸
+
+Q3. **World-class 對照覆蓋** — 每個 predicate 決策都有至少 3 家 world-class DS 對照?
+   - Polaris / Material / Atlassian / Apple HIG / Ant / Carbon / Figma / Linear 至少 3 家
+   - 對照缺 = predicate 根據薄 → P1 flag(請補 benchmark 或 downgrade 為 heuristic 不上升 canonical)
+
+Q4. **Empty category** — predicate 有 category 但 example 表沒 real case?
+   - 空 category = 概念未收斂 / predicate 未完成 → P1 flag
+
+**報告格式**:
+- `spec.md:L42 [Q1 membership drift] — DatePicker Calendar icon 列入 Inline Action 但 pointer-events-none / aria-hidden → 改歸 decorative indicator`
+- `spec.md:L88 [Q2 cap 違反] — FileItem rich row 56 → Button size md (32) 違反 row ≤ 24 cap`
+- `spec.md:L120 [Q3 benchmark 缺] — overlay close X 無 world-class 對照 → 補 Material / Polaris / Apple HIG`
+- `spec.md:L200 [Q4 empty] — Cat 3 standalone action 無 real example → 待補或刪 category`
+
+End: `N predicate specs scanned, V1/V2/V3/V4 violations by Q. Top offenders: [list]`. Under 600 words. Don't fix.
+```
+
+## 23. Benchmark-First discipline(對齊 CLAUDE.md Meta-Pattern M8)
+
+**Type**: Consistency
+**Canonical source**: CLAUDE.md `# Meta-Pattern 預警` M8(訂 canonical 前必 benchmark 至少 3 家 world-class);principle-audit-protocol.md D6e Q3
+**Rationale home**: spec.md / memory — 若 canonical 刻意偏離 benchmark 或 benchmark 不適用,需明文 rationale
+
+```
+Your job: audit「spec 訂 canonical 決策」是否前置 benchmark(M8)。防「憑直覺訂 → 疊代 4 次 → user 拉回」bug class(2026-04-22 Icon Action Primitive 案例)。
+
+For each canonical declaration in spec.md(任何「Row action cap = X」「Dismiss 嚴格 = X only」「predicate A vs B 分類」等 canonical 聲明):
+1. 該段落 / 近區有無至少 3 家 world-class DS 對照(Polaris / Material / Atlassian / Apple HIG / Ant / Carbon / Figma / Linear / Notion)
+2. 有對照 → `benchmark ✓`
+3. 無對照但在 memory / CLAUDE.md `# Meta-Pattern` 有 rationale → `rationale ✓`
+4. 兩者皆無 → P1 flag「canonical 無 benchmark 根據,疑似憑直覺訂」
+
+Report: `spec.md:L{line} — canonical「{宣告}」無 benchmark 對照 → 補 world-class 至少 3 家 or 降級為 heuristic`
+
+End: `N canonical declarations scanned, M without benchmark, top 3: [list]`. Under 400 words. Don't fix.
+```

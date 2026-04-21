@@ -16,9 +16,9 @@
 
 ---
 
-## D6 4 子維(含 scan mode 分類)
+## D6 5 子維(含 scan mode 分類)
 
-**關鍵**:4 子維依「單 item 檢」vs「跨 item 比對」分兩類。跨 item 比對的**必走 Phase 0 全掃再判**(對齊 CLAUDE.md `# 稽核 6 維 + 2 模式`「一致性類稽核必先全掃再判」),否則無法檢出矛盾 / 不一致。
+**關鍵**:5 子維依「單 item 檢」vs「跨 item 比對」vs「predicate 自測」分三類。跨 item 比對的**必走 Phase 0 全掃再判**(對齊 CLAUDE.md `# 稽核 6 維 + 2 模式`「一致性類稽核必先全掃再判」),否則無法檢出矛盾 / 不一致。
 
 | # | 子維 | Scan mode | 掃什麼 | 怎麼掃 |
 |---|------|-----------|-------|-------|
@@ -26,6 +26,7 @@
 | **D6b** | **一致性** | **cross-inventory**(必全掃)| 同概念跨 spec / 跨元件表達 / 術語是否一致? | 必先全掃建 inventory(見下 Phase 0)→ 比對 |
 | **D6c** | **無矛盾** | **cross-inventory**(必全掃)| spec↔spec / CLAUDE.md↔spec / canonical 聲明衝突 | 必先全掃 canonical concept index(見下 Phase 0)→ 比對 |
 | **D6d** | **完整性** | **per-item + reference**(per spec 但要比 scope default canonical)| 原則有無覆蓋 applicable state / scope / edge case? | 單 spec 檢 + 對照 Rule B scope defaults(CLAUDE.md)|
+| **D6e** | **Predicate 自測**(**new 2026-04-22**) | **predicate-internal**(對含 decision tree + example 表的 spec)| Membership drift / cap 違反 / example × world-class / empty category | 對齊 CLAUDE.md Meta-Pattern M9;4 題 coherence check(見下 D6e scan) |
 
 ## Phase 0 — 全掃再判(cross-inventory 子維硬規則)
 
@@ -165,6 +166,58 @@
    
 2. 缺且無 scope default pointer → flag(可能 AUTO 補 pointer or STOP 補 prose)
 ```
+
+### D6e Predicate coherence scan(對齊 CLAUDE.md Meta-Pattern M9)
+
+針對含 **decision tree + example 表 / real case 表 / category 分類** 的 spec
+(item-anatomy.spec.md 的 Predicate、button.spec.md 的 variant 選擇、field-controls.spec.md
+的 mode 選擇等),跑 4 題 coherence check。任一題失敗 → P0 violation(絕對不可忽略)。
+
+```
+1. Example → decision tree 回跑驗證:
+   - Parse spec 的決策樹 Q1/Q2/Q3 條件
+   - Parse real case 表的每個 entry 的 claim(category / primitive / size 等)
+   - 對每個 entry:把 context 屬性(位置 / row size / interaction 類型)丟回 decision tree
+   - 結果 vs claim 不一致 → P0 membership drift violation
+   - 典型 FP 避免:tree 條件有模糊詞(「大」/「小」),對照表內 value 明確(24 / 28)
+     時,以明確值為準判斷
+
+2. Cap / constraint cross-check:
+   - grep spec 內「絕對值 X」/「≤ Y」/「必 size Z」類 constraint 句
+   - 對 real case 表 grep 相同欄位的所有 value
+   - 有 value 超出 cap → P0 violation
+
+3. Example × world-class benchmark(per example,非整體):
+   - 對 real case 表每個 entry 各取 ≥3 家世界級 DS 對照
+   - 我方選擇跟世界級 3 家中過半不同 → flag(可能對或可能錯)
+     → 查 spec 有無 rationale 解釋為何不同
+     → 有 rationale = deviation ✓
+     → 無 rationale = P1 應補 rationale(AUTO 加 pointer),或提議 revise(STOP)
+
+4. Empty category check:
+   - Decision tree 所有 category 都要有 ≥1 example
+   - 空 category = 概念未收斂 / predicate 未完成 → P1 flag
+```
+
+**Phase 0 要求**:D6e 必先 grep 專案所有 `.spec.md` 找 decision tree / real case 表 /
+category 分類,建 inventory 再逐個跑 4 題。不是隨機挑。
+
+**世界級 benchmark source**(從 memory 或 CLAUDE.md M8 列表):Polaris / Material / Atlassian /
+Ant Design / Carbon / Apple HIG / VS Code / Figma。對每個 example,至少查 3 家的對應
+實作名 / API / spec 段落。
+
+**常見 FP 記憶**(2026-04-22 新增):
+- decorative indicator 被誤列入 action predicate:DatePicker Calendar icon 放 Cat 1
+  Inline Action(實際 pointer-events-none 不可點)→ D6e 應抓出,flag 為「點了不做事
+  的 icon 不屬 action predicate」
+- cap 違反自 session 訂立的 cap:FileItem rich 用 Button sm(28),同 spec 說 ≤ 24 cap
+  → cap cross-check 應抓出
+- **Cap scope 必明示 context**(2026-04-22 D6e scan 自測發現)— 預估 cap 違反前先確認 example 屬該 cap 的 context
+  - 例:「Row dedicated action ≤ 24 cap」只適用 Row context,Chrome corner 不受此 cap 束縛
+  - flag 前先 grep cap 句的 scope prefix(「Row」/「Chrome」/「Field」)再判斷
+- **Benchmark 粒度匹配 predicate 粒度**(2026-04-22 D6e scan 自測發現)— per-variant / per-category predicate 需 per-variant benchmark,不是整體兜底一句
+  - 例:Button 5 variant 選擇 predicate 需 per-variant world-class mapping(不只 L74 整體「Material / Polaris 共識」兜底)
+  - flag 時區分「predicate 粒度 vs benchmark 粒度」不匹配 = P1 補 pointer
 
 ---
 
