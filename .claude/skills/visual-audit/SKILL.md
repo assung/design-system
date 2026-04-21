@@ -21,14 +21,50 @@ description: Pixel-level visual audit for design-system components based on user
 
 這些 bug 的共通點:`cva` 對、token 對、spec 對,但是消費組合後**實際 render 的 pixel 關係錯**。code audit 無視,只能靠視覺稽核。
 
-## 短期 vs 長期定位
+## 兩層稽核架構(2026-04-21 升級)
 
-| 階段 | 做法 | 自動化程度 |
-|------|------|-----------|
-| **短期(本 skill 提供)** | checklist 版 — AI 讀 Storybook screenshot(user 上傳)+ 量尺規 + 跨元件比對,mechanical 對照 DS 既有 token / spec 宣告的值 | 手動 trigger,AI 需 screenshot 才跑 |
-| **長期(tech debt)** | Chromatic / Storybook screenshot diff 基建接入 — pixel-level regression 自動化(跨 branch diff、CI fail 阻擋) | CI / pre-merge 自動 |
+本專案視覺稽核已分 **Layer A mechanical + Layer B AI judgement**,互補覆蓋:
 
-**長期規劃記錄於 `memory/project_pending_tasks` 的「視覺 regression 基建」條目**。本 skill **不取代 pixel-diff 自動化**,是在基建到位前的「人機協作視覺稽核」。
+| Layer | 做什麼 | 由誰做 | 自動化 |
+|-------|-------|--------|--------|
+| **A. Mechanical** | (1) 截圖每個 scenario(retina PNG → `snapshots/`)<br>(2) WCAG 對比度掃描(所有可見文字 / icon vs 底色,flag AA 不過的組合)<br>(3) DOM 幾何 assertion(等高 / 對稱 padding / 正確 gap — 讀 `scripts/visual-assertions.json` 定義) | `scripts/visual-audit.mjs`(Playwright-driven) | **npm run visual-audit** 一鍵跑,產出 `snapshots/report.json` + PNG。CI 可接(exit 1 on violation) |
+| **B. AI judgement** | (1) 設計合理性(badge 位置語意對、carousel 箭頭不壓文字、zoom step 手感)<br>(2) 跨元件視覺一致(同 flex 列幾何鐵律、Family 視覺對齊)<br>(3) 世界級對照(「這跟 Figma/Notion/iOS 相比還差在哪」) | **本 skill**(`/visual-audit`),讀 `snapshots/*.png` + `report.json` 做 pattern recognition | invoke 時 AI 跑 |
+
+### Layer A 先跑,Layer B 後補(workflow)
+
+```
+1. npm run visual-audit                  # Layer A 產 snapshots + report
+2. /visual-audit                         # 本 skill 讀 snapshots/ 做 Layer B 判斷
+   (skill 自動讀 snapshots/report.json 作為 Layer A baseline,
+    重點關注 A 沒 flag 但視覺仍不對的 case)
+```
+
+### 為什麼分兩層
+
+- Mechanical 能抓的事(對比度、等高、padding 數字)讓 script 做,AI 不浪費 token
+- 設計合理性 / 世界級對照需要 pattern matching,只有 AI / human 能做——這部分走 skill
+- 兩層互相 cross-check:Layer A 漏掉但 Layer B 看出 → 回填新 assertion 到 `visual-assertions.json`,轉為 mechanical
+
+### Layer A 命令速查
+
+```bash
+npm run visual-audit            # headless,auto-start storybook,全自動
+npm run visual-audit:headed     # 同上帶 UI(debug 模式)
+node scripts/visual-audit.mjs   # 假設 storybook 已在 :6006 跑
+```
+
+產出:
+- `snapshots/*.png` — 每個 scenario 的 retina screenshot
+- `snapshots/report.json` — contrast / geometry violations 結構化 data
+
+### 本 skill(Layer B)invoke 前置條件
+
+- **優先:`snapshots/` 已有 PNG + `report.json`**(user 先跑 `npm run visual-audit`)
+- 次要:user 臨時上傳 screenshot(本 skill 原始 fallback 模式仍可用)
+
+### 長期:Pixel regression 基建
+
+**Chromatic / Percy / reg-suit**接入為 post-Layer-A 增量,做跨 branch pixel diff。現階段 Layer A 夠 gate 99% 視覺 bug;pixel regression 等 DS 穩定再接(列 post-v1 tech debt)。
 
 ## Skill 生態位
 

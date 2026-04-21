@@ -1,0 +1,65 @@
+{
+  "$schema-note": "scripts/visual-audit.mjs 消費此檔。每個 scenario 含 Storybook id / 輸出檔名 / 可選 assertions(DOM 幾何測量)",
+  "scenarios": [
+    {
+      "id": "design-system-components-datepicker-展示--basic",
+      "file": "datepicker-basic.png"
+    },
+    {
+      "id": "design-system-components-datepicker-展示--range-picker",
+      "file": "datepicker-range.png"
+    },
+    {
+      "id": "design-system-components-calendar-展示--團隊行事曆",
+      "file": "calendar-event-team.png"
+    },
+    {
+      "id": "design-system-components-calendar-展示--空行事曆",
+      "file": "calendar-event-empty.png"
+    },
+    {
+      "id": "design-system-components-timepicker-展示--會議時段",
+      "file": "timepicker-meeting.png"
+    },
+    {
+      "id": "design-system-components-timepicker-展示--店家營業時間",
+      "file": "timepicker-shop-hours.png"
+    },
+    {
+      "id": "design-system-components-timepicker-展示--航班起飛時間",
+      "file": "timepicker-flight.png"
+    },
+    {
+      "id": "design-system-components-fileviewer-展示--default",
+      "file": "fileviewer-default.png"
+    },
+    {
+      "id": "design-system-components-rating-展示--default",
+      "file": "rating-default.png"
+    },
+    {
+      "id": "design-system-components-coachmark-展示--tipsmultistep",
+      "file": "coachmark-tips-multistep.png"
+    },
+    {
+      "id": "design-system-components-coachmark-展示--multisteptour",
+      "file": "coachmark-new-features.png"
+    },
+    {
+      "id": "design-system-components-carousel-展示--default",
+      "file": "carousel-default.png"
+    },
+    {
+      "id": "design-system-components-descriptionlist-設計規格--horizontal-variants",
+      "file": "description-list-horizontal.png"
+    },
+    {
+      "id": "design-system-components-badge-設計原則--ruleoverlayiconanchoronly",
+      "file": "badge-overlay-iconanchor.png"
+    },
+    {
+      "id": "design-system-internal-dategrid-展示--rangemode",
+      "file": "dategrid-range.png"
+    }
+  ]
+}
