@@ -174,8 +174,12 @@ const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? // list mode:保留 px-loose 對齊 header / footer;移除 pt/pb 讓 list 接頂接底
-              "px-[var(--layout-space-loose)]"
+            ? // list mode 2026-04-22:
+              // - px:`calc(loose - 8px)` — item 自己再 px-2,總 content left = loose 對齊 header title
+              //   剩 8px 給 item 作 hover bg inset gutter,hover bg 不貼 chrome 邊(視覺稽核「不貼邊」)
+              // - py-2(8px):對齊 menu group canonical(menu 有 group 則 group py-2 / 無 group 則 wrap layer py-2)
+              //   user 從 0 改回 8px 同 menu 節奏
+              "px-[calc(var(--layout-space-loose)-0.5rem)] py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

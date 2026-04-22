@@ -41,7 +41,7 @@ const textareaVariants = cva(
         edit: [
           'bg-surface border border-border',
           'hover:border-border-hover',
-          'focus:border-primary focus:hover:border-primary',
+          'focus-visible:border-primary focus-visible:hover:border-primary',
         ],
         readonly: 'bg-disabled border border-transparent',
         disabled: 'bg-disabled border border-transparent cursor-not-allowed text-fg-disabled',
@@ -119,7 +119,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           textareaVariants({ mode: resolvedMode, size }),
           isEditable && error && [
             'border-error hover:border-error-hover',
-            'focus:border-error focus:hover:border-error',
+            'focus-visible:border-error focus-visible:hover:border-error',
           ],
           className
         )}

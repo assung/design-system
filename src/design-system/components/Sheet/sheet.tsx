@@ -157,7 +157,8 @@ const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? "px-[var(--layout-space-loose)]"
+            ? // 同 DialogBody variant="list" canonical — 對齊 menu group py-2 + content left=loose + hover bg inset
+              "px-[calc(var(--layout-space-loose)-0.5rem)] py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

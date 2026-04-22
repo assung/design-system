@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Meta } from '@storybook/react'
 import {
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle, DialogClose,
@@ -6,6 +7,58 @@ import { Button } from '@/design-system/components/Button/button'
 import { Field, FieldLabel, FieldDescription } from '@/design-system/components/Field/field'
 import { Input } from '@/design-system/components/Input/input'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
+import { Switch } from '@/design-system/components/Switch/switch'
+
+/**
+ * 通知設定 — variant="list" 中 item(title + desc + right-side Switch)
+ * in-modal 直接設定 pattern(對齊 Gmail 通知設定 / macOS Sys Prefs / Notion prefs)
+ * user Image 9 指出:modal 內 list item 通常可直接被設定,不是跳去其他地方
+ */
+function NotificationSettings() {
+  const [email, setEmail] = useState(true)
+  const [push, setPush] = useState(false)
+  const [slack, setSlack] = useState(true)
+  const items = [
+    { key: 'email', title: '電子郵件通知', desc: '接收每日摘要到信箱', checked: email, onChange: setEmail },
+    { key: 'push', title: '推播通知', desc: '即時推送到桌面與手機', checked: push, onChange: setPush },
+    { key: 'slack', title: 'Slack 整合', desc: '提及時自動發送到 #notifications', checked: slack, onChange: setSlack },
+  ]
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="tertiary">開啟通知設定(中 item:title+desc+Switch)</Button>
+      </DialogTrigger>
+      <DialogContent autoHeight maxWidth={480}>
+        <DialogHeader>
+          <DialogTitle>通知設定</DialogTitle>
+        </DialogHeader>
+        <DialogBody variant="list">
+          <div className="flex flex-col">
+            {items.map((n) => (
+              // label wrapping → click label toggle Switch(native behavior);item 整行可點擊
+              // px-2 rounded-md 對齊 canonical;item 右側 Switch 做 in-modal 設定
+              <label
+                key={n.key}
+                className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover cursor-pointer"
+              >
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-body font-medium">{n.title}</span>
+                  <span className="text-caption text-fg-muted">{n.desc}</span>
+                </div>
+                <Switch checked={n.checked} onCheckedChange={n.onChange} />
+              </label>
+            ))}
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="tertiary">關閉</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
 
 const meta: Meta = {
   title: 'Design System/Components/Dialog/展示',
@@ -103,9 +156,11 @@ export const LongContent = {
           <DialogBody variant="list">
             <div className="flex flex-col">
               {names.map((name, i) => (
+                // px-2 rounded-md:content left = body px(loose-8) + item px(8)= loose ✓ 對齊 header title
+                // hover bg(item bg)inset 8px from body padded edge → 不貼 chrome 邊(視覺稽核「不貼邊」)
                 <button
                   key={name}
-                  className="flex items-center gap-3 py-3 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
+                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover text-left"
                 >
                   <Avatar size={40} alt={name} color={(['primary', 'info', 'success', 'warning'] as const)[i % 4]} />
                   <div className="flex flex-col min-w-0 flex-1">
@@ -194,11 +249,10 @@ export const ListBody = {
                 { name: 'Ethan Park', org: 'Nebula Inc', id: 'EMP-01093' },
                 { name: 'Fiona Lin', org: 'ACME Corp', id: 'EMP-00672' },
               ].map((m) => (
-                // Body 已 px-loose(對齊 header title),item 只負責 py + gap + border
-                // 對應 item-anatomy Family 2 reading mode(prefix avatar / content title+desc)
+                // variant="list" canonical:item px-2 rounded-md,content 對齊 header + hover bg inset 8px
                 <button
                   key={m.id}
-                  className="flex items-center gap-3 py-3 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
+                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover text-left"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary-subtle text-primary flex items-center justify-center text-body-lg font-medium shrink-0">
                     {m.name.charAt(0)}
@@ -219,39 +273,12 @@ export const ListBody = {
         </DialogContent>
       </Dialog>
 
-      {/* 中 item:icon + title + description 2 行 */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="tertiary">開啟通知設定(中 item:icon+desc)</Button>
-        </DialogTrigger>
-        <DialogContent autoHeight maxWidth={480}>
-          <DialogHeader>
-            <DialogTitle>通知設定</DialogTitle>
-          </DialogHeader>
-          <DialogBody variant="list">
-            <div className="flex flex-col">
-              {[
-                { title: '電子郵件通知', desc: '接收每日摘要到信箱' },
-                { title: '推播通知', desc: '即時推送到桌面與手機' },
-                { title: 'Slack 整合', desc: '提及時自動發送到 #notifications' },
-              ].map((n) => (
-                <button
-                  key={n.title}
-                  className="flex flex-col gap-0.5 py-2 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
-                >
-                  <span className="text-body font-medium">{n.title}</span>
-                  <span className="text-caption text-fg-muted">{n.desc}</span>
-                </button>
-              ))}
-            </div>
-          </DialogBody>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="tertiary">關閉</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* 中 item:title+desc + 右側直接 Switch 設定(in-modal 操作,不 navigate)
+          user Image 9 指出 modal 內 list item 通常可直接被設定 — 對齊 Gmail 通知設定 /
+          macOS System Preferences / Notion preferences 的 in-modal pattern */}
+      <NotificationSettings />
+
+      {/* 小 item:純文字 label(對齊 Linear Cmd+K 密集) */}
 
       {/* 小 item:純文字 label(對齊 Linear Cmd+K 密集) */}
       <Dialog>
@@ -267,7 +294,7 @@ export const ListBody = {
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
                 <button
                   key={t}
-                  className="flex py-1.5 hover:bg-neutral-hover text-left text-body border-b border-divider last:border-b-0"
+                  className="flex py-1.5 px-2 rounded-md hover:bg-neutral-hover text-left text-body"
                 >
                   {t}
                 </button>

@@ -20,8 +20,12 @@ import {
  * - Radix primitives：behavior（keyboard nav, focus management, aria roles）
  * - MenuItem：visual（layout, padding, icon alignment, typography）
  *
- * Radix primitive 是外層容器，控制 focus:bg-neutral-hover。
+ * Radix primitive 是外層容器，控制 focus-visible:bg-neutral-hover。
  * MenuItem 內層只負責佈局，不加互動樣式。
+ *
+ * 為何 focus-visible 而非 focus：滑鼠 click 也會觸發 `:focus`,會讓使用者
+ * 點選後留下 hover-bg 殘影。`focus-visible` 只在鍵盤導覽 / 程式 focus 時
+ * 套用,click 不套——對齊 Menu/menu-item.tsx canonical。
  */
 
 // ── Floating layer 共用樣式 ──
@@ -44,7 +48,7 @@ const ICON_SIZE = ROW_ICON_SIZE
 const radixItemClass = [
   'relative cursor-pointer select-none outline-none',
   'transition-colors duration-150',
-  'focus:bg-neutral-hover',
+  'focus-visible:bg-neutral-hover',
   'data-[disabled]:pointer-events-none data-[disabled]:text-fg-disabled data-[disabled]:cursor-default',
 ].join(' ')
 
