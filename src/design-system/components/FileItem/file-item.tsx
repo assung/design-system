@@ -111,10 +111,10 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       />
     ) : null
 
-    // suffix
-    const suffixAlign = isRich && showDesc
-      ? 'h-[calc(1lh+2px+var(--font-body-size)*1.5)]'
-      : 'h-[1lh]'
+    // suffix 對齊 label 第一行(item-anatomy「24px 閾值對齊規則」小 suffix canonical):
+    // icons 16 ≤ 24 屬小 suffix,統一 `h-[1lh]` inline,不因 desc wrap 改公式。
+    // 兩 mode 同公式,跟 item-anatomy 一致。
+    const suffixAlign = 'h-[1lh]'
 
     // Status slot 幾何:與 consumer 的 delete action **同尺寸**(row action ≤ 24 cap canonical)
     //   rich  → Button xs iconOnly(24 固定,不隨 row 放大)
@@ -179,13 +179,14 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       </div>
     )
 
-    // content row
+    // content row — label ↔ desc gap `mt-0.5` (2px) 對齊 item-anatomy「Label ↔ Desc 間距」canonical
+    // (同 Empty 的 title→description 實踐,DS-wide 一致)
     const contentRow = (
       <div className="flex items-start gap-2">
         <div className="flex flex-col min-w-0 flex-1">
           <span className="truncate">{name}</span>
           {showDesc && (
-            <span className={cn(status === 'error' ? 'text-error-text' : 'text-fg-secondary')}>
+            <span className={cn('mt-0.5', status === 'error' ? 'text-error-text' : 'text-fg-secondary')}>
               {description}
             </span>
           )}
@@ -232,10 +233,10 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
           {...props}
         >
           <Avatar src={thumbnailSrc} alt={name} size={AVATAR_SIZE} shape="square" className="shrink-0" />
-          <div
-            className={cn('flex flex-col flex-1 min-w-0', progressBar ? 'justify-between' : 'justify-center')}
-            style={{ minHeight: AVATAR_SIZE }}
-          >
+          {/* content ↔ progress bar gap-2 (8px) 對齊 item-anatomy canonical,兩 mode 一致。
+              Avatar 固定 56,content 自然高度(可超過 avatar);row `items-start` 由 avatar 作
+              視覺引導(upload manager box tight-stack 情境明文例外,avatar 邊界分隔 item)。 */}
+          <div className="flex flex-col flex-1 min-w-0 gap-2">
             {contentRow}
             {progressBar}
           </div>
