@@ -1,6 +1,5 @@
 import type { Meta } from '@storybook/react'
 import { NameCard, NameCardDefaultActions } from './name-card'
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
@@ -11,41 +10,37 @@ export default meta
 
 const noop = () => {}
 
-// NameCard canonical(2026-04-23):無「精簡」variant — 一律完整呈現
-// (Profile + Actions 固定 Header,Status + Fields 可捲動 Body,View more 固定 Footer)。
-// Consumer 僅傳 subset props → 對應 section 不 render,但結構一致。
-// 世界級對照:Slack / GitHub / LinkedIn hover-profile 皆單一結構(chrome pattern)。
+// NameCard canonical(2026-04-23):
+// - 單一結構(Profile + Actions + Status + Fields + View more),consumer 僅傳 subset props
+// - 透過 `<Avatar hoverCard={<NameCard.../>} />` canonical path(avatar.spec.md DS-wide rule)
+//   Avatar 內部已處理 HoverCardTrigger + HoverCardContent + keyboard focus + NameCard wrapping chrome,
+//   不需在 story 層手刻 HoverCard / HoverCardTrigger / HoverCardContent → 避免 raw button UA default
+//   chrome(padding / border)污染視覺 + 對齊世界級 Slack / GitHub / LinkedIn hover-profile canonical。
 function NameCardHover({ name, src, subtitle }: { name: string; src: string; subtitle: string }) {
   return (
-    <HoverCard openDelay={300} closeDelay={200}>
-      <span className="inline-flex items-center gap-2">
-        <HoverCardTrigger asChild>
-          <button type="button" className="cursor-pointer">
-            <Avatar src={src} alt={name} size={32} />
-          </button>
-        </HoverCardTrigger>
-        <span className="text-body">{name}</span>
-      </span>
-      <HoverCardContent
-        align="start"
-        className="bg-surface-raised rounded-lg border border-border overflow-hidden"
-        style={{ boxShadow: 'var(--elevation-200)' }}
-      >
-        <NameCard
-          name={name}
-          avatar={{ src, alt: name }}
-          subtitle={subtitle}
-          status="online"
-          statusMessage="Out of Office: Back on Monday! For urgent matters please contact @Wei-Lun Cheng in the meantime."
-          actions={<NameCardDefaultActions />}
-          fields={[
-            { label: 'ID', value: 'YHANAX' },
-            { label: 'Employee number', value: '1234567' },
-          ]}
-          onViewMore={noop}
-        />
-      </HoverCardContent>
-    </HoverCard>
+    <span className="inline-flex items-center gap-2">
+      <Avatar
+        src={src}
+        alt={name}
+        size={32}
+        hoverCard={
+          <NameCard
+            name={name}
+            avatar={{ src, alt: name }}
+            subtitle={subtitle}
+            status="online"
+            statusMessage="Out of Office: Back on Monday! For urgent matters please contact @Wei-Lun Cheng in the meantime."
+            actions={<NameCardDefaultActions />}
+            fields={[
+              { label: 'ID', value: 'YHANAX' },
+              { label: 'Employee number', value: '1234567' },
+            ]}
+            onViewMore={noop}
+          />
+        }
+      />
+      <span className="text-body">{name}</span>
+    </span>
   )
 }
 
