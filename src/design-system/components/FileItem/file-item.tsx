@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 import { ProgressBar } from '@/design-system/components/ProgressBar/progress-bar'
-import { ItemContent, ItemInlineActionButton, ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * FileItem — 檔案顯示 / 上傳進度
@@ -116,13 +116,11 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     // 兩 mode 同公式,跟 item-anatomy 一致。
     const suffixAlign = 'h-[1lh]'
 
-    // Status slot 幾何:與 consumer 的 delete action **同尺寸**(row action ≤ 24 cap canonical)
-    //   rich  → Button xs iconOnly(24 固定,不隨 row 放大)
-    //   compact → ItemInlineActionButton(icon 16,row 24 容不下 Button xs)
-    // 這樣 `gap-2`(8px) 是兩個「同 size slot」之間的距離,真 8px gap 不被溢出覆蓋。
-    // Passive icon 16px 置中於 action-sized 容器(視覺 framing 與 hover-swap 一致)。
-    const deleteBtnSize = 'xs' as const
-    const slotHw = isRich ? 'var(--field-height-xs)' : '16px'
+    // Status slot 幾何(2026-04-23 user 統一):rich + compact 都用 `var(--field-height-xs)`(24)
+    // 容器,裡面 Button xs iconOnly variant="text"(auto data-unbounded)。
+    // Compact 不影響 row 高度 = suffix wrapper 的 data-unbounded CSS 讓 Button layout
+    // 收斂到 1lh(同 compact row 內容高),視覺/touch target 仍 24。
+    const slotHw = 'var(--field-height-xs)'
 
     const hoverAction =
       status === 'completed' && onDownload ? { icon: Download, onClick: onDownload, label: '下載' } :
@@ -131,6 +129,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
 
     const statusSlot = statusConfig ? (
       <span
+        data-unbounded="true"
         className="relative inline-flex items-center justify-center shrink-0"
         style={{ width: slotHw, height: slotHw }}
       >
@@ -144,33 +143,33 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
           )}
           aria-hidden
         />
-        {/* Active action:row-hover 時淡入(僅 hoverAction 存在時渲染)
-            Rich → Button xs iconOnly(24 固定,同 delete)
-            Compact → ItemInlineActionButton(16 icon,同 delete;Button xs 24 會爆 row) */}
-        {hoverAction && (isRich ? (
+        {/* Active action:row-hover 時淡入(rich + compact 同 Button xs 統一) */}
+        {hoverAction && (
           <Button
             variant="text"
-            size={deleteBtnSize}
+            size="xs"
             iconOnly
             startIcon={hoverAction.icon}
             aria-label={hoverAction.label}
             onClick={(e) => { e.stopPropagation(); hoverAction.onClick() }}
             className="absolute inset-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
           />
-        ) : (
-          <ItemInlineActionButton
-            icon={hoverAction.icon}
-            size="sm"
-            aria-label={hoverAction.label}
-            onClick={(e) => { e.stopPropagation(); hoverAction.onClick() }}
-            className="absolute inset-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
-          />
-        ))}
+        )}
       </span>
     ) : null
 
     const suffix = (
-      <div className={cn('flex items-center gap-2 shrink-0', suffixAlign)}>
+      <div
+        className={cn(
+          'flex items-center gap-2 shrink-0',
+          suffixAlign,
+          // data-unbounded chrome-canonical trick:let Button xs (24) live inside h-[1lh]
+          // wrapper(compact ~18.2 / rich ~18.2 scanning)without pushing row height。
+          // 視覺/hit area 仍 24,layout footprint 收斂到 1lh。同 overlay-surface
+          // 的 SurfaceHeader dismiss canonical(2026-04-22 v5)。
+          '[&_[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]',
+        )}
+      >
         {status === 'uploading' && isRich && (
           <span className="text-fg-secondary tabular-nums">{progress}%</span>
         )}
@@ -223,7 +222,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
         <div
           ref={ref}
           className={cn(
-            'group/row flex items-start gap-2 px-3 py-2 w-full text-body leading-compact transition-colors',
+            'group/row flex items-start gap-2 px-3 py-3 w-full text-body leading-compact transition-colors',
             'border border-divider rounded-md bg-surface',
             hoverClass,
             className,
@@ -259,7 +258,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       <div
         ref={ref}
         className={cn(
-          'group/row relative flex items-start gap-2 px-3 py-2 w-full text-body leading-compact transition-colors rounded-md',
+          'group/row relative flex items-start gap-2 px-3 py-3 w-full text-body leading-compact transition-colors rounded-md',
           compactStaticBg,
           hoverClass,
           className,

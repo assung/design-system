@@ -2,7 +2,6 @@ import type { Meta } from '@storybook/react'
 import { Trash2 } from 'lucide-react'
 import { FileItem } from './file-item'
 import { Button } from '@/design-system/components/Button/button'
-import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 // 錯誤 description 範例(含 clickable "View log"):consumer 自由 ReactNode,通常用底線 link 表 clickable
 const errorDescWithLog = (
@@ -31,8 +30,11 @@ const noop = () => {}
 // Trash/Delete 非 dismiss 語意(dismiss 嚴格 = X close overlay),不套 `dismiss` prop——
 // Button variant="text" / Inline Action 本來就 fg-muted,視覺已弱化。
 // 詳 item-anatomy.spec.md「Predicate」+「Row action 絕對值 cap」
+// rich + compact 統一 Button xs variant="text"(2026-04-23 canonical):
+// compact row 透過 FileItem 內部 `[&_[data-unbounded]]:my-[calc((1lh-xs)/2)]` trick
+// 讓 Button(24)layout 收斂到 1lh(~18px)不影響 row 高度,觸控範圍仍 24。
 const deleteBtn = <Button size="xs" iconOnly variant="text" startIcon={Trash2} aria-label="刪除" onClick={noop} />
-const deleteBtnXs = <ItemInlineActionButton icon={Trash2} size="sm" aria-label="刪除" onClick={noop} />
+const deleteBtnXs = deleteBtn
 
 export const Rich = {
   name: 'Rich(Type A upload manager)',
