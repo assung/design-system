@@ -13,7 +13,8 @@ import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
  * ── Layout ──
  * px = layout-space-loose, header/footer py = layout-space-tight。
  * Body pt = layout-space-tight, pb = layout-space-bottom。
- * data-density="lg" 讓所有 token 解析為 lg。
+ * Density:繼承 page `data-density`(v5 校準,跟 Sheet 對齊;header 自動對齊
+ * `--chrome-header-height` 48/56)。詳 dialog.spec.md「Density」節。
  *
  * ── Viewport Inset ──
  * Modal 與 viewport 四邊保持 layout-space-bottom (48px) 最小間距。
