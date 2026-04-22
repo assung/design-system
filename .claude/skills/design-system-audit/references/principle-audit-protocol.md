@@ -219,6 +219,16 @@ Ant Design / Carbon / Apple HIG / VS Code / Figma。對每個 example,至少查 
   - 例:Button 5 variant 選擇 predicate 需 per-variant world-class mapping(不只 L74 整體「Material / Polaris 共識」兜底)
   - flag 時區分「predicate 粒度 vs benchmark 粒度」不匹配 = P1 補 pointer
 - **Overlay autoFocus canonical**(2026-04-22 新增)— Portal overlay 元件需檢 autoFocus 行為是否對齊 DS-wide canonical(body first interactive,不是 chrome close X)。詳見下方「Overlay autoFocus canonical」section。
+- **Binary strict rule 震盪 FP**(2026-04-22 新增,CLAUDE.md M12):visual preference 類 rule 被寫成「必 X」或「禁 Y」時,**先驗 ≥3 世界級 DS 一致**再 flag;找得到 counter-example = variance 不是 canonical,這是 AI 最常陷的 FP。
+  - 例:「hover bg 必 flush 容器內邊」— Material / Polaris / Linear list row 多 flush 但非 must,Material Bottom Sheet / Polaris card-in-modal 允許 inset → 不該寫成 strict rule
+  - 例:「chrome close X 必 size=sm」— Dialog / Sheet sm,但 Popover 因輕量浮層用 xs 合法 → 必 per-component context 判
+  - **判斷公式**:strict rule 寫完前自問「我能想出一個 legal 的反例嗎?」→ 能 → relax 成「canonical 偏好 + variance 允許」,不寫 strict
+  - **震盪症狀**:同一概念的 rule 被 A → not A → A 糾正 = meta invariant 沒抓到,停下找 root invariant
+  - **Layer 確認 question**:rule 寫錯 layer(在 variance layer 糾結)是震盪主因。問「真實 invariant 在哪 layer?」通常深一層:
+    - Surface:「bg flush 還是 inset」(bg-edge layer,是 variance)
+    - Root invariant:「content 必在 bg 內有 padding」(content-vs-bg relationship,是 invariant)
+    - 這兩 layer 的規則彼此 orthogonal:bg 邊可以 flush 也可以 inset,**content-inside-bg padding 跟 bg 邊位置無關**,但都必要
+  - **AI 必自己跑此 check,不該靠 user 提醒**:rule 寫「必 / 禁」的瞬間就要觸發 M12 self-check。user 提醒第 3 次還沒 trigger = meta-loop 完全 bypass,違反「自我升級機制」
 
 ---
 

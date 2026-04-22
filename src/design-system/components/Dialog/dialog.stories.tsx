@@ -195,11 +195,12 @@ export const LongContent = {
             <div className="flex flex-col">
               {members.map((m, i) => (
                 // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(mt-0.5 gap)]
-                // 無 px → hover bg flush body padded 邊緣(容器內貼邊合理,chrome 仍保留 loose 呼吸)
+                // `px-2 rounded-md` → content(avatar / text)在 hover bg 內有 8px breathing
+                // (非背景元素不可直接觸 affordance bg 邊 — 真實 invariant,對齊 Material / Polaris 世界級)
                 // description 色 = text-fg-secondary(neutral-8);separator = full-width 「｜」
                 <button
                   key={m.empNum}
-                  className="flex items-center gap-3 py-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
                   <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
                   <div className="flex flex-col min-w-0 flex-1">
@@ -288,10 +289,10 @@ export const ListBody = {
                 { name: 'Ethan Park', role: 'Engineering', empId: 'E-0210', empNum: 'EMP-1005' },
                 { name: 'Fiona Lin', role: 'Design', empId: 'D-0098', empNum: 'EMP-1006' },
               ].map((m) => (
-                // variant="list" canonical v2:item 無 px,rounded-md,hover bg flush body padded edge
+                // variant="list" canonical v3:item `px-2 rounded-md` → content 在 hover bg 內有 breathing
                 <button
                   key={m.empNum}
-                  className="flex items-center gap-3 py-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
                   <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
                   <div className="flex flex-col min-w-0 flex-1">
@@ -331,10 +332,10 @@ export const ListBody = {
           <DialogBody variant="list">
             <div className="flex flex-col">
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
-                // variant="list" canonical v2:item 無 px,hover bg flush body padded edge
+                // variant="list" canonical v3:item `px-2 rounded-md` → text 在 hover bg 內有 breathing
                 <button
                   key={t}
-                  className="flex py-1.5 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left text-body"
+                  className="flex py-1.5 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left text-body"
                 >
                   {t}
                 </button>

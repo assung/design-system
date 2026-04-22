@@ -157,10 +157,11 @@ const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? // 同 DialogBody variant="list" canonical v2(2026-04-22):
-              // body `px-loose + py-2`,item 自己 px=0 + rounded-md → hover bg flush body padded 邊緣
-              // (容器內貼邊合理;chrome 外殼仍保留 loose 呼吸)
-              "px-[var(--layout-space-loose)] py-2"
+            ? // 同 DialogBody variant="list" canonical v3(2026-04-22 校準為真實 invariant):
+              // body `px-(loose-8) + py-2`,item 負責 `px-2 rounded-md`
+              // → hover bg flush body padded 內邊,content 在 hover bg 內有 8px breathing
+              // (content 不可觸 bg 邊 — 對齊 Material / Polaris / Linear list row canonical)
+              "px-[calc(var(--layout-space-loose)-0.5rem)] py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

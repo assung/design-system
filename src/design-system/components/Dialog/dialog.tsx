@@ -158,10 +158,12 @@ interface DialogBodyProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Body 佈局模式。
    * - `default`(預設):body 有 px-loose / pt-tight / pb-bottom,適合 form 或一般內容
-   * - `list`:body 保留 `px-loose`(item 對齊 header title)+ `py-2`(menu group 節奏),
-   *   item 本身 **px=0 rounded-md**,hover bg **flush 對齊 body padded 邊緣**
-   *   (對齊 user 視覺要求:overlay body 中的 list item hover,bg 可以貼齊
-   *   body padded 邊緣——容器內的「貼邊」在此語境合理;chrome 與 body 仍保留 loose 呼吸)
+   * - `list`:body `px-[calc(loose-8px)] py-2`,item 自己 **`px-2 rounded-md`**
+   *   → hover bg 外邊 flush body padded 內邊緣(整片 hover 覆蓋 row)、**content(avatar / text)
+   *   在 hover bg 內仍有 8px horizontal padding**(真實 invariant:非背景元素必有 spacing,
+   *   不可直接觸到 affordance bg 邊 — 2026-04-22 v3 校準,對齊 Material / Polaris / Linear
+   *   / Notion / Slack 世界級 list row 共通 pattern)
+   * - 幾何等式:content left = body px (loose-8) + item px (8) = **loose** from chrome → 對齊 header title ✓
    *
    * List item 本身應遵循 **item-anatomy** 原則:
    * - 純文字 / 簡單 list → MenuItem(Family 1 scanning)或 Family 2 手刻(reading)
@@ -176,12 +178,12 @@ const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? // list mode 2026-04-22 v2(user revision):
-              // - px:`loose`(不再 calc,body padded 邊緣 = 對齊 header title 的位置)
-              //   item 自己 px=0 + rounded-md → hover bg 寬度 = body padded area,視覺 flush 到
-              //   容器內邊。content 位置 = body px = loose,自動對齊 header title ✓
-              // - py-2:menu group 節奏(對齊無 group menu 的 wrap layer py-2)
-              "px-[var(--layout-space-loose)] py-2"
+            ? // list mode 2026-04-22 v3(user Image #24 vs #25 校準為真實 invariant):
+              // - px `calc(loose-8)`:body 把 chrome 推開 loose-8,item 再 px-2 → content 在 chrome 裡總 loose 對齊 header
+              // - py-2:menu group 節奏
+              // - item 負責 px-2 rounded-md → hover bg 寬 = body padded area(flush body padded 內邊);
+              //   **content 在 hover bg 內有 8px breathing**(不直接觸 bg 邊緣 = Image #25 canonical)
+              "px-[calc(var(--layout-space-loose)-0.5rem)] py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

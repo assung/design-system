@@ -92,36 +92,75 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
   都採此 pattern:body 有 gutter,item hover bg 貼滿 gutter 內邊(容器內貼邊合理;chrome 外殼仍保留 loose 呼吸)
 - Item size 對齊 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1 Menu item / Family 2 List item)
 
-**規則 3.1 — Hover bg flush 的 canonical(2026-04-22 新增,v2 2026-04-22 校準)**:
-**Hover bg 必 flush「容器內邊緣」,禁止 inset**。inset 或貼 chrome 邊都是違規。
+**規則 3.1 — 內容元素與 affordance bg 的 spacing invariant(2026-04-22 v3 校準為真實 invariant)**:
 
-**正確認知**「貼邊」的兩種情境:
+**真實 invariant(CLAUDE.md M11 canonical,Image #25 證實的)**:
+**Content 元素(text / icon / avatar / control)不可直接觸到 affordance bg(hover bg / selected bg / row highlight)的邊緣**——**必有 padding 在 bg 內**。content 貼 bg 邊 = 違規(視覺像 content 被擠到 bg 邊,失去 row 的視覺 structure);bg 邊緣則本身有設計自由(flush 容器 / inset 容器皆合法,依 DS 一致性)。
 
-| Context | 判定 | Rationale |
-|---------|------|-----------|
-| Hover bg flush **容器內邊緣**(body padded area 的內邊、card 內部、sidebar nav padded area 內邊) | ✅ **合法,且是 canonical**(必 flush) | 世界級 Linear / Notion / Figma / Slack / Material M3 / Polaris 的 overlay list item hover 一律 flush 到容器 padded 內邊緣,row 的 full-width 可點擊感才成立 |
-| Hover bg **inset** 容器內邊緣(兩側留 gutter 沒填滿) | ❌ **違規**(視覺「縮在中間」,破壞 row 可點擊感) | inset 會讓 hover 看起來像「只對 row 的中段反應」,違反 row = full-width click target 的心智模型 |
-| Hover bg 貼 **chrome 外殼邊**(dialog border / sheet border / page edge) | ❌ **違規**(視覺被裁切) | chrome 外殼是浮層的「框」,hover bg 貼死會失去「列表 vs 外殼」的層次 |
+**Layer 區分**(重要心智結構):
+| Layer | 元素類型 | Spacing 規則 |
+|-------|---------|-------------|
+| 1. Chrome 外殼 | dialog / sheet / popover border | 自己 `px-loose` gutter 推開內容 |
+| 2. 背景 affordance | hover bg / selected bg / divider | bg 邊位置**有自由**(flush body padded 內邊 / inset 皆合法);**但 bg 寬度必比 content 寬,讓 content 在 bg 內有 breathing** |
+| 3. Content 元素 | text / icon / avatar / control | **必有 padding 在 bg 內**(不可觸 bg 邊);content 之間也必 gap |
 
-**Layer 區分**:
-- Chrome 外殼(dialog / sheet / popover border)— hover bg 不能貼到這裡(chrome 本身有 `px-loose` gutter 把 hover bg 推離外殼)
-- **Body padded 容器內邊緣**(chrome 的 `px-loose` 結束的位置,即 body padded area 的內邊)— hover bg 必 flush 到這裡
-- Item content 內距(item 自己的 text / icon 到 item box 邊的距離)— 由 item-anatomy 規則處理
+**世界級 benchmark**(≥5 家一致,content-inside-bg 是 invariant):
+- Material M3 List / MenuItem:item 內 horizontal padding = 16,hover bg 寬 = full row,**content 在 bg 內有 16px breathing**
+- Polaris ResourceList / OptionList:item padding 12-16,hover bg full row,content inside
+- Linear command palette / member list:item padding 8,hover bg full row,content inside
+- Slack channel list / DM list:item padding 12,hover bg full row,content inside
+- Notion page list:item padding 6-8,hover bg full row,content inside
+- GitHub Primer ActionList:item padding 8,hover bg full row,content inside
 
-**實作等式**(為什麼 `body px-loose + item px-0` 會產生 canonical flush):
+**共通 pattern**:hover bg 是 affordance layer,content 永遠在 bg 內有 breathing。不同 DS 的 bg 邊位置(flush body / inset body)有選擇空間,但 **content-inside-bg padding 是 invariant**。
+
+**本 DS canonical 實作**(`DialogBody variant="list"` / `SheetBody variant="list"`):
 ```
-chrome 外殼邊 ─────── [ loose gutter ] ─────── body padded 內邊 ─────── item box ─────── body padded 內邊 ─────── [ loose gutter ] ─────── chrome 外殼邊
-                                                          ↑              ↑
-                                                 hover bg 左邊        hover bg 右邊(flush)
+chrome ──── [ loose gutter ] ──── body padded 內邊 ──── [ 8px breathing ] ──── content
+                                        ↑                          ↑
+                                 hover bg 左邊          content(avatar / text)
+                                 (flush body padded)
 ```
-- 若 item 加 `px-N`,hover bg 就會 inset N px from body padded 內邊 = 違規
-- 若 body 減 `px-(loose-N)`,hover bg 就會貼近 chrome 邊 N px = 違規
-- **Canonical = body `px-loose` + item `px-0` + item `rounded-md`**(rounded 讓 hover 內邊緣有柔和轉折)
+- body `px-[calc(loose-8)]`、item `px-2 rounded-md`
+- hover bg 邊緣 = body padded 內邊(flush,chrome 有 loose-8 呼吸)
+- content 在 hover bg 內有 8px breathing(**不可觸 bg 邊**)
+- content left = body (loose-8) + item 8 = **loose** from chrome → 對齊 header title ✓
 
-**判斷 checklist(改完 UI 走 M11 state walk 時必跑)**:
-1. hover 元素的「直接 container」是什麼?(body padded area / card 內 / sidebar padded area)
-2. hover bg 左右兩邊是否 flush 到這個 container 的 padded 內邊?
-3. Flush ✓ → OK;Inset / 貼 chrome ✗ → 修
+**M11 state walk hover 檢查**(真正要問的):
+1. **Content 內嵌**:text / icon / avatar 距 hover bg 邊 ≥ N(通常 8px)? ← **invariant,最重要**
+2. **Hover 區覆蓋整列**:整 row 可 click?
+3. **bg 邊位置**:flush body padded 內邊(本 DS canonical)/ inset(選擇 alt)— 兩者皆合法,不是違規判斷點
+
+**Consumer 範例**:
+
+```tsx
+// ✅ canonical(2026-04-22 v3):Dialog 放 contact picker
+<Dialog>
+  <DialogContent>
+    <DialogHeader>...</DialogHeader>
+    <DialogBody variant="list">  {/* body:px-[calc(loose-8)] + py-2 */}
+      <div className="flex flex-col">
+        {contacts.map(c => (
+          {/* item `px-2 rounded-md` → content 在 hover bg 內有 8px breathing */}
+          <button className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover">
+            <Avatar size={40} />  {/* Family 2 block mode avatar */}
+            <div>
+              {c.name}
+              {/* title↔desc 2px gap,desc 色 fg-secondary */}
+              <p className="mt-0.5 text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </DialogBody>
+  </DialogContent>
+</Dialog>
+```
+
+**常見違規(M12 FP 記憶)**:
+- ❌ 寫 "hover bg 必 flush" / "hover bg 必 inset" = 把 bg 邊位置(variance)誤升級成 strict rule(震盪 anti-pattern)
+- ❌ item `px=0` 讓 content 直接觸 hover bg 邊(Image #24 pattern)= 違反 content-inside-bg 真 invariant
+- ✅ 真實 invariant = 「content 必在 bg 內有 padding」,bg 邊位置留給 DS 一致性選擇
 
 **規則 4 — 對稱**:
 - 對稱 pt=pb(避免「頂貼邊、底留空」非對稱斷裂)
@@ -136,15 +175,15 @@ chrome 外殼邊 ─────── [ loose gutter ] ─────── bo
 ### Consumer 範例
 
 ```tsx
-// ✅ canonical(2026-04-22 v2):Dialog 放 contact picker
+// ✅ canonical(2026-04-22 v3):Dialog 放 contact picker
 <Dialog>
   <DialogContent>
     <DialogHeader>...</DialogHeader>
-    <DialogBody variant="list">  {/* body:px-loose + py-2 */}
+    <DialogBody variant="list">  {/* body:px-[calc(loose-8)] + py-2 */}
       <div className="flex flex-col">
         {contacts.map(c => (
-          {/* item 無 px + rounded-md → hover bg flush body padded 邊緣 */}
-          <button className="flex items-center gap-3 py-2 rounded-md hover:bg-neutral-hover">
+          {/* item `px-2 rounded-md` → content 在 hover bg 內有 8px breathing(不可觸 bg 邊) */}
+          <button className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover">
             <Avatar size={40} /> {/* Family 2 block mode avatar */}
             <div>
               {c.name}
