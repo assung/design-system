@@ -306,15 +306,29 @@ async function auditScenario(browser, scenario, opts = {}) {
 
   try {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 45_000 })
-    await page.mouse.move(0, 0) // avoid mouse hovering an icon-only trigger auto-showing tooltip in snapshot
-    await page.waitForTimeout(600) // animations + font settle
-    // Blur active element — overlays with autoFocus (Radix Dialog / Popover) focus on close button,
-    // and icon-only Button's focus-triggered tooltip would appear in the snapshot
-    await page.evaluate(() => {
-      const el = document.activeElement
-      if (el && 'blur' in el && typeof el.blur === 'function') el.blur()
-    })
-    await page.waitForTimeout(200) // let tooltip dismiss
+
+    // Interactive stories(hover / focus / tooltip / click / item-hover 等)透過 play() 設定狀態,
+    // 不可被 reset 覆蓋。用 story id 關鍵字偵測(keyword-based),tagged 以外 fallback keyword match。
+    const storyId = scenario.id ?? ''
+    // 匹配 story id 含 interactive keywords(anywhere after '--'),不限於結尾
+    const isInteractive =
+      /--[a-z-]*(hover|focus|tooltip|click|interactive|pressed|active|swap|open-snapshot)[a-z-]*$/i.test(storyId)
+
+    if (!isInteractive) {
+      await page.mouse.move(0, 0) // avoid mouse hovering an icon-only trigger auto-showing tooltip in snapshot
+    }
+    await page.waitForTimeout(isInteractive ? 1200 : 600) // interactive stories 需更長等 play() + animations 結束
+
+    if (!isInteractive) {
+      // Blur active element — overlays with autoFocus (Radix Dialog / Popover) focus on close button,
+      // and icon-only Button's focus-triggered tooltip would appear in the snapshot
+      await page.evaluate(() => {
+        const el = document.activeElement
+        if (el && 'blur' in el && typeof el.blur === 'function') el.blur()
+      })
+      await page.waitForTimeout(200) // let tooltip dismiss
+    }
+
     await page.screenshot({
       path: join(OUT_DIR, scenario.file),
       fullPage: false,

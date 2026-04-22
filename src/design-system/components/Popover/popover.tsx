@@ -110,17 +110,24 @@ const PopoverFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 )
 PopoverFooter.displayName = "PopoverFooter"
 
-// PopoverTitle(2026-04-22 v3:overlay family canonical 統一):`text-body-lg font-medium`
-// 跟 Dialog / Sheet 對齊 — overlay chrome title typography 一致,避免跨 overlay primitive 漂移。
-// density 鎖 md 仍成立(popover.spec.md),但跟 title 字級獨立 — title 字級是 overlay family 共通
-// canonical,不以 modal/non-modal 區分。
+// PopoverTitle(2026-04-22 v4 non-modal canonical):`text-body font-medium`(14px)
+// Rationale:Popover / Coachmark 屬 **non-modal 輕量浮層**,跟 density 鎖 md 同源的視覺語言 —
+// chrome 全體輕量:
+//   - density 鎖 md(不隨 page 放大)
+//   - dismiss X 透過 v5 unbounded trick layout 佔位 24
+//   - **title `text-body`(14px)跟 Dialog / Sheet modal 的 body-lg(16px)形成重量級 vs 輕量級視覺區分**
+// 世界級對照:Figma / Notion / Linear / Material 的 popover / filter panel / inline settings
+// 的 header title 多半比 modal dialog title 小一級(16→14 或同比),視覺宣告「此浮層可忽略」
+//
+// Coachmark 同樣消費 PopoverTitle 作 header 小標籤(如 "新功能介紹" / "Tip 1 of 3"),
+// CoachmarkBody 的主 title 另走 text-body-lg(見 coachmark.tsx L178)。
 const PopoverTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
   <h2
     ref={ref}
-    className={cn("text-body-lg font-medium truncate", className)}
+    className={cn("text-body font-medium truncate", className)}
     {...props}
   />
 ))
