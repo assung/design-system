@@ -54,6 +54,7 @@ export const PersonNameCard: Story = {
                 { label: 'Timezone', value: 'UTC+8 台北' },
                 { label: 'Employee #', value: 'E-4821' },
               ]}
+              onViewMore={() => {}}
             />
           </HoverCardContent>
         </HoverCard>
