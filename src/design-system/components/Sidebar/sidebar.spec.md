@@ -281,7 +281,7 @@ Modal header 用 **padding-based**（`py-3` + content），因為 modal 是 ephe
 
 - 頂部 bar 跨整個畫面寬度(包含 sidebar 跟 main content 的水平範圍)
 - Sidebar 在 top bar **下方**,只佔頁面剩餘高度
-- **Trigger 位置**:top bar 的最左(視覺上看起來「在 sidebar 上方」,但實際上是 top bar 的一部分,top bar 永遠存在,所以 offcanvas 收掉 sidebar 後 trigger 仍然在)
+- **Trigger 位置**:top bar 的最左(視覺位置在 sidebar 上方對齊,實際屬於 top bar 的一部分;top bar 永遠存在,所以 offcanvas 收掉 sidebar 後 trigger 仍然在)
 - **代表**:**Gmail / Google Calendar / Google Drive / Material Design apps** / 多數企業 dashboard
 
 ### 判斷:trigger 在哪 = top bar 在哪

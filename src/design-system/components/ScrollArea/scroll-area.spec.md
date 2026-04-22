@@ -19,7 +19,7 @@ Native scrollbar 跨 OS 不一致:
 | macOS | Overlay——不吃寬度,預設隱藏,捲動時浮出 |
 | Windows / Linux | Always-visible——永遠吃 ~15–17px 寬度 |
 
-**結果**:同一個 DataTable 橫向捲動、Sheet / Dialog 內容垂直捲動在 macOS 看起來對齊,在 Windows 右側被 scrollbar 吃 17px 跑版。「Left pinned + Row Actions」的 DataTable 截圖即是此類 bug。
+**結果**:同一個 DataTable 橫向捲動、Sheet / Dialog 內容垂直捲動在 macOS 視覺對齊,在 Windows 右側被 scrollbar 吃 17px 跑版。「Left pinned + Row Actions」的 DataTable 截圖即是此類 bug。
 
 ScrollArea 用 Radix 自訂 overlay 捲軸 → **跨 OS 一致、不吃寬度、捲動時浮出(hover / scroll 自動顯示)**。
 

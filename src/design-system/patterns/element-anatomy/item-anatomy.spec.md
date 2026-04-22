@@ -61,7 +61,7 @@
 | `Notice`（→ `Alert` / `Toast`） | `components/Notice/notice.tsx` | 語意為 notification 而非 row collection,但**視覺排版遵循 Family 2**確保跨元件視覺語言一致 |
 | `SelectionItem` variant | `components/SelectionControl/selection-item.tsx` | Prefix 是 selection control（Checkbox / Radio indicator），用於頁面 RadioGroup / Checkbox group |
 
-**為什麼 Notice 是 Family 2（即使語意不同）**：Notice / Alert / Toast 的 `[icon] [title + description] [action buttons / dismiss]` 結構就是 List item layout 的 prefix / content / suffix——語意不同（通知 vs 列表），但**結構和排版原則必須一致**，否則同個系統內會看到兩套「看起來一樣但規則不同」的版面，跨元件視覺語言漂移。
+**為什麼 Notice 是 Family 2（即使語意不同）**：Notice / Alert / Toast 的 `[icon] [title + description] [action buttons / dismiss]` 結構就是 List item layout 的 prefix / content / suffix——語意不同（通知 vs 列表），但**結構和排版原則必須一致**，否則同個系統內會產生兩套表面形式相同但規則不同的版面,跨元件視覺語言漂移。
 
 **SelectionItem variant 特徵**：prefix slot 放 Checkbox/Radio indicator（而非 icon/avatar），其餘結構完全遵循 Family 2。RadioGroup / Checkbox group 在頁面上直接展開使用時走此 variant。
 
@@ -1170,7 +1170,7 @@ hook `check_story_anatomy.sh` 規則 B 已在 stories 層攔 label Button 作 di
 
 理由:
 - 既有 prop 背後綁定 **canonical token**(`bg-neutral-selected` / `border-primary-hover` 等),一改全系統同步
-- `className` 自創樣式繞過 canonical,導致「同一狀態在不同元件看起來不同」的視覺漂移
+- `className` 自創樣式繞過 canonical,導致「同一狀態在不同元件產生視覺分歧」的跨元件漂移
 - 既有 prop 通常也綁 ARIA attributes(`aria-selected` / `aria-checked` 等),自創樣式會丟失 a11y 語意
 
 #### 真實犯錯紀錄

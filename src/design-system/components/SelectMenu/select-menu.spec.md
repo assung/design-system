@@ -44,7 +44,7 @@ Popover（浮動容器，handle 展開 / 定位）
 
 **定位**:SelectMenu 的 `sideOffset` 與 `align` 直接走 Popover canonical——`sideOffset=8` / `align` 跟隨 trigger 位置(見 `../Popover/popover.spec.md`「Align 對齊 canonical(跨浮層 SSOT)」)。SelectMenu 不自訂浮層定位規則。
 
-**視覺 vs 語意**(2026-04-20 精緻化):SelectMenu 的 **width 預設跟 trigger(input)同寬**(Radix trigger-width),此時 `start` / `center` / `end` 三種 align 視覺上看起來完全相同(popover 正好跟 input 貼合,左右邊緣對齊無差異)。但當 consumer 傳 `minWidth` 大於 input 寬度(例:長 option label 要空間展示)、或 option 內容撐開導致 popover 寬於 trigger,**align 的視覺差異立刻顯現**——此時嚴格照 structured overlay canonical(trigger 在左 → start / 中 → center / 右 → end)。
+**視覺 vs 語意**(2026-04-20 精緻化):SelectMenu 的 **width 預設跟 trigger(input)同寬**(Radix trigger-width),此時 `start` / `center` / `end` 三種 align 呈現視覺完全相同(popover 正好跟 input 貼合,左右邊緣對齊無差異)。但當 consumer 傳 `minWidth` 大於 input 寬度(例:長 option label 要空間展示)、或 option 內容撐開導致 popover 寬於 trigger,**align 的視覺差異立刻顯現**——此時嚴格照 structured overlay canonical(trigger 在左 → start / 中 → center / 右 → end)。
 
 換言之 SelectMenu **永遠照 canonical**,只是大多數情況 width=trigger-width 讓 canonical 視覺上被 mask,一旦 popover 突破 trigger 寬度 canonical 立刻生效。規則沒例外,只是呈現條件。
 

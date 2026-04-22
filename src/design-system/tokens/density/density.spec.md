@@ -110,4 +110,4 @@ document.documentElement.setAttribute('data-layout-space', 'md')
 
 - ❌ 元件同時設 `data-density` + `data-ui-size`(重複,以後者為準但混亂)
 - ❌ Overlay Portal 元件不自設 density(Portal 到 body 不繼承 trigger — 見 Meta-Pattern M3)
-- ❌ 為了「看起來 consistent」硬把 Dialog button 綁 lg ui-size(犧牲 header 高度 / strapline 彈性)
+- ❌ 為了追求表面一致性硬把 Dialog button 綁 lg ui-size(犧牲 header 高度 / strapline 彈性)

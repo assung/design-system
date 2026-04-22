@@ -283,7 +283,7 @@ Padding-based 套用在 overlay family 時,配合 **v5 data-unbounded layout-slo
 - SurfaceHeader / SurfaceFooter 的 CSS rule 對 `[data-unbounded]` 套負 my `calc((--field-height-xs - --field-height-sm) / 2)` → md -2px / lg -4px
 - 效果:Button native size + touch target 不變(sm 28/32),layout 佔位縮到 24
 - Header 只有 unbounded control 時高度 = 24 + 2×tight = 48 md / 56 lg = `--chrome-header-height` ✓
-- Header 塞 bounded control(primary / tertiary,無 `data-unbounded`)→ 自然長高(bounded 的視覺邊界讓 padding 看起來合理)
+- Header 塞 bounded control(primary / tertiary,無 `data-unbounded`)→ 自然長高(bounded 的視覺邊界讓 padding 比例合理)
 
 **完整細節 + 震盪歷史備忘**:`patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」
 
@@ -293,7 +293,7 @@ Padding-based 套用在 overlay family 時,配合 **v5 data-unbounded layout-slo
 
 - **Fixed-height 套到能 grow 的 chrome**(e.g. 把 Dialog 改 fixed-h 48):DialogDescription 被剪切 → 違反 modal 作為完整決策 context 的職責
 - **Padding-based 套到剛性 chrome**(e.g. 把 Sidebar header 改 padding-based):長 workspace 名稱時 chrome 跳動 → 違反 sidebar 剛性佈局職責
-- **overlay 用 xs dismiss(size 而非 layout-slot trick)**:touch target 變 24 違反 a11y,且看起來小失禮 — v5 trick 同時保視覺 + a11y + 幾何
+- **overlay 用 xs dismiss(size 而非 layout-slot trick)**:touch target 變 24 違反 a11y,且 dismiss 按鈕尺寸與 overlay chrome 比例不協調 — v5 trick 同時保視覺 + a11y + 幾何
 
 ---
 
