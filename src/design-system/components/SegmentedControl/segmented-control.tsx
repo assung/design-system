@@ -105,15 +105,15 @@ const SegmentedControl = React.forwardRef<
       sizeProp ?? (fieldCtx?.size as SegmentedControlSize) ?? 'md'
     const resolvedDisabled = disabled || !!fieldCtx?.disabled
 
+    // Memoize provider value(2026-04-22 D3 perf audit):避免每次父 render 重建 4-field object
+    // 讓 children SegmentedControlItem 不必要 re-render
+    const ctxValue = React.useMemo(
+      () => ({ size: resolvedSize, fullWidth, iconOnly, disabled: resolvedDisabled }),
+      [resolvedSize, fullWidth, iconOnly, resolvedDisabled],
+    )
+
     return (
-      <SegmentedControlContext.Provider
-        value={{
-          size: resolvedSize,
-          fullWidth,
-          iconOnly,
-          disabled: resolvedDisabled,
-        }}
-      >
+      <SegmentedControlContext.Provider value={ctxValue}>
         <ToggleGroupPrimitive.Root
           ref={ref}
           type="single"

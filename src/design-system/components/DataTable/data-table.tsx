@@ -82,12 +82,45 @@ const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)',
 const HEADER_BG = 'bg-muted'
 
 // ── TruncateCell ─────────────────────────────────────────────────────────────
+// Shared ResizeObserver(2026-04-22 D3 perf audit):從 per-cell RO 改為全 DS 共用一個 RO
+// dispatch 到 per-element callback。10 col × 100 row = 1 RO(before:1000 RO)。
+// 跨 OS 一致的 RO 行為;element 卸載時 cleanup。
+
+type RoCallback = (entry: ResizeObserverEntry) => void
+let sharedResizeObserver: ResizeObserver | null = null
+const roCallbacks = new WeakMap<Element, RoCallback>()
+
+function getSharedRO(): ResizeObserver {
+  if (sharedResizeObserver) return sharedResizeObserver
+  sharedResizeObserver = new ResizeObserver((entries) => {
+    entries.forEach((entry) => {
+      const cb = roCallbacks.get(entry.target)
+      if (cb) cb(entry)
+    })
+  })
+  return sharedResizeObserver
+}
+
+function observeShared(el: Element, cb: RoCallback): () => void {
+  const obs = getSharedRO()
+  roCallbacks.set(el, cb)
+  obs.observe(el)
+  return () => {
+    roCallbacks.delete(el)
+    obs.unobserve(el)
+  }
+}
 
 function TruncateCell({ children, className }: { children: React.ReactNode; className?: string }) {
   const ref = React.useRef<HTMLSpanElement>(null)
   const [isTruncated, setIsTruncated] = React.useState(false)
-  const check = React.useCallback(() => { const el = ref.current; if (el) setIsTruncated(el.scrollWidth > el.clientWidth) }, [])
-  React.useEffect(() => { check(); const obs = new ResizeObserver(check); if (ref.current) obs.observe(ref.current); return () => obs.disconnect() }, [check])
+  React.useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const check = () => setIsTruncated(el.scrollWidth > el.clientWidth)
+    check()
+    return observeShared(el, check)
+  }, [])
   const span = <span ref={ref} className={cn('truncate min-w-0', className)}>{children}</span>
   if (!isTruncated) return span
   return <Tooltip><TooltipTrigger asChild>{span}</TooltipTrigger><TooltipContent>{children}</TooltipContent></Tooltip>
@@ -191,14 +224,34 @@ function DataTableInner<TData>(
 
   const rowHeight = `h-table-row-${size}`
 
-  // ── Cross-region row hover ──
-  const onRowEnter = React.useCallback((idx: number) => {
-    tableRef.current?.querySelectorAll(`[data-row-index="${idx}"]`).forEach(el => (el as HTMLElement).dataset.hovered = '')
-  }, [])
-  const onRowLeave = React.useCallback((idx: number) => {
-    tableRef.current?.querySelectorAll(`[data-row-index="${idx}"]`).forEach(el => delete (el as HTMLElement).dataset.hovered)
-  }, [])
-  const hoverProps = (idx: number) => enableHover ? { onMouseEnter: () => onRowEnter(idx), onMouseLeave: () => onRowLeave(idx) } : {}
+  // ── Cross-region row hover (2026-04-22 D3 perf audit):event delegation 改 per-row closure
+  // 舊:每 row 建 `{ onMouseEnter, onMouseLeave }` + 2 arrow functions → 100 row = 200 closures/render
+  // 新:表格層 single onMouseOver / onMouseOut,透過 event.target.closest 找 data-row-index
+  const enterLeaveHandlers = React.useMemo(() => {
+    if (!enableHover) return { onMouseOver: undefined, onMouseOut: undefined }
+    const findRowIndex = (target: EventTarget | null): string | null => {
+      if (!(target instanceof HTMLElement)) return null
+      const rowEl = target.closest<HTMLElement>('[data-row-index]')
+      return rowEl?.dataset.rowIndex ?? null
+    }
+    return {
+      onMouseOver: (e: React.MouseEvent) => {
+        const idx = findRowIndex(e.target)
+        if (idx == null) return
+        tableRef.current?.querySelectorAll(`[data-row-index="${idx}"]`).forEach((el) => ((el as HTMLElement).dataset.hovered = ''))
+      },
+      onMouseOut: (e: React.MouseEvent) => {
+        const idx = findRowIndex(e.target)
+        if (idx == null) return
+        // 仍在同一 row 的子元素間 bubble(e.g. cell → text node)則 relatedTarget 還在 row 內
+        const related = e.relatedTarget instanceof HTMLElement ? e.relatedTarget.closest<HTMLElement>('[data-row-index]') : null
+        if (related?.dataset.rowIndex === idx) return
+        tableRef.current?.querySelectorAll(`[data-row-index="${idx}"]`).forEach((el) => delete (el as HTMLElement).dataset.hovered)
+      },
+    }
+  }, [enableHover])
+  // 維持 API:hoverProps(idx) 仍存在但 no-op,實際邏輯搬到 table 層 delegation
+  const hoverProps = (_idx: number): Record<string, never> => ({})
 
   // ── Cell render ──
   const renderCellContent = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number]) => {
@@ -350,6 +403,8 @@ function DataTableInner<TData>(
       data-table-size={size}
       className={cn(dataTableVariants({ bordered }), className)}
       role="table" aria-rowcount={rows.length + 1}
+      onMouseOver={enterLeaveHandlers.onMouseOver}
+      onMouseOut={enterLeaveHandlers.onMouseOut}
       {...props}
     >
       {/* ══ HEADER（固定頂部，不在 scroll 內）══ */}

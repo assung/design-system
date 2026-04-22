@@ -82,8 +82,11 @@ interface BreadcrumbListProps extends React.ComponentPropsWithoutRef<'ol'> {
 }
 
 const BreadcrumbList = React.forwardRef<HTMLOListElement, BreadcrumbListProps>(
-  ({ className, size = 'md', ...props }, ref) => (
-    <BreadcrumbContext.Provider value={{ size }}>
+  ({ className, size = 'md', ...props }, ref) => {
+    // Memoize provider value(2026-04-22 D3 perf audit):單 field wrapper memoize
+    const ctxValue = React.useMemo(() => ({ size }), [size])
+    return (
+    <BreadcrumbContext.Provider value={ctxValue}>
       <ol
         ref={ref}
         // gap-1 (4px) — separator 與兩邊 items 間距;緊湊節奏,符合 breadcrumb 密集流動感
@@ -95,7 +98,8 @@ const BreadcrumbList = React.forwardRef<HTMLOListElement, BreadcrumbListProps>(
         {...props}
       />
     </BreadcrumbContext.Provider>
-  )
+    )
+  },
 )
 BreadcrumbList.displayName = 'BreadcrumbList'
 

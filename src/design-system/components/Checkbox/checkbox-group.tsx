@@ -65,9 +65,12 @@ export interface CheckboxGroupProps extends React.HTMLAttributes<HTMLDivElement>
   orientation?: 'vertical' | 'horizontal'
 }
 
+// Module-level 常數(2026-04-22 D3 perf audit):provider value 無狀態,hoist 避免 render 重建
+const CHECKBOX_GROUP_CTX_VALUE = { inGroup: true } as const
+
 const CheckboxGroup = React.forwardRef<HTMLDivElement, CheckboxGroupProps>(
   ({ className, orientation = 'vertical', ...props }, ref) => (
-    <CheckboxGroupContext.Provider value={{ inGroup: true }}>
+    <CheckboxGroupContext.Provider value={CHECKBOX_GROUP_CTX_VALUE}>
       <div
         ref={ref}
         role="group"

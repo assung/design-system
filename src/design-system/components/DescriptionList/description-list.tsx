@@ -62,8 +62,10 @@ const colsClass: Record<number, string> = {
 const DescriptionList = React.forwardRef<HTMLDListElement, DescriptionListProps>(
   ({ cols = 1, direction = 'vertical', divided = false, className, ...props }, ref) => {
     const isHorizontal = direction === 'horizontal'
+    // Memoize provider value(2026-04-22 D3 perf audit):避免每 render 重建 2-field object
+    const ctxValue = React.useMemo(() => ({ direction, divided }), [direction, divided])
     return (
-      <DescriptionContext.Provider value={{ direction, divided }}>
+      <DescriptionContext.Provider value={ctxValue}>
         <dl
           ref={ref}
           className={cn(

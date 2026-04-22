@@ -133,22 +133,37 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
 )
 Notice.displayName = 'Notice'
 
+// Singleton MutationObserver + subscription fan-out(2026-04-22 D3 perf audit):
+// 先前每個 useInverseTheme consumer(Alert / Toast / Notice instance 等)各建一個 MO,
+// N 個 Notice = N 個 observers。singleton 共用一個 MO + pub/sub 讓 theme swap 只做一次 DOM read。
+let themeObserverStarted = false
+const themeSubscribers = new Set<() => void>()
+
+function getInverseTheme(): 'dark' | 'light' {
+  if (typeof document === 'undefined') return 'dark'
+  const current = document.documentElement.getAttribute('data-theme') ?? 'light'
+  return current === 'dark' ? 'light' : 'dark'
+}
+
+function startThemeObserver() {
+  if (themeObserverStarted || typeof document === 'undefined') return
+  themeObserverStarted = true
+  const root = document.documentElement
+  const observer = new MutationObserver(() => {
+    themeSubscribers.forEach((cb) => cb())
+  })
+  observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+}
+
+function subscribe(cb: () => void): () => void {
+  startThemeObserver()
+  themeSubscribers.add(cb)
+  return () => themeSubscribers.delete(cb)
+}
+
 export function useInverseTheme(): 'dark' | 'light' {
-  const [inverse, setInverse] = React.useState<'dark' | 'light'>('dark')
-
-  React.useEffect(() => {
-    const root = document.documentElement
-    const update = () => {
-      const current = root.getAttribute('data-theme') ?? 'light'
-      setInverse(current === 'dark' ? 'light' : 'dark')
-    }
-    update()
-    const observer = new MutationObserver(update)
-    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => observer.disconnect()
-  }, [])
-
-  return inverse
+  // useSyncExternalStore canonical (React 18+):單一 external source 被 N consumers 訂閱
+  return React.useSyncExternalStore(subscribe, getInverseTheme, getInverseTheme)
 }
 
 export { Notice }

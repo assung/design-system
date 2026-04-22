@@ -52,9 +52,11 @@ const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
   ({ id, className, children, config, ...props }, ref) => {
     const uniqueId = React.useId()
     const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`
+    // Memoize provider value(2026-04-22 D3 perf audit):避免 render 重建 wrapper object
+    const ctxValue = React.useMemo(() => ({ config }), [config])
 
     return (
-      <ChartContext.Provider value={{ config }}>
+      <ChartContext.Provider value={ctxValue}>
         <div
           ref={ref}
           data-chart={chartId}

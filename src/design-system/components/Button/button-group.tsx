@@ -35,12 +35,16 @@ interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   align?: 'start' | 'center' | 'end'
 }
 
+// Module-level 常數(2026-04-22 D3 perf audit):provider value 為 2 狀態 boolean,hoist 避免 render 重建
+const BUTTON_GROUP_CTX_VERTICAL = { fullWidth: true } as const
+const BUTTON_GROUP_CTX_HORIZONTAL = { fullWidth: false } as const
+
 const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonGroupProps>(
   ({ direction = 'horizontal', align = 'start', className, children, ...props }, ref) => {
     const isVertical = direction === 'vertical'
 
     return (
-      <ButtonGroupContext.Provider value={{ fullWidth: isVertical }}>
+      <ButtonGroupContext.Provider value={isVertical ? BUTTON_GROUP_CTX_VERTICAL : BUTTON_GROUP_CTX_HORIZONTAL}>
         <div
           ref={ref}
           className={cn(
