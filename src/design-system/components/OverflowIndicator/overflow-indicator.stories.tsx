@@ -2,6 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { OverflowIndicator } from './overflow-indicator'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
+import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+
+/** Person avatar hover canonical helper — 對齊 avatar.spec.md DS-wide rule:person avatar 必 hover → NameCard */
+const personHoverCard = (p: { name: string }) => (
+  <NameCard name={p.name} actions={<NameCardDefaultActions />} />
+)
 
 const meta: Meta<typeof OverflowIndicator> = {
   title: 'Design System/Internal/OverflowIndicator/展示',
@@ -80,7 +86,7 @@ export const AvatarStackOverflow: Story = {
       <div className="flex items-center">
         {reviewers.slice(0, 3).map((p, i) => (
           <span key={p.name} className={i > 0 ? '-ml-1.5' : ''}>
-            <Avatar alt={p.name} color={p.color} size={24} />
+            <Avatar alt={p.name} color={p.color} size={24} hoverCard={personHoverCard(p)} />
           </span>
         ))}
         <span className="-ml-1.5">
@@ -88,7 +94,7 @@ export const AvatarStackOverflow: Story = {
             <div className="flex flex-col gap-1 min-w-[160px] text-caption">
               {reviewers.slice(3).map((p) => (
                 <div key={p.name} className="flex items-center gap-2">
-                  <Avatar alt={p.name} color={p.color} size={20} />
+                  <Avatar alt={p.name} color={p.color} size={20} hoverCard={personHoverCard(p)} />
                   <span>{p.name}</span>
                 </div>
               ))}
@@ -225,7 +231,7 @@ export const TableRowAssignees: Story = {
                   <div className="flex items-center">
                     {visible.map((p, i) => (
                       <span key={p.name} className={i > 0 ? '-ml-1.5' : ''}>
-                        <Avatar alt={p.name} color={p.color} size={20} />
+                        <Avatar alt={p.name} color={p.color} size={20} hoverCard={personHoverCard(p)} />
                       </span>
                     ))}
                     {hidden.length > 0 && (
@@ -234,7 +240,7 @@ export const TableRowAssignees: Story = {
                           <div className="flex flex-col gap-1 min-w-[140px]">
                             {hidden.map((p) => (
                               <div key={p.name} className="flex items-center gap-2">
-                                <Avatar alt={p.name} color={p.color} size={20} />
+                                <Avatar alt={p.name} color={p.color} size={20} hoverCard={personHoverCard(p)} />
                                 <span>{p.name}</span>
                               </div>
                             ))}

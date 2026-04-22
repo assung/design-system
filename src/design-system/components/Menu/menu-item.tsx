@@ -241,6 +241,7 @@ const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
                 src={avatar.src}
                 alt={avatar.alt}
                 color={avatar.color}
+                hoverCard={avatar.hoverCard}
                 size={avatarPx}
               />
             )}

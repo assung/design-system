@@ -10,19 +10,22 @@ import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Switch } from '@/design-system/components/Switch/switch'
 import { MenuItem } from '@/design-system/components/Menu/menu-item'
 import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * 通知設定 — variant="list" 中 item(title + desc + right-side Switch)
  * in-modal 直接設定 pattern(對齊 Gmail 通知設定 / macOS Sys Prefs / Notion prefs)
  *
- * **Item-anatomy 套用(2026-04-22 v2 修正)**:
+ * **Item-anatomy Family 2 reading mode 套用(2026-04-22 v3 修正,user 指出 Switch 是 suffix)**:
  * - Row 結構 = Family 2 reading(無 prefix、content: title+desc、suffix: Switch)
- * - title / description gap = `mt-0.5`(2px)— 對齊 item-anatomy「label+desc 2px」canonical
- * - description 色 = `text-fg-secondary`(neutral-8)— 對齊 item-anatomy 預設 description 色
- * - **無 row hover**:只有 Switch 互動(整排點擊無 affordance 改變、無 hover bg、無 cursor-pointer)
- *   Rationale:row 上沒有其他可點區、label wrap 又會讓整排出現 hover bg 暗示「整排可 click」
- *   違反「only Switch 反應」—— 直接拿掉 label wrap,用 `<div>` 純排版,Switch 自己是唯一 focusable
- * - Switch `items-center` 對齊 title+desc 文字塊中心(無 avatar、全文字 row 的自然對齊)
+ * - Switch **包 `<ItemSuffix>`**:suffix h-[1lh] 對齊 **title 第一行**(≤ 24px suffix 的 canonical,
+ *   見 item-anatomy.spec.md「24px 閾值對齊規則」)—— 不是 items-center 對齊文字塊中心
+ *   世界級對照:macOS System Prefs / iOS Settings / Gmail notif / Notion 皆 suffix control
+ *   對齊 title 第一行(不 center 文字塊)
+ * - 外層 flex 用 `items-start`(讓 content 自然 flow,suffix 由 h-[1lh] 對齊第一行)
+ * - title / description gap = `mt-0.5`(2px)
+ * - description 色 = `text-fg-secondary`(neutral-8)
+ * - **無 row hover**:只有 Switch 互動
  */
 function NotificationSettings() {
   const [email, setEmail] = useState(true)
@@ -45,19 +48,22 @@ function NotificationSettings() {
         <DialogBody variant="list">
           <div className="flex flex-col">
             {items.map((n) => (
-              // item-anatomy Family 2:[content: title + desc(mt-0.5 gap)] [suffix: Switch]
-              // 無 hover / 無 cursor-pointer —— 只有 Switch 是互動元素
-              // `px-loose`:content 對齊 header/footer 的 loose padding(variant="list" body 無水平 padding)
+              // item-anatomy Family 2:[content: title + desc(mt-0.5 gap)] [ItemSuffix: Switch]
+              // items-start(let content flow);suffix h-[1lh] 對齊 title 第一行(24px 閾值 canonical)
+              // px-loose:content 對齊 header/footer 的 loose padding(body variant="list" 無水平 padding)
               <div
                 key={n.key}
-                className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)]"
+                className="flex items-start gap-3 py-2 px-[var(--layout-space-loose)]"
               >
-                <div className="flex flex-col min-w-0 flex-1">
-                  <span className="text-body font-medium">{n.title}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-body font-medium">{n.title}</div>
                   {/* mt-0.5 = 2px title↔desc gap(item-anatomy canonical);neutral-8 = fg-secondary */}
-                  <span className="mt-0.5 text-caption text-fg-secondary">{n.desc}</span>
+                  <div className="mt-0.5 text-caption text-fg-secondary">{n.desc}</div>
                 </div>
-                <Switch checked={n.checked} onCheckedChange={n.onChange} />
+                {/* Suffix: Switch — ItemSuffix h-[1lh] 對齊 title 第一行(≤ 24px suffix 的 canonical) */}
+                <ItemSuffix>
+                  <Switch checked={n.checked} onCheckedChange={n.onChange} />
+                </ItemSuffix>
               </div>
             ))}
           </div>

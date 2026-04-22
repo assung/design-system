@@ -3,6 +3,10 @@ import { useState } from 'react'
 import { OverflowIndicator } from './overflow-indicator'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
+import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+
+const personHover = (name: string) => <NameCard name={name} actions={<NameCardDefaultActions />} />
+const P = { A: 'Alan Chen', B: 'Betty Wu', C: 'Charlie Lee' } as const
 import { H3, Desc, Td, Th, Swatch } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
@@ -448,9 +452,9 @@ export const SizeMatrix: Story = {
                 <Td mono>sm</Td>
                 <Td>
                   <div className="flex items-center">
-                    <Avatar alt="A" color="indigo" size={20} />
+                    <Avatar alt={P.A} color="indigo" size={20} hoverCard={personHover(P.A)} />
                     <span className="-ml-1.5">
-                      <Avatar alt="B" color="magenta" size={20} />
+                      <Avatar alt={P.B} color="magenta" size={20} hoverCard={personHover(P.B)} />
                     </span>
                     <span className="-ml-1.5">
                       <OverflowIndicator count={3} shape="circle" size="sm">
@@ -478,7 +482,7 @@ export const SizeMatrix: Story = {
                 <Td mono>md</Td>
                 <Td>
                   <div className="flex items-center">
-                    <Avatar alt="A" color="indigo" size={24} />
+                    <Avatar alt={P.A} color="indigo" size={24} hoverCard={personHover(P.A)} />
                     <span className="-ml-1.5">
                       <OverflowIndicator count={4} shape="circle" size="md">
                         <div className="p-1 text-caption">…</div>

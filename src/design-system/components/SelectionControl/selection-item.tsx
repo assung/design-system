@@ -178,6 +178,7 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
                 src={avatar.src}
                 alt={avatar.alt}
                 color={avatar.color}
+                hoverCard={avatar.hoverCard}
                 size={avatarPx}
               />
             )}

@@ -20,6 +20,7 @@ import {
 } from './sidebar'
 import { TreeView, TreeItem } from '@/design-system/components/TreeView/tree-view'
 import { ItemAvatar, ItemLabel } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
 
 const meta: Meta = {
   title: 'Design System/Components/Sidebar/展示',
@@ -69,7 +70,11 @@ const UserFooter = () => (
     <SidebarMenuItem>
       <SidebarMenuButton asChild>
         <button type="button">
-          <ItemAvatar alt="Alan Chen" color="blue" />
+          <ItemAvatar
+            alt="Alan Chen"
+            color="blue"
+            hoverCard={<NameCard name="Alan Chen" subtitle="Design｜D-0042" actions={<NameCardDefaultActions />} />}
+          />
           <span data-sidebar="menu-label" className="min-w-0 flex-1 truncate">Alan Chen</span>
         </button>
       </SidebarMenuButton>

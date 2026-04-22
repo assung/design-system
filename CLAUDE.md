@@ -7,12 +7,12 @@
 3. **改一處必看三處**——code / spec / story 三方聯動是常態,不是例外。改 cva `defaultVariants`、改 variant、改 token 前先 grep 該元件所有檔案,一次改完。
 4. **範例必須是真實業務場景**——Jira / Stripe / Notion / Figma 等可辨識的情境;禁止 `Option A/B/C`、「按鈕一」、極端不現實、ASCII art。Storybook 的受眾是任何打開它的人,不是作者。
 5. **猶豫就問,不往前推**——遇到無前例的設計決策:(a) 先 grep 既有 pattern,(b) 讀近親元件 spec,(c) 仍不確定就停下問使用者。**禁止憑直覺造新 pattern**——這是本專案最常被糾正的錯誤。
-6. **大原則吸收瑣碎,記憶索引不該長**——同類 bug 反覆被糾正 = 規則寫太細、meta 層沒抓住。真正該寫的是「哪一類 meta-pattern 誤用」,不是「哪一個具體 bug」。失敗記憶索引應該長**不大**;若一直長,代表 meta-principle 漏寫或沒執行。見 `# Meta-Pattern 預警` 的 12 條大原則。**AI 不需要被 user 提醒才去找 root invariant**——rule 震盪(寫成 A → 被糾 → 寫成 not A)發生時 AI 必**自己**停下,跑 M12 benchmark + invariant test,而不是把 user 每次視覺 preference 機械地寫成新 strict rule。使用者 tell me once,我不該要 tell me twice。
+6. **大原則吸收瑣碎,記憶索引不該長**——同類 bug 反覆被糾正 = 規則寫太細、meta 層沒抓住。真正該寫的是「哪一類 meta-pattern 誤用」,不是「哪一個具體 bug」。失敗記憶索引應該長**不大**;若一直長,代表 meta-principle 漏寫或沒執行。見 `# Meta-Pattern 預警` 的 13 條大原則。**AI 不需要被 user 提醒才去找 root invariant**——rule 震盪(寫成 A → 被糾 → 寫成 not A)發生時 AI 必**自己**停下,跑 M12 benchmark + invariant test。**User 就同主題第 2 次問 → 必主動截圖 verify**(M13),不靠第 3 次才醒。**User 說「所有 X」= DS-wide 聲明,當下做完 + 建 hook 防線,不拖 tech debt**。使用者 tell me once,我不該要 tell me twice。
 
 每條規則展開請讀後面對應章節(`# Spec 規則`、`# UI 開發規則`、`# Story`、`# 命名與語言一致性` 等)。
 
 
-# Meta-Pattern 預警(12 條大原則)
+# Meta-Pattern 預警(13 條大原則)
 
 **mindset #6 的具體化**。每條能吸收數十個具體 bug,是失敗記憶索引的上游。接到任務先過這 11 條,再跑 `# 任務導航表`。
 
@@ -31,6 +31,8 @@
 | **M11** | **User-perspective interactive state walk — 改完 UI 後 present 前必親自走一次 user 視角**,不留待 user 抓。改 UI 完成必過 7 題 self-test:(a) **static**(對齊 / padding / 色);(b) **hover / selected / active**(overlay list 三 invariant 必同時成立:(1) hover bg flush chrome 邊、(2) content 對齊 header title、(3) content 在 bg 內有 loose breathing;world-class Linear / Notion / Slack / Raycast / VS Code Quick Pick 共通;**必用截圖驗證 3 invariant 幾何**,不靠記憶判斷;詳 `patterns/overlay-surface/overlay-surface.spec.md` 規則 3.1;鼠標 cursor;hover 區覆蓋整列);(c) **focus-visible**(只 keyboard tab 顯示 ring,滑鼠 click 不該 — 檢查 `focus:` vs `focus-visible:` 用對);(d) **active / pressed**;(e) **keyboard**(Tab / Shift+Tab / Esc / Enter 正確);(f) **範例真實性**(「誰會這樣用?」— modal 內 list item 通常 in-modal 直接設定,不 navigate 去別處;symbolic tags / placeholder content 全改掉);(g) **CSS 對稱**(`lg` override 必對應 `md` reset;`dark` 必對應 `light` default)。每 UI 改動未跑 7 題 walk 就 commit = 違反本條。 | 2026-04-22 ListBody 修完 user 連抓 5 波:hover bg 貼邊違反不貼邊 / focus ring click 觸發擾人 / notification 範例不現實(誰會進 modal 又跳別處)/ menu py-2 沒對齊 / layoutSpace md reset selector 缺。每個都是 user 視角一看就知,AI 沒跑 state walk 就 commit |
 
 | **M12** | **Binary strict rule(「必 X」/「禁 Y」)前必 benchmark + invariant test**。使用者單次視覺 preference、單次觀察 → **不是** canonical;canonical 是 **invariant across context**。強化 rule 前必 3 題自測:(a) **≥3 家世界級 DS 一致**(Polaris / Material / Atlassian / Ant / Carbon / Apple HIG 取 3 比對;有差異 = variance 不是 canonical);(b) **Counter-example scan**:能舉出 legal 的反例嗎?能 → 不該寫 strict rule,rule 寫錯 layer;(c) **Root invariant vs surface observation**:「flush bg」是表象(bg 邊位置),真實 invariant 通常比表象深一層(例:真正規則在 **content 與 bg 的關係** — content 必在 bg 內有 breathing,與 bg 邊位置無關)。**震盪症狀**:同一概念的 rule 被 A → not A → A 糾正 = meta invariant 沒抓到,**停下 present,自己跑 3 題 benchmark + invariant test,不要寫第 3 版**。**禁止**把「我這 case 偏好 X」機械升級成「canonical must X」。**AI 不該靠 user 提醒才 benchmark** — rule 寫強(必 / 禁)的瞬間就要觸發本條 self-check。 | 2026-04-22 hover bg 四次震盪:v1 寫「bg 不貼邊」→ user 糾 Image 22 inset 錯 / 23 flush 對 → v2 寫「必 flush」→ user 糾「flush 本來就合法,不一定要 flush」→ v3 又寫「bg 邊自由、content 有 spacing 即可」→ user 再糾 Image 24「content 貼 bg 邊」仍違規,Image 25「bg 比 content 寬」才對 → **真 invariant = content 必在 bg 內有 padding,bg 邊位置是 variance**。根因 4 層:(1) AI 把 user 單次 preference 升級 strict rule(沒 benchmark);(2) 寫 rule 層級錯(在 bg-edge layer 糾結,真 invariant 在 content-padding layer);(3) 震盪被糾 3 次才醒,CLAUDE.md 已寫「同類 bug 糾正 3 次 = meta 漏寫」AI 仍沒自覺;(4) 需要 user 反覆提醒才啟動 meta-reflection,違反「自我升級機制」精神 |
+
+| **M13** | **User 第 2 次提起相關問題 → 自動觸發截圖 verify,不靠第 3 次提醒**。當 user 就同一視覺 / 行為主題 **第 2 次**問 / 糾正(even 用不同角度),AI **必自動 invoke 截圖 verify**(`node scripts/visual-audit.mjs --scope=component:XXX` + `Read snapshots/*.png`),用視覺證據 compare user image vs 當前狀態。**禁止靠記憶 / 推論回答**。第 3 次才 verify = 已違反本條。**Scope = 任何 UI / 視覺 / interaction pattern** 的問答。**Corollary(大規模 migration)**:user 指定「所有 X 都要 Y」(e.g.「所有 avatar hover NameCard」),不可分批 / 拖延 / 留 tech debt — 同 session 全部做完 + 建 hook 防線。 | 2026-04-22 hover bg 震盪 4 次 + avatar-NameCard migration 拖延:user 說「我說所有」明示 DS-wide,但 AI 第一次只改 2 處 dialog stories,15+ 處放 tech debt 留到下次。user 第 2 次提起才完成。根因:AI「做完」標準太鬆(視 user 明示為「提醒」而非「canonical 聲明」),截圖比對工具已存在但 AI 不主動用。本條防線:第 2 次相關訊息 = 觸發器,不等第 3 次 |
 
 **判斷 meta-principle 是否漏寫的 test**:
 - 同類 bug 一年內被糾正 3 次 → meta-principle 漏寫或沒執行,檢討本清單

@@ -248,6 +248,13 @@ export interface AvatarData {
   alt: string
   /** Icon / text fallback 的背景色，預設 neutral */
   color?: ColorKey
+  /**
+   * Person avatar hover NameCard(DS-wide canonical,person avatar 預設必有,見 avatar.spec.md)。
+   * Entity avatar(專案 / 組織 logo)不帶 → consumer 不傳 hoverCard 即豁免。
+   * 所有消費 AvatarData 的 primitive(MenuItem / DropdownMenu / SelectMenu / SelectionItem / NameCard)
+   * 需 forward 此 prop 到內部 <Avatar hoverCard={avatar.hoverCard} />。
+   */
+  hoverCard?: React.ReactNode
 }
 
 export { Avatar }

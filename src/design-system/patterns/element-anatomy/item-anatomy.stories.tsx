@@ -11,6 +11,12 @@ import { SelectionItem } from '@/design-system/components/SelectionControl/selec
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
+import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+
+/** Person avatar hover canonical helper — avatar.spec.md DS-wide rule */
+const personHover = (name: string, subtitle?: string) => (
+  <NameCard name={name} subtitle={subtitle} actions={<NameCardDefaultActions />} />
+)
 import { Button } from '@/design-system/components/Button/button'
 import { Separator } from '@/design-system/components/Separator/separator'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -264,6 +270,7 @@ const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, descriptio
               src={avatar.src}
               alt={avatar.alt}
               color={avatar.color}
+              hoverCard={avatar.hoverCard}
               size={hasBlockPrefix ? (size === 'lg' ? 40 : 32) : 24}
             />
           )}
@@ -515,7 +522,7 @@ const InspectorInner = () => {
                 <MenuItem
                   size={size}
                   startIcon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
-                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const } : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const, hoverCard: personHover("Alice", "Design team lead") } : undefined}
                   description={hasDescription ? descText : undefined}
                   tag={effectiveHasSuffix ? <Tag size={size} variant="blue">Pro</Tag> : undefined}
                   labelMaxLines={propLabelClamp}
@@ -531,7 +538,7 @@ const InspectorInner = () => {
                   size={size}
                   control={<Checkbox size={size} checked={true} />}
                   icon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
-                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const } : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const, hoverCard: personHover("Alice", "Design team lead") } : undefined}
                   label={labelText}
                   description={hasDescription ? descText : undefined}
                   labelMaxLines={propLabelClamp}
@@ -544,7 +551,7 @@ const InspectorInner = () => {
                 <ListItemPreview
                   size={size}
                   startIcon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
-                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const } : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const, hoverCard: personHover("Alice", "Design team lead") } : undefined}
                   label={labelText}
                   description={hasDescription ? descText : undefined}
                   suffix={effectiveHasSuffix ? <ChevronRight size={spec.iconPx} className="text-fg-muted" /> : undefined}
@@ -1011,10 +1018,10 @@ export const AlignmentThreshold = {
 
           {/* Live example */}
           <MenuFrame width={360}>
-            <MenuItem size="md" avatar={{ alt: "Alice", color: "indigo" as const }} description="Design team lead">
+            <MenuItem size="md" avatar={{ alt: "Alice", color: "indigo" as const, hoverCard: personHover("Alice Chen", "Design team lead") }} description="Design team lead">
               Alice Chen
             </MenuItem>
-            <MenuItem size="md" avatar={{ alt: "Bob", color: "yellow" as const }} description="Backend engineer">
+            <MenuItem size="md" avatar={{ alt: "Bob", color: "yellow" as const, hoverCard: personHover("Bob Wang", "Backend engineer") }} description="Backend engineer">
               Bob Wang
             </MenuItem>
           </MenuFrame>
