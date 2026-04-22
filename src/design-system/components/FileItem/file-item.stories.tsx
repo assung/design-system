@@ -40,10 +40,12 @@ export const Rich = {
 }
 
 export const Compact = {
-  name: 'Compact（上傳狀態）',
+  name: 'Compact（上傳狀態 · Type A upload manager）',
   render: () => (
-    // Compact 上傳中/error 無 bg,completed 靜態加 bg-neutral-3 → 混場景保守 `gap-1` 讓靜態 bg 不相連
-    <div className="flex flex-col gap-1 max-w-md">
+    // Compact + status(永遠有 progress bar)= Type A upload manager
+    // 永久視覺:flush 透明 row + 底部 progress bar(分隔線型 affordance 同 DataTable border-b)
+    // → 0 gap 合法(item-anatomy v2「連續 item 貼邊合法性」),progress bar 自身作 separator
+    <div className="flex flex-col max-w-md">
       <FileItem mode="compact" name="UXP T-Phone.csv" status="uploading" progress={60} actions={deleteBtnXs} />
       <FileItem mode="compact" name="UXP T-Phone.csv" status="error" description="There's something wrong" actions={deleteBtnXs} />
       <FileItem mode="compact" name="UXP T-Phone.csv" status="completed" actions={deleteBtnXs} />
@@ -74,8 +76,8 @@ export const HoverSwap = {
         <div className="text-caption text-fg-muted mb-2">
           同樣 pattern 在 compact mode:status slot 幾何與 Inline Action(16×16 icon)一致,center 自動對齊
         </div>
-        {/* Compact 上傳完成態屬 Type A upload manager,有 progress bar 無 bg → 0 gap 合法,但 error 有 bg 場景保守 `gap-1` */}
-        <div className="flex flex-col gap-1">
+        {/* Compact + status = Type A(flush + progress bar 分隔線型 affordance)→ 0 gap 合法 */}
+        <div className="flex flex-col">
           <FileItem mode="compact" name="data-2024-q1.csv" status="completed"
             onDownload={noop} actions={deleteBtnXs} />
           <FileItem mode="compact" name="backup-failed.json" status="error"

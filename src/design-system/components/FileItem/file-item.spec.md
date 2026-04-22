@@ -152,13 +152,13 @@ ProgressBar 底部對齊 avatar 底部。justify-between 自動分配 gap(有 de
 
 ## List wrapper canonical(多 item 間距)
 
-`FileItem` 連續排列時,**list wrapper 的 gap 取決於 item 是否有底色 / 邊框**(詳 `patterns/element-anatomy/item-anatomy.spec.md`「連續 item 貼邊合法性」)。
+`FileItem` 連續排列時,**list wrapper 的 gap 取決於 item 永久視覺層是否為 standalone card/pill**(詳 `patterns/element-anatomy/item-anatomy.spec.md`「連續 item 貼邊合法性 v2」公式)。
 
-| 情境 | List wrapper gap | 為什麼 |
-|------|----------------|--------|
-| **Rich**(任何 status,永遠有 border card) | `gap-2`(8px) | Card 邊框會相黏融合成一張大 card → 必 gap 讓每張 card 視覺自立 |
-| **Compact + bg-neutral-3**(Type B form attachment 靜態) | `gap-1`(4px) | 底色塊連續會合成一大塊 bg → 必 gap 讓 item 邊界清晰 |
-| **Compact + 有 progress**(Type A upload manager 動態) | 無 gap 要求(可 0) | 無 bg / 無 border,progress bar 各自獨立色,不會相連 |
+| 情境 | 永久視覺層分類 | List wrapper gap | 為什麼 |
+|------|--------------|----------------|--------|
+| **Rich**(任何 status,永遠 border card) | standalone card(`border + bg-surface + rounded-md + inset`)| `gap-2`(8px) | Card 邊框會相黏融合成一張大 card → 必 gap |
+| **Compact + bg-neutral-3**(Type B form attachment 靜態) | standalone pill(`bg-neutral-3 + rounded-md + inset`)| `gap-1`(4px) | 底色塊連續會合成一塊大 bg |
+| **Compact + 有 progress bar**(Type A upload manager) | flush + 底部 progress bar(分隔線型 affordance) | **0 gap 合法** | Progress bar 同 DataTable border-b 邏輯——是分隔線型 affordance,非 card 容器(user 2026-04-22 確認)|
 
 **List wrapper 本身的視覺**(2026-04-22 user 直指):
 - **不應該有外框**(無 `border` / 無 `rounded-*` / 無 `overflow-hidden`)
