@@ -157,8 +157,10 @@ const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? // 同 DialogBody variant="list" canonical — 對齊 menu group py-2 + content left=loose + hover bg inset
-              "px-[calc(var(--layout-space-loose)-0.5rem)] py-2"
+            ? // 同 DialogBody variant="list" canonical v2(2026-04-22):
+              // body `px-loose + py-2`,item 自己 px=0 + rounded-md → hover bg flush body padded 邊緣
+              // (容器內貼邊合理;chrome 外殼仍保留 loose 呼吸)
+              "px-[var(--layout-space-loose)] py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

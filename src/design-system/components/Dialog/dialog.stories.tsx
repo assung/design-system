@@ -12,7 +12,15 @@ import { Switch } from '@/design-system/components/Switch/switch'
 /**
  * 通知設定 — variant="list" 中 item(title + desc + right-side Switch)
  * in-modal 直接設定 pattern(對齊 Gmail 通知設定 / macOS Sys Prefs / Notion prefs)
- * user Image 9 指出:modal 內 list item 通常可直接被設定,不是跳去其他地方
+ *
+ * **Item-anatomy 套用(2026-04-22 v2 修正)**:
+ * - Row 結構 = Family 2 reading(無 prefix、content: title+desc、suffix: Switch)
+ * - title / description gap = `mt-0.5`(2px)— 對齊 item-anatomy「label+desc 2px」canonical
+ * - description 色 = `text-fg-secondary`(neutral-8)— 對齊 item-anatomy 預設 description 色
+ * - **無 row hover**:只有 Switch 互動(整排點擊無 affordance 改變、無 hover bg、無 cursor-pointer)
+ *   Rationale:row 上沒有其他可點區、label wrap 又會讓整排出現 hover bg 暗示「整排可 click」
+ *   違反「only Switch 反應」—— 直接拿掉 label wrap,用 `<div>` 純排版,Switch 自己是唯一 focusable
+ * - Switch `items-center` 對齊 title+desc 文字塊中心(無 avatar、全文字 row 的自然對齊)
  */
 function NotificationSettings() {
   const [email, setEmail] = useState(true)
@@ -35,18 +43,19 @@ function NotificationSettings() {
         <DialogBody variant="list">
           <div className="flex flex-col">
             {items.map((n) => (
-              // label wrapping → click label toggle Switch(native behavior);item 整行可點擊
-              // px-2 rounded-md 對齊 canonical;item 右側 Switch 做 in-modal 設定
-              <label
+              // item-anatomy Family 2:[content: title + desc(mt-0.5 gap)] [suffix: Switch]
+              // 無 hover / 無 cursor-pointer —— 只有 Switch 是互動元素
+              <div
                 key={n.key}
-                className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover has-[:focus-visible]:bg-neutral-hover cursor-pointer"
+                className="flex items-center gap-3 py-2"
               >
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-body font-medium">{n.title}</span>
-                  <span className="text-caption text-fg-muted">{n.desc}</span>
+                  {/* mt-0.5 = 2px title↔desc gap(item-anatomy canonical);neutral-8 = fg-secondary */}
+                  <span className="mt-0.5 text-caption text-fg-secondary">{n.desc}</span>
                 </div>
                 <Switch checked={n.checked} onCheckedChange={n.onChange} />
-              </label>
+              </div>
             ))}
           </div>
         </DialogBody>
@@ -129,44 +138,46 @@ export const WithForm = {
 export const LongContent = {
   name: '長內容（body 捲動）',
   render: () => {
-    // 30 avatar(真實圖片)+ title + description(ORG | EMPLOYEE_ID | EMPLOYEE_NUMBER)
+    // 30 avatar + title + description(ROLE｜EMP_ID｜EMP_NUM,full-width 「｜」 separator)
     // 對齊 user 要求 + NameCard 資訊量:
     //   - avatar:real photo src(pravatar seed 確保每人不同面孔)
     //   - title:name(body font-medium)
-    //   - description:ORG | Employee ID | Employee Number(caption fg-muted,類 NameCard subtitle)
-    // item-anatomy Family 2 reading mode — prefix avatar 40 / content title + description 2 行
-    const orgs = ['ACME Corp', 'Nebula Inc', 'Orion Labs', 'Polaris Co']
+    //   - description:「職稱｜員編｜工號」格式(text-caption text-fg-secondary = neutral-8)
+    //     → 世界級 Slack / Linear / Notion 成員卡都用「職稱」而非「公司名」作為 subtitle 核心(辨識工作身份)
+    // item-anatomy Family 2 reading mode — prefix Avatar 40 / content title + description 2 行
+    // hover bg flush to body padded edge(無 item px)—— 2026-04-22 canonical
+    const roles = ['Design', 'Engineering', 'Product', 'Research']
     const members = [
-      { name: 'Alan Chen', empId: 'D-0042', empNum: '1234567' },
-      { name: 'Betty Wu', empId: 'E-0183', empNum: '2345671' },
-      { name: 'Charlie Lee', empId: 'D-0127', empNum: '3456712' },
-      { name: 'Diana Kim', empId: 'M-0055', empNum: '4567123' },
-      { name: 'Ethan Park', empId: 'E-0210', empNum: '5671234' },
-      { name: 'Fiona Lin', empId: 'D-0098', empNum: '6712345' },
-      { name: 'George Ho', empId: 'E-0271', empNum: '7123456' },
-      { name: 'Hana Yu', empId: 'M-0019', empNum: '1234098' },
-      { name: 'Ivan Sun', empId: 'D-0145', empNum: '2340981' },
-      { name: 'Julia Shen', empId: 'E-0302', empNum: '3409812' },
-      { name: 'Kevin Hsu', empId: 'D-0076', empNum: '4098123' },
-      { name: 'Lydia Cao', empId: 'M-0088', empNum: '0981234' },
-      { name: 'Mark Tseng', empId: 'E-0154', empNum: '9812340' },
-      { name: 'Nina Pan', empId: 'D-0031', empNum: '8123409' },
-      { name: 'Oscar Lo', empId: 'E-0249', empNum: '1234560' },
-      { name: 'Peggy Qin', empId: 'M-0067', empNum: '2345601' },
-      { name: 'Ray Tang', empId: 'D-0192', empNum: '3456012' },
-      { name: 'Sophia Fei', empId: 'E-0115', empNum: '4560123' },
-      { name: 'Tom Liang', empId: 'D-0234', empNum: '5601234' },
-      { name: 'Uma Jiang', empId: 'M-0043', empNum: '6012345' },
-      { name: 'Victor Ren', empId: 'E-0168', empNum: '0123456' },
-      { name: 'Wendy Xia', empId: 'D-0059', empNum: '1230456' },
-      { name: 'Xavier Ma', empId: 'E-0296', empNum: '2304561' },
-      { name: 'Yuki Du', empId: 'D-0081', empNum: '3045612' },
-      { name: 'Zach Feng', empId: 'M-0024', empNum: '0456123' },
-      { name: 'Amy Zhao', empId: 'D-0163', empNum: '4561230' },
-      { name: 'Brad Fan', empId: 'E-0207', empNum: '5612304' },
-      { name: 'Cathy Miao', empId: 'M-0102', empNum: '6123045' },
-      { name: 'Derek Qu', empId: 'D-0140', empNum: '1204563' },
-      { name: 'Elena Xu', empId: 'E-0318', empNum: '2045631' },
+      { name: 'Alan Chen', empId: 'D-0042', empNum: 'EMP-1001' },
+      { name: 'Betty Wu', empId: 'E-0183', empNum: 'EMP-1002' },
+      { name: 'Charlie Lee', empId: 'D-0127', empNum: 'EMP-1003' },
+      { name: 'Diana Kim', empId: 'M-0055', empNum: 'EMP-1004' },
+      { name: 'Ethan Park', empId: 'E-0210', empNum: 'EMP-1005' },
+      { name: 'Fiona Lin', empId: 'D-0098', empNum: 'EMP-1006' },
+      { name: 'George Ho', empId: 'E-0271', empNum: 'EMP-1007' },
+      { name: 'Hana Yu', empId: 'M-0019', empNum: 'EMP-1008' },
+      { name: 'Ivan Sun', empId: 'D-0145', empNum: 'EMP-1009' },
+      { name: 'Julia Shen', empId: 'E-0302', empNum: 'EMP-1010' },
+      { name: 'Kevin Hsu', empId: 'D-0076', empNum: 'EMP-1011' },
+      { name: 'Lydia Cao', empId: 'M-0088', empNum: 'EMP-1012' },
+      { name: 'Mark Tseng', empId: 'E-0154', empNum: 'EMP-1013' },
+      { name: 'Nina Pan', empId: 'D-0031', empNum: 'EMP-1014' },
+      { name: 'Oscar Lo', empId: 'E-0249', empNum: 'EMP-1015' },
+      { name: 'Peggy Qin', empId: 'M-0067', empNum: 'EMP-1016' },
+      { name: 'Ray Tang', empId: 'D-0192', empNum: 'EMP-1017' },
+      { name: 'Sophia Fei', empId: 'E-0115', empNum: 'EMP-1018' },
+      { name: 'Tom Liang', empId: 'D-0234', empNum: 'EMP-1019' },
+      { name: 'Uma Jiang', empId: 'M-0043', empNum: 'EMP-1020' },
+      { name: 'Victor Ren', empId: 'E-0168', empNum: 'EMP-1021' },
+      { name: 'Wendy Xia', empId: 'D-0059', empNum: 'EMP-1022' },
+      { name: 'Xavier Ma', empId: 'E-0296', empNum: 'EMP-1023' },
+      { name: 'Yuki Du', empId: 'D-0081', empNum: 'EMP-1024' },
+      { name: 'Zach Feng', empId: 'M-0024', empNum: 'EMP-1025' },
+      { name: 'Amy Zhao', empId: 'D-0163', empNum: 'EMP-1026' },
+      { name: 'Brad Fan', empId: 'E-0207', empNum: 'EMP-1027' },
+      { name: 'Cathy Miao', empId: 'M-0102', empNum: 'EMP-1028' },
+      { name: 'Derek Qu', empId: 'D-0140', empNum: 'EMP-1029' },
+      { name: 'Elena Xu', empId: 'E-0318', empNum: 'EMP-1030' },
     ]
     return (
       <Dialog defaultOpen>
@@ -177,24 +188,24 @@ export const LongContent = {
           <DialogHeader>
             <DialogTitle>成員列表</DialogTitle>
           </DialogHeader>
-          {/* Body 放 list → variant="list":body px-loose 保留(item 對齊 header/footer)、pt/pb 移除、item 自己 py
+          {/* Body 放 list → variant="list":body px-loose + py-2,item 自己 px=0(hover bg flush body padded edge)
               item 用 Family 2 reading mode(prefix Avatar 40 + content title+description)
-              對應 user Image #3 期望 + item-anatomy canonical */}
+              對應 user Image #16 期望 + overlay-surface.spec.md 規則 3.1 hover bg context 判斷 */}
           <DialogBody variant="list">
             <div className="flex flex-col">
               {members.map((m, i) => (
-                // px-2 rounded-md:content left = body px(loose-8) + item px(8)= loose ✓ 對齊 header title
-                // hover bg inset 8px from body padded edge → 不貼 chrome 邊
-                // Avatar 真實 photo(pravatar seed)+ description 對齊 NameCard 資訊量(ORG | EMP_ID | EMP_NUM)
+                // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(mt-0.5 gap)]
+                // 無 px → hover bg flush body padded 邊緣(容器內貼邊合理,chrome 仍保留 loose 呼吸)
+                // description 色 = text-fg-secondary(neutral-8);separator = full-width 「｜」
                 <button
                   key={m.empNum}
-                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  className="flex items-center gap-3 py-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
                   <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-body font-medium truncate">{m.name}</span>
-                    <span className="text-caption text-fg-muted truncate">
-                      {orgs[i % orgs.length]} | {m.empId} | {m.empNum}
+                    <span className="mt-0.5 text-caption text-fg-secondary truncate">
+                      {roles[i % roles.length]}｜{m.empId}｜{m.empNum}
                     </span>
                   </div>
                 </button>
@@ -270,24 +281,24 @@ export const ListBody = {
           <DialogBody variant="list">
             <div className="flex flex-col">
               {[
-                { name: 'Alan Chen', org: 'ACME Corp', id: 'EMP-00427' },
-                { name: 'Betty Wu', org: 'ACME Corp', id: 'EMP-00831' },
-                { name: 'Charlie Lee', org: 'Nebula Inc', id: 'EMP-01204' },
-                { name: 'Diana Kim', org: 'ACME Corp', id: 'EMP-00558' },
-                { name: 'Ethan Park', org: 'Nebula Inc', id: 'EMP-01093' },
-                { name: 'Fiona Lin', org: 'ACME Corp', id: 'EMP-00672' },
+                { name: 'Alan Chen', role: 'Design', empId: 'D-0042', empNum: 'EMP-1001' },
+                { name: 'Betty Wu', role: 'Engineering', empId: 'E-0183', empNum: 'EMP-1002' },
+                { name: 'Charlie Lee', role: 'Design', empId: 'D-0127', empNum: 'EMP-1003' },
+                { name: 'Diana Kim', role: 'Product', empId: 'M-0055', empNum: 'EMP-1004' },
+                { name: 'Ethan Park', role: 'Engineering', empId: 'E-0210', empNum: 'EMP-1005' },
+                { name: 'Fiona Lin', role: 'Design', empId: 'D-0098', empNum: 'EMP-1006' },
               ].map((m) => (
-                // variant="list" canonical:item px-2 rounded-md,content 對齊 header + hover bg inset 8px
+                // variant="list" canonical v2:item 無 px,rounded-md,hover bg flush body padded edge
                 <button
-                  key={m.id}
-                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  key={m.empNum}
+                  className="flex items-center gap-3 py-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
-                  <div className="w-10 h-10 rounded-full bg-primary-subtle text-primary flex items-center justify-center text-body-lg font-medium shrink-0">
-                    {m.name.charAt(0)}
-                  </div>
+                  <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-body font-medium truncate">{m.name}</span>
-                    <span className="text-caption text-fg-muted truncate">{m.org} · {m.id}</span>
+                    <span className="mt-0.5 text-caption text-fg-secondary truncate">
+                      {m.role}｜{m.empId}｜{m.empNum}
+                    </span>
                   </div>
                 </button>
               ))}
@@ -320,9 +331,10 @@ export const ListBody = {
           <DialogBody variant="list">
             <div className="flex flex-col">
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
+                // variant="list" canonical v2:item 無 px,hover bg flush body padded edge
                 <button
                   key={t}
-                  className="flex py-1.5 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left text-body"
+                  className="flex py-1.5 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left text-body"
                 >
                   {t}
                 </button>

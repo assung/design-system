@@ -158,11 +158,13 @@ interface DialogBodyProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Body 佈局模式。
    * - `default`(預設):body 有 px-loose / pt-tight / pb-bottom,適合 form 或一般內容
-   * - `list`:body 移除 vertical padding(pt/pb),保留 `px-loose` 讓 list item 左右對齊 header
-   *   title 與 footer button(視覺垂直對齊)。item 自己負責 py 節奏。
+   * - `list`:body 保留 `px-loose`(item 對齊 header title)+ `py-2`(menu group 節奏),
+   *   item 本身 **px=0 rounded-md**,hover bg **flush 對齊 body padded 邊緣**
+   *   (對齊 user 視覺要求:overlay body 中的 list item hover,bg 可以貼齊
+   *   body padded 邊緣——容器內的「貼邊」在此語境合理;chrome 與 body 仍保留 loose 呼吸)
    *
    * List item 本身應遵循 **item-anatomy** 原則:
-   * - 純文字 / 簡單 list → MenuItem(Family 1 scanning)或 ListItem(Family 2 reading,future)
+   * - 純文字 / 簡單 list → MenuItem(Family 1 scanning)或 Family 2 手刻(reading)
    * - key-value pair → DescriptionList(horizontal / vertical 模式)
    * 見 `patterns/element-anatomy/item-anatomy.spec.md`「Row primitives 共用結構規格」。
    */
@@ -174,12 +176,12 @@ const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? // list mode 2026-04-22:
-              // - px:`calc(loose - 8px)` — item 自己再 px-2,總 content left = loose 對齊 header title
-              //   剩 8px 給 item 作 hover bg inset gutter,hover bg 不貼 chrome 邊(視覺稽核「不貼邊」)
-              // - py-2(8px):對齊 menu group canonical(menu 有 group 則 group py-2 / 無 group 則 wrap layer py-2)
-              //   user 從 0 改回 8px 同 menu 節奏
-              "px-[calc(var(--layout-space-loose)-0.5rem)] py-2"
+            ? // list mode 2026-04-22 v2(user revision):
+              // - px:`loose`(不再 calc,body padded 邊緣 = 對齊 header title 的位置)
+              //   item 自己 px=0 + rounded-md → hover bg 寬度 = body padded area,視覺 flush 到
+              //   容器內邊。content 位置 = body px = loose,自動對齊 header title ✓
+              // - py-2:menu group 節奏(對齊無 group menu 的 wrap layer py-2)
+              "px-[var(--layout-space-loose)] py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

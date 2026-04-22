@@ -84,10 +84,26 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 - 禁止 list 外再 wrap `py-2` / `py-4` 等(重複 padding 造成上下過鬆)
 
 **規則 3 — list item 本身有 py,由 item 決定節奏**:
-- 小 item(icon + label):item `py-1.5 px-3`(6px 垂直,符合 MenuItem canonical)
-- 中 item(icon + title + description 2 行):item `py-2 px-3`(8px 垂直)
-- 大 item(avatar + title + description):item `py-3 px-3`(12px 垂直,符合 FileItem rich)
+- 小 item(icon + label):item `py-1.5`(6px 垂直,符合 MenuItem canonical)
+- 中 item(icon + title + description 2 行):item `py-2`(8px 垂直)
+- 大 item(avatar + title + description):item `py-3`(12px 垂直,符合 FileItem rich)
+- **Item `px=0`**(2026-04-22 v2 revision):item 不加水平 padding,hover bg 寬度 = body padded area,
+  flush 到 body padded 邊緣。世界級 overlay list(Material M3 Dialog / Polaris Modal + ResourceList / Linear Cmd+K)
+  都採此 pattern:body 有 gutter,item hover bg 貼滿 gutter 內邊(容器內貼邊合理;chrome 外殼仍保留 loose 呼吸)
 - Item size 對齊 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1 Menu item / Family 2 List item)
+
+**規則 3.1 — Hover bg 「不貼邊」的 context 判斷(2026-04-22 新增)**:
+CLAUDE.md mindset「視覺上不輸世界級」要求 hover bg 不貼 chrome 邊(避免視覺斷裂)。**但「邊」指的是
+chrome 外殼邊緣(dialog border / sheet border / popover border),不是 body padded 容器內邊緣**:
+
+| Context | hover bg 能否貼邊 | Rationale |
+|---------|-------------------|-----------|
+| Chrome 外殼邊緣(dialog border / sheet border) | ❌ 不能貼 | 貼死 chrome 看起來被裁掉,失去浮層「有外殼」的感 |
+| Body padded 容器內邊緣(body px-loose 內側) | ✅ 可以貼(flush) | body 已經把 chrome 推開 loose,hover bg 填滿 body padded area 視覺自然 |
+| Page content 中的獨立 card / section | ❌ 不能貼 | card 自己是獨立元素需呼吸 |
+
+**判斷法**:問「hover bg 邊緣外還有沒有其他 breathing space?」有(body padding / chrome gutter)→ 可以 flush;
+無(直接接到 chrome / page edge)→ 不能貼,需 inset gutter。
 
 **規則 4 — 對稱**:
 - 對稱 pt=pb(避免「頂貼邊、底留空」非對稱斷裂)
@@ -102,15 +118,21 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 ### Consumer 範例
 
 ```tsx
-// ✅ canonical:Dialog 放 contact picker(2026-04-22 ship variant="list")
+// ✅ canonical(2026-04-22 v2):Dialog 放 contact picker
 <Dialog>
   <DialogContent>
     <DialogHeader>...</DialogHeader>
-    <DialogBody variant="list">  {/* body 保留 px-loose,移除 pt/pb */}
+    <DialogBody variant="list">  {/* body:px-loose + py-2 */}
       <div className="flex flex-col">
         {contacts.map(c => (
-          <button className="flex items-center gap-3 py-2 hover:bg-neutral-hover">
-            <Avatar /> <div>{c.name}<p>{c.org}</p></div>
+          {/* item 無 px + rounded-md → hover bg flush body padded 邊緣 */}
+          <button className="flex items-center gap-3 py-2 rounded-md hover:bg-neutral-hover">
+            <Avatar size={40} /> {/* Family 2 block mode avatar */}
+            <div>
+              {c.name}
+              {/* title↔desc 2px gap,desc 色 fg-secondary */}
+              <p className="mt-0.5 text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
+            </div>
           </button>
         ))}
       </div>
