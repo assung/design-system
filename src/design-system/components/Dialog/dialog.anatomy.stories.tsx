@@ -394,7 +394,7 @@ export const ColorMatrix: Story = {
     <div className="flex flex-col gap-8">
       <div>
         <H3>Density</H3>
-        <Desc>`DialogContent` 強制 `data-density="lg"`——dialog 內所有子元件 token 解析為 lg 模式。Dialog 是獨立上下文,不繼承頁面 density。</Desc>
+        <Desc>Dialog 繼承 page `data-density`(v5 校準,跟 Sheet 對齊)— 不自設密度 attribute。先前曾設 `data-layout-space="lg"` 給 body 寬鬆呼吸,但跟 `--chrome-header-height` canonical(md=48)衝突,2026-04-22 撤回。世界級:Polaris Modal px 16(md loose)/ Material M3 24(lg loose)— 我方跟 page density 自動對齊。</Desc>
       </div>
 
       <div>

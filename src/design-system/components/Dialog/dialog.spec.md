@@ -42,9 +42,17 @@ DialogContent (fixed, centered)
 
 **Padding SSOT**：Header / Body / Footer 的 padding + 分隔線由 `patterns/overlay-surface/overlay-surface.spec.md` own——Dialog 與 Popover 共用同一套 primitive，避免 token 漂移。Dialog 特有行為:Header 的 Close 按鈕;Body 用 `<ScrollArea>` wrap(viewport-fill 專用,SSOT 見 overlay-surface.spec.md 「Body overflow canonical」節 + `components/ScrollArea/scroll-area.spec.md`)。
 
-## Density
+## Density(2026-04-22 v5 校準:繼承 page density,跟 Sheet 對齊)
 
-`DialogContent` 強制 `data-density="lg"`——dialog 內所有子元件的 token 解析為 lg 模式。Dialog 是獨立上下文，不繼承頁面密度。
+Dialog **繼承 page `data-density`**,不自設密度 attribute。這是 overlay primitive 的 canonical(跟 `components/Sheet/sheet.tsx` 對齊 — Sheet 不自設 density,繼承 page 層級 `html[data-density]`,見 sheet.tsx line 111 canonical)。
+
+**歷史備忘**:先前曾設 `data-layout-space="lg"` 給 header/body 寬鬆呼吸,但跟 `--chrome-header-height` canonical 衝突(md page dialog header 期望 48,強設 lg 會變 56)。**已於 2026-04-22 v5 撤回**,Dialog 全盤繼承 page density,header 高度 = `--chrome-header-height` 自動對齊(md=48 / lg=56)。
+
+**世界級對照**:
+- Polaris Modal:px 16(= md loose)
+- Material M3 Dialog:px 24(= lg loose)
+- Atlassian Dialog:px 24
+- 我方:跟隨 page density,md=16 / lg=24,兩端都在世界級 range 內。
 
 ## Layout
 
@@ -69,9 +77,13 @@ Modal 與 viewport 四邊保持 `--layout-space-bottom`（48px）最小間距。
 
 ## 關閉按鈕
 
-永遠存在於 DialogHeader 右側。使用 `<Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />`，不可移除——使用者永遠需要明確的關閉手段。
+永遠存在於 DialogHeader 右側。使用 `<Button data-dismiss iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />`，不可移除——使用者永遠需要明確的關閉手段。
 
-**Canonical 來源**:Dialog 是 overlay chrome，corner close X 屬 action group region，必用 Button(非 Inline Action / 非自刻 button)。詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical」+ `patterns/overlay-surface/overlay-surface.spec.md`「Close X canonical」。
+**Size canonical(v5 chrome-unbounded)**:Button native size **sm**(28 md / 32 lg),touch target 亦同。SurfaceHeader 的 `[data-unbounded]` CSS rule 自動對 text variant / dismiss 套負 my `calc((xs-sm)/2)` → **layout 佔位 = 24**(xs 固定)。效果:
+- Header 只有 title + close X → max layout = 24 → header = 24 + 2×tight = **48 md / 56 lg = `--chrome-header-height`** ✓
+- Header 塞 bounded primary(無 `data-unbounded`)→ header 自然長高
+
+**Canonical 來源**:Dialog 是 overlay chrome，corner close X 屬 action group region，必用 Button(非 Inline Action / 非自刻 button)。詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical」+ `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical v5」。
 
 ## Title
 
@@ -108,7 +120,7 @@ Dialog 是容器，無整體 disabled / loading / empty 狀態——這些屬於
 
 **Dark mode**：由 semantic token（`bg-surface-raised` / `border-border`）自動切換，無自訂 palette。
 
-**Density**：Dialog 強制 `data-density="lg"`（見上「Density」段），不繼承頁面 density。
+**Density**:Dialog **繼承 page density**(v5 校準,跟 Sheet 對齊),見上「Density」段。
 
 ---
 

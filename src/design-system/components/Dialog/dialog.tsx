@@ -93,12 +93,14 @@ const DialogContent = React.forwardRef<
       <DialogOverlay />
       <DialogPrimitive.Content
         ref={ref}
-        // Density decouple canonical(2026-04-22):Dialog 的 layout-space=lg 給 header/body/footer
-        // 寬鬆呼吸,但 ui-size 繼承 page default(通常 md)— Button/Input 不被撐大。
-        // 這樣 header 不會被 button chrome 撐高,未來加 strapline / wrap 內容也不需限死高度。
-        // 詳 density.spec.md「layout-space vs ui-size 解耦」+ 世界級對照(Carbon spacing scale
-        // 獨立於 control size / GitHub Primer 8px scale 獨立)。
-        data-layout-space="lg"
+        // Density canonical(2026-04-22 v5 校準):Dialog 繼承 page density(跟 Sheet 對齊
+        // sheet.tsx line 111 canonical),不自設 data-layout-space="lg" 或 data-density。
+        //
+        // 先前曾設 `data-layout-space="lg"` 給 header/body 寬鬆呼吸,但跟 chrome-header-height
+        // canonical 衝突(md page dialog header 期望 48,強設 lg 會變 56)。
+        // 世界級對照:Polaris Modal horizontal padding 16 / Material M3 24 / Atlassian 24 — 16 是
+        // 合理 lower bound;md page 用 16 loose body padding 可接受,lg page 自動 24。
+        // 詳 overlay-surface.spec.md「Chrome dismiss size canonical v5」
         onOpenAutoFocus={handleOpenAutoFocus}
         className={cn(
           "fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2",
