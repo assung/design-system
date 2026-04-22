@@ -118,12 +118,19 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!isInteractive) return
       const step = precision === 'half' ? 0.5 : 1
+      // Full ARIA slider pattern(WAI-ARIA):Arrow / Home / End 支援 — D4 UX audit 2026-04-22
       if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
         e.preventDefault()
         setValue(Math.min(max, currentValue + step))
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
         e.preventDefault()
         setValue(Math.max(0, currentValue - step))
+      } else if (e.key === 'Home') {
+        e.preventDefault()
+        setValue(0)
+      } else if (e.key === 'End') {
+        e.preventDefault()
+        setValue(max)
       }
     }
 
@@ -134,6 +141,7 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
         aria-valuenow={isInteractive ? currentValue : undefined}
         aria-valuemin={isInteractive ? 0 : undefined}
         aria-valuemax={isInteractive ? max : undefined}
+        aria-valuetext={isInteractive ? `${currentValue} of ${max} stars` : undefined}
         aria-disabled={disabled || undefined}
         aria-readonly={readOnly || undefined}
         tabIndex={isInteractive ? 0 : undefined}

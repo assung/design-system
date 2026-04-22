@@ -180,14 +180,32 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     )
 
     const hasOverlay = status || typeof badgeCount === 'number'
+    // Keyboard access canonical(D4 UX audit 2026-04-22 finding):Avatar with `hoverCard`
+    // 需 keyboard 可達 — Radix `HoverCardTrigger asChild` 不自動加 tabIndex,non-focusable
+    // `<div>` 會讓 keyboard-only user 無法 reach NameCard popover(WCAG 2.1.1 / 4.1.2 違反)。
+    // 解:當 `hoverCard` 存在時,wrapper `<div>` 變 focusable(`tabIndex=0` + `role="button"` +
+    // `aria-haspopup="dialog"` + focus-visible ring)。若無 hoverCard 則維持純展示 `<div>`。
+    const focusableProps = hoverCard
+      ? {
+          tabIndex: 0,
+          role: 'button' as const,
+          'aria-haspopup': 'dialog' as const,
+          'aria-label': alt ?? 'View profile',
+        }
+      : {}
+    const focusableClass = hoverCard
+      ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded-full'
+      : ''
     const baseEl = !hasOverlay
-      ? <div ref={ref} className={cn('inline-flex shrink-0', className)} style={style} {...props}>{avatarEl}</div>
+      ? <div ref={ref} className={cn('inline-flex shrink-0', focusableClass, className)} style={style} {...focusableProps} {...props}>{avatarEl}</div>
       : (
-        <div ref={ref} className={cn('relative inline-flex shrink-0', className)} style={style} {...props}>
+        <div ref={ref} className={cn('relative inline-flex shrink-0', focusableClass, className)} style={style} {...focusableProps} {...props}>
           {avatarEl}
           {/* Status dot:bottom-right(presence — 世界級對照 Slack / Teams / Discord),
               落在 circle avatar 圓周 45° 位置 / square avatar 右下直角;
-              border ring 用 surface 色讓 dot 從 avatar 邊界視覺分離 */}
+              border ring 用 surface 色讓 dot 從 avatar 邊界視覺分離。
+              a11y:`aria-hidden` — presence 資訊整合到 parent avatar 的 aria-label
+              (world-class Slack 做法),避免多 `role="status"` 造成 screen reader 洪水 */}
           {status && (
             <span
               className="absolute block rounded-full"
@@ -199,8 +217,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
                 backgroundColor: STATUS_DOT_COLOR[status],
                 boxShadow: `0 0 0 ${dotBorder}px var(--surface-raised, var(--canvas))`,
               }}
-              role="status"
-              aria-label={`presence: ${status}`}
+              aria-hidden
             />
           )}
           {/* Count badge:top-right(chat 未讀 / 通知計數 — 世界級對照 iMessage /
