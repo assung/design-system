@@ -109,13 +109,15 @@ const PopoverFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 )
 PopoverFooter.displayName = "PopoverFooter"
 
+// 2026-04-22:PopoverTitle size 對齊 Dialog / Sheet canonical(`text-body-lg font-medium`)
+// 統一 overlay-surface family header title typography,避免 overlay 類 chrome 字級跨元件漂移
 const PopoverTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
   <h2
     ref={ref}
-    className={cn("text-body font-medium truncate", className)}
+    className={cn("text-body-lg font-medium truncate", className)}
     {...props}
   />
 ))

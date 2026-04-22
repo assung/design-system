@@ -129,17 +129,44 @@ export const WithForm = {
 export const LongContent = {
   name: '長內容（body 捲動）',
   render: () => {
-    // 30 avatar+title+description items(對應 user Image #3 期望 + item-anatomy Family 2
-    // reading mode:prefix avatar 40 + content title+description 2 行節奏)。
-    // 用於示範 overlay body 真正 scroll 情境,對齊 Material M3 Dialog list / Polaris
-    // ResourceList / Linear Cmd+K member picker。
+    // 30 avatar(真實圖片)+ title + description(ORG | EMPLOYEE_ID | EMPLOYEE_NUMBER)
+    // 對齊 user 要求 + NameCard 資訊量:
+    //   - avatar:real photo src(pravatar seed 確保每人不同面孔)
+    //   - title:name(body font-medium)
+    //   - description:ORG | Employee ID | Employee Number(caption fg-muted,類 NameCard subtitle)
+    // item-anatomy Family 2 reading mode — prefix avatar 40 / content title + description 2 行
     const orgs = ['ACME Corp', 'Nebula Inc', 'Orion Labs', 'Polaris Co']
-    const names = [
-      'Alan Chen', 'Betty Wu', 'Charlie Lee', 'Diana Kim', 'Ethan Park', 'Fiona Lin',
-      'George Ho', 'Hana Yu', 'Ivan Sun', 'Julia Shen', 'Kevin Hsu', 'Lydia Cao',
-      'Mark Tseng', 'Nina Pan', 'Oscar Lo', 'Peggy Qin', 'Ray Tang', 'Sophia Fei',
-      'Tom Liang', 'Uma Jiang', 'Victor Ren', 'Wendy Xia', 'Xavier Ma', 'Yuki Du',
-      'Zach Feng', 'Amy Zhao', 'Brad Fan', 'Cathy Miao', 'Derek Qu', 'Elena Xu',
+    const members = [
+      { name: 'Alan Chen', empId: 'D-0042', empNum: '1234567' },
+      { name: 'Betty Wu', empId: 'E-0183', empNum: '2345671' },
+      { name: 'Charlie Lee', empId: 'D-0127', empNum: '3456712' },
+      { name: 'Diana Kim', empId: 'M-0055', empNum: '4567123' },
+      { name: 'Ethan Park', empId: 'E-0210', empNum: '5671234' },
+      { name: 'Fiona Lin', empId: 'D-0098', empNum: '6712345' },
+      { name: 'George Ho', empId: 'E-0271', empNum: '7123456' },
+      { name: 'Hana Yu', empId: 'M-0019', empNum: '1234098' },
+      { name: 'Ivan Sun', empId: 'D-0145', empNum: '2340981' },
+      { name: 'Julia Shen', empId: 'E-0302', empNum: '3409812' },
+      { name: 'Kevin Hsu', empId: 'D-0076', empNum: '4098123' },
+      { name: 'Lydia Cao', empId: 'M-0088', empNum: '0981234' },
+      { name: 'Mark Tseng', empId: 'E-0154', empNum: '9812340' },
+      { name: 'Nina Pan', empId: 'D-0031', empNum: '8123409' },
+      { name: 'Oscar Lo', empId: 'E-0249', empNum: '1234560' },
+      { name: 'Peggy Qin', empId: 'M-0067', empNum: '2345601' },
+      { name: 'Ray Tang', empId: 'D-0192', empNum: '3456012' },
+      { name: 'Sophia Fei', empId: 'E-0115', empNum: '4560123' },
+      { name: 'Tom Liang', empId: 'D-0234', empNum: '5601234' },
+      { name: 'Uma Jiang', empId: 'M-0043', empNum: '6012345' },
+      { name: 'Victor Ren', empId: 'E-0168', empNum: '0123456' },
+      { name: 'Wendy Xia', empId: 'D-0059', empNum: '1230456' },
+      { name: 'Xavier Ma', empId: 'E-0296', empNum: '2304561' },
+      { name: 'Yuki Du', empId: 'D-0081', empNum: '3045612' },
+      { name: 'Zach Feng', empId: 'M-0024', empNum: '0456123' },
+      { name: 'Amy Zhao', empId: 'D-0163', empNum: '4561230' },
+      { name: 'Brad Fan', empId: 'E-0207', empNum: '5612304' },
+      { name: 'Cathy Miao', empId: 'M-0102', empNum: '6123045' },
+      { name: 'Derek Qu', empId: 'D-0140', empNum: '1204563' },
+      { name: 'Elena Xu', empId: 'E-0318', empNum: '2045631' },
     ]
     return (
       <Dialog defaultOpen>
@@ -155,18 +182,19 @@ export const LongContent = {
               對應 user Image #3 期望 + item-anatomy canonical */}
           <DialogBody variant="list">
             <div className="flex flex-col">
-              {names.map((name, i) => (
+              {members.map((m, i) => (
                 // px-2 rounded-md:content left = body px(loose-8) + item px(8)= loose ✓ 對齊 header title
-                // hover bg(item bg)inset 8px from body padded edge → 不貼 chrome 邊(視覺稽核「不貼邊」)
+                // hover bg inset 8px from body padded edge → 不貼 chrome 邊
+                // Avatar 真實 photo(pravatar seed)+ description 對齊 NameCard 資訊量(ORG | EMP_ID | EMP_NUM)
                 <button
-                  key={name}
+                  key={m.empNum}
                   className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
-                  <Avatar size={40} alt={name} color={(['primary', 'info', 'success', 'warning'] as const)[i % 4]} />
+                  <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-body font-medium truncate">{name}</span>
+                    <span className="text-body font-medium truncate">{m.name}</span>
                     <span className="text-caption text-fg-muted truncate">
-                      {orgs[i % orgs.length]} · EMP-{String(427 + i * 17).padStart(5, '0')}
+                      {orgs[i % orgs.length]} | {m.empId} | {m.empNum}
                     </span>
                   </div>
                 </button>
