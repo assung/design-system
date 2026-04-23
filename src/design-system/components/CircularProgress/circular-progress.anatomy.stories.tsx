@@ -38,16 +38,14 @@ export const Overview: Story = {
           strokeWidth 動態 scale = <span className="font-mono">max(2, size/10)</span>。
         </Desc>
         <div className="flex items-center gap-6 border border-border rounded-lg p-6">
-          {/* 只示範 canonical size:16 / 20 = field-inline(spec.md「Size canonical」)、
-              24 = 獨立預設、48 = Empty overlay 大圖。**不示範 32**(非獨立 canonical 值)。 */}
-          <CircularProgress size={16} />
-          <CircularProgress size={20} />
+          {/* CircularProgress 只有一種預設尺寸(24)。其他尺寸 **不**示範 —
+              consumer 在 Button / Input / Empty 等 context 內由這些元件自動依原則縮放
+              (見 spec.md「Size canonical」+ UsageInButton / UsageInline 兩個 context story)。
+              Overview 只展示 indeterminate + determinate 兩種模式。 */}
           <CircularProgress />
-          <CircularProgress size={48} />
           <CircularProgress value={60} />
-          <CircularProgress value={60} size={48} />
           <span className="text-caption text-fg-muted font-mono">
-            indeterminate 16 / 20 / 24(預設)/ 48(Empty) · determinate value=60 預設 / 48
+            indeterminate(不傳 value)· determinate(value=60)
           </span>
         </div>
       </div>

@@ -138,10 +138,15 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
         doubleClick={{ mode: 'reset' }}
         onTransform={handleTransformed}
       >
-        <TransformComponent
-          wrapperClass="!w-full !h-full"
-          contentClass="!w-full !h-full flex items-center justify-center"
-        >
+        {/* 2026-04-23 debug fix:contentClass 不設 `!w-full !h-full`。
+            設 `!w-full !h-full` 會讓 `.react-transform-component` 強制 1280×752 容器尺寸,
+            但 image 是 natural 1440×900(自然溢出 container)。Library `centerView(scale)`
+            基於 component 尺寸計算 translate → 計算偏 61px(視 image 被 WRAPPER 框住而非
+            自然 size)。
+            移除 content fixed size 後:component 自然 size = image natural → library 以
+            image 實際尺寸計算置中,translate 正確(42.4, 2.5)得到 symmetric padding。
+            wrapper 保留 `!w-full !h-full` 作 interaction capture bounds。 */}
+        <TransformComponent wrapperClass="!w-full !h-full">
           <img
             ref={imgRef}
             src={file.url}

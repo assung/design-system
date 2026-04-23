@@ -23,26 +23,33 @@ const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>
 >(({ className, align = "center", sideOffset = 8, collisionPadding = 12, ...props }, ref) => (
-  // collisionPadding=12(2026-04-23):Radix / browser 內部 1-2px rounding 讓
-  // visual padding 實際比 prop 值少 1-2px。提高到 12 保證使用者實際看到 ≥ 8px viewport
-  // edge gap(對齊 overlay-surface「靠邊 8px」canonical)。
-  <HoverCardPrimitive.Content
-    ref={ref}
-    align={align}
-    sideOffset={sideOffset}
-    collisionPadding={collisionPadding}
-    className={cn(
-      "z-50 outline-none",
-      "data-[state=open]:animate-in data-[state=closed]:animate-out",
-      "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-      "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
-      "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      "origin-[var(--radix-hover-card-content-transform-origin)]",
-      className,
-    )}
-    {...props}
-  />
+  // HoverCardPrimitive.Portal(2026-04-23):把 Content 搬到 `document.body`。
+  // 不 Portal 時 Content 會 DOM-nested 在 trigger subtree,如 trigger 位於 OverflowIndicator
+  // `data-theme="dark"` tooltip 內部 → Avatar 自帶 HoverCard 的 Content 也卡在 dark subtree,
+  // CSS var(--foreground) 繼承 dark 值 → NameCard 內部文字變 white 看不見(user 抓的 bug)。
+  // Portal 到 body 讓 CSS 繼承 chain 從 app root data-theme 起算,不受 trigger subtree 污染。
+  //
+  // collisionPadding=12:Radix / browser 內部 1-2px rounding 讓 visual padding 比 prop 值少 1-2px。
+  // 提高到 12 保證使用者實際看到 ≥ 8px viewport edge gap(overlay-surface「靠邊 8px」canonical)。
+  <HoverCardPrimitive.Portal>
+    <HoverCardPrimitive.Content
+      ref={ref}
+      align={align}
+      sideOffset={sideOffset}
+      collisionPadding={collisionPadding}
+      className={cn(
+        "z-50 outline-none",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "origin-[var(--radix-hover-card-content-transform-origin)]",
+        className,
+      )}
+      {...props}
+    />
+  </HoverCardPrimitive.Portal>
 ))
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName
 

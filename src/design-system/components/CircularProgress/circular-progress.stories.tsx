@@ -29,11 +29,13 @@ export const Default: Story = {
   name: '預設(indeterminate)',
   render: () => (
     <div className="flex items-center gap-6">
-      {/* 只示範 canonical size(spec.md「Size canonical」)— 16/20 inline、24 預設、48 Empty 大圖 */}
-      <CircularProgress size={16} />
-      <CircularProgress size={20} />
+      {/* CircularProgress 只提供一種預設尺寸(24);其他尺寸由 consumer context 自動縮放
+          (Button loading = iconSize / Input loading = iconSize / Empty = iconSize)。
+          不 parallel 展示多 sizes 因為 DS 不「提供各種 sizes」讓 consumer 挑,而是透過原則
+          在 consumer 端自動決定(見 spec.md「Size canonical」)。 */}
       <CircularProgress />
-      <CircularProgress size={48} />
+      <CircularProgress value={60} />
+      <CircularProgress value={90} affix="value" />
     </div>
   ),
 }
