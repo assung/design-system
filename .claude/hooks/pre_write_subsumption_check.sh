@@ -12,6 +12,9 @@
 # Output: additionalContext warning with top-3 potential duplicates. Non-blocking —
 # Claude decides whether to merge / point / continue with new file.
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 INPUT=$(cat)

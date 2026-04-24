@@ -14,6 +14,9 @@
 #
 # Trigger: PostToolUse on Edit/Write/MultiEdit where file_path ends in `.spec.md`.
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -uo pipefail
 
 FILE_PATH="${CLAUDE_TOOL_INPUT_FILE_PATH:-}"

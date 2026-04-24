@@ -6,6 +6,9 @@
 #
 # Full audit (dead export / circular / long function) — use `/code-quality-audit` skill.
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')

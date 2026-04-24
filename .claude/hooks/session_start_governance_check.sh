@@ -15,6 +15,9 @@
 #
 # Non-blocking; injects context only when thresholds breached.
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"

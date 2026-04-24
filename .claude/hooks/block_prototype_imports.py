@@ -3,6 +3,16 @@ import json
 import os
 import re
 import sys
+import time
+
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+try:
+    _log_dir = os.path.join(os.environ.get('CLAUDE_PROJECT_DIR', os.getcwd()), '.claude', 'logs')
+    os.makedirs(_log_dir, exist_ok=True)
+    with open(os.path.join(_log_dir, 'hook-fires-per-hook.jsonl'), 'a') as _f:
+        _f.write(json.dumps({'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'hook': os.path.basename(__file__)}) + '\n')
+except Exception:
+    pass
 
 EXPLORATION_PREFIX = "src/explorations/"
 SRC_PREFIX = "src/"

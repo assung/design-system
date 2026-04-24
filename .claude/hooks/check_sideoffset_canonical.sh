@@ -12,6 +12,9 @@
 # Trigger: PostToolUse on Edit/Write/MultiEdit for any .tsx/.md file that
 # contains `sideOffset=`.
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 FILE_PATH="${CLAUDE_TOOL_INPUT_FILE_PATH:-}"

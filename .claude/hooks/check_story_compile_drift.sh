@@ -6,6 +6,9 @@
 # key 不齊 = canonical drift,該修。本 hook 是 write-time early warning
 # (git commit 前),讓 AI / user 立刻看到 drift 而非 audit 時才發現。
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 INPUT=$(cat)

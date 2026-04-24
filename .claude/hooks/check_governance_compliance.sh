@@ -9,6 +9,9 @@
 # 本 hook 在 Write 時注入強制 self-check prompt,AI 必逐條答。
 # 非 blocking(只注入 context),但 AI 必在 response 裡提出 audit 結果。
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 INPUT=$(cat)

@@ -1,0 +1,32 @@
+#!/bin/bash
+# Shared helper: log per-hook fire to .claude/logs/hook-fires-per-hook.jsonl
+#
+# Why: enables /knowledge-prune D2 dead-hook detection(6 月 0 fire → retire 提名)。
+# 各 hook 在 top-of-file source 本檔 + 呼叫 `log_hook_fire`。
+#
+# 與 hook-fires.jsonl 分離:後者記 governance-file edits(tool+path),本 log 記
+# per-hook fire(hook basename+ts)。兩 log 互補不重疊。
+#
+# 規則:silent on failure,不 block hook 執行。
+
+log_hook_fire() {
+  local hook_name="${1:-$(basename "${BASH_SOURCE[1]:-$0}")}"
+  local log_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}/.claude/logs"
+  local log_file="$log_dir/hook-fires-per-hook.jsonl"
+
+  mkdir -p "$log_dir" 2>/dev/null || return 0
+
+  # Rotate if > 1 MB
+  if [ -f "$log_file" ]; then
+    local size
+    size=$(wc -c < "$log_file" 2>/dev/null | tr -d ' ')
+    if [ -n "$size" ] && [ "$size" -gt 1048576 ]; then
+      mv "$log_file" "${log_file}.$(date +%Y%m)" 2>/dev/null || true
+    fi
+  fi
+
+  printf '{"ts":"%s","hook":"%s"}\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    "$hook_name" \
+    >> "$log_file" 2>/dev/null || true
+}

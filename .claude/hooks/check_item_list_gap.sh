@@ -22,6 +22,9 @@
 #   exit 0 — pass(OR P1 warn only,stderr has 訊息但不 block)
 #   exit 2 + stderr — P2 block
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 INPUT=$(cat)

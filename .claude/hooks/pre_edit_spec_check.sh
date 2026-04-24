@@ -5,6 +5,9 @@
 # Diff-aware: skip if the edit is purely import cleanup / type-only / typo —
 # spec reading not required for those. Only fire if edit touches render body,
 # cva, variants, tokens, or other design-meaningful regions.
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 

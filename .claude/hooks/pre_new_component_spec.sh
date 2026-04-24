@@ -7,6 +7,9 @@
 #
 # Exit: 0 + stdout JSON additionalContext (non-blocking)
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 INPUT=$(cat)

@@ -10,6 +10,9 @@
 # Output: stderr warning if missing; exit 0 (non-blocking by design — AI decides
 # whether to re-edit and add the block).
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 # Read stdin JSON payload (Claude Code hook input)

@@ -29,6 +29,9 @@
 #   - p-0 刻意覆寫(如 SheetBody variant="list" `py-2`)
 #   - 無 bg 的 flex container 只用 border separator
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 set -euo pipefail
 
 INPUT=$(cat)

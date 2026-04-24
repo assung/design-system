@@ -13,6 +13,9 @@
 #
 # WARN-style (not BLOCK): hook emits additionalContext so AI reads and can fix in next iteration.
 
+# Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 
 # Scope: only design-system component / pattern .tsx files (not stories, not specs)
