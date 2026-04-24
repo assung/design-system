@@ -44,10 +44,12 @@ CORRECTIONS=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null \
 [ -z "$CORRECTIONS" ] && exit 0
 
 # Dedup by session:only log latest per session(avoid re-harvest same session 爆炸 log)
-# 2026-04-24 dogfood 發現:同 session Stop event 每次重掃同 transcript,
-# 產生 N 筆相同 sample。改 dedup:grep 本 session 既有 line 刪除再 append latest。
+# 2026-04-24 bug fix v2:原 `grep && mv` 若全 line 都 match(grep 返回 1)→ && short-circuit
+# 不跑 mv → log 繼續 grow。改用獨立 grep + 無條件 mv,確保替換一定執行。
 if [ -f "$LOG_FILE" ]; then
-  grep -v "\"session\":\"$SESSION_ID\"" "$LOG_FILE" > "$LOG_FILE.tmp" 2>/dev/null && mv "$LOG_FILE.tmp" "$LOG_FILE" || true
+  grep -v "\"session\":\"$SESSION_ID\"" "$LOG_FILE" > "$LOG_FILE.tmp" 2>/dev/null || true
+  # grep -v 可能 exit 1(無 non-match 時),但 tmp 檔一定存在(空或含內容);無條件 mv
+  [ -f "$LOG_FILE.tmp" ] && mv -f "$LOG_FILE.tmp" "$LOG_FILE"
 fi
 
 # Append summary line(latest per session)
