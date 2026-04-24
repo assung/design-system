@@ -642,8 +642,12 @@ const sidebarGroupLabelVariants = cva(
 
 const SidebarGroupLabel = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & { asChild?: boolean } & VariantProps<typeof sidebarGroupLabelVariants>
->(({ className, asChild = false, size: sizeProp, children, ...props }, ref) => {
+  React.ComponentProps<"div"> & {
+    asChild?: boolean
+    /** ARIA label for the expand/collapse chevron (only when group is collapsible). Override for i18n. Default: 「展開或收合」 */
+    toggleAriaLabel?: string
+  } & VariantProps<typeof sidebarGroupLabelVariants>
+>(({ className, asChild = false, size: sizeProp, children, toggleAriaLabel = '展開或收合' /* i18n-allow: DS default; consumer override via toggleAriaLabel prop */, ...props }, ref) => {
   const { size: contextSize } = useSidebar()
   const size = sizeProp ?? contextSize
   const group = useSidebarGroup()
@@ -683,7 +687,7 @@ const SidebarGroupLabel = React.forwardRef<
         <CollapsiblePrimitive.Trigger asChild>
           <ItemInlineActionButton
             icon={ChevronDown}
-            aria-label="展開或收合"
+            aria-label={toggleAriaLabel}
             className="pointer-events-auto ml-auto"
             iconClassName="transition-transform duration-150 [[data-state=open]_&]:rotate-180"
           />

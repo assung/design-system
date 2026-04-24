@@ -144,7 +144,7 @@ export const OverflowScrollArrow: React.FC<OverflowScrollArrowProps> = ({
   onClick,
   'aria-label': ariaLabel,
 }) => {
-  const defaultLabel = direction === 'left' ? '向左捲動' : '向右捲動'
+  const defaultLabel = direction === 'left' ? '向左捲動' : '向右捲動' // i18n-allow: DS default; consumer override via aria-label prop
   return (
     <div
       className={cn(

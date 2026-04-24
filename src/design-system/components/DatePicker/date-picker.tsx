@@ -161,7 +161,7 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
                 size={size ?? 'md'}
                 action={{
                   icon: X,
-                  label: '清除日期',
+                  label: '清除日期', // i18n-allow: DS default inline-action label
                   onClick: (e) => {
                     e?.stopPropagation()
                     onChange?.('')
@@ -306,7 +306,7 @@ const DatePickerRange = React.forwardRef<HTMLButtonElement, DatePickerRangeProps
                 size={size ?? 'md'}
                 action={{
                   icon: X,
-                  label: '清除日期區間',
+                  label: '清除日期區間', // i18n-allow: DS default inline-action label
                   onClick: (e) => {
                     e?.stopPropagation()
                     onChange?.([null, null])

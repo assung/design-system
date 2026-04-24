@@ -65,9 +65,9 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       maxSize,
       disabled = false,
       loading = false,
-      loadingTitle = '上傳中…',
-      title = 'Click or drag file here to upload',
-      description = multiple ? 'Support for a single or bulk upload' : 'Support for a single file upload',
+      loadingTitle = '上傳中…', // i18n-allow: DS default; consumer override via loadingTitle prop
+      title = 'Click or drag file here to upload', // i18n-allow: DS default; consumer override via title prop
+      description = multiple ? 'Support for a single or bulk upload' : 'Support for a single file upload', // i18n-allow: DS default; consumer override via description prop
       children,
       className,
       onClick,

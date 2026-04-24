@@ -53,8 +53,8 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   value,
   onChange,
   people = [],
-  searchPlaceholder = '搜尋人員…',
-  emptyText = '沒有符合的人員',
+  searchPlaceholder = '搜尋人員…', // i18n-allow: DS default; consumer override via searchPlaceholder prop
+  emptyText = '沒有符合的人員', // i18n-allow: DS default; consumer override via emptyText prop
   className,
   disabled,
   ...props

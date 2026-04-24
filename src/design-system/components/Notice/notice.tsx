@@ -66,6 +66,8 @@ export interface NoticeProps
   endContent?: React.ReactNode
   dismissible?: boolean
   onDismiss?: () => void
+  /** ARIA label for the dismiss button. Override for i18n. Default: "關閉通知" */
+  dismissAriaLabel?: string
   iconClassName?: string
 }
 
@@ -78,6 +80,7 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
       endContent,
       dismissible = true,
       onDismiss,
+      dismissAriaLabel = '關閉通知', // i18n-allow: DS default; consumer override via dismissAriaLabel prop
       iconClassName,
       className,
       ...props
@@ -117,7 +120,7 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
                 dismiss
                 size="xs"
                 startIcon={XIcon}
-                aria-label="關閉通知"
+                aria-label={dismissAriaLabel}
                 onClick={onDismiss}
               />
             )}

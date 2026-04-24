@@ -87,6 +87,12 @@ export interface CalendarProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 
   /** locale(預設 'en-US') */
   locale?: string
+
+  /** ARIA labels for chrome controls. Override for i18n. */
+  prevAriaLabel?: string
+  nextAriaLabel?: string
+  viewToggleAriaLabel?: string
+  todayLabel?: string
 }
 
 // ── Event tile color tokens ─────────────────────────────────────────────────
@@ -139,6 +145,10 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
   size = 'md',
   className,
   locale = 'en-US',
+  prevAriaLabel = '上個月', // i18n-allow: DS default; consumer override via prevAriaLabel prop
+  nextAriaLabel = '下個月', // i18n-allow: DS default; consumer override via nextAriaLabel prop
+  viewToggleAriaLabel = '檢視切換', // i18n-allow: DS default; consumer override via viewToggleAriaLabel prop
+  todayLabel = '今天', // i18n-allow: DS default; consumer override via todayLabel prop
   ...props
 }, ref) {
   // Controlled / uncontrolled refDate
@@ -216,18 +226,18 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
             size="sm"
             iconOnly
             startIcon={ChevronLeft}
-            aria-label="上個月"
+            aria-label={prevAriaLabel}
             onClick={handlePrev}
           />
           <Button variant="tertiary" size="sm" onClick={handleToday}>
-            今天
+            {todayLabel}
           </Button>
           <Button
             variant="text"
             size="sm"
             iconOnly
             startIcon={ChevronRight}
-            aria-label="下個月"
+            aria-label={nextAriaLabel}
             onClick={handleNext}
           />
         </div>
@@ -243,7 +253,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
           size="sm"
           value={currentView}
           onValueChange={(v) => setView(v as CalendarView)}
-          aria-label="檢視切換"
+          aria-label={viewToggleAriaLabel}
         >
           <SegmentedControlItem value="day" disabled>日</SegmentedControlItem>
           <SegmentedControlItem value="week" disabled>週</SegmentedControlItem>

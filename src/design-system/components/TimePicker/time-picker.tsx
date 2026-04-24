@@ -387,7 +387,7 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
                 size={size ?? 'md'}
                 action={{
                   icon: X,
-                  label: '清除時間',
+                  label: '清除時間', // i18n-allow: DS default inline-action label
                   onClick: (e) => {
                     e?.stopPropagation()
                     onChange?.('')

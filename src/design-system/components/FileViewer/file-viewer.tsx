@@ -124,6 +124,7 @@ function resolveRenderer(file: FileInfo): FileRenderer {
 type ZoomFit = 'fit-width' | 'fit-page'
 
 const ZOOM_PRESETS: number[] = [10, 25, 50, 75, 100, 125, 150, 200, 400]
+// i18n-allow-block: DS defaults for zoom fit menu;consumer override via `labels.zoomFitOptions` (future) or fork
 const ZOOM_FIT_OPTIONS: { value: ZoomFit; label: string }[] = [
   { value: 'fit-width', label: 'Fit to width' },
   { value: 'fit-page', label: 'Fit to page' },
@@ -148,6 +149,7 @@ interface ZoomInputProps {
   value: number
   onChange: (next: number) => void
   onFit: (fit: ZoomFit) => void
+  labels: Pick<Required<FileViewerLabels>, 'zoomInput' | 'zoomMenu'>
 }
 
 /**
@@ -165,7 +167,7 @@ interface ZoomInputProps {
  * 目前只 FileViewer 消費;MVP 階段遵循 YAGNI。當 PDF / Video viewer 也需要相同
  * primitive 時,再依「建立前必查既有 pattern」原則從 FileViewer 抽出升級。
  */
-const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
+const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit, labels }) => {
   const [draft, setDraft] = React.useState<string>(`${value}%`)
   const [menuOpen, setMenuOpen] = React.useState(false)
 
@@ -208,7 +210,7 @@ const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
         <Input
           size="sm"
           autoWidth
-          aria-label="縮放比例"
+          aria-label={labels.zoomInput}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={commitDraft}
@@ -224,7 +226,7 @@ const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
             <DropdownMenuTrigger asChild>
               <ItemInlineActionButton
                 icon={ChevronDown}
-                aria-label="開啟縮放選單"
+                aria-label={labels.zoomMenu}
                 size="sm"
               />
             </DropdownMenuTrigger>
@@ -300,6 +302,7 @@ interface ToolbarProps {
   onDownload?: () => void
   allowDownload: boolean
   onClose: () => void
+  labels: Required<FileViewerLabels>
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -313,6 +316,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onDownload,
   allowDownload,
   onClose,
+  labels,
 }) => {
   return (
     <div
@@ -347,7 +351,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         {capabilities.zoom && (
           <>
             {/* Zoom group:-/%/+/▼ 屬同類「縮放」操作,群組並在右側加分隔線跟其他動作分群 */}
-            <ZoomInput value={zoom} onChange={onZoomChange} onFit={onFit} />
+            <ZoomInput value={zoom} onChange={onZoomChange} onFit={onFit} labels={labels} />
             {/* zoom group → next action group divider(action-bar canonical) */}
             <div className="h-6 w-px bg-divider mx-1" aria-hidden />
           </>
@@ -357,7 +361,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           size="sm"
           iconOnly
           startIcon={Info}
-          aria-label={infoOpen ? '收合詳細資訊面板' : '展開詳細資訊面板'}
+          aria-label={infoOpen ? labels.infoToggleCollapse : labels.infoToggleExpand}
           pressed={infoOpen}
           onClick={onInfoToggle}
         />
@@ -367,7 +371,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
             size="sm"
             iconOnly
             startIcon={Download}
-            aria-label="下載檔案"
+            aria-label={labels.download}
             onClick={onDownload}
           />
         )}
@@ -382,7 +386,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           size="sm"
           data-dismiss
           startIcon={XIcon}
-          aria-label="關閉檢視器"
+          aria-label={labels.close}
           onClick={onClose}
         />
       </div>
@@ -397,6 +401,7 @@ interface InfoPanelProps {
   readOnly: boolean
   onDescriptionChange?: (fileId: string, description: string) => void
   onClose: () => void
+  labels: Required<FileViewerLabels>
 }
 
 function formatBytes(bytes: number | undefined): string | undefined {
@@ -412,6 +417,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   readOnly,
   onDescriptionChange,
   onClose,
+  labels,
 }) => {
   const [draft, setDraft] = React.useState(file.description ?? '')
 
@@ -434,7 +440,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         'w-80 shrink-0 flex flex-col bg-surface border-l border-divider',
         'h-full',
       )}
-      aria-label="檔案詳細資訊"
+      aria-label={labels.detailPanel}
     >
       {/* Panel header — 與 Toolbar 等高(h-[var(--chrome-header-height)]),視覺一致 */}
       <div
@@ -443,7 +449,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           'px-[var(--layout-space-loose)]',
         )}
       >
-        <h3 className="text-body-lg font-medium text-foreground">詳細資訊</h3>
+        <h3 className="text-body-lg font-medium text-foreground">{labels.detailsHeading}</h3>
         {/* InfoPanel close 走 dismiss canonical `<Button iconOnly dismiss />`,對齊 button.spec.md
             「Dismiss 視覺類」+ item-anatomy.spec.md「Dismiss canonical」。 */}
         <Button
@@ -452,7 +458,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           size="sm"
           data-dismiss
           startIcon={XIcon}
-          aria-label="關閉詳細資訊"
+          aria-label={labels.detailPanelClose}
           onClick={onClose}
         />
       </div>
@@ -473,7 +479,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             onChange={(e) => setDraft(e.target.value)}
             onBlur={commit}
             readOnly={readOnly}
-            placeholder={readOnly ? '尚無說明' : '為這個檔案加上說明…'}
+            placeholder={readOnly ? labels.descriptionPlaceholderReadOnly : labels.descriptionPlaceholderEdit}
             rows={5}
           />
         </Field>
@@ -486,7 +492,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             - 不再手刻 dl/dt/dd — canonical 由 DS primitive own */}
         {/* heading → first-item gap = item → item gap(Gestalt proximity,見 description-list.spec.md) */}
         <div className="flex flex-col gap-[var(--layout-space-tight)]">
-          <span className="text-body font-normal text-foreground">檔案資訊</span>
+          <span className="text-body font-normal text-foreground">{labels.fileInfoHeading}</span>
           <DescriptionList direction="horizontal" divided>
             <DescriptionItem label="檔名">{file.name}</DescriptionItem>
             <DescriptionItem label="類型">{file.mimeType || '—'}</DescriptionItem>
@@ -512,11 +518,12 @@ interface FilmstripProps {
   files: FileInfo[]
   activeIndex: number
   onSelect: (index: number) => void
+  labels: Pick<Required<FileViewerLabels>, 'filmstripLabel'>
 }
 
 const THUMB_SIZE = 64 // px, 固定
 
-const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect }) => {
+const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect, labels }) => {
   const { scrollRef, atStart, atEnd, canScroll } = useScrollEdges<HTMLDivElement>()
   const scrollByPage = useScrollByPage(scrollRef)
   const maskImage = buildFadeMask({ canScroll, atStart, atEnd, reserveArrowWidth: 32 })
@@ -560,7 +567,7 @@ const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect }) =
             role="tablist" 擺在 tabs 的直接父元件,符合 ARIA tab pattern 語意。 */}
         <div
           role="tablist"
-          aria-label="檔案佇列"
+          aria-label={labels.filmstripLabel}
           className="flex items-center gap-[var(--layout-space-tight)] mx-auto shrink-0"
         >
         {files.map((file, i) => {
@@ -616,6 +623,64 @@ const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect }) =
 
 // ─── FileViewer (shell) ───────────────────────────────────────────────────────
 
+/**
+ * i18n-able labels for FileViewer chrome / controls.
+ * All keys are optional — defaults are CJK (see `DEFAULT_LABELS`).
+ * Consumer typically spreads partial override:
+ *   `<FileViewer labels={{ close: 'Close', download: 'Download' }} />`
+ */
+export interface FileViewerLabels {
+  /** Zoom input ARIA label */
+  zoomInput?: string
+  /** Zoom menu trigger ARIA label */
+  zoomMenu?: string
+  /** Info panel toggle button — shown when panel is OPEN */
+  infoToggleCollapse?: string
+  /** Info panel toggle button — shown when panel is CLOSED */
+  infoToggleExpand?: string
+  /** Download button ARIA label */
+  download?: string
+  /** Close viewer button ARIA label */
+  close?: string
+  /** InfoPanel outer aside ARIA label */
+  detailPanel?: string
+  /** InfoPanel heading text */
+  detailsHeading?: string
+  /** InfoPanel close button ARIA label */
+  detailPanelClose?: string
+  /** Description textarea placeholder (readOnly) */
+  descriptionPlaceholderReadOnly?: string
+  /** Description textarea placeholder (editable) */
+  descriptionPlaceholderEdit?: string
+  /** Detail section — file info section heading */
+  fileInfoHeading?: string
+  /** Filmstrip tablist ARIA label */
+  filmstripLabel?: string
+  /** Previous-file nav button ARIA label */
+  previousFile?: string
+  /** Next-file nav button ARIA label */
+  nextFile?: string
+}
+
+// i18n-allow: DS defaults;consumer override via `labels` prop
+const DEFAULT_LABELS: Required<FileViewerLabels> = {
+  zoomInput: '縮放比例',
+  zoomMenu: '開啟縮放選單',
+  infoToggleCollapse: '收合詳細資訊面板',
+  infoToggleExpand: '展開詳細資訊面板',
+  download: '下載檔案',
+  close: '關閉檢視器',
+  detailPanel: '檔案詳細資訊',
+  detailsHeading: '詳細資訊',
+  detailPanelClose: '關閉詳細資訊',
+  descriptionPlaceholderReadOnly: '尚無說明',
+  descriptionPlaceholderEdit: '為這個檔案加上說明…',
+  fileInfoHeading: '檔案資訊',
+  filmstripLabel: '檔案佇列',
+  previousFile: '上一個檔案',
+  nextFile: '下一個檔案',
+}
+
 export interface FileViewerProps
   extends Omit<
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
@@ -638,6 +703,8 @@ export interface FileViewerProps
   allowDownload?: boolean
   /** 自訂 download 行為;未傳則用 anchor download attribute。 */
   onDownload?: (file: FileInfo) => void
+  /** i18n labels override. Partial — merged with DS defaults. */
+  labels?: FileViewerLabels
 }
 
 const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function FileViewer({
@@ -652,8 +719,13 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
   showFilmstrip = false,
   allowDownload = true,
   onDownload,
+  labels: labelsOverride,
   ...props
 }, ref) {
+  const labels = React.useMemo(
+    () => ({ ...DEFAULT_LABELS, ...labelsOverride }) satisfies Required<FileViewerLabels>,
+    [labelsOverride],
+  )
   // Index:uncontrolled fallback
   const [internalIndex, setInternalIndex] = React.useState(initialIndex)
   const activeIndex = indexProp ?? internalIndex
@@ -831,6 +903,7 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
               onDownload={handleDownload}
               allowDownload={allowDownload}
               onClose={() => onOpenChange(false)}
+              labels={labels}
             />
 
             {/* 主區:Viewport + 可選 InfoPanel(右側)
@@ -857,7 +930,7 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                       size="md"
                       iconOnly
                       startIcon={ChevronLeft}
-                      aria-label="上一個檔案"
+                      aria-label={labels.previousFile}
                       onClick={() => setIndex(activeIndex - 1)}
                     />
                   </div>
@@ -885,7 +958,7 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                       size="md"
                       iconOnly
                       startIcon={ChevronRight}
-                      aria-label="下一個檔案"
+                      aria-label={labels.nextFile}
                       onClick={() => setIndex(activeIndex + 1)}
                     />
                   </div>
@@ -897,6 +970,7 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                   readOnly={readOnly}
                   onDescriptionChange={onDescriptionChange}
                   onClose={() => setInfoOpen(false)}
+                  labels={labels}
                 />
               )}
             </div>
@@ -906,6 +980,7 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                 files={files}
                 activeIndex={activeIndex}
                 onSelect={setIndex}
+                labels={labels}
               />
             )}
           </div>

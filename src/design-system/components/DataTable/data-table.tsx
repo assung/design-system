@@ -356,7 +356,7 @@ function DataTableInner<TData>(
     if (isEmpty && isCenter) {
       // 有框容器 → 垂直置中(design principle)
       if (emptyState && typeof emptyState !== 'string') return <div className="flex-1 flex items-center justify-center py-12">{emptyState}</div>
-      return <div className="flex-1 flex items-center justify-center py-12"><Empty description={typeof emptyState === 'string' ? emptyState : '沒有資料'} /></div>
+      return <div className="flex-1 flex items-center justify-center py-12"><Empty description={typeof emptyState === 'string' ? emptyState : '沒有資料'} /></div> // i18n-allow: DS default fallback; consumer override via emptyState prop
     }
     if (isEmpty) return null
 

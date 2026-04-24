@@ -217,7 +217,11 @@ CarouselItem.displayName = 'CarouselItem'
 // opacity transition 控制(Button 本身不負責)。此 wrapper 存在僅為絕對定位 +
 // hover/focus 可見性,不再覆寫 Button 的視覺 token。
 
-type ArrowProps = { className?: string }
+type ArrowProps = {
+  className?: string
+  /** ARIA label. Override for i18n. Prev default: 「上一張」;Next default: 「下一張」 */
+  'aria-label'?: string
+}
 
 const arrowWrapperClass = cn(
   'absolute z-10',
@@ -228,7 +232,7 @@ const arrowWrapperClass = cn(
 )
 
 const CarouselPrevious = React.forwardRef<HTMLButtonElement, ArrowProps>(
-  ({ className }, ref) => {
+  ({ className, 'aria-label': ariaLabel = '上一張' /* i18n-allow: DS default; consumer override via aria-label prop */ }, ref) => {
     const { orientation, scrollPrev, canScrollPrev } = useCarousel()
     return (
       <div
@@ -246,7 +250,7 @@ const CarouselPrevious = React.forwardRef<HTMLButtonElement, ArrowProps>(
           size="md"
           iconOnly
           startIcon={ChevronLeft}
-          aria-label="上一張"
+          aria-label={ariaLabel}
           disabled={!canScrollPrev}
           onClick={scrollPrev}
           // documented exception:視覺取向的 media carousel 箭頭用 rounded-full 圓形,
@@ -261,7 +265,7 @@ const CarouselPrevious = React.forwardRef<HTMLButtonElement, ArrowProps>(
 CarouselPrevious.displayName = 'CarouselPrevious'
 
 const CarouselNext = React.forwardRef<HTMLButtonElement, ArrowProps>(
-  ({ className }, ref) => {
+  ({ className, 'aria-label': ariaLabel = '下一張' /* i18n-allow: DS default; consumer override via aria-label prop */ }, ref) => {
     const { orientation, scrollNext, canScrollNext } = useCarousel()
     return (
       <div
@@ -279,7 +283,7 @@ const CarouselNext = React.forwardRef<HTMLButtonElement, ArrowProps>(
           size="md"
           iconOnly
           startIcon={ChevronRight}
-          aria-label="下一張"
+          aria-label={ariaLabel}
           disabled={!canScrollNext}
           onClick={scrollNext}
           // documented exception:同 Previous,媒體導向 carousel 箭頭圓形

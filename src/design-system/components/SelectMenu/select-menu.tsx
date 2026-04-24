@@ -114,8 +114,8 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
   onCreate,
   createLabel = (q) => `直接使用「${q}」`,
   children,
-  searchPlaceholder = '搜尋…',
-  emptyText = '沒有符合的選項',
+  searchPlaceholder = '搜尋…', // i18n-allow: DS default; consumer override via searchPlaceholder prop
+  emptyText = '沒有符合的選項', // i18n-allow: DS default; consumer override via emptyText prop
   size = 'md',
   align = 'start',
   minRows = 3,

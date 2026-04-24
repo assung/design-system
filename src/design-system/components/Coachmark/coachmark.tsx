@@ -97,6 +97,7 @@ export interface CoachmarkProps extends Omit<React.HTMLAttributes<HTMLDivElement
   className?: string
 }
 
+// i18n-allow: DS-internal kind → title 預設對照表;consumer 透過 `title` prop 直接覆寫
 const KIND_TITLE: Record<'tips' | 'new-features', string> = {
   tips: '使用技巧',
   'new-features': '新功能介紹',
@@ -118,7 +119,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
       onNext,
       onPrev,
       isLastStep = false,
-      doneLabel = '知道了',
+      doneLabel = '知道了', // i18n-allow: DS default; consumer override via doneLabel prop
       side = 'bottom',
       align = 'center',
       sideOffset = 8,

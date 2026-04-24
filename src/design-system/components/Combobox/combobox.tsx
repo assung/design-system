@@ -156,6 +156,12 @@ export interface ComboboxProps {
   searchable?: boolean
   /** 搜尋框位置：menu（浮層內，預設）或 trigger（inline input） */
   searchIn?: 'menu' | 'trigger'
+  /** 搜尋框 placeholder（未有選項時顯示)。Default: 「搜尋…」 */
+  searchPlaceholder?: string
+  /** 搜尋框 ARIA label。Default: 「搜尋選項」 */
+  searchAriaLabel?: string
+  /** Empty-selection placeholder text。Default: 「選擇…」 */
+  emptyPlaceholder?: string
 }
 
 const getIconSize = (size: string) => size === 'lg' ? 20 : 16
@@ -237,7 +243,7 @@ function NativeCombobox({
           <span className="pointer-events-auto">
             <ItemInlineAction
               size={size ?? 'md'}
-              action={{ icon: X, label: '清除全部', onClick: () => onChange?.([]) }}
+              action={{ icon: X, label: '清除全部', onClick: () => onChange?.([]) }} // i18n-allow: DS default inline-action label
             />
           </span>
         )}
@@ -252,6 +258,9 @@ function NativeCombobox({
 function CustomCombobox({
   mode = 'edit', error = false, size = 'md', options, value = [], onChange, placeholder,
   className, disabled, wrap = false, clearable = false, searchable = false, searchIn = 'menu',
+  searchPlaceholder = '搜尋…', // i18n-allow: DS default
+  searchAriaLabel = '搜尋選項', // i18n-allow: DS default
+  emptyPlaceholder = '選擇…', // i18n-allow: DS default
 }: ComboboxProps) {
   const resolvedMode = disabled ? 'disabled' : mode
   const iconSize = getIconSize(size)
@@ -303,12 +312,12 @@ function CustomCombobox({
             onRemove={handleRemove}
             trailing={searchable && searchIn === 'trigger' ? (
               <input value={search} onChange={(e) => setSearch(e.target.value)}
-                placeholder={items.length === 0 ? '搜尋…' : ''} onClick={(e) => { e.stopPropagation(); setOpen(true) }}
-                aria-label="搜尋選項"
+                placeholder={items.length === 0 ? searchPlaceholder : ''} onClick={(e) => { e.stopPropagation(); setOpen(true) }}
+                aria-label={searchAriaLabel}
                 className="flex-1 min-w-[60px] bg-transparent outline-none text-body leading-compact relative z-10" />
             ) : undefined} />
         ) : (
-          <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
+          <span className="text-fg-muted">{placeholder ?? emptyPlaceholder}</span>
         )}
       </div>
       <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
@@ -319,7 +328,7 @@ function CustomCombobox({
               size={size ?? 'md'}
               action={{
                 icon: X,
-                label: '清除全部',
+                label: '清除全部', // i18n-allow: DS default inline-action label
                 onClick: (e) => { e?.stopPropagation(); onChange?.([]) },
               }}
             />

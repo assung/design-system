@@ -175,7 +175,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
           </span>
           <ItemInlineAction
             size={size ?? 'md'}
-            action={{ icon: Pencil, label: '編輯連結', onClick: handleEdit }}
+            action={{ icon: Pencil, label: '編輯連結', onClick: handleEdit }} // i18n-allow: DS default inline-action label
           />
         </div>
       )

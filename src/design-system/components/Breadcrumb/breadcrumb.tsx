@@ -222,13 +222,13 @@ BreadcrumbSeparator.displayName = 'BreadcrumbSeparator'
 type BreadcrumbEllipsisProps = React.ComponentPropsWithoutRef<'button'>
 
 const BreadcrumbEllipsis = React.forwardRef<HTMLButtonElement, BreadcrumbEllipsisProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, 'aria-label': ariaLabel = '顯示折疊路徑' /* i18n-allow: DS default; consumer override via aria-label prop */, ...props }, ref) => {
     const { size } = React.useContext(BreadcrumbContext)
     return (
       <button
         ref={ref}
         type="button"
-        aria-label="顯示折疊路徑"
+        aria-label={ariaLabel}
         className={cn(
           'inline-flex items-center text-fg-muted',
           'hover:text-primary-hover transition-colors duration-150',

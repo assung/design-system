@@ -48,7 +48,24 @@ fi
 VIOLATIONS=""
 
 CJK_HITS=$(perl -CSD -ne '
-  BEGIN { our $jsdoc = 0; our $console_open = 0; our $jsx_comment = 0; }
+  BEGIN {
+    our $jsdoc = 0; our $console_open = 0; our $jsx_comment = 0;
+    our $allow_pending = 0; our $allow_depth = 0;
+  }
+  # ── block-level i18n-allow:上一行有 `// i18n-allow-block` 或
+  # `// i18n-allow`(單獨 comment 行)→ 標記下一個 `{...}` 區塊整個 skip ──
+  if (m{^\s*(?://|/\*+)\s*i18n-allow(-block)?\b}) { $allow_pending = 1; next }
+  if ($allow_pending && m{[\{\[]}) {
+    $allow_pending = 0;
+    my $opens = () = /[\{\[]/g; my $closes = () = /[\}\]]/g;
+    $allow_depth = $opens - $closes;
+    next if $allow_depth > 0;  # only enter block if net positive opens
+  }
+  if ($allow_depth > 0) {
+    my $opens = () = /[\{\[]/g; my $closes = () = /[\}\]]/g;
+    $allow_depth += $opens - $closes;
+    next;
+  }
   # ── JSDoc block(多行 /** ... */)── stateful ──
   if (!$jsdoc && m{/\*\*}) { $jsdoc = 1 }
   if ($jsdoc) {
@@ -66,6 +83,11 @@ CJK_HITS=$(perl -CSD -ne '
   next if m{^\s*/\*.*\*/\s*$};          # single-line block comment
   next if m{^\s*\*};                    # stray JSDoc line
   next if m{i18n-allow};
+  # ── strip trailing `//` comments(naïve:不處理 URL 等 string 內 `//`)─
+  # Fix FP:`code() // CJK comment` 被誤匹配 comment 內的 CJK
+  # 注意:不能用 `[^\x27"]` 限制,comment 內可能有 `"` 被 CJK 夾住
+  # 簡單策略 — `//` 後到 EOL 全 strip(string 內的 `//` 罕見 → 可接受 FP trade)
+  $_ =~ s{\s+//.*$}{};
   # ── dev-only console.* / throw new Error() multi-line — stateful ─
   # 這些是 DS internal dev / developer-facing diagnostics,consumer 看不到
   if (!$console_open && m{(console\.(warn|error|log|info|debug)|throw\s+new\s+(Error|TypeError|RangeError))\s*\(}) {
@@ -96,18 +118,27 @@ fi
 
 # English sentence-case labels — narrow detection
 ENG_HITS=$(perl -CSD -ne '
+  BEGIN { our $allow_pending = 0; our $allow_depth = 0; }
+  # ── block-level i18n-allow(同 CJK block)─
+  if (m{^\s*(?://|/\*+)\s*i18n-allow(-block)?\b}) { $allow_pending = 1; next }
+  if ($allow_pending && m{[\{\[]}) {
+    $allow_pending = 0;
+    my $opens = () = /[\{\[]/g; my $closes = () = /[\}\]]/g;
+    $allow_depth = $opens - $closes;
+    next if $allow_depth > 0;  # only enter block if net positive opens
+  }
+  if ($allow_depth > 0) {
+    my $opens = () = /[\{\[]/g; my $closes = () = /[\}\]]/g;
+    $allow_depth += $opens - $closes;
+    next;
+  }
   # ── 註解 skip(line-level)─────────────────────
-  next if m{^\s*//};                    # single-line comment
-  next if m{^\s*/\*.*\*/\s*$};          # single-line block comment
-  next if m{^\s*\*};                    # JSDoc continuation ` * ...`
-  next if m{^\s*/\*\*?\s*$};            # `/**` opener line
+  next if m{^\s*//};
+  next if m{^\s*/\*.*\*/\s*$};
+  next if m{^\s*\*};
+  next if m{^\s*/\*\*?\s*$};
   next if m{i18n-allow};
-  # ── dev-only debug skip ────────────────────
-  # console.{warn,error,log,info,debug}(...) 屬 DS internal dev warning,
-  # 不是 end-user-facing 文案,consumer 看不到
   next if m{console\.(warn|error|log|info|debug)\s*\(};
-  # Only flag JSX text >X Y Z< or attr ="X Y Z" with 2+ capitalized words,
-  # skip common code tokens (className / data-* / href / etc)
   next if m{className=|aria-label=|data-\w+=|href=|key=};
   if (m{>([A-Z][a-z]+ [a-z]+(?: [a-z]+)+)<} || m{[\"\047]([A-Z][a-z]+ [a-z]+(?: [a-z]+)+)[\"\047]}) {
     print "$.:$1\n";

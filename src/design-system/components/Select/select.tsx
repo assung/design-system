@@ -127,7 +127,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
       <span className="relative z-10">
         <ItemInlineAction
           size={size ?? 'md'}
-          action={{ icon: X, label: '清除選取', onClick: () => onChange?.('') }}
+          action={{ icon: X, label: '清除選取', onClick: () => onChange?.('') }} // i18n-allow: DS default inline-action label; consumer override by passing own `clearable` / wrapping logic
         />
       </span>
     ) : null
@@ -197,7 +197,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
           size={size ?? 'md'}
           action={{
             icon: X,
-            label: '清除選取',
+            label: '清除選取', // i18n-allow: DS default inline-action label
             onClick: (e) => { e?.stopPropagation(); onChange?.('') },
           }}
         />
