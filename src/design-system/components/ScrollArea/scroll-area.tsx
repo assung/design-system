@@ -45,7 +45,13 @@ const ScrollArea = React.forwardRef<
         content height 而非 parent height → 失去 scroll 能力。
         改 Root 為 flex container,Viewport 成 flex item,flex algorithm 給 definite height。
         `w-full` 保留(水平維度不受影響)。 */}
-    <ScrollAreaPrimitive.Viewport className="flex-1 min-h-0 w-full rounded-[inherit]">
+    {/* a11y(2026-04-25 axe scrollable-region-focusable fix):Viewport 需 tabIndex=0
+        才能 keyboard focus(Safari 不自動把 scroll container 標 focusable)。focus-
+        visible:outline 用 DS focus ring,不破壞視覺。 */}
+    <ScrollAreaPrimitive.Viewport
+      tabIndex={0}
+      className="flex-1 min-h-0 w-full rounded-[inherit] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
+    >
       {children}
     </ScrollAreaPrimitive.Viewport>
     <ScrollBar />
