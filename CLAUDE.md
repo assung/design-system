@@ -416,54 +416,14 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 - 建立新 UI 前必先檢查 pattern(見 `# 建立 UI 前必讀`);缺元件明確指出不假裝存在
 - 使用 `cn()` 合併 Tailwind class(`@/lib/utils`)
 
-## 同 flex 列的互動 slot 幾何鐵律(避免 gap token 被破壞)
+## 深度規則 → `.claude/references/ui-dev-rules.md`
 
-任何新 slot(status indicator / inline action / hover-swap button)放進既有 flex row 之前,**必須**執行 3 步 mechanical check:
-
-1. **grep 該行既有 interactive slot 的 box 尺寸**:讀 row host spec(FileItem rich row=56 用 Button xs 24 / compact row=24 用 Inline Action,依 item-anatomy「≤24 cap」canonical);grep stories 看 consumer 傳什麼
-2. **新 slot box 尺寸 = 既有 slot 尺寸**(嚴格相等):不同 → `gap-*` token 被 overflow 吃掉,實際 gap ≠ 宣告值;例外需明文 spec 註解
-3. **Hover state 也要驗**:hover-bg / ring / focus outline 若超出 box 會吃進 gap 空間
-
-**失敗案例**:2026-04-19 FileItem status-slot hover-swap 用 `ItemInlineActionButton` 16px(不符 rich 用 Button),hover-bg 24px overflow 吃掉 4px `gap-2` → status ↔ delete 實際 gap 變 ~4px 違反 8px。修法:rich row=56 用 Button xs 24 / compact row=24 用 Inline Action。
-
-**世界級鐵律**:同 flex 列互動元素統一 box 尺寸,gap token 才能如實呈現 — 跨元件治理層不變量,非元件內部細節。
-
-## 新增數值前必先查既有 pattern(舉一反三)
-
-寫 gap / padding / font-size / line-height / icon size / border-radius 數值前,**必 grep 系統現值**。
-
-- `gap` → `fieldWrapperStyles`(gap-2)/ MenuItem cva / SelectionItem cva
-- `padding` → `--layout-space-loose/tight` / fieldWrapperStyles `px-3`
-- `font-size` → `typography.css` + item-anatomy reading/scanning 規則
-- `line-height` → scanning = leading-compact 1.3,reading = default 1.5
-- `icon size` → `ICON_SIZE` 常數(sm/md=16, lg=20)
-- `inline action` → item-anatomy「Inline Action 設計規格」(icon 16 / hover-bg=icon+2 / gap-2 / fg-muted → hover foreground)
-
-**舉一反三**:Select inline action gap-2 → 所有元件 inline action gap-2。MenuItem description reading 14px → 所有 reading mode desc 14px。確實需要新值 → 先提理由讓 user 確認,不自決。
-
-## Padding source 分層規則(三層各自 canonical)
-
-| 層級 | 用途 | 來源 | 例 |
-|------|------|------|---|
-| **Chrome / Section / Card**(跨元件、密度切換)| page gutter / card padding / toolbar / dialog body | `p-[var(--layout-space-loose)]` / `p-[var(--layout-space-tight)]` | FileViewer toolbar / Dialog body |
-| **元件內 slot**(結構性、不隨 density)| MenuItem row / Field wrapper / Dropdown item padding | Tailwind `p-N`(`p-3` / `px-2 py-1.5` 等) | item-anatomy row `px-2` / Field `px-3` |
-| **精確幾何**(icon ↔ text 對齊、calc-based)| Button padding = `(field-height - icon-size)/2` | `p-[calc(...)]` / `p-[var(...)]` | Button `px-[calc((h-field-md-icon-md)/2)]` |
-
-**判斷法**:padding 會隨 density/theme 變動嗎?是 → layout-space token;元件內部 layout 結構?是 → Tailwind `p-N`;跟 icon/text/token 算出來?是 → calc()/var。
-
-**禁止**:Chrome padding 硬寫 `p-4`(density 切換會壞)/ 元件內 slot 用 `p-[var(--layout-space-tight)]`(密度切換讓 row 結構跑掉)。
-
-## Icon size 來源分層規則
-
-Icon 尺寸按 context 分三類:
-
-| Context | 來源 | 例 |
-|---------|------|---|
-| **Row primitive 內**(MenuItem / TreeItem / SelectionItem / FileItem slot)| `ICON_SIZE[size]` 讀 `RowSizeContext`(自動 size-aware) | `<ItemIcon icon={User} />` 內部走 `ICON_SIZE[contextSize]` |
-| **Button startIcon / endIcon** | Button 自己 mapping(固定 16/16/20 by size)| `<Button size="lg" startIcon={Save} />` 自動走 20px |
-| **一次性 / 非 row / 非 Button**(chrome / decorative / toolbar)| inline `size={n}`,**n 必對齊 uiSize token**(16/20/24,不自創)| `<FileIcon size={16} />` |
-
-**禁止**:Tailwind `w-4 h-4` / `size-4` 表達 icon size(是 dimension 非 semantic)/ Row 內手刻 `<Icon size={16} />` 繞過 Context(density 切換不聯動)/ 自創非 uiSize 值(`size={18}` / `size={22}`)。
+| 規則 | Anchor |
+|------|--------|
+| **同 flex 列互動 slot 幾何鐵律** | 新 slot 進 row 前 3 步 mechanical check(統一 box 尺寸保 gap token)|
+| **新增數值前必先查既有 pattern** | gap / padding / font-size / icon size 等 grep 既有系統值 |
+| **Padding source 分層規則** | Chrome `layout-space token` / 元件內 slot `p-N` / 精確幾何 `calc()` 三 canonical |
+| **Icon size 來源分層規則** | Row 讀 Context / Button 自 mapping / 一次性對齊 uiSize token |
 
 ## Row primitives 共用 item-anatomy 公式
 
@@ -488,28 +448,15 @@ Icon 尺寸按 context 分三類:
 
 # Tailwind 使用規則
 
-**間距與尺寸**:Tailwind 預設間距(`p-4`、`gap-2`、`mt-6` 等)可正常使用。對應 token 時用任意值:
+Tailwind 預設間距 / 尺寸 class 可用;對應 token 時用 `className="p-[var(--layout-space-loose)]"` 任意值。圓角:`rounded-md` 4px / `rounded-lg` 8px / `rounded-full` 9999px。
 
-```tsx
-<div className="p-[var(--layout-space-loose)]" />
-<div className="h-[var(--ui-height-36)]" />
-```
+## 5 條核心規則(每條過真實 bug,詳見 `.claude/references/tailwind-gotchas.md`)
 
-## 5 條核心規則(每條都有過真實 bug,必遵守)
-
-1. **CSS variable 必須 `var()` 包覆** — 寫 `w-[var(--foo)]` 而非 `w-[--foo]`;後者在 Tailwind v4 **靜默失效**(曾讓 Sidebar 8 處寬度爆掉)
-2. **自訂 utility 必在 `lib/utils.ts` 顯式註冊到正確 group** — 否則 tailwind-merge 猜 group 誤判衝突 strip 掉 class(曾讓 `text-body` 被 `text-fg-secondary` strip)
-3. **禁用 Tailwind 預設 `shadow-sm/md/lg` / 預設 `text-xs/sm/base` / 硬寫色值** — 繞過 token 系統,dark mode / brand swap 會斷(用 `shadow-[var(--elevation-*)]` / `text-body` 等)
-4. **禁用 shadcn compat alias**(`bg-popover` / `text-muted-foreground` / `bg-accent` 等) — 那是 shadcn add 的臨時橋,我們元件 code 必用 direct token(`bg-surface-raised` / `text-fg-muted` / `bg-neutral-hover`)。hook `check_token_hygiene.sh` 自動攔
-5. **禁用 primitive 色名作 Tailwind utility**(`bg-neutral-3` / `text-blue-6` / `border-red-5` 等) — primitive 只在 `:root` 宣告 CSS var,**沒經 `@theme inline` 橋接**,寫成 utility 會 **silent 失效**(class 編譯後不生成規則)。正確:用 semantic utility(`bg-secondary`(= neutral-3)/ `bg-muted` / `text-fg-muted`)或 arbitrary value(`bg-[var(--color-blue-6)]` 給 Tag categorical 色用)。歷史 bug:2026-04-22 FileItem compact `bg-neutral-3` 完全沒底色,user 對照 Badge low 發現才修。hook `check_token_hygiene.sh` Check 4 自動攔
-
-## 圓角對應(常用)
-
-`rounded-md` = 4px / `rounded-lg` = 8px / `rounded-full` = 9999px
-
----
-
-**完整對照**(每條 bug 的詳細歷史 + 核可清單 + 禁止清單 + shadcn alias 全對照表)→ `.claude/references/tailwind-gotchas.md`
+1. **CSS variable 必 `var()` 包覆** — `w-[var(--foo)]` 而非 `w-[--foo]`(v4 silent 失效)
+2. **自訂 utility 必在 `lib/utils.ts` 註冊 group** — 否則 tailwind-merge 誤判 strip
+3. **禁 `shadow-sm/md/lg` / `text-xs/sm/base` / 硬寫色值** — 用 `shadow-[var(--elevation-*)]` / `text-body`
+4. **禁 shadcn compat alias**(`bg-popover` / `text-muted-foreground` / `bg-accent` 等)— 用 direct token;hook `check_token_hygiene.sh` 攔
+5. **禁 primitive 色名作 utility**(`bg-neutral-3` / `text-blue-6` — silent 失效,無 `@theme inline` 橋接)— 用 semantic utility 或 `bg-[var(--color-blue-6)]`
 
 
 # Token 命名原則
@@ -536,54 +483,31 @@ Icon 尺寸按 context 分三類:
 
 # 元件 Props 命名原則
 
-**按「是什麼」命名,不按「在哪裡」命名**。參考 Material(Chip: avatar / icon / deleteIcon)、Ant Design(Tag: icon / closeIcon)。
+**按「是什麼」命名,不按「在哪裡」命名**(Material Chip / Ant Tag idiom):
+- slot 只接 icon → `startIcon` / `endIcon`(型別 `LucideIcon`,元件控尺寸)
+- slot 接任意視覺 → 描述內容類型(`avatar`,型別 `ReactNode`)
+- slot 是行為 → callback(`onDismiss`,元件渲染互動 + 樣式)
+- ❌ 禁 `prefix` / `suffix` / `left` / `right`(位置名不傳達本質)
 
-- slot 只接 icon → 命名帶 `icon`(`startIcon` / `endIcon`),型別 `LucideIcon`,元件內部控尺寸
-- slot 接任意視覺 → 命名描述內容類型(如 `avatar`),型別 `ReactNode`
-- slot 是行為 → 用 callback(如 `onDismiss`),元件內部渲染互動 + 樣式
-- ❌ 禁用 `prefix` / `suffix` / `left` / `right` 純位置名 — 不傳達本質,無法約束型別
+**4 名關閉 / 移除 callback 各有語意不合併**(詳 `.claude/references/props-naming.md`):
+`onClose`(Dialog / Sheet / Popover overlay session)/ `onDismiss`(Alert / Toast 通知忽略)/ `onRemove`(集合移除 item)/ `onClear`(欄位內容清空)。
 
-## 核心 canonical 速查(詳表 → `.claude/references/props-naming.md`)
+**Badge 命名按放置**:`badge`(inline in pill 有 label)/ `overlayBadge`(疊視覺重心 iconOnly)/ `badgeCount`(Avatar count)/ `status`(Avatar presence dot 非 Badge)。禁組合:有 label 的 Button/Chip 不疊 `overlayBadge`。
 
-**關閉 / 移除類 callback**(4 名各有語意,不合併):
-- `onClose` = 關閉 overlay session(Dialog / Sheet / Popover / FileViewer / HoverCard)
-- `onDismiss` = 通知被忽略(Alert / Notice / Toast / Coachmark)
-- `onRemove` = 從集合移除 item(PeoplePicker tag / Combobox multi-select / Tag in list)
-- `onClear` = 欄位內容清空(Input / Select / Combobox / DatePicker clear)
-
-**Badge prop 命名**(按放置,不按「是 badge」):
-- `badge` = pill 內 inline(Button 有 label / Tab / Chip)
-- `overlayBadge` = 疊視覺重心(iconOnly Button / pure Icon)
-- `badgeCount`(Avatar 專用)= count overlay
-- `status`(Avatar 專用)= presence dot(非 Badge)
-- 禁組合:有 label 的 Button / Chip 不疊 `overlayBadge`(詳 `badge.spec.md`)
-
-**常用 icon canonical**:
-- Overflow menu → `MoreVertical`(禁 `MoreHorizontal`)
-- Breadcrumb ellipsis → `MoreHorizontal`(唯一保留)
-- Close / Dismiss → `X`(禁 `XCircle` — error 專用)
-- 成功 `Check`/`CircleCheck` / 失敗 `XCircle` / 警告 `TriangleAlert` / 資訊 `Info`
+**Icon canonical**:Overflow `MoreVertical` / Breadcrumb ellipsis `MoreHorizontal`(唯一保留)/ Close `X`(error 才 `XCircle`)/ 成功 `Check` / 警告 `TriangleAlert` / 資訊 `Info`。
 
 
 # shadcn 元件規範
 
-**結構**:每元件一資料夾:`{name}.{tsx,spec.md,stories.tsx,anatomy.stories.tsx,principles.stories.tsx}`。tsx 基本結構 forwardRef + cva + VariantProps + cn() + `{Component, componentVariants}` export(讀 Button/Input 當範本)。Import 路徑 `@/design-system/components/{Name}/{name}`(無 barrel)。新增走 `npx shadcn add {name}` 後**立刻 grep 移除 shadcn compat alias**(見 `# Tailwind 使用規則`)。
+**結構**:每元件一資料夾 `{name}.{tsx,spec.md,stories.tsx,anatomy.stories.tsx,principles.stories.tsx}`。tsx 用 forwardRef + cva + VariantProps + cn() + `{Component, componentVariants}` export(讀 Button/Input 當範本)。Import `@/design-system/components/{Name}/{name}`(無 barrel)。`npx shadcn add` 後**立刻 grep 移除 shadcn compat alias**。
 
-## cva 適用範圍
+**cva 適用**(詳 `.claude/references/cva-patterns.md`):className-only 差異 → cva;style 物件 → object map + `style={{}}`;不同 JSX 樹 → conditional rendering。禁:塞 style prop 入 cva / 不同結構硬塞同 JSX。
 
-- 變體差異只有 className(同 JSX 樹) → **cva**
-- 變體要 inline style 物件 → **object map + `style={{...}}`**(例:Avatar color variants)
-- 變體是不同 JSX 樹(不同 layout) → **conditional rendering**(例:FileItem compact/rich)
+## 元件不得自包全域 Provider(Tooltip / Theme / Toast / Portal)
 
-禁止:硬塞 style prop 入 cva / 不同結構壓同 JSX 配 className 切換(會長滿 `{mode === 'x' && ...}`)。完整對照 → `.claude/references/cva-patterns.md`。
+由應用層(main.tsx / preview.tsx)統一設定。**判斷**:Context 是**行為狀態**(open / size / current)→ 可包;**全域外觀配置**(delay / theme / portal / variant defaults)→ 禁止。
 
-## 元件不得自包 Provider
-
-**Tooltip / Theme / Toast / Portal Provider 一律由應用層**(main.tsx / Storybook preview.tsx)統一設定。元件本體禁止自包(劫持全域配置)。
-
-**判斷**:Context 是**行為狀態**(open / size / current item) → **可包**(SidebarProvider.open / DropdownMenuContext.size 是元件自己的狀態);Context 是**全域外觀配置**(delay / theme / portal / variant defaults) → **禁止**。
-
-**歷史 bug**:shadcn 原版 SidebarProvider 包 `TooltipProvider delayDuration={0}` 強制覆寫 app delay,破壞全站 hover 節奏。從 shadcn 複製時必檢查移除內建 Provider。
+歷史 bug:shadcn 原版 SidebarProvider 包 `TooltipProvider delayDuration={0}` 覆寫全站 hover 節奏。從 shadcn 複製時必 grep 移除內建 Provider。
 
 
 # Primitive Exposure Layer(3 層暴露 canonical)
