@@ -217,30 +217,29 @@ const FILL_FILLED = 'var(--warning)' // yellow-6 — 黃星 convention
 const FILL_EMPTY = 'var(--color-neutral-4)' // 灰色空星
 
 function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onClick }: StarIconProps) {
+  // a11y(2026-04-25 axe nested-interactive fix):inner 點擊目標改 <span>(非 interactive
+  // element),不會跟外層 role='slider' 形成 nested-interactive 違規。鍵盤控制統一在外層
+  // slider 的 arrow keys,inner 只處理 mouse click 定位。Ant Rate / Material MUI 同模式。
   if (!isHalf) {
     // Full: 一整顆 fill(filled 或 empty)
     const fill = fillRatio >= 1 ? FILL_FILLED : FILL_EMPTY
     return (
-      <button
-        type="button"
-        disabled={!interactive}
-        onMouseEnter={() => onHover(false)}
-        onClick={() => onClick(false)}
+      <span
+        role="presentation"
+        onMouseEnter={interactive ? () => onHover(false) : undefined}
+        onClick={interactive ? () => onClick(false) : undefined}
         className={cn(
-          // p-0 + border-0 + outline-none 三層移除:button 預設視覺(避免 ring / border 漏出)
-          'inline-flex p-0 border-0 bg-transparent outline-none shadow-none',
-          'focus-visible:outline-none',  // focus 視覺由 parent div ring 承擔,不 per-star ring
+          'inline-flex',
           interactive ? 'cursor-pointer' : 'cursor-default',
         )}
         style={{ color: fill }}
-        tabIndex={-1}
         aria-hidden
       >
         {/* stroke="none" 移除 Lucide Star 預設的 outline stroke(1.5px 黑線),
             讓星星是純 fill-only 的 shape——fill 與 outline 同色視覺上仍有亮度差。
             世界級對照:Ant Rate / Material MUI Rating 皆純 fill,無 outline stroke。*/}
         <Icon size={sizePx} fill={fill} stroke="none" className="shrink-0" />
-      </button>
+      </span>
     )
   }
 
@@ -253,20 +252,18 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
       </span>
       {interactive && (
         <>
-          <button
-            type="button"
+          <span
+            role="presentation"
             onMouseEnter={() => onHover(true)}
             onClick={() => onClick(true)}
-            className="absolute inset-y-0 left-0 w-1/2 cursor-pointer bg-transparent border-0 p-0"
-            tabIndex={-1}
+            className="absolute inset-y-0 left-0 w-1/2 cursor-pointer"
             aria-hidden
           />
-          <button
-            type="button"
+          <span
+            role="presentation"
             onMouseEnter={() => onHover(false)}
             onClick={() => onClick(false)}
-            className="absolute inset-y-0 right-0 w-1/2 cursor-pointer bg-transparent border-0 p-0"
-            tabIndex={-1}
+            className="absolute inset-y-0 right-0 w-1/2 cursor-pointer"
             aria-hidden
           />
         </>
