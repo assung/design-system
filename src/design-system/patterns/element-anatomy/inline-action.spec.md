@@ -1,0 +1,267 @@
+# Inline Action 設計規格(SSOT)
+
+**定位**:嵌入在其他元件內部的互動觸發點(Tag dismiss / Field endAction / Row suffix action)。不是獨立 Button,由宿主元件渲染 + 控制。
+
+**本 spec 是 Inline Action 的獨立 SSOT**(2026-04-24 從 `item-anatomy.spec.md` 抽出,避免單一 spec 過長)。Row primitive 結構走 `item-anatomy.spec.md`;本 spec 含「確定用 Inline Action」後的完整視覺 / API / predicate / same-row consistency 規格。
+
+### 視覺規則
+
+1. **Icon 視覺尺寸跟隨宿主 tier**，排版以 icon 為準
+2. **平時透明**，視覺上等同靜態 icon
+3. **Hover 時顯示背景色區域**，提示可點擊。背景色區域 = icon + 2px（直徑，即每邊 +1px），不影響排版（用 absolute positioning 或 negative margin 溢出）
+
+### 互動狀態
+
+與 Button text variant 一致：
+
+| 狀態 | 背景 | 過渡 |
+|---|---|---|
+| 預設 | transparent | — |
+| hover | `bg-neutral-hover` | transition-colors |
+| active | `bg-neutral-active` | transition-colors |
+| focus-visible | `outline: 2px solid var(--ring)` | — |
+| 宿主 disabled | 不渲染 inline action | — |
+
+### Icon 色彩（按 host 分兩類,2026-04-21 D6 矛盾解）
+
+Inline action icon 色彩規則 **依 host 是否有自帶色彩分兩支**。共同精神:inline action 視覺融入 host — neutral host 的融入方式是「退到 muted」,colored host 的融入方式是「接收 host 色」。
+
+**預設（neutral host）**:預設 `fg-muted`,hover / active 時變 `foreground`
+- 適用:Field endAction（Input clear button）/ TreeItem inline action / Menu inline action / DropdownMenu trigger inline action 等 **neutral 容器內**的 inline action
+- 語意:utility icon 是輔助操作,預設退到背景,hover 時提示可操作
+
+**例外（colored host）**:**繼承 host 文字色**（非 `fg-muted`）
+- 適用:**Tag dismiss** / 未來任何 **宿主自帶 branded / categorical 色彩** 的 inline action
+- 語意:宿主 bg 有色（Tag subtle blue 底 + blue-text 文字）,inline action icon 用 `fg-muted` 會視覺不連貫（視覺斷裂 / 顏色不連貫）;繼承 host 文字色維持「一個整體視覺單元」
+- Hover / active 背景:跟 host 同色系的 hover / active token（例 Tag solid blue dismiss → `--blue-hover`）
+
+**判斷法**:宿主 bg 是 surface / transparent（neutral）→ 走預設;宿主有 branded / categorical 色彩 → 走 colored host 例外。
+
+**現況清單**:
+| Host | 規則分類 | Icon 色 |
+|------|---------|--------|
+| Field / Input / NumberInput / DatePicker / Combobox endAction | neutral host | `fg-muted` → `foreground` |
+| TreeItem / Menu / DropdownMenu inline action | neutral host | `fg-muted` → `foreground` |
+| Tag dismiss | colored host | 繼承 Tag 文字色 |
+
+### 尺寸對照
+
+| 宿主 | Icon 視覺 | Hover 背景 | 圓角 | 排版佔位 |
+|---|---|---|---|---|
+| Tag sm (20px) | 16px | 18px | rounded-md | 16px |
+| Tag md/lg (24px) | 16px | 18px | rounded-md | 16px |
+| Field sm/md | 16px | 18px | rounded-md | 16px |
+| Field lg | 20px | 22px | rounded-md | 20px |
+| TreeItem sm/md | 16px | 18px | rounded-md | 16px |
+| TreeItem lg | 20px | 22px | rounded-md | 20px |
+
+### 多個 Inline Action 並排
+
+當一個宿主有多個 inline action(如 Select 的 clear X + ChevronDown,或 TreeItem 的 ⋯ + ＋)時:
+
+- **間距**:`gap-2`(8px)——跟 fieldWrapperStyles 的元素間距一致(Select 的 clear X 和 ChevronDown 就是 gap-2)
+- **對齊**:全部垂直置中在同一行(`flex items-center`)
+- **出現時機**:全部一起出現(TreeItem 的 hover-reveal 是同時淡入所有 action,不逐個)
+
+### API 設計
+
+Inline action 由宿主元件渲染，消費者只需宣告 intent：
+
+```tsx
+// ❌ 舊：消費者自行決定 Button size、icon size
+<Input endAction={<Button size="xs" iconOnly startIcon={X} aria-label="清除" onClick={...} />} />
+
+// ✅ 新：宣告式，Field 自己根據 size tier 渲染
+<Input endAction={{ icon: X, label: '清除', onClick: handleClear }} />
+```
+
+Field 內部根據自己的 size 決定 icon 尺寸、hover 背景大小、視覺層級。消費者不需要知道這些。
+
+### 實作要求
+
+- 必須是 `<button>` 元素，不是 `<span>` + onClick
+- 必須有 `aria-label`
+- 必須有 `cursor-pointer`——可點擊的元素必須有明確的游標指引
+- 必須有 Tooltip（`label` 欄位同時作為 `aria-label` 和 tooltip 內容）——icon-only 控件沒有可見文字，tooltip 是使用者理解功能的唯一視覺提示
+- 宿主 disabled 時不渲染（不可操作就不該暗示可以操作）
+
+### Predicate:Inline Action vs Button iconOnly(canonical)
+
+DS 跨元件 icon action primitive 的 canonical。接到 icon 相關決策,跑下面決策樹。
+
+#### 三種 icon primitive 的身份
+
+| Primitive | 定義 | 實作 |
+|-----------|------|------|
+| **Decorative indicator** | 純視覺提示(點了不做事,host 是 click target)| Host 內 `<Icon aria-hidden pointer-events-none />` |
+| **Inline Action** | **可點擊的 icon**,embedded 在 host 內部(content flow / chrome padding)| `ItemInlineAction` / `ItemInlineActionButton`(詳下方 API 區)|
+| **Button** | **獨立按鈕**,有 chrome,可參與 action group | `<Button iconOnly />`(詳 button.spec.md)|
+
+#### 決策樹(3 步)
+
+```
+Q1. icon 點了要做事嗎?
+    ├─ 否 → Decorative indicator(host 內 <Icon aria-hidden />,本 spec 不討論)
+    └─ 是 ↓
+Q2. 位置在哪?
+    ├─ Host 內部(chrome padding / content flow / row inline suffix)→ Inline Action
+    ├─ Row 獨立 action slot(跟 content 視覺分開,有獨立 column/分隔線)→ 看 Q3
+    └─ Action group region(toolbar / chrome corner / standalone)→ Button
+Q3. Row 多大?
+    ├─ ≤ 24(compact / xs row)→ Inline Action(Button xs 24 填滿 row,無呼吸)
+    └─ ≥ 28(sm/md/lg row)→ Button iconOnly xs(固定 24,不隨 row 放大)
+```
+
+#### Row action 絕對值 cap(核心原則)
+
+**Row dedicated action 永遠 ≤ 24px**,不隨 row tier 放大。超過 24 action 會搶 content 視覺焦點,違反「資料 > 行動」的視覺階層。
+
+**世界級對照**:Material DataGrid / Polaris ResourceList / Atlassian Table / Ant Design Table / Apple HIG — **全部固定小尺寸 icon button**,不依 row height 放大 action。
+
+#### 3 條關鍵補充
+
+1. **Inline Action 不參與 action group 規則** — 沒有 Button 的 variant chrome / Separator 分群 / size 對稱要求;只是 host 內部 tap target
+2. **Button 必對齊 action group 規則** — 同 size、Separator 分群(詳 `patterns/action-bar.spec.md`)
+3. **Dismiss X(close)特殊弱化** — Inline Action default 已 `fg-muted`;Button 需加 `dismiss` prop 才 override(詳本 spec 下方 dismiss 節)
+
+#### Real case 表(所有 DS 用法一覽)
+
+| Host | Context | Primitive | Why |
+|------|---------|-----------|-----|
+| Input / NumberInput / Combobox clear X | Field chrome padding | Inline Action | Embedded |
+| Tag dismiss X | Pill body | Inline Action(colored host 繼承色)| Embedded |
+| Menu / TreeView / SidebarMenuButton / SelectionItem suffix | Row inline flow | Inline Action | Inline with content |
+| SidebarGroup header chevron | Aux toggle | Inline Action | Inline header toggle |
+| Select ChevronDown / DatePicker Calendar / Combobox ChevronDown | Field chrome(裝飾)| **Decorative**(不是 action)| Click falls through;host 是 trigger |
+| **FileItem compact**(row 24)| Row slot | Inline Action | Row 太小容不下 Button xs 24 |
+| **FileItem rich**(row 56 sm/md rich)| Row slot | Button xs iconOnly(24 固定)| ≤ 24 cap,不放大 |
+| **DataTable row action**(任何 tier)| Row dedicated column | Button xs iconOnly(24 固定)| ≤ 24 cap |
+| **Dialog / Sheet / Popover / Alert corner close** | Chrome corner | Button iconOnly `dismiss`(size sm)| Action group region |
+| **Toolbar commands**(FileViewer zoom / editor bold)| Toolbar | Button iconOnly(md 常見)| Action group region |
+| FileViewer / rich text editor formatting group | Toolbar action group | Button iconOnly 同 size + Separator | Action group 完整範例 |
+
+#### Content-role vs action-role 分層(附補充原理)
+
+Row 內元件分兩類,**size 規則不同**:
+- **Content-role**(display 資料):InputDisplay / Badge / Avatar / Tag → size 對應 row tier(sm row → sm)
+- **Action-role**(互動觸發):row action icon → **固定 ≤ 24**,不參與 content size-pair
+
+Row action 的 affordance 是「次要功能」,不是 primary CTA。Button chrome 過度強調;用 **Button xs 24 固定** 提供 command affordance 但不侵蝕 content hierarchy。
+
+### Same-row consistency rule(防混用)
+
+**同一 action row 所有 icon action 必同一類**(不混 Inline Action + Button)— 消除 box size 不一致造成 gap 斷裂。
+
+**Alert / Dialog chrome corner(Cat 3 action group)範例**:
+
+```
+✅ canonical 佈局:
+┌─ Alert ────────────── [⟲] [↗] │ [X] ┐   ← chrome corner action group
+│ [icon] Title                        │      ⟲ share → Button iconOnly sm variant="text"
+│ Description                         │      close X → Button iconOnly sm dismiss
+│                   [CTA1] [CTA2]     │      Separator `h-5 mx-1` 分群
+└─────────────────────────────────────┘   ← body action row(Button sm,有 variant chrome)
+
+**Corner action group 視覺規則**:
+- Corner 所有 action 一律 `variant="text"`(跟 dismiss 同視覺權重,避免填色 chrome 跟 body CTA 搶焦點)
+- Close X 走 `dismiss` prop 套 fg-muted 弱化
+- Separator 用 `h-5 mx-1`(visible 分群,不太窄不太寬)
+
+❌ 禁止:
+│ Title     [CTA1] [CTA2] [X] │   ← 同 row 混 CTA + dismiss(違反 same-row;
+                                   dismiss X 應搬到 chrome corner action group)
+```
+
+### Inline action 共用元件(`ItemInlineAction` / `ItemSuffix`)
+
+**過去每個 host(Input / NumberInput / Tag / LinkInput / Combobox)自己複製 ~18 行 JSX** 來渲染——重複、易漂移、任何規格調整都要改 5+ 處。
+
+Canonical 實作搬到 `item-layout.tsx`,匯出兩個元件:
+
+```tsx
+import { ItemInlineAction, ItemSuffix, type InlineActionConfig } from "@/design-system/patterns/element-anatomy/item-anatomy"
+
+// 單一 action
+<ItemInlineAction action={{ icon: X, label: '清除', onClick: handleClear }} />
+
+// 多個 action + hover-reveal(TreeView 模式)
+<ItemSuffix hoverReveal>
+  <ItemInlineAction action={{ icon: MoreVertical, label: '更多', onClick: ... }} />
+  <ItemInlineAction action={{ icon: Plus, label: '新增', onClick: ... }} />
+</ItemSuffix>
+```
+
+`ItemInlineAction` 自動從 `RowSizeContext` 查:
+
+- Icon 尺寸 = `ICON_SIZE[size]`(16/16/20)
+- Hover bg 尺寸 = `INLINE_ACTION_HOVER_BG_SIZE[size]`(18/18/22)
+- 圓角 = `rounded-md` (sm/md) / `rounded-md` (lg)
+- Tooltip / aria-label / cursor-pointer / fg-muted → foreground 全部內建
+
+**Host 的責任**(宣告式 API,不自己渲染 button JSX):
+
+```tsx
+// ✅ 正確:consumer 宣告 intent,host 用 ItemInlineAction 渲染
+<SidebarMenuButton inlineActions={[{ icon: X, label: '...', onClick: ... }]} />
+
+// ❌ 錯誤:host 自己複製 18 行 JSX
+<button className="...">
+  <span className="absolute ..." />
+  <X size={16} />
+</button>
+```
+
+**現況**:`SidebarMenuButton` 已遷移。**未來 refactor target**:Input、NumberInput、Tag、LinkInput、Combobox 都有同一段重複 JSX,應該逐步改用 `ItemInlineAction`,讓 canonical 實作成為**單一 source of truth**。
+
+任何 row primitive 要支援 suffix inline action,只要:
+1. 接收 `inlineActions?: InlineActionConfig[]` prop
+2. 在 suffix slot 用 `ItemInlineAction` 渲染
+3. 用 `RowSizeProvider`(已由 SidebarProvider 等容器提供)確保 descendant 讀到對的 size
+
+### Dismiss canonical — X close only
+
+**Dismiss 語意嚴格定義**:「**關閉 surface / 忽略訊息**」— **只屬 X(close)icon**。
+
+**不是 dismiss 的情境**(常被誤判):
+- Trash / Delete / Remove — destructive action(破壞性移除),不是 dismiss
+- Clear — 欄位清空(value 設 empty,元件本身不關),不是 dismiss
+- 以上三者**禁止套 dismiss 弱化**
+
+**世界級對照**:
+- Dismiss:Material `IconButton` close / Polaris `Banner.onDismiss` / Ant Design `Alert.closable` / Apple HIG window close → 一律 icon = `X`
+- Destructive:Material `IconButton` Delete(red)/ Polaris `Button destructive` / 我們的 row Trash → 一般 primitive(無 dismiss 弱化)
+
+#### Dismiss X 的實作(按 position 決定)
+
+| 位置 | 實作 | 視覺弱化 |
+|------|------|---------|
+| Chrome corner(Dialog / Sheet / Popover / Alert / Toast / Coachmark 右上 X)| **Button iconOnly + `dismiss` prop**(Cat 3)| `dismiss` prop 套 fg-muted override |
+| Host chrome padding 內(Input clear X / Tag 內 X)| **Inline Action**(Cat 1)| default 已 fg-muted(內建)|
+| 獨立 standalone close(罕見)| **Button iconOnly + `dismiss` prop**(Cat 3)| `dismiss` prop 套 fg-muted override |
+
+#### `dismiss` prop 觸發條件(Button 限定)
+
+**明示**:`<Button dismiss />` 或 callback = `onClose` / `onDismiss` → 觸發弱化 override(icon fg-muted → hover foreground;variant 強制 text)
+
+**不觸發**:callback = `onRemove`(collection 操作)/ `onClear`(欄位清空)/ `onDelete` — 這些不是 dismiss 語意,Button 用對應 variant 即可
+
+#### Colored host 例外(Tag 內 X)
+
+Tag solid / branded color variant(`red / blue / orange`)→ Tag 內 X **繼承 host 文字色**(非 fg-muted),hover bg 配色相。詳「Icon 色彩原則」段。
+
+#### ❌ 禁止
+
+- 帶文字 label 的 Button 作 dismiss(「關閉」字按鈕)— 雙重 affordance
+- 自刻 `<button><X /></button>` — 繞過 `ItemInlineAction` / Button `dismiss` 的 a11y + 尺寸自動化
+- **Trash / Clear / Delete 套 `dismiss` prop** — 語意誤用,destructive 本身已有破壞性意涵不需再弱化
+- Button dismiss 用 `variant="primary/secondary/tertiary"` — `dismiss` prop 強制 `variant="text"`
+- Chrome corner close 用 Inline Action — corner 屬 action group region,必用 Button
+
+#### 第三方 managed 不是例外
+
+sonner toast auto-dismiss / Radix Dialog `DialogClose` wiring — 第三方只管 state logic(何時關),**我們渲染的視覺按鈕必套對應 canonical**(chrome corner → Button dismiss;chrome padding → Inline Action)。
+
+hook `check_story_anatomy.sh` 規則 B 已在 stories 層攔 label Button 作 dismiss。
+
+---
+
