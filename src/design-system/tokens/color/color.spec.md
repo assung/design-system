@@ -91,83 +91,15 @@ Tailwind utility 透過 `@theme inline` 橋接 semantic token，元件寫 `bg-pr
 弱化 icon hover 後變 `text-fg-secondary`。
 
 
-## Disabled 狀態
 
-disabled 元件內的所有子元素必須呈現 disabled 狀態：
+## Disabled 狀態 → `.claude/references/color-disabled-state.md`
 
-| 元素類型 | Disabled 處理 |
-|---|---|
-| 文字 | `text-fg-disabled` |
-| Icon（stroke） | `text-fg-disabled` |
-| 圖片 / Avatar | `opacity-disabled`——圖片無法套用語義色，用透明度弱化 |
-| Checkbox / Radio | 元件自身的 disabled 樣式 |
-| 背景色 | `bg-disabled`（如適用） |
+Disabled 元件內所有子元素必呈 disabled 狀態:文字 `text-fg-disabled` / bg `bg-neutral-disabled` / border `border-neutral-disabled` / icon 繼承 `fg-disabled`。
 
-**判斷標準：disabled 元件內不應有任何元素呈現可互動 affordance。**
+**禁止** Foreground-family token 借用到 bg/border(例:`bg-foreground` 除 inverse 情境外屬誤用);唯一合法例外走 inverse namespace(`--inverse-*` family)。
 
-### 兩種 disabled 策略:何時用哪個
+詳完整策略 / 合法例外 / code review 檢查點 → 見 reference。
 
-系統有**兩種** disabled 視覺處理方式,判準是「**顏色是否是 semantic state 的唯一視覺載體**」:
-
-| 策略 | 何時用 | 消費者 | 做法 |
-|---|---|---|---|
-| **灰階 token swap** | State 由形狀 / 位置 / icon / 文字 等**非顏色載體**承載,顏色只是美學 | Button、Checkbox、Input、Slider、Tag | 每個元素換到 disabled 對應的灰階 token(`bg-disabled` / `text-fg-disabled` / `border-fg-disabled` 等) |
-| **`opacity-disabled`** | State **完全只靠顏色區分**(形狀在 on/off 之間沒有差異),灰階化會丟失 state 辨識 | **Switch** | Root 層套 `opacity-disabled`,保留原有顏色身分,透過透明度均勻降級 |
-
-**具體判準(寫新元件時問自己)**:
-1. 在 disabled 狀態下,使用者需要辨識的 state 資訊是什麼?
-2. 這些資訊**沒有顏色**仍然能看出來嗎?
-3. 能 → 灰階 swap;不能 → opacity
-
-**範例**:
-- Checkbox 的 checked:checkmark **形狀**是 state 載體 → 灰階 swap OK
-- Slider 的 value:thumb **位置** + range **長度**是 state 載體 → 灰階 swap OK
-- Radio 的 selected:內圓點 **形狀**是 state 載體 → 灰階 swap OK
-- Switch 的 on/off:track 在 on/off 之間**形狀相同**,只有**顏色**差別 → 必須 opacity
-
-### Disabled 視覺階層公式(多元素元件參考)
-
-多元素互動元件(Slider、Progress、複合 Input 等)在 disabled 狀態常需要 3–4 階灰階深度來分層:
-
-```
-底層背景 (n-2)  <  中層填充 (n-5)  <  輪廓邊框 (n-6)  <  文字 (n-7+)
-bg-muted          bg-border         border-fg-disabled     text-fg-disabled
-```
-
-每階至少差 1 個 primitive step,使用者掃視時才能分清四個層。Slider 的 disabled 就是這個公式:track(底)< range(填充)< thumb border(輪廓)< label(文字)。
-
-### ⚠️ fg token 不可當 bg 用(跨 family 借用是 smell)
-
-Semantic token 按**載體類型**分成四個 family,**family 之間的 token 不能互借**:
-
-| Family | 前綴 | 語意 | 範例 |
-|---|---|---|---|
-| **Foreground**(前景) | `--fg-*` / `--foreground` | 文字 / icon stroke 的前景色 | `--foreground`, `--fg-secondary`, `--fg-muted`, `--fg-disabled` |
-| **Background**(背景) | `--bg-*` / `--surface` / `--muted` / 色相 subtle | 填充色 | `--surface`, `--muted`, `--bg-disabled`, `--primary-subtle` |
-| **Border**(邊框 / 分隔)| `--border`, `--border-hover`, `--divider` | 視覺分隔線、容器邊框 | `--border`, `--border-hover` |
-| **Ring**(聚焦環)| `--ring` | `focus-visible` 的聚焦環 | `--ring` |
-
-**跨 family 借用是 smell**,即使「剛好是我想要的顏色」。曾經踩過的例子:
-
-> **Case**:Slider disabled 的 Range(填充段)一開始寫成 `bg-fg-disabled`。理由:`--fg-disabled`(neutral-6)剛好是我想要的「比 track 深但比文字淺」的灰度。但 `--fg-disabled` 語意是「**disabled 文字的前景色**」,拿來當 bg 等於借 fg token 當 bg 用。
->
-> **問題**:
-> 1. **語意矛盾**:consumer 讀 code 時 `bg-fg-disabled` 會困惑「這到底是 bg 還是 fg」
-> 2. **耦合未來變動**:未來若微調 `--fg-disabled`(例如從 n-6 改成 n-7 讓 disabled 文字更可讀),Slider range 會被迫一起變,但它不是文字、不需要文字可讀性的約束
-> 3. **缺乏單一來源的 bg token**:應該存在一個「disabled 狀態的中層填充色」的 bg token(如果沒有,要新增一個 semantic alias,而不是借 fg)
->
-> **修正**:改用 `bg-border`(neutral-5)。`--border` 屬於 Border family,語意是「視覺分隔線 / 容器邊框 / 階層分隔的視覺元件」——跟 range 的「填充視覺指示器」角色接近,且 family 對得上(非文字的視覺填充類)。
-
-**規則**:
-
-1. **新元件寫新樣式前,先確認 class 的 family 語意跟實際用途對齊**——`bg-*` 一律從 bg/surface family 選,`text-*` 一律從 fg family 選,`border-*` 一律從 border family 選
-2. **沒有合適 token 時,新增 semantic alias,不要借** family——例如若 bg family 沒有「中層填充」token,在 semantic.css 開 `--fill-muted` 或類似名稱,不要借 `--fg-disabled`
-3. **Code review 檢查**:看到 `bg-fg-*` / `bg-foreground` / `text-surface` / `border-fg-*` 這類命名組合,立刻質疑是否 family 借用
-
-**唯一合法例外**:`--foreground` 偶爾用在 `bg-foreground`(暗色填充)表達「inverse surface」(例如 Tooltip 深底)——但這是 inverse namespace 的設計意圖,有專門的 `--inverse-*` token family 處理,不是隨便借。一般元件不該 `bg-foreground`。
-
-
-## Icon 色彩原則
 
 一條統一規則，跨所有元件：
 
@@ -404,178 +336,12 @@ Light mode 的 step-1 使用不透明色票。Dark mode 的 step-1 在 primitive
 `α = 0.12 / l`：亮度越高的色相 alpha 越低，在 dark canvas 上感知亮度自動統一。所有色相用同一套公式，無需在 semantic 層額外覆寫。
 
 
-## 互動狀態推導（Hover / Active）
 
-### 公式
+## 互動狀態推導 → `.claude/references/color-interaction-states.md`
 
-Hover / active **直接引用色盤 step**，不使用獨立公式：
+Hover / active 直接引用色盤 step(non-primary filled:+1 step;primary filled:-1 step);**無獨立 token 定義** —  等是 semantic alias 指向 primitive(例:`--primary-hover = var(--color-blue-7)`)。
 
-| | Hover（較亮） | Active（較暗） |
-|---|---|---|
-| Light | step **-5** | step **-7** |
-| Dark | step **-7** | step **-5** |
-
-相對色階公式保證 step -5 永遠比 base 亮、step -7 永遠比 base 暗，
-所有色相適用同一規則，無例外。
-
-高亮度色相（yellow 等）的 hover gap 較小（ΔL ≈ 0.03），
-這是物理事實——亮色的淺色方向空間窄。
-cursor 變化 + 細微色移疊加仍提供足夠互動回饋。
-
-```tsx
-<button className="bg-primary hover:bg-primary-hover active:bg-primary-active" />
-```
-
-### Semantic token 直接指向 primitive
-
-| Token | 指向 primitive |
-|-------|----------------|
-| --primary / --primary-hover / --primary-active / --primary-subtle | → blue-6 / blue-5 / blue-7 / blue-1 |
-| --info / --info-hover / --info-active / --info-subtle / --info-text | → blue-6 / blue-5 / blue-7 / blue-1 / blue-7 |
-| --error / --error-hover / --error-active / --error-subtle / --error-text | → deep-orange-6 / deep-orange-5 / deep-orange-7 / deep-orange-1 / deep-orange-7 |
-| --success / --success-hover / --success-active / --success-subtle / --success-text | → green-6 / green-5 / green-7 / green-1 / green-7 |
-| --warning / --warning-hover / --warning-active / --warning-subtle / --warning-text | → yellow-6 / yellow-5 / yellow-7 / yellow-1 / yellow-7 |
-
-每個色相使用色盤的 4 個 step：-1（subtle）、-5（hover）、-6（base）、-7（active / text）。
-
-Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → step-5），subtle 使用 alpha 公式。text 不需覆寫——primitives 的相對色階公式已處理 dark mode 方向。
-
-### `--{hue}-hover/active` — 非語意色相的互動 token
-
-除了 semantic 色相（primary、info、error、success、warning）有完整 5 件套（base/hover/active/subtle/text）外，**作為 bg 使用的非語意色相**還有獨立的 hover/active 互動 token：
-
-| Token | 指向 primitive | dark mode swap |
-|-------|--------------|--------------|
-| `--blue-hover` / `--blue-active` | blue-5 / blue-7 | blue-7 / blue-5 |
-| `--red-hover` / `--red-active` | deep-orange-5 / deep-orange-7 | deep-orange-7 / deep-orange-5 |
-| `--green-hover` / `--green-active` | green-5 / green-7 | green-7 / green-5 |
-| `--yellow-hover` / `--yellow-active` | yellow-5 / yellow-7 | yellow-7 / yellow-5 |
-| `--turquoise-hover` / `--turquoise-active` | turquoise-5 / turquoise-7 | turquoise-7 / turquoise-5 |
-| `--purple-hover` / `--purple-active` | purple-5 / purple-7 | purple-7 / purple-5 |
-| `--magenta-hover` / `--magenta-active` | magenta-5 / magenta-7 | magenta-7 / magenta-5 |
-| `--indigo-hover` / `--indigo-active` | indigo-5 / indigo-7 | indigo-7 / indigo-5 |
-
-#### 為什麼存在這組 token
-
-**Tag/Avatar 的 solid 色相 dismiss 互動需要**：
-- 跟 Button 同樣的 solid color shade change（hover 較亮、active 較暗）
-- 跨 mode 一致的方向（dark mode 必須 swap step 號）
-- 但 Tag 的「藍」≠ semantic primary（解耦：改 primary 不應影響 Tag）
-
-直接用 primitive `--color-blue-5/-7` 不行——dark mode 公式互換會方向顛倒。所以擴展 semantic 互動 token 模式到所有 8 個非語意色相。
-
-#### 嚴格限制
-
-**只有 hover/active 兩個 token**——**沒有** `--blue` base、`--blue-subtle`、`--blue-text`：
-
-| 用途 | 該用什麼 |
-|------|---------|
-| Tag/Avatar 的 base bg（solid） | primitive `--color-blue-6` |
-| Tag/Avatar 的 subtle bg | primitive `--color-blue-1` |
-| Tag/Avatar 的 text on subtle | primitive `--color-blue-7` |
-| Tag/Avatar 的 dismiss hover bg | semantic `--blue-hover` |
-| Tag/Avatar 的 dismiss active bg | semantic `--blue-active` |
-
-**為什麼故意不加 base/subtle/text？** 那些不需要 mode 翻轉知識（primitives 已處理），加 semantic alias 只會污染命名空間、讓 semantic 層重新引入色相維度(backslide 到廢除的 categorical token layer)。只有 hover/active 真的需要 semantic 層處理 mode swap。
-
-#### 新增非語意色相 hue 互動 token 的步驟
-
-當需要在 Tag/Avatar 加入新色相 variant（例：lime）：
-
-1. **確認 primitive 已存在**：`--color-lime-6` 等（primitives.css 應該已定義）
-2. **在 semantic.css 加 hover/active**（light + dark）：
-   ```css
-   /* :root, [data-theme] */
-   --lime-hover:  var(--color-lime-5);
-   --lime-active: var(--color-lime-7);
-
-   /* [data-theme="dark"] */
-   --lime-hover:  var(--color-lime-7);
-   --lime-active: var(--color-lime-5);
-   ```
-3. **更新 Tag/Avatar 元件**：variant cva 加 lime 條目，SOLID_DISMISS_HOVER 加 lime hover/active
-4. **不要加** `--lime`、`--lime-subtle`、`--lime-text`（這些用 primitive 直接消費）
-
-### 新增語意色相的標準流程
-
-每次新增 semantic 色相（例：新增 `--accent` 指向 turquoise）必須**完整執行**這 4 步，不可省略——確保所有 semantic 色相結構一致。
-
-#### Step 1: Primitive（如該色相不存在）
-
-在 `primitives.css` 定義 base-6 值（只需指定 L、C、H），相對公式自動推導 1-10 階。如已存在則跳過。
-
-```css
---color-turquoise-6: oklch(0.57 0.10 225);
-/* 1-5 / 7-10 自動由公式推導 */
-```
-
-#### Step 2: Semantic 五件套（必填）
-
-在 `semantic.css` 的 `:root, [data-theme]` 區塊新增 5 個 token，**不可缺任何一個**：
-
-```css
---accent:        var(--color-turquoise-6);   /* base */
---accent-hover:  var(--color-turquoise-5);   /* hover */
---accent-active: var(--color-turquoise-7);   /* active */
---accent-subtle: var(--color-turquoise-1);   /* subtle bg */
---accent-text:   var(--color-turquoise-7);   /* text on subtle bg */
-```
-
-**對應規則**（不可亂改）：
-| Semantic role | Primitive step | 為什麼 |
-|---|---|---|
-| base | -6 | 主色 |
-| hover | -5 | 輕微變亮 |
-| active | -7 | 輕微變暗（pressed feel） |
-| subtle | -1 | 弱化背景（dark mode 自動 alpha） |
-| text | -7 | 高對比文字（dark mode 自動反轉方向） |
-
-#### Step 3: Dark mode 反轉（必填）
-
-在 `[data-theme="dark"]` 區塊新增 hover/active 方向反轉：
-
-```css
-[data-theme="dark"] {
-  --accent-hover:  var(--color-turquoise-7);   /* dark: 仍是較亮 */
-  --accent-active: var(--color-turquoise-5);   /* dark: 仍是較暗 */
-  /* subtle、text 不需覆寫 — primitives 已處理 */
-}
-```
-
-**為什麼只反轉 hover/active？** Primitives 在 dark mode 已經：
-- 把 step-1 改為 alpha 公式（subtle 自動正確）
-- 把 step-5/-7 公式互換（step-7 在 dark mode 仍是高對比方向，所以 text 自動正確）
-
-但 semantic token 直接 reference step number，所以 hover→step-5 在 dark mode 會變成 darker（錯方向）。必須在 semantic 層手動 swap。
-
-#### Step 4: Tailwind Bridge（必填）
-
-在 `semantic.css` 的 `@theme inline` 區塊加入：
-
-```css
---color-accent:        var(--accent);
---color-accent-hover:  var(--accent-hover);
---color-accent-active: var(--accent-active);
---color-accent-subtle: var(--accent-subtle);
---color-accent-text:   var(--accent-text);
-```
-
-讓 `bg-accent`、`text-accent-text`、`hover:bg-accent-hover` 等 Tailwind utility 可用。
-
----
-
-### 檢查清單
-
-新增完一個語意色相，逐項對照：
-
-- [ ] Primitive base-6 已定義（或已存在）
-- [ ] Semantic 五件套全部寫齊（base / hover / active / subtle / text）
-- [ ] Dark mode `hover` / `active` 方向反轉已加
-- [ ] Dark mode `subtle` / `text` 沒亂加（primitives 已處理）
-- [ ] Tailwind bridge 五件套全部加齊
-- [ ] 命名遵循 `--{name}` / `--{name}-{role}` 模式（不混色相名）
-- [ ] 用 `npx tsc --noEmit` 檢查零錯誤
-
+**核心公式**:Hover = step+1(非 primary filled)/ step-1(primary filled);Active = 更深 step。詳完整公式 / 推導例 / variant 對照 / neutral interaction 兩 family / 反例 → 見 reference。
 
 ## Neutral Interaction
 
