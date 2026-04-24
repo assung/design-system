@@ -65,11 +65,16 @@ const WorkspaceBrand = () => (
  *
  * asChild + h-[1lh] 容器強制 avatar 對齊第一行文字中線。
  */
+// a11y(2026-04-25 nested-interactive fix):user footer 用 <div role='group'>,避免
+// 外層 button + 內層 Avatar hoverCard focusable trigger 構成 nested-interactive。
+// Avatar hoverCard 本身已是 keyboard accessible 入口(Tab 直接到 Avatar → 開 NameCard
+// 取得 profile actions)。世界級 Slack / Linear user footer 亦 row 非 button,靠
+// inner avatar / menu-button 明確 disclosure。
 const UserFooter = () => (
   <SidebarMenu>
     <SidebarMenuItem>
       <SidebarMenuButton asChild>
-        <button type="button">
+        <div role="group" aria-label="當前使用者">
           <ItemAvatar
             alt="Alan Chen"
             color="blue"
@@ -90,7 +95,7 @@ const UserFooter = () => (
             }
           />
           <span data-sidebar="menu-label" className="min-w-0 flex-1 truncate">Alan Chen</span>
-        </button>
+        </div>
       </SidebarMenuButton>
     </SidebarMenuItem>
   </SidebarMenu>
