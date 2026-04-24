@@ -163,7 +163,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 |------|----------|
 | 元件選擇 | `ls components/` + `ls patterns/` + 近親 spec |
 | Token / 值 | `tokens/{name}/spec.md` |
-| Padding 分層 | `.claude/references/ui-dev-rules.md`「Padding source 分層」 |
+| Padding 分層 | `# UI 開發規則`「Padding source 分層規則」 |
 | Row / item 結構 | `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 SSOT) |
 | **連續 item list gap** | item-anatomy.spec「連續 item 貼邊合法性」+ 元件 spec「List wrapper canonical」(standalone card/pill → 必 gap / flush → 0 gap) |
 | **視覺容器 breathing** | `element-anatomy.spec.md`「視覺容器 breathing invariant」— 有邊界必 inner padding |
@@ -172,7 +172,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | 按鈕排列 / 群組 | `patterns/action-bar/action-bar.spec.md` |
 | Chrome header 選型 + 高度 | `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」|
 | Overlay(header/body/footer / dismiss / title size)| `patterns/overlay-surface/overlay-surface.spec.md` |
-| Icon 選擇 / 尺寸 | `# 元件 Props 命名原則`「常用 icon canonical」+ ui-dev-rules.md「Icon size 分層」 |
+| Icon 選擇 / 尺寸 | `# 元件 Props 命名原則`「常用 icon canonical」+ `# UI 開發規則`「Icon size 來源分層規則」 |
 | Variant / prop 命名 | 既有 grep + `# 命名與語言一致性`「三重 test」 |
 
 ## 強制 checklist — 新 tsx top-of-file 註解
