@@ -153,29 +153,22 @@ Governance 自身遵循 SSOT + anti-bloat。**寫新規則前先決定放哪個 
 
 # SSOT 消費 canonical(做 X 前必查 Y)
 
-mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表**列出你查過的家** — 沒列等同自創(hook `check_ssot_consultation.sh` 會 inject 提示)。
-
-## 高頻決策 quick lookup(詳表 → `.claude/references/ssot-consultation.md`)
+mindset #2 機械化執行清單。寫視覺 code 前對照列查過的家 — 沒列 = 自創(hook `check_ssot_consultation.sh` 攔)。完整對照 + 6 條隱性自創反例 → `.claude/references/ssot-consultation.md`。
 
 | 決策 | 必查 SSOT |
 |------|----------|
 | 元件選擇 | `ls components/` + `ls patterns/` + 近親 spec |
 | Token / 值 | `tokens/{name}/spec.md` |
-| Padding 分層 | `# UI 開發規則`「Padding source 分層規則」 |
-| Row / item 結構 | `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 SSOT) |
-| **連續 item list gap** | item-anatomy.spec「連續 item 貼邊合法性」+ 元件 spec「List wrapper canonical」(standalone card/pill → 必 gap / flush → 0 gap) |
-| **視覺容器 breathing** | `element-anatomy.spec.md`「視覺容器 breathing invariant」— 有邊界必 inner padding |
-| **Label ↔ Desc gap** | Token `--item-gap-label-desc` / primitive `<ItemContent>`(改 token 一處全 DS 同步) |
-| Dismiss / Inline action / Overflow menu | item-anatomy spec 三個 section |
-| 按鈕排列 / 群組 | `patterns/action-bar/action-bar.spec.md` |
-| Chrome header 選型 + 高度 | `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」|
-| Overlay(header/body/footer / dismiss / title size)| `patterns/overlay-surface/overlay-surface.spec.md` |
-| Icon 選擇 / 尺寸 | `# 元件 Props 命名原則`「常用 icon canonical」+ `# UI 開發規則`「Icon size 來源分層規則」 |
-| Variant / prop 命名 | 既有 grep + `# 命名與語言一致性`「三重 test」 |
+| Padding 分層 / Icon size | `.claude/references/ui-dev-rules.md` |
+| Row / item 結構 / Label-Desc gap / Dismiss / Inline action | `patterns/element-anatomy/item-anatomy.spec.md` |
+| 連續 item list gap / 視覺容器 breathing | `patterns/element-anatomy/element-anatomy.spec.md` + 元件「List wrapper canonical」 |
+| 按鈕排列 / 群組 / Action bar | `patterns/action-bar/action-bar.spec.md` |
+| Chrome header 選型 + 高度 | `tokens/uiSize/uiSize.spec.md` |
+| Overlay(header/body/footer / dismiss / title)| `patterns/overlay-surface/overlay-surface.spec.md` |
+| Icon 選擇 | `# 元件 Props 命名原則`「Icon canonical」|
+| Variant / prop 命名 | 既有 grep + `# 命名與語言一致性` 三重 test |
 
-## 強制 checklist — 新 tsx top-of-file 註解
-
-新元件 tsx 開頭**必須**含「── 消費的 SSOT ──」段列出 components / patterns / tokens / spec refs。Hook 自動檢測;模板 + 禁止清單(隱性自創反例 6 條)詳 `ssot-consultation.md`。
+**強制 checklist**:新元件 tsx 開頭必含「── 消費的 SSOT ──」段列 components/patterns/tokens/spec refs。Hook 自動檢測;模板詳 reference。
 
 
 # 任務導航表（做 X → 讀 Y）
@@ -184,29 +177,21 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 
 | 任務類型 | 必讀章節（按順序） |
 |---------|-----------------|
-| **新增元件** | `# 建立 UI 前必讀` → `# shadcn 元件規範` → `# Spec 規則` → skill `/component-quality-gate` |
-| **修改元件 variant / size / state** | 該元件 `spec.md` → skill `/story-writing`(Phase 4 連動) |
-| **改 cva `defaultVariants`** | skill `/story-writing` Phase 4 高風險漂移點 |
+| **新增元件** | `# 建立 UI 前必讀` → `# shadcn 元件規範` → `# Spec 規則` → `/component-quality-gate` |
+| **修改 variant / size / state** / **改 cva `defaultVariants`** | 該元件 `spec.md` → `/story-writing`(Phase 4 高風險漂移)|
 | **新增 / 修改 token** | `tokens/README.md` charter → `# Token 命名原則` → 對應 `tokens/xxx.spec.md` |
 | **新增 / 修改 pattern** | `patterns/README.md` charter → `# 建立 UI 前必讀` → 對應 `patterns/{name}/spec.md` |
-| **寫任何 story** | skill `/story-writing`(含 anatomy 標準 + 範例選擇 + 自我檢查) |
-| **跨元件比較 / 加 SSOT pointer** | `# Spec 規則` → SSOT 規則與 anchors 清單 |
+| **寫任何 story** / **寫任何視覺 code 前** | `/story-writing` + `# SSOT 消費 canonical` |
 | **命名新檔案 / 變數 / prop** | `# 命名與語言一致性` + `# 元件 Props 命名原則` |
-| **新元件的內部 layout 選型** | `# 系統內部 Layout — 4-Family Model` 判斷流程 → `patterns/element-anatomy/element-anatomy.spec.md`(完整 taxonomy) |
-| **新 row / item 元件的結構(Family 1+2)** | `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 row 結構 SSOT) |
+| **新元件 layout 選型** / **row 元件結構(F1+2)** | `# 系統內部 Layout — 4-Family Model` → `element-anatomy.spec.md` / `item-anatomy.spec.md` |
 | **新 skill / hook / command** | 對應 `.claude/{home}/README.md` charter → `design-system-audit/references/rule-placement.md` |
-| **建立新 chrome header** | `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」(fixed-h vs padding-based + 8 家對照) |
-| **無明確前例的設計決策** | `# 遇不確定時的協議` |
-| **提設計建議 / option A/B/C** | 每 option 必含 DS canonical(spec:line / token name)+ 世界級對照;只給世界級 = 螺絲鬆 |
-| **Tailwind / CSS 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` 技術陷阱 anchor |
-| **寫任何視覺 code 前** | `# SSOT 消費 canonical` 對照表列出查過的家 |
-| **Stakeholder-visible 產出**(新元件 / 新功能 / 新產品頁 / 比稿) | `# 稽核 canonical` → Tier 1 強制 |
-| **稽核結論 = 修實作 or 改原則?** | `# 稽核 canonical`「稽核 vs 執行 分權」節(auto vs STOP 公式 + 表)|
-| **跑 D6 設計原則稽核** | `.claude/skills/design-system-audit/references/principle-audit-protocol.md`(4 子維 scan + 判斷表 + FP 記憶) |
-| **User 糾正 AI 後** | `# 資訊治理 canonical`(判斷 home + 寫到 memory / CLAUDE.md / skill reference) |
-| **spec 跟 code 結論衝突** | `# Spec 規則`(主動提出討論,不默默改) |
-| **在 classification-sensitive dir 建新檔** | **先 Read 該 dir 的 `README.md` charter`**(硬規則,見 `# 資訊治理 canonical`「8 home」)|
-| **稽核缺口 / 覆蓋盤點 / 補洞決策** | `.claude/references/audit-coverage-vs-24-checklist.md`(業界 24 節 vs 我們 / Dim 9 framework multiplier / 刻意不補清單) |
+| **建立新 chrome header** | `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」|
+| **無前例的設計決策** / **提設計建議 / option A/B/C** | `# 遇不確定時的協議`;option 必含 DS canonical + 世界級對照(只給世界級 = 螺絲鬆)|
+| **Tailwind / CSS 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` |
+| **Stakeholder-visible 產出** / **稽核結論修實作 or 原則** / **跑 D6 稽核** | `# 稽核 canonical`(Tier 1 強制 / 分權 auto-vs-stop / D6 protocol)|
+| **User 糾正 AI 後** / **spec 跟 code 衝突** | `# 資訊治理 canonical`(home 判斷)/ `# Spec 規則`(主動提出討論)|
+| **classification dir 建新檔** | 先 Read dir `README.md` charter(硬規則,見 `# 資訊治理 canonical`)|
+| **稽核缺口盤點** | `.claude/references/audit-coverage-vs-24-checklist.md` |
 
 **找不到對應的任務類型** → 進 `# 遇不確定時的協議`，不要自己決定讀什麼。
 
@@ -214,26 +199,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 
 # 專案規則
 
-本專案使用：
-
-- Vite + React + TypeScript
-- Tailwind CSS v4（@tailwindcss/vite）
-- shadcn/ui 元件庫
-- Storybook
-- 自訂 Design Token 系統
-
-專案必須可以正常啟動。
-
-必要檔案：
-
-- index.html（位於專案根目錄）
-- src/main.tsx
-- src/globals.css
-- vite.config.ts
-- package.json
-- tsconfig.json
-
-若缺少上述檔案，請先建立再進行其他修改。
+Stack:Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design Token。必要檔案:`index.html`(root)/ `src/main.tsx` / `src/globals.css` / `vite.config.ts` / `package.json` / `tsconfig.json`。缺即建。
 
 
 
@@ -269,48 +235,24 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 
 # 命名與語言一致性(Meta 規則)
 
-**本節 meta 規則** — 影響所有命名決定(檔案 / 資料夾 / 變數 / spec 章節 / story / API prop)。
-
-命名前必 `ls` / `grep` 既有 pattern,嚴格對齊不憑直覺。詳表 + 禁止清單 → `.claude/references/naming-conventions.md`。
+影響所有命名決定(檔案 / 資料夾 / 變數 / spec 章節 / story / API prop)。命名前必 `ls` / `grep` 既有 pattern 嚴格對齊。詳表 + 禁止 → `.claude/references/naming-conventions.md`。
 
 ## 命名必過三重 test(governance)
 
-任何新命名(variant / mode / prop value / token / 元件名 / section 名)**必同時通過**:
+1. **既有設計語言 test**:對齊本專案既有詞彙(`compact/rich / sm/md/lg / action/indicator / scanning/reading` 等)?
+2. **世界級 idiom test**:≥ 2 家 world-class DS(Polaris / Material / Atlassian / Ant / Carbon / Apple HIG / Discord / Slack / Notion)用此詞?
+3. **跨元件認知衝突 test**(最易漏):同字串在其他元件已有不同語義?如 `text` 是 Button `variant="text"`,若 FileItem `mode="text"` 變「文字為主」= 雙語義 consumer 混淆。
 
-1. **既有設計語言 test**:跟本專案現行命名對齊?跟 CLAUDE.md 既有詞彙(`compact / rich / sm / md / lg / action / indicator / scanning / reading` 等)沿用而非發明?
-
-2. **世界級 idiom test**:≥2 家 world-class DS 用此詞(Polaris / Material / Atlassian / Ant / Carbon / Apple HIG / Discord / Slack / Notion)?孤立發明詞(即使意思對)不算世界級。
-
-3. **跨元件認知衝突 test**(最易漏):同字串在其他元件是否已有不同語義?例:`text` 是 Button `variant="text"`(文字樣式),若 FileItem `mode="text"` 變「文字為主呈現」= 雙語義,consumer 混淆。grep 既有 prop value 確認同字不撞。
-
-**三個 test 全過才採納**。一個不過 → 改詞或加明確區隔(prefix / 語境)。
-
-**歷史**:FileItem mode 本來差點用 `text / picture`(Ant idiom + 既有語言 ✓),撞 Button `variant="text"` 語義 → 改 `compact / rich`。
+**三 test 全過才採納**。歷史:FileItem 差點用 `text/picture`(test 1+2 ✓)撞 Button `variant="text"` → 改 `compact/rich`。
 
 ## 語言一致性
 
-- spec.md 原則繁中(技術術語保留英);Code identifier 一律英;單一檔案註解統一語言,不中英夾雜;同段落不跨語言(「Rule A」「判斷法 A」擇一)
+spec.md 繁中(技術術語保留英)/ code identifier 一律英 / 單一檔案註解統一語言不中英夾雜 / 同段落不跨語言(「Rule A」「判斷法 A」擇一)。
 
 
 # 技術架構概覽
 
-```
-src/
-├── globals.css             ← Tailwind v4 入口 + CSS token bridge
-├── lib/utils.ts            ← cn()(clsx + tailwind-merge)
-├── hooks/                  ← app-level React hooks
-├── design-system/
-│   ├── README.md           ← DS 入口 + 各子 dir charter 索引
-│   ├── hooks/              ← DS 共用 React hooks(use-overflow-items / use-is-mobile)
-│   ├── tokens/             ← charter: tokens/README.md
-│   ├── components/         ← charter: components/README.md(PascalCase folder 一元件一家)
-│   └── patterns/           ← charter: patterns/README.md(runtime UI primitive)
-└── explorations/           ← 未定案 prototype 比稿
-```
-
-**目錄以實際檔案系統為準**。查看元件 / pattern / token 清單前先 `ls` 對應 dir。各子 dir 的 charter(收什麼 / 不收什麼)寫在該 dir 的 `README.md`——建立新檔前必讀(見 `# 資訊治理 canonical` 硬規則)。
-
-Internal primitive vs public-facing 元件的分類 test 見 `components/README.md` 及 Storybook title 命名(`# Story` 章節)。
+`src/` = `globals.css`(Tailwind v4 入口)+ `lib/utils.ts`(`cn()`)+ `hooks/`(app)+ **`design-system/`**(`README.md` + `hooks/` / `tokens/` / `components/` / `patterns/`,各 dir charter 在 `README.md`)+ `explorations/`(未定案 prototype)。**目錄以實際檔案系統為準**,查看清單前先 `ls`;各 dir charter 建立新檔前必讀(見 `# 資訊治理 canonical` 硬規則)。Internal vs public 分類 test 見 `components/README.md` 及 `# Story`。
 
 
 # Token 系統運作方式
@@ -339,51 +281,27 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 
 # 建立 UI 前必讀
 
-**先 `ls src/design-system/{components,patterns}/`**(不依賴本文件列表)。
+**先 `ls src/design-system/{components,patterns}/`**(不依賴本文件清單)。必查 spec:Tokens(`tokens/{color|typography|density|uiSize|layoutSpace|elevation|radius}/*.spec.md`)/ Row + List item(`item-anatomy.spec.md` Family 1+2 SSOT)/ Action bar / Overflow / Overlay(`patterns/{action-bar,horizontal-overflow,overlay-surface}/*.spec.md`)/ Field(`components/Field/*.spec.md`)。
 
-## Spec 索引(必查)
+**既有 primitive 優先消費**(超級規則):命中既有 → 必消費不 hand-craft。**自我檢查**:icon+text 垂直 → `<Empty>`;橫向 row → `<MenuItem>` + slot;浮層 → `overlay-surface`;跨 OS 捲軸 → `<ScrollArea>`(隱藏+fade → `horizontal-overflow`);鎖長寬比 → `<AspectRatio>`。都沒命中才自建。缺口回元件 spec 擴 API 不自刻(`check_story_anatomy.sh` 攔)。完整對照(12 情境 + 8 primitive + overflow 三規則)→ `.claude/references/build-ui-canonicals.md`。
 
-| 主題 | Spec |
-|------|------|
-| Tokens(色彩 / 字體 / 密度 / 尺寸 / 間距 / 陰影 / 圓角)| `tokens/{color|typography|density|uiSize|layoutSpace|elevation|radius}/*.spec.md` |
-| Row primitive + List item 必消費 + 選擇/狀態視覺 | `patterns/element-anatomy/item-anatomy.spec.md` |
-| 工具列 / 溢出 / 浮層外殼 | `patterns/{action-bar,horizontal-overflow,overlay-surface}/*.spec.md` |
-| Field 容器 / Controls / 驗證 | `components/Field/{field,field-controls,form-validation}.spec.md` |
-
-## 既有 primitive 優先消費(超級規則)
-
-命中既有元件 → 必消費,不 hand-craft。**自我檢查**:icon+text 垂直 → `<Empty>`;橫向 row → `<MenuItem>` + slot;浮層 → `overlay-surface`;跨 OS 捲軸 → `<ScrollArea>`(隱藏 + fade → `horizontal-overflow`);鎖長寬比 → `<AspectRatio>`。都沒命中才自建,建完立刻回來加條目。
-
-缺口回元件 spec 擴 API 不自刻。`check_story_anatomy.sh` 攔手刻。完整對照(12 情境 + 8 layout primitive + overflow 三規則)→ `.claude/references/build-ui-canonicals.md`。
-
-**Pattern 規則**:建 UI 前必檢查 pattern;exploration 定案 → 升級 pattern;平坦結構(一 pattern 一資料夾),同領域 ≥ 3 pattern 才建子資料夾。
+**Pattern 規則**:建 UI 前檢查 pattern / exploration 定案升級 pattern / 平坦結構(一 pattern 一 dir,同領域 ≥ 3 才建子 dir)。
 
 
 # UI 開發規則
 
-- 必須優先重用 `src/design-system/components/` 內已存在的元件
-- 必須使用 design tokens(Tailwind utilities / CSS 變數);不硬寫顏色、font-size、spacing、radius
-- 建立新 UI 前必先檢查 pattern(見 `# 建立 UI 前必讀`);缺元件明確指出不假裝存在
-- 使用 `cn()` 合併 Tailwind class(`@/lib/utils`)
+**4 條核心**:必重用既有 `components/` / 必用 design tokens(禁硬寫色/字/間距/圓角)/ 建新 UI 前查 pattern(見 `# 建立 UI 前必讀`)/ 用 `cn()`(`@/lib/utils`)合併 Tailwind class。
 
-## 深度規則 → `.claude/references/ui-dev-rules.md`
+**深度規則**(→ `.claude/references/ui-dev-rules.md`):同 flex 列互動 slot 幾何鐵律 / 新增數值前查既有 pattern / Padding source 3 層(Chrome token / slot `p-N` / 精確 `calc()`)/ Icon size 3 層(Row Context / Button mapping / 一次性對齊 uiSize)。
 
-| 規則 | Anchor |
-|------|--------|
-| **同 flex 列互動 slot 幾何鐵律** | 新 slot 進 row 前 3 步 mechanical check(統一 box 尺寸保 gap token)|
-| **新增數值前必先查既有 pattern** | gap / padding / font-size / icon size 等 grep 既有系統值 |
-| **Padding source 分層規則** | Chrome `layout-space token` / 元件內 slot `p-N` / 精確幾何 `calc()` 三 canonical |
-| **Icon size 來源分層規則** | Row 讀 Context / Button 自 mapping / 一次性對齊 uiSize token |
-
-## Row primitive / 清 imports 後 runtime / 一句話 pointer
-
-- **新 row 元件**:先讀 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 深度 SSOT)含「自我檢查」節
-- **清 unused imports / export 異動後**:`npx tsc -b`(**禁 `--noEmit`**,`files: []` silent pass)→ grep `export {}` 定義 → `npm run storybook` 載 story → 互動驗動態 path
-- **Inline Action vs Button**:判斷樹 → item-anatomy.spec.md「Inline Action 設計規格」
-- **Separator vs CSS border**:誰決定分隔 → `separator.spec.md`
-- **陰影**:必 `--elevation-*`;禁 `shadow-sm/md/lg/xl/2xl` / 硬寫;`shadow-none` OK → `elevation.spec.md`
-- **視覺容器 breathing**:有邊界(bg / border / shadow)→ 必 inner padding → `element-anatomy.spec.md`
-- **選擇 / 狀態視覺**:用既有 state prop,指示器對應 selection model → item-anatomy.spec.md
+**一句話 pointer**:
+- 新 row 元件 → `patterns/element-anatomy/item-anatomy.spec.md`「自我檢查」
+- 清 unused imports / export 異動後:`npx tsc -b`(禁 `--noEmit`,`files: []` silent pass)→ grep `export {}` → `npm run storybook` → 互動驗動態 path
+- Inline Action vs Button → item-anatomy.spec.md「Inline Action 設計規格」
+- Separator vs CSS border → `separator.spec.md`
+- 陰影:必 `--elevation-*`;禁 `shadow-sm/md/lg/xl/2xl` / 硬寫;`shadow-none` OK
+- 視覺容器 breathing:有邊界(bg/border/shadow)→ 必 inner padding
+- 選擇 / 狀態視覺:用既有 state prop → item-anatomy.spec.md
 
 
 # Tailwind 使用規則
@@ -401,24 +319,14 @@ Tailwind 預設間距 / 尺寸 class 可用;對應 token 時用 `className="p-[v
 
 # Token 命名原則
 
-所有 design token 必一致命名邏輯 — 看 token 名就知層級 / 角色 / 關聯。
-
-## 核心區分
-
-- **Primitive**(無語意):`--color-*` 前綴 + 編號(`--color-blue-6` / `--color-neutral-9` / `--field-height-md`)
-- **Semantic**(賦 purpose):無 `--color-` 前綴,直接表 purpose(`--primary` / `--foreground` / `--neutral-hover` / `--inverse-fg`)
-
-**Namespace + Role 結構**:`--{namespace}-{role}-{variant?}` —
-- Namespace:`primary / error / neutral / inverse / fg / bg / field`
-- Role:`fg / bg / hover / active / subtle / text / height / size`
-- Variant:`secondary / muted / disabled / xs/sm/md/lg`
+看 token 名必知層級 / 角色 / 關聯。**核心區分**:**Primitive**(無語意)`--color-*` 前綴 + 編號(`--color-blue-6` / `--field-height-md`);**Semantic**(賦 purpose)無前綴直接表 purpose(`--primary` / `--foreground` / `--neutral-hover`)。**Namespace + Role 結構** `--{namespace}-{role}-{variant?}`(namespace: primary/error/neutral/inverse/fg/bg/field;role: fg/bg/hover/active/subtle/text/height/size)。
 
 ## 4 條硬規則
 
-1. **對齊既有 family**:新 token 鏡射既有 family,不孤立發明(詳 `tokens/color/color.spec.md`)
-2. **不混語義與色名**:Tag / Avatar 用 primitive(`var(--color-deep-orange-1)`);Button / Checkbox 用 semantic(`var(--error-subtle)`)。改 `--error` 色不影響 Tag red variant
-3. **新增語意色相**:走 `tokens/color/color.spec.md`「新增語意色相的標準流程」(SSOT)。本系統採 **Atlassian-style Semantic State Token** 流派(靜態色用 primitive,互動狀態用 semantic)
-4. **禁止事項**:籠統命名(`--inverse-hover` 不知 text/bg/border)/ 孤立命名 / 自創縮寫(`--fg` vs 既有 `--foreground`) / Primitive 帶語意(`--color-primary-6`) / Semantic 帶色相(`--primary-blue`) / Categorical 中間層(`--blue-hover` 已廢除)
+1. **對齊既有 family**(不孤立發明)— 詳 `tokens/color/color.spec.md`
+2. **不混語義與色名**:Tag/Avatar 用 primitive(`var(--color-deep-orange-1)`);Button/Checkbox 用 semantic(`var(--error-subtle)`)
+3. **新增語意色相**走 `tokens/color/color.spec.md`「新增語意色相流程」SSOT。本系統採 **Atlassian-style Semantic State Token**(靜態色 primitive / 互動狀態 semantic)
+4. **禁止**:籠統命名 / 孤立命名 / 自創縮寫(`--fg` vs `--foreground`)/ Primitive 帶語意(`--color-primary-6`)/ Semantic 帶色相(`--primary-blue`)/ Categorical 中間層(已廢除)
 
 
 # 元件 Props 命名原則
@@ -452,48 +360,32 @@ Tailwind 預設間距 / 尺寸 class 可用;對應 token 時用 `className="p-[v
 
 # Primitive Exposure Layer(3 層暴露 canonical)
 
-設計系統的 primitive 按**暴露對象**分 3 層。建新元件 / 新 API 時先決定層級,錯置會造成 consumer 選用困擾(Button 太複雜卻當 embedded action 用)。
+Primitive 按暴露對象分 3 層。建新元件 / 新 API 時先決定層級,錯置 = consumer 選用困擾。
 
 | Layer | 對象 | API 形式 | 例 |
 |-------|------|---------|---|
-| **L1 — User-facing** | 所有人(app + stories + consumer) | variant / size prop / ReactNode slot | Button / Input / MenuItem / FileItem / DataTable |
+| **L1 — User-facing** | 所有人(app / stories / consumer) | variant / size prop / ReactNode slot | Button / Input / MenuItem / FileItem / DataTable |
 | **L2 — Host slot API** | 消費 L1 host 的 app code | config-based `{icon, label, onClick}` | `Input.endAction` / `MenuItem.inlineActions` |
-| **L3 — Internal**(不暴露 app)| 建新 host / row primitive 的 DS 作者 | 低階 building block,only export for composition | `ItemInlineAction` / `ItemIcon` / `RowSizeProvider` |
+| **L3 — Internal** | 建新 host / row primitive 的 DS 作者 | low-level building block,export for composition | `ItemInlineAction` / `ItemIcon` / `RowSizeProvider` |
 
-## 判斷新 primitive 放哪層(3 題)
+**3 題判斷**:App 直接 import? → L1 / Host 內部 embedded action config? → L2 / 建新 host 的 low-level block? → L3 / 皆否 → **不該是新 primitive**(走 feature prop)。
 
-1. **App code 需要直接 import 嗎?** → 是 → L1(e.g. `Button`);否 → 看 Q2
-2. **它是「host 內部 embedded action」的 config API 嗎?** → 是 → L2(e.g. `InlineActionConfig` + host slot prop);否 → 看 Q3
-3. **它是「建新 host 元件時的低階 building block」嗎?** → 是 → L3(e.g. `ItemInlineActionButton`);否 → **不該是新 primitive**(可能是舊元件的 feature,走 feature prop)
+**規則**:L3 stories 必明示 internal;L1 不做 L3 的事(Button 不加 embedded=true,走 L2 host slot);L2 config > ReactNode slot(防 consumer drift);新 L1 經 Checkpoint 3。
 
-## 規則
-
-- **L3 primitive 的 stories / docs 必明示「internal; app 請走 host slot API」**
-- **L1 上不做 L3 該做的事**(例:Button 不該加「embedded=true」density 維度;embedded 情境走 L2 host slot)
-- **L2 config-based 比 ReactNode slot 更 opinionated**(防 consumer drift),新 host 元件優先 config
-- **新 L1 primitive 要經 Checkpoint 3**(classification ambiguity);L2 / L3 可 AUTO
-
-**世界級對照**:結構對齊 Radix / Headless UI / Ariakit compound pattern(L1 wrapper + L3 primitives);L2 config-based 比 Polaris / Material 的 ReactNode slot 更 opinionated(防 consumer drift,有 rationale 的 slight deviation)。
-
-**Icon action 範例**:L1 `<Button iconOnly />`(獨立 action)/ L2 `Input.endAction` / `MenuItem.inlineActions`(config API)/ L3 `ItemInlineAction`(composition primitive)。完整 predicate → `patterns/element-anatomy/item-anatomy.spec.md`。
+**世界級對照**:結構對齊 Radix / Headless UI / Ariakit compound pattern;L2 config-based 比 Polaris / Material ReactNode slot 更 opinionated(rationale slight deviation)。**Icon action 範例**:L1 `<Button iconOnly />` / L2 `Input.endAction` / L3 `ItemInlineAction`。完整 predicate → `patterns/element-anatomy/item-anatomy.spec.md`。
 
 
 # 系統內部 Layout — 4-Family Model
 
-**每個元件 spec 第一段必須聲明 Layout Family**(1/2/3/4 或「非上述 / self-contained」),確保相同用途用相同 layout,AI 舉一反三。
+**每個元件 spec 第一段必須聲明 Layout Family**(1/2/3/4 或「非上述 / self-contained」)。
 
 | Family | 用途 | SSOT |
 |--------|------|------|
-| **1. Menu item** | Menu 內掃視單列(scanning) | `patterns/element-anatomy/item-anatomy.spec.md` |
-| **2. List item** | 頁面閱讀式單列(reading) | 同上 |
-| **3. Pill** | 單行互動 pill | `components/Button/button.spec.md`「Pill Layout」 |
+| **1. Menu item** / **2. List item** | scanning(menu 內)/ reading(頁面) | `patterns/element-anatomy/item-anatomy.spec.md` |
+| **3. Pill** | 單行互動 pill | `components/Button/button.spec.md`「Pill Layout」|
 | **4. Field control** | 可編輯資料輸入 | `components/Field/field-controls.spec.md` |
 
-**判斷**:垂直列表 → F1(menu)/ F2(頁面);單行可點 / 可讀 pill → F3;單行可編輯 → F4;都不是 → 停下討論(新 family 還是 self-contained)。
-
-**dual-anchor**:`element-anatomy.spec.md` = 4-Family 整體 taxonomy(cross-pattern governance);`item-anatomy.spec.md` = Family 1+2 row 深度 SSOT(runtime primitive)。
-
-**命名鐵律**:「layout」保留給 page-level(未來家);element 結構永遠用「anatomy」。Material / Polaris / Atlassian / Carbon 皆如此 — Foundations > Layout 是 page-level,element 屬 component anatomy。
+**判斷**:垂直列表 → F1/F2;單行可點 / 可讀 pill → F3;單行可編輯 → F4;都不是 → 停下討論。**dual-anchor**:`element-anatomy.spec.md` = 4-Family taxonomy(cross-pattern governance);`item-anatomy.spec.md` = Family 1+2 深度 SSOT。**命名鐵律**:「layout」保留 page-level,element 結構永遠用「anatomy」(Material / Polaris / Atlassian / Carbon 共識)。
 
 
 # 元件完成 checklist
@@ -511,32 +403,12 @@ Tailwind 預設間距 / 尺寸 class 可用;對應 token 時用 `className="p-[v
 
 # Story
 
-**完整 workflow → `/story-writing` skill**。本節只留每 session signal。
+**完整 workflow → `/story-writing` skill**。本節留每 session signal。
 
-## 三層定位
+**三層定位**(深度遞進 看→查→判斷):**展示** `{name}.stories.tsx`(設計規格便利瀏覽)/ **設計規格** `{name}.anatomy.stories.tsx`(token + 尺寸藍圖,取代 Figma Inspect)/ **設計原則** `{name}.principles.stories.tsx`(do/don't + 情境選擇)。
 
-| 層 | 檔案 | 職責 |
-|---|---|---|
-| **展示** | `{name}.stories.tsx` | 設計規格便利瀏覽(車子展示間) |
-| **設計規格** | `{name}.anatomy.stories.tsx` | token / 尺寸藍圖 / Inspect,取代 Figma(車子規格表) |
-| **設計原則** | `{name}.principles.stories.tsx` | do/don't / 情境選擇(駕駛手冊) |
+**Title**:`Design System/{Tokens|Patterns|Components|Internal}/...`;第一層英 / PascalCase / 子頁中文 / 子頁前不加元件名(❌ `MenuItem 展示` → ✅ `展示`)。**Internal vs Components 三 test**:(1) 有預設視覺(bg/border/shadow/padding/rounded)?(2) 直接 `<X>` 有視覺?(3) 所有消費者都包 wrapper?三題傾向 Internal → `Internal/`;任一傾向 Components → `Components/`。**看行為不看名字**(HoverCard 名字 public 但純行為 → Internal/)。
 
-三層「看→查→判斷」閱讀深度遞進,職責不重複。
-
-## Title + Internal vs Components
-
-Title path `Design System/{Tokens|Patterns|Components|Internal}/...`;第一層英文 / 元件 PascalCase / 子頁中文 / 子頁前不加元件名(❌ `MenuItem 展示` → ✅ `展示`)。
-
-**Internal vs Components 三題 test**:(1) 有預設視覺(bg/border/shadow/padding/rounded)?(2) 直接 `<X>` 有視覺?(3) 所有消費者都包 wrapper?三題傾向 Internal → `Internal/`;任一傾向 Components → `Components/`。**看行為不看名字**(HoverCard 名字 public 但純行為 → Internal/)。
-
-## 範例最高準則
-
-**精簡幹練、0 重複、每 story earn its existence**。Story 教學任務:讓讀者推得出自己產品怎麼用,或把模糊原則具象化。
-
-**Philosophy**:舉一反三為主(1 story 1 原則,讀者類推)/ manual 範例補抽象原則具象化(Jira/Stripe/Notion 劇情釘「真實場景」)/ 禁湊數重複秀肌肉(audit Dim 24/25 會抓)。
-
-**Earn-existence 雙 test**(兩題皆 NO → retire):(a) 教一條別 story 沒教的原則?(b) 移除後 spec 理解會 degrade?
-
-**驗收 2 test**:「人 test」遮標題 5 秒懂?/「舉一反三 test」讀者推得出自己產品怎麼用?
+**範例最高準則**:精簡幹練、0 重複、每 story earn its existence。Philosophy:舉一反三(1 story 1 原則讀者類推)/ manual 補抽象原則具象化(Jira/Stripe/Notion 劇情釘「真實場景」)/ 禁湊數重複秀肌肉(audit Dim 24/25 抓)。**Earn-existence 2 test**(兩題皆 NO → retire):(a) 教一條別 story 沒教的原則?(b) 移除後 spec 理解會 degrade?**驗收 2 test**:「人 test」遮標題 5 秒懂?/「舉一反三 test」讀者推得出自己產品?
 
 ❌ 禁止:佔位符(`Option A/B/C` / Lorem / foo)/ 抽象代號(「按鈕一」/ `Variant X`)/ 極端不現實 / 視覺符號 / spec 內部代號。詳細合法場景 + anatomy 5-story + Rule note + cva defaultVariants 漂移 → `/story-writing` skill。
