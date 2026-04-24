@@ -1,6 +1,6 @@
 ---
 name: governance-health
-description: Continuous governance metric monitoring + auto-propose rule changes. Reads `.claude/logs/hook-fires.jsonl` / `skill-invokes.jsonl` / `user-corrections.jsonl` to detect dead rules (6mo 0 fire), hot rules (high fire count → Meta-Pattern candidate), stale memories, and pending corrections. Produces governance health report + retire candidates + Meta-Pattern upgrade proposals. Invoke via /governance-health monthly OR when .claude/logs/ grows > 10MB OR after audit Phase F reports sprawl. Complementary to /knowledge-prune: this skill is CONTINUOUS metric-driven (auto-propose changes); prune is DEEP quarterly restructure.
+description: Continuous governance metric monitoring + auto-propose rule changes. Reads `.claude/logs/hook-fires.jsonl` (governance-file edits, per-event) / `skill-invokes.jsonl` / `user-corrections.jsonl` to surface hot files (edited repeatedly → refactor candidate), unused skills (3mo 0 invoke), stale memories, and pending corrections. Note: per-hook fire log not yet instrumented; dead-hook detection currently manual. Produces governance health report + retire candidates + Meta-Pattern upgrade proposals. Invoke via /governance-health monthly OR when .claude/logs/ grows > 10MB OR after audit Phase F reports sprawl. Complementary to /knowledge-prune: this skill is CONTINUOUS metric-driven (auto-propose changes); prune is DEEP quarterly restructure.
 ---
 
 # Governance Health — 持續 metric 監控 + auto-propose

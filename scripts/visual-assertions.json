@@ -410,6 +410,14 @@
     {
       "id": "design-system-components-treeview-展示--file-browser",
       "file": "treeview-file-browser.png"
+    },
+    {
+      "id": "design-system-internal-menu-展示--basic",
+      "file": "menu-menuitem-basic.png"
+    },
+    {
+      "id": "design-system-internal-selectioncontrol-展示--notification-preferences",
+      "file": "selectioncontrol-notification-preferences.png"
     }
   ]
 }
