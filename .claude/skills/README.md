@@ -8,7 +8,7 @@
 
 **核心特徵**:**只在 user invoke 時載入**(不佔每 session context);流程包含 checkpoint 讓 user 介入決策。
 
-## 當前居民(13 skills,2026-04-24)
+## 當前居民(14 skills,2026-04-24)
 
 **Audit / Quality(5)**:
 | Skill | Invoke 時機 | Scope |
@@ -28,8 +28,9 @@
 | `prototype/` | 「做 prototype / MVP / 原型」 | exploration + Phase 3.5 gate |
 | `delivery-handoff/` | 「要交付 / handoff」 | figma-like 交付包 |
 
-**Story 層(1)**:
+**Story 層(2)**:
 | `story-writing/` | 「寫 story / 補 anatomy / principles story」 | 6-story 結構 + 範例品質 |
+| `story-auto-compile-migrate/` | 「migrate 元件到 auto-compile」/ auto-chained by audit Dim 23 | 批次加 `componentMeta` export + spec YAML frontmatter(Phase 1+2 migration) |
 
 **Governance(2)**:
 | `knowledge-prune/` | 季度 / CLAUDE.md > 800 / MEMORY.md > 20 / audit 報 sprawl | 治理冗贅深度 prune |

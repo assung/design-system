@@ -119,7 +119,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
 | # | Audit | What it catches |
 |---|-------|-----------------|
-| 23 | **Story canonical-drift**(spec/tsx vs stories) | 跑 `node scripts/compile-stories.mjs --all --check` — 偵測 已 migration 的元件(有 `componentMeta` export + spec YAML frontmatter)spec variants/sizes keys 跟 tsx cva 對齊嗎?不齊 = P0 violation(stories 的 canonical 會錯),立即修。Migration 未做的元件 skip(gracefully)— 另由 Dim 11 story 三層齊全 / Dim 9 shadcn passthrough 等覆蓋 |
+| 23 | **Story canonical-drift + Migration coverage**(spec/tsx vs stories) | 跑 `node scripts/compile-stories.mjs --all --check` — 兩類 finding:(a) 已 migration 元件 key 不齊 = **P0 drift**(立即修);(b) 未 migration 元件(無 `componentMeta` export / 無 spec frontmatter)= **P2 migration pending**(必 Checkpoint 1 提報 user,Phase 3 chain `/story-auto-compile-migrate` 批次處理,不 silent skip)。進階模式 `--deep` 必跑本 Dim 直到全 DS 元件都 migrated + 0 drift |
 
 ---
 
