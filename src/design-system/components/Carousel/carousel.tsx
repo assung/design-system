@@ -113,6 +113,7 @@ const Carousel = React.forwardRef<
       api.on('select', onSelect)
       return () => {
         api?.off('select', onSelect)
+        api?.off('reInit', onSelect) // D3 fix: previously leaked — stale closure on remount
       }
     }, [api, onSelect])
 
