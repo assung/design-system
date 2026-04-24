@@ -1,7 +1,24 @@
 # Row Primitive Consolidation — SidebarMenuButton / TreeItem 消費 MenuItem 評估
 
-**Status**:Planned, not started(2026-04-24)
-**Goal**:評估 SidebarMenuButton / TreeItem 是否適合消費 `menuItemVariants` cva base,減少 drift risk + spec 體積。**重點:Phase 0 評估為 GO/NO-GO decision,不無腦 refactor**。
+**Status**:✅ **Phase 0 done / Phase 1 declined**(2026-04-24 二次評估)
+**結論**:ROW_PADDING_BY_SIZE token SSOT 已是 practical best;full cva consume 經二次評估**不適合**執行(差異超過共通)
+**Goal(原)**:評估 SidebarMenuButton / TreeItem 是否適合消費 `menuItemVariants` cva base,減少 drift risk + spec 體積。
+
+## 為什麼 Phase 1 declined(2026-04-24 第二輪評估)
+
+實際比對兩 cva 後發現 Sidebar 有**大量 sidebar-specific 樣式**無法歸入 menuItemVariants base:
+- `peer/menu-button group/menu-button`(nested peer/group state)
+- `group-data-[collapsible=icon]:*`(icon-only mode:歸零 spacing + justify-center + hide label)
+- `data-[active=true]:*`(single-selection state)
+- `transition-[width,height,padding,gap,background-color,color]`(collapse animation — MenuItem 只 transition-colors)
+- `pr-8 group-has-[[data-sidebar=menu-action]]/menu-item`(menu-action 預留空間)
+- `text-fg-secondary font-medium`(MenuItem 無這預設)
+
+共通的只有 `cursor-pointer select-none outline-none focus-visible:bg-neutral-hover` — 不到 5 個 class,抽 shared base 反而 noise。
+
+**ROW_PADDING_BY_SIZE token(已實施)是 real value 共享**:改一處全同步,消除 py 公式 drift。full cva consume 屬 over-engineering。
+
+若未來真要共享更多,該走「token / primitive」層(add new token for hover bg semantic)不是「cva composition」層。
 
 ## 起因
 
