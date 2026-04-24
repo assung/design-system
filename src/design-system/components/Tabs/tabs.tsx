@@ -428,5 +428,27 @@ const TabsContent = React.forwardRef<
 ))
 TabsContent.displayName = 'TabsContent'
 
+// Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
+// Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
+export const tabsMeta = {
+  component: 'Tabs',
+  family: null, // TODO: Phase 2 — declare Layout Family(1/2/3/4 或 non-family)
+  variants: {
+
+  },
+  sizes: {
+    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
+    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
+    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+  },
+  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  tokens: {
+    bg: [], // TODO: grep tsx for bg-* tokens
+    fg: [],
+    ring: [],
+  },
+  defaultSize: 'md',
+} as const
+
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsTriggerVariants }
 export type { TabsSize, TabsListProps, TabsTriggerProps }

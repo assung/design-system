@@ -1,3 +1,23 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: Badge
+family: null
+variants:
+  critical:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  high:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  medium:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  low:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+sizes: {}
+---
+
 # Badge 設計原則
 
 ## 定位

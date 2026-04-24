@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: CircularProgress
+family: null
+variants: {}
+sizes: {}
+---
+
 # CircularProgress 設計原則
 
 **圓形進度指示(determinate + indeterminate 雙模式)**——整個設計系統 circular 形式進度的 SSOT。

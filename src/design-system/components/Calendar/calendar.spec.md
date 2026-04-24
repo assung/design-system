@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: Calendar
+family: null
+variants: {}
+sizes: {}
+---
+
 # Calendar 設計原則
 
 ## 定位

@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: FileItem
+family: null
+variants: {}
+sizes: {}
+---
+
 # FileItem 設計原則
 
 **檔案上傳列表項目**——顯示檔案名稱、上傳進度、狀態（uploading / completed / error）。

@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: NameCard
+family: null
+variants: {}
+sizes: {}
+---
+
 # NameCard 設計原則
 
 人員 HoverCard 的內容元件。提供統一的人員資訊展示格式，作為 HoverCard 的 content 消費者。

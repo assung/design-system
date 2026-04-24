@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: DescriptionList
+family: null
+variants: {}
+sizes: {}
+---
+
 # DescriptionList 設計原則
 
 唯讀 label + value 展示元件，用於呈現結構化的屬性資訊。HTML 語義為 `dl` + `dt` + `dd`，對齊 Atlassian、Shopify Polaris 慣例。

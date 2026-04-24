@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: ProgressBar
+family: null
+variants: {}
+sizes: {}
+---
+
 # ProgressBar 設計原則
 
 **水平進度條(linear determinate progress)**——表達「已完成 X%、還剩 Y%」的量化進度視覺 primitive。0–100% 的已知進度、單向推進、可預期終點。circular 形式(含 indeterminate)走 `CircularProgress`。

@@ -203,4 +203,35 @@ function TagInner(
 const Tag = React.forwardRef<HTMLDivElement, TagProps>(TagInner)
 Tag.displayName = 'Tag'
 
+// Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
+// Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
+export const tagMeta = {
+  component: 'Tag',
+  family: null, // TODO: Phase 2 — declare Layout Family(1/2/3/4 或 non-family)
+  variants: {
+    neutral: { purpose: 'TODO: Phase 2 fill' },
+    blue: { purpose: 'TODO: Phase 2 fill' },
+    red: { purpose: 'TODO: Phase 2 fill' },
+    green: { purpose: 'TODO: Phase 2 fill' },
+    yellow: { purpose: 'TODO: Phase 2 fill' },
+    turquoise: { purpose: 'TODO: Phase 2 fill' },
+    purple: { purpose: 'TODO: Phase 2 fill' },
+    magenta: { purpose: 'TODO: Phase 2 fill' },
+    indigo: { purpose: 'TODO: Phase 2 fill' },
+  },
+  sizes: {
+    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
+    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
+    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+  },
+  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  tokens: {
+    bg: [], // TODO: grep tsx for bg-* tokens
+    fg: [],
+    ring: [],
+  },
+  defaultVariant: 'neutral',
+  defaultSize: 'md',
+} as const
+
 export { Tag, tagVariants }

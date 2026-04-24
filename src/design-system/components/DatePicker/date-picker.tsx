@@ -372,6 +372,25 @@ DatePickerRange.displayName = 'DatePickerRange'
 // 走 Object.assign 確保 TS 型別帶上 Range 屬性,而非只做 runtime 附掛
 const DatePickerWithRange = Object.assign(DatePicker, { Range: DatePickerRange })
 
+// Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
+// Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
+export const datePickerMeta = {
+  component: 'DatePicker',
+  family: null, // TODO: Phase 2 — declare Layout Family(1/2/3/4 或 non-family)
+  variants: {
+
+  },
+  sizes: {
+
+  },
+  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  tokens: {
+    bg: [], // TODO: grep tsx for bg-* tokens
+    fg: [],
+    ring: [],
+  },
+} as const
+
 export {
   DatePickerWithRange as DatePicker,
   DatePickerDisplay,

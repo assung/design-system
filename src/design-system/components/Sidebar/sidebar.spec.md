@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: Sidebar
+family: null
+variants: {}
+sizes: {}
+---
+
 # Sidebar 設計原則
 
 > **Foundational SSOT rationale**(2026-04-24 approved,cap 800):

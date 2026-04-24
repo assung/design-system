@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: Slider
+family: null
+variants: {}
+sizes: {}
+---
+
 # Slider 設計原則
 
 **數值範圍選取器**——基於 Radix Slider primitive,橋接設計系統 token。

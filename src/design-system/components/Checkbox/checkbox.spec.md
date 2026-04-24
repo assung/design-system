@@ -1,3 +1,17 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: Checkbox
+family: null
+variants: {}
+sizes:
+  sm:
+    when: "TODO: Phase 2 fill"
+  md:
+    when: "TODO: Phase 2 fill"
+  lg:
+    when: "TODO: Phase 2 fill"
+---
+
 # Checkbox 設計原則
 
 (Radio 共用本規格,詳見 `../RadioGroup/radio-group.spec.md`;本文件通用於兩者視覺與行為,名稱保留 Checkbox 為主體)

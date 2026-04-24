@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: Separator
+family: null
+variants: {}
+sizes: {}
+---
+
 # Separator 設計原則
 
 Separator 是語意分隔元件，用於標示內容群組之間的邊界。

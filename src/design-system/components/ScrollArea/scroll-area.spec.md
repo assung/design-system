@@ -1,3 +1,11 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: ScrollArea
+family: null
+variants: {}
+sizes: {}
+---
+
 # ScrollArea 設計原則
 
 ScrollArea 是**跨 OS 視覺一致的自訂捲動容器**——用 overlay 捲軸取代原生 scrollbar,解決 macOS / Windows / Linux 之間的跑版落差。

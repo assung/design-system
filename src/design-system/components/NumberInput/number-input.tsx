@@ -164,4 +164,23 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 NumberInput.displayName = 'NumberInput'
 
 // code-quality-allow: dead-export — public API surface — consumer-exposed for future use
+// Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
+// Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
+export const numberInputMeta = {
+  component: 'NumberInput',
+  family: null, // TODO: Phase 2 — declare Layout Family(1/2/3/4 或 non-family)
+  variants: {
+
+  },
+  sizes: {
+
+  },
+  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  tokens: {
+    bg: [], // TODO: grep tsx for bg-* tokens
+    fg: [],
+    ring: [],
+  },
+} as const
+
 export { NumberInput, NumberInputDisplay, formatNumber }

@@ -1,3 +1,44 @@
+---
+# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
+component: Tag
+family: null
+variants:
+  neutral:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  blue:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  red:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  green:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  yellow:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  turquoise:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  purple:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  magenta:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+  indigo:
+    when: "TODO: Phase 2 fill"
+    world-class: []
+sizes:
+  sm:
+    when: "TODO: Phase 2 fill"
+  md:
+    when: "TODO: Phase 2 fill"
+  lg:
+    when: "TODO: Phase 2 fill"
+---
+
 # Tag 設計原則
 
 ## 定位
