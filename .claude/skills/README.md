@@ -8,14 +8,32 @@
 
 **核心特徵**:**只在 user invoke 時載入**(不佔每 session context);流程包含 checkpoint 讓 user 介入決策。
 
-## 當前居民
+## 當前居民(13 skills,2026-04-24)
 
+**Audit / Quality(5)**:
 | Skill | Invoke 時機 | Scope |
 |-------|-----------|-------|
-| `design-system-audit/` | user 要求 audit DS 本身 | DS 內部 spec/cva/SSOT 18 維度 |
+| `design-system-audit/` | user 要求 audit DS 本身 | DS 內部 spec/cva/SSOT 23 維度(含 Dim 23 story drift) |
 | `product-ui-audit/` | 「audit 這個 UI / 檢查 DS 用對嗎」| consumer UI 6 維檢核 |
-| `prototype/` | user 明言「做 prototype / MVP / 原型」| exploration candidates + phase 3.5 gate |
-| `delivery-handoff/` | 產品 final 後「要交付 / handoff」| figma-like 交付包 |
+| `component-quality-gate/` | 元件 merge / ready / check | 45+ 項 checklist + Phase 4 Ship 6 項 |
+| `baseline-audit/` | 跨元件 matrix(design-system-audit P1 prerequisite)| scan-only,不決策 |
+| `visual-audit/` | 視覺對齊 / 排版問題 / gap 錯 | pixel-level Layer A + B |
+
+**Performance / UX(2)**:
+| `performance-audit/` | 「這元件效能如何」 | render / memo / bundle |
+| `ux-audit/` | 「鍵盤用不了 / focus 跑飛 / 無障礙」 | keyboard / ARIA / animation |
+
+**Build-phase workflow(3)**:
+| `new-component/` | 「做新元件 X」 | 6-phase 建新元件 |
+| `prototype/` | 「做 prototype / MVP / 原型」 | exploration + Phase 3.5 gate |
+| `delivery-handoff/` | 「要交付 / handoff」 | figma-like 交付包 |
+
+**Story 層(1)**:
+| `story-writing/` | 「寫 story / 補 anatomy / principles story」 | 6-story 結構 + 範例品質 |
+
+**Governance(2)**:
+| `knowledge-prune/` | 季度 / CLAUDE.md > 800 / MEMORY.md > 20 / audit 報 sprawl | 治理冗贅深度 prune |
+| `governance-health/` | 月度 / auto-chain by audit | continuous metric monitor + auto-propose |
 
 ## 這裡**不收**(反例 + 正確去處)
 

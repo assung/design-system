@@ -1,0 +1,6 @@
+# Fetched content(cache,每月 refresh,不進 git)
+claude-code-features.md
+external-ds-snapshots/
+last-fetch.txt
+last-failure.jsonl
+.last-auto-fetch.log

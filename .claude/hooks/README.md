@@ -8,20 +8,44 @@
 
 **核心特徵**:**不依賴 AI 自律**,tool 層強制執行;規則可用 `grep` / 條件判斷自動驗證。
 
-## 當前居民
+## 當前居民(25 hooks,2026-04-24)
 
+**元件 tsx / spec write-time 檢查(10)**:
 | Hook | Event | 做什麼 |
 |------|-------|--------|
-| `pre_edit_spec_check.sh` | PreToolUse(Edit/Write/MultiEdit) | 編輯元件 tsx 前提醒讀對應 spec |
+| `pre_edit_spec_check.sh` | PreToolUse Edit/Write/MultiEdit | 編輯元件 tsx 前提醒讀對應 spec |
+| `pre_new_component_spec.sh` | PreToolUse Write | 建新 component spec.md 強制 Layout Family 宣告 |
 | `check_sync_update.sh` | PostToolUse | 改 spec.md 後提醒連動更新 stories |
 | `check_token_hygiene.sh` | PostToolUse | grep 硬寫 shadow / shadcn compat alias / overflow raw class |
+| `check_cva_default_sync.sh` | PostToolUse | 動到 cva defaultVariants 時 3 方同步警告 |
+| `check_anatomy_section_numbering.sh` | PostToolUse | anatomy stories 編號 contiguous 驗證 |
+| `check_sideoffset_canonical.sh` | PostToolUse | overlay `sideOffset` 非 8 警告 |
+| `check_story_anatomy.sh` | PreToolUse Edit/Write/MultiEdit | **BLOCKS** stories 繞 DS canonical hand-craft |
+| `check_third_party_dom_verified.sh` | PreToolUse | 3rd-party lib 用 data-* selector 前提醒驗 DOM |
+| `check_spec_iteration_tag.sh` | PostToolUse | spec iteration tag 格式驗證 |
+
+**DS 一致性(4)**:
+| `check_ssot_consultation.sh` | PreToolUse Write 新 tsx | 新元件 tsx 開頭必含 SSOT 消費 註解區 |
+| `check_avatar_hovercard.sh` | PostToolUse | Avatar hover 必含 NameCard canonical |
+| `check_item_list_gap.sh` | PostToolUse | 連續 item list wrapper gap 正確性 |
+| `check_container_breathing.sh` | PostToolUse | 自建視覺容器必有 inner padding |
+| `check_item_content_primitive.sh` | PostToolUse | 用 `<ItemContent>` 替代手刻 label+desc 結構 |
+| `enforce_home_charter.sh` | PreToolUse Write 新 subdir / flat file | classification-sensitive dir charter gate |
 | `block_prototype_imports.py` | PostToolUse | 產品 code 禁止 import `explorations/` |
-| `enforce_home_charter.sh` | PreToolUse(Write) | 寫新檔到 classification-sensitive dir 前強制看 charter README;hooks/commands/agents 的 flat-file 慣例自動豁免 |
-| `pre_new_component_spec.sh` | PreToolUse(Write) | 建新 component spec.md 時強制 Layout Family 宣告 + 建議走 `/component-quality-gate` |
-| `check_cva_default_sync.sh` | PostToolUse(Edit/Write/MultiEdit) | 動到 cva `defaultVariants` 時 grep spec / docblock / anatomy 三方,警告不一致(SegmentedControl bug class 預防) |
-| `check_anatomy_section_numbering.sh` | PostToolUse(Edit/Write/MultiEdit) | 編輯 *.anatomy.stories.tsx 時驗證 `name: 'N. ...'` 編號 contiguous 1..N,drift 時警告 |
-| `check_sideoffset_canonical.sh` | PostToolUse(Edit/Write/MultiEdit) | overlay consumer 寫 `sideOffset={N!=8}` 時警告:DS canonical = 8,不該 override;overlay primitive source 本身豁免 |
-| `check_story_anatomy.sh` | PreToolUse(Edit/Write/MultiEdit) | **blocks** stories 裡 hand-craft 繞 DS canonical:raw `<div flex items-center><Icon/>` / raw `<table>` / 自刻 full-surface loading / 自刻 field / dismiss via label Button / 自刻 overlay structure。允許 `// @anatomy-exempt: <reason>` 檔首 bypass、`// @anatomy-exempt-next` 單行 bypass |
+
+**Governance 治理 anti-bloat(4)**:
+| `check_file_size_budget.sh` | PreToolUse Edit/Write | CLAUDE.md/spec/SKILL/memory 行數預算警告 |
+| `pre_write_subsumption_check.sh` | PreToolUse Write 新檔 | governance file 新建前 duplicate 警告 |
+| `check_governance_compliance.sh` | PreToolUse Write | 新 skill/hook/rule 前跑 7 題 M7 self-check |
+| `log_governance_fires.sh` | PostToolUse Write/Edit | 治理檔 fire log 寫入 .claude/logs/ |
+
+**Story auto-compile(1)**:
+| `check_story_compile_drift.sh` | PreToolUse Edit/Write | 改元件 tsx/spec 自動跑 compile-stories --check |
+
+**Stop / SessionStart(3)**:
+| `stop_tsc_sanity.sh` | Stop | turn 動到 .ts/.tsx 時跑 `tsc -b` 檢查 |
+| `stop_harvest_corrections.sh` | Stop | 掃 session 的 user 糾正信號寫 .claude/logs/ |
+| `session_start_governance_check.sh` | SessionStart | 4 check(行數 / prune / corrections / benchmarks 過期 auto-fetch) |
 
 ## Task ↔ Hook 對照表(世界級設計任務觸發)
 
