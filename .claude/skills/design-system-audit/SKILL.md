@@ -115,6 +115,12 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 | 21 | **連續 item list wrapper gap**(consumer 層 Consistency)| consumer stories / app code 的 `.map()` list wrapper gap 是否對齊 item 元件的「List wrapper canonical」:standalone card/pill → 必 gap;flush/transparent → 0 gap OK;mixed 視覺語言 → 必取保守 gap。hook `check_item_list_gap.sh` 是預警層,本 dim 補 audit 層 |
 | 22 | **視覺容器 inner breathing**(consumer 層 Absolute)| consumer 自建的視覺邊界容器(permanent bg / border / shadow 三擇一)是否有 inner padding。hook `check_container_breathing.sh` 是預警層,本 dim 補 multi-line className / 非 div 容器的 case |
 
+### Group I — Story auto-compile drift(2026-04-24 新增 C Phase 4)
+
+| # | Audit | What it catches |
+|---|-------|-----------------|
+| 23 | **Story canonical-drift**(spec/tsx vs stories) | 跑 `node scripts/compile-stories.mjs --all --check` — 偵測 已 migration 的元件(有 `componentMeta` export + spec YAML frontmatter)spec variants/sizes keys 跟 tsx cva 對齊嗎?不齊 = P0 violation(stories 的 canonical 會錯),立即修。Migration 未做的元件 skip(gracefully)— 另由 Dim 11 story 三層齊全 / Dim 9 shadcn passthrough 等覆蓋 |
+
 ---
 
 ## Workflow

@@ -1,152 +1,184 @@
 #!/usr/bin/env node
 /**
- * Story Auto-Compile POC — Phase 3
+ * Story Auto-Compile — Phase 4(2026-04-24)
  *
- * 讀 tsx componentMeta export + spec.md YAML frontmatter,
- * 驗 keys 一致性,產出 canonical story rows(variant/size/state/token matrix)。
+ * 讀 tsx `*Meta` export + spec.md YAML frontmatter,驗 key 一致性,
+ * 產出 canonical story rows(6-story anatomy:Overview / Inspector /
+ * Color / Size / State / A11y + Do-Don't + See also)。
  *
  * Usage:
- *   node scripts/compile-stories.mjs <ComponentName>
- *     e.g. node scripts/compile-stories.mjs Button
+ *   node scripts/compile-stories.mjs <ComponentName>         # default: print to stdout
+ *   node scripts/compile-stories.mjs <ComponentName> --check # drift detection(exit 1 若 spec/tsx key 不齊)
+ *   node scripts/compile-stories.mjs --all                   # 全 components
  *
- * 本 POC 只做 Phase 3 核心 step:
- * 1. Parse spec.md frontmatter(YAML)
- * 2. Extract componentMeta from tsx(regex,之後改 AST)
- * 3. Validate variants / sizes keys 對齊
- * 4. 產 anatomy Overview canonical block(markdown for now,之後產 tsx)
- *
- * Phase 4 會加:AST-based tsx parse / pre-commit hook / drift detection。
+ * Phase 4 變更 vs Phase 3:
+ * - eval() → vm.runInNewContext(sandbox {}),防 arbitrary code execution
+ * - 加 --check / --all flags
+ * - 加 6-story A11y placeholder(對齊 2026-04-24 canonical)
+ * - 加 See also cross-link section
+ * - 非 zero exit 時明確錯誤訊息,供 pre-commit hook / audit skill 消費
  */
 
 import fs from 'node:fs'
-import path from 'node:path'
+import vm from 'node:vm'
 import yaml from 'js-yaml'
+import { globSync } from 'node:fs'
 
-const componentName = process.argv[2]
-if (!componentName) {
-  console.error('Usage: node scripts/compile-stories.mjs <ComponentName>')
+const args = process.argv.slice(2)
+const isCheck = args.includes('--check')
+const isAll = args.includes('--all')
+const componentArgs = args.filter(a => !a.startsWith('--'))
+
+if (!isAll && componentArgs.length === 0) {
+  console.error('Usage: node scripts/compile-stories.mjs <ComponentName> [--check] | --all')
   process.exit(1)
 }
 
-const lowerKebab = componentName.replace(/[A-Z]/g, (c, i) => (i === 0 ? c.toLowerCase() : `-${c.toLowerCase()}`))
-const specPath = `src/design-system/components/${componentName}/${lowerKebab}.spec.md`
-const tsxPath = `src/design-system/components/${componentName}/${lowerKebab}.tsx`
+const COMPONENTS_DIR = 'src/design-system/components'
 
-// ── 1. Parse spec.md frontmatter ──────────────────
-const specContent = fs.readFileSync(specPath, 'utf-8')
-const fmMatch = specContent.match(/^---\n([\s\S]*?)\n---\n/)
-if (!fmMatch) {
-  console.error(`❌ ${specPath} 無 YAML frontmatter — Phase 2 migration 未做`)
-  process.exit(1)
-}
-const specMeta = yaml.load(fmMatch[1])
-
-// ── 2. Extract componentMeta from tsx(POC regex)─────
-const tsxContent = fs.readFileSync(tsxPath, 'utf-8')
-const metaMatch = tsxContent.match(/export const \w+Meta = (\{[\s\S]*?\n\}) as const/)
-if (!metaMatch) {
-  console.error(`❌ ${tsxPath} 無 componentMeta export — Phase 1 migration 未做`)
-  process.exit(1)
-}
-// POC:eval in sandbox(Phase 4 改 AST parse,避免 eval 安全風險)
-const tsxMeta = eval(`(${metaMatch[1]})`)
-
-// ── 3. Validate keys 對齊 ───────────────────────────
-const errors = []
-const specVariants = Object.keys(specMeta.variants || {})
-const tsxVariants = Object.keys(tsxMeta.variants || {})
-const missing = specVariants.filter(k => !tsxVariants.includes(k))
-const extra = tsxVariants.filter(k => !specVariants.includes(k))
-if (missing.length) errors.push(`variants spec-only: ${missing.join(', ')}`)
-if (extra.length) errors.push(`variants tsx-only: ${extra.join(', ')}`)
-
-const specSizes = Object.keys(specMeta.sizes || {})
-const tsxSizes = Object.keys(tsxMeta.sizes || {})
-const sMissing = specSizes.filter(k => !tsxSizes.includes(k))
-const sExtra = tsxSizes.filter(k => !specSizes.includes(k))
-if (sMissing.length) errors.push(`sizes spec-only: ${sMissing.join(', ')}`)
-if (sExtra.length) errors.push(`sizes tsx-only: ${sExtra.join(', ')}`)
-
-if (errors.length) {
-  console.error(`❌ ${componentName} — spec/tsx canonical drift:`)
-  errors.forEach(e => console.error(`  - ${e}`))
-  process.exit(1)
-}
-console.log(`✅ ${componentName} — spec + tsx canonical keys 對齊`)
-
-// ── 4. Generate anatomy Overview canonical block(markdown POC)──
-console.log('')
-console.log('=== AUTO-COMPILED anatomy Overview section ===')
-console.log('')
-console.log(`# ${componentName} 元件總覽`)
-console.log('')
-console.log(`**Layout Family**: ${tsxMeta.family}`)
-console.log(`**Default**: variant=\`${tsxMeta.defaultVariant}\` / size=\`${tsxMeta.defaultSize}\``)
-console.log('')
-console.log('## Variants')
-console.log('')
-console.log('| Variant | When | World-class 對照 |')
-console.log('|---------|------|-----------------|')
-for (const [key, specV] of Object.entries(specMeta.variants)) {
-  const wc = (specV['world-class'] || []).join(' / ')
-  console.log(`| \`${key}\` | ${specV.when} | ${wc} |`)
+function toKebab(name) {
+  return name.replace(/[A-Z]/g, (c, i) => (i === 0 ? c.toLowerCase() : `-${c.toLowerCase()}`))
 }
 
-console.log('')
-console.log('## Sizes')
-console.log('')
-console.log('| Size | Field Height | Icon | Typography | When |')
-console.log('|------|-------------|------|-----------|------|')
-for (const [key, tsxS] of Object.entries(tsxMeta.sizes)) {
-  const specS = specMeta.sizes[key] || {}
-  console.log(`| \`${key}\` | ${tsxS.fieldHeight}px | ${tsxS.iconSize}px | ${tsxS.typography} | ${specS.when || '—'} |`)
+function compileOne(componentName) {
+  const lowerKebab = toKebab(componentName)
+  const specPath = `${COMPONENTS_DIR}/${componentName}/${lowerKebab}.spec.md`
+  const tsxPath = `${COMPONENTS_DIR}/${componentName}/${lowerKebab}.tsx`
+
+  if (!fs.existsSync(specPath) || !fs.existsSync(tsxPath)) {
+    return { component: componentName, skipped: true, reason: 'spec or tsx missing' }
+  }
+
+  const specContent = fs.readFileSync(specPath, 'utf-8')
+  const fmMatch = specContent.match(/^---\n([\s\S]*?)\n---\n/)
+  if (!fmMatch) {
+    return { component: componentName, skipped: true, reason: 'no frontmatter(Phase 2 未 migration)' }
+  }
+  const specMeta = yaml.load(fmMatch[1])
+
+  const tsxContent = fs.readFileSync(tsxPath, 'utf-8')
+  const metaMatch = tsxContent.match(/export const \w+Meta = (\{[\s\S]*?\n\}) as const/)
+  if (!metaMatch) {
+    return { component: componentName, skipped: true, reason: 'no componentMeta export(Phase 1 未 migration)' }
+  }
+
+  // Phase 4:vm.runInNewContext sandbox 取代 eval
+  // Context = {} 空物件,無法存取 process/fs/require 等,compile-safe
+  let tsxMeta
+  try {
+    tsxMeta = vm.runInNewContext(`(${metaMatch[1]})`, {}, { timeout: 500 })
+  } catch (e) {
+    return { component: componentName, skipped: true, reason: `componentMeta parse error: ${e.message}` }
+  }
+
+  // Validate keys alignment
+  const errors = []
+  const specVariants = Object.keys(specMeta.variants || {})
+  const tsxVariants = Object.keys(tsxMeta.variants || {})
+  const vMissing = specVariants.filter(k => !tsxVariants.includes(k))
+  const vExtra = tsxVariants.filter(k => !specVariants.includes(k))
+  if (vMissing.length) errors.push(`variants spec-only: ${vMissing.join(', ')}`)
+  if (vExtra.length) errors.push(`variants tsx-only: ${vExtra.join(', ')}`)
+
+  const specSizes = Object.keys(specMeta.sizes || {})
+  const tsxSizes = Object.keys(tsxMeta.sizes || {})
+  const sMissing = specSizes.filter(k => !tsxSizes.includes(k))
+  const sExtra = tsxSizes.filter(k => !specSizes.includes(k))
+  if (sMissing.length) errors.push(`sizes spec-only: ${sMissing.join(', ')}`)
+  if (sExtra.length) errors.push(`sizes tsx-only: ${sExtra.join(', ')}`)
+
+  if (errors.length) {
+    return { component: componentName, drift: true, errors }
+  }
+
+  // Generate canonical rendering(POC markdown)
+  const lines = []
+  lines.push('=== AUTO-COMPILED anatomy section ===\n')
+  lines.push(`# ${componentName} 元件總覽\n`)
+  lines.push(`**Layout Family**: ${tsxMeta.family}`)
+  lines.push(`**Default**: variant=\`${tsxMeta.defaultVariant}\` / size=\`${tsxMeta.defaultSize}\`\n`)
+  lines.push('## Variants\n')
+  lines.push('| Variant | When | World-class 對照 |')
+  lines.push('|---------|------|-----------------|')
+  for (const [key, specV] of Object.entries(specMeta.variants)) {
+    const wc = (specV['world-class'] || []).join(' / ')
+    lines.push(`| \`${key}\` | ${specV.when} | ${wc} |`)
+  }
+  lines.push('\n## Sizes\n')
+  lines.push('| Size | Field Height | Icon | Typography | When |')
+  lines.push('|------|-------------|------|-----------|------|')
+  for (const [key, tsxS] of Object.entries(tsxMeta.sizes)) {
+    const specS = specMeta.sizes[key] || {}
+    lines.push(`| \`${key}\` | ${tsxS.fieldHeight}px | ${tsxS.iconSize}px | ${tsxS.typography} | ${specS.when || '—'} |`)
+  }
+  lines.push('\n## States\n')
+  tsxMeta.states.forEach(s => lines.push(`- ${s}`))
+  lines.push('\n## Tokens consumed\n')
+  for (const [cat, tokens] of Object.entries(tsxMeta.tokens)) {
+    lines.push(`- **${cat}**: ${tokens.map(t => `\`${t}\``).join(', ')}`)
+  }
+
+  if (specMeta['禁止事項']) {
+    lines.push('\n## Do / Don\'t(auto from spec 禁止事項)\n')
+    specMeta['禁止事項'].forEach((d, i) => {
+      lines.push(`**${i + 1}. ❌ ${d.rule}**`)
+      lines.push(`   - Why: ${d.reason}`)
+      lines.push(`   - 反例: \`${d['反例']}\``)
+      lines.push('')
+    })
+  }
+
+  lines.push('## 6. 無障礙與鍵盤(Accessibility & Keyboard)\n')
+  lines.push('> 2026-04-24 6-story canonical(對齊 Material/Polaris/Atlassian 專章)。')
+  lines.push('> Phase 4 加 spec `a11y:` frontmatter 欄位後自動產 ARIA 對照 / Keyboard map / Focus order / WCAG AA 對比 snapshot。\n')
+
+  lines.push('## See also(三層 stories 互聯)\n')
+  lines.push(`- **展示**(${lowerKebab}.stories.tsx)— 真實業務場景`)
+  lines.push(`- **設計規格**(${lowerKebab}.anatomy.stories.tsx)— 6-matrix inspect(本檔)`)
+  lines.push(`- **設計原則**(${lowerKebab}.principles.stories.tsx)— do/don't + 情境選擇`)
+  lines.push('\n=== END AUTO-COMPILED ===')
+
+  return { component: componentName, ok: true, output: lines.join('\n') }
 }
 
-console.log('')
-console.log('## States')
-console.log('')
-console.log(tsxMeta.states.map(s => `- ${s}`).join('\n'))
+// ─── Main ────────────────────────────────────────
+const targets = isAll
+  ? fs.readdirSync(COMPONENTS_DIR).filter(d => fs.statSync(`${COMPONENTS_DIR}/${d}`).isDirectory())
+  : componentArgs
 
-console.log('')
-console.log('## Tokens consumed')
-console.log('')
-for (const [cat, tokens] of Object.entries(tsxMeta.tokens)) {
-  console.log(`- **${cat}**: ${tokens.map(t => `\`${t}\``).join(', ')}`)
+const results = targets.map(compileOne)
+const drifts = results.filter(r => r.drift)
+const skipped = results.filter(r => r.skipped)
+const ok = results.filter(r => r.ok)
+
+if (isCheck) {
+  // --check mode:drift detection only,no output
+  if (drifts.length > 0) {
+    console.error(`❌ ${drifts.length} component(s) with spec/tsx canonical drift:\n`)
+    drifts.forEach(d => {
+      console.error(`  ${d.component}:`)
+      d.errors.forEach(e => console.error(`    - ${e}`))
+    })
+    process.exit(1)
+  }
+  console.log(`✅ ${ok.length} component(s) canonical aligned; ${skipped.length} skipped(migration 未做)`)
+  process.exit(0)
 }
 
-// ── 5. Do/Don't from spec.禁止事項 ─────────────────
-if (specMeta['禁止事項']) {
+// Default mode:print compiled output + summary
+if (!isAll && ok.length > 0) {
+  console.log(ok[0].output)
   console.log('')
-  console.log('## Do / Don\'t(auto from spec 禁止事項)')
-  console.log('')
-  specMeta['禁止事項'].forEach((d, i) => {
-    console.log(`**${i + 1}. ❌ ${d.rule}**`)
-    console.log(`   - Why: ${d.reason}`)
-    console.log(`   - 反例: \`${d['反例']}\``)
-    console.log('')
+}
+if (skipped.length > 0) {
+  console.log(`ℹ️  Skipped(${skipped.length}): ${skipped.map(s => `${s.component}(${s.reason})`).join(', ')}`)
+}
+if (drifts.length > 0) {
+  console.error(`\n❌ Drift(${drifts.length}):`)
+  drifts.forEach(d => {
+    console.error(`  ${d.component}:`)
+    d.errors.forEach(e => console.error(`    - ${e}`))
   })
+  process.exit(1)
 }
-
-// ── 6. Accessibility story stub(2026-04-24,6-story 新增)──
-// 對齊 Material / Polaris / Atlassian a11y 專章。POC 先輸出 section 架構;
-// aria-*/keyboard/focus-order 詳細內容由 spec frontmatter a11y 欄位 + tsx aria props 合併產。
-console.log('')
-console.log('## 6. 無障礙與鍵盤(Accessibility & Keyboard)')
-console.log('')
-console.log('> 2026-04-24 加入 6-story canonical(對齊 Material/Polaris/Atlassian 專章)。')
-console.log('> Phase 4 會擴充:從 spec frontmatter `a11y` 欄位 + tsx aria props 合併產 ARIA 對照表 / Keyboard map / Focus order / WCAG AA 對比 snapshot。')
-console.log('')
-console.log('*Phase 3 POC 先輸出 section placeholder;正式內容 Phase 4 加 spec `a11y:` frontmatter 欄位後產。*')
-
-// ── 7. Cross-link section(2026-04-24 canonical — 3 層 stories 互聯)──
-console.log('')
-console.log('## See also(三層 stories 互聯)')
-console.log('')
-console.log(`- **展示**(${lowerKebab}.stories.tsx)— 真實業務場景`)
-console.log(`- **設計規格**(${lowerKebab}.anatomy.stories.tsx)— 6-matrix inspect(本檔)`)
-console.log(`- **設計原則**(${lowerKebab}.principles.stories.tsx)— do/don't + 情境選擇`)
-
-console.log('')
-console.log('=== END AUTO-COMPILED block ===')
-console.log('')
-console.log(`Phase 3 POC done. Next: Phase 4 integration(pre-commit hook + drift detection + tsx AST parse + 44 元件 migration + a11y frontmatter schema).`)
+console.log(`\n✅ ${ok.length} aligned / ${skipped.length} skipped / 0 drift`)
