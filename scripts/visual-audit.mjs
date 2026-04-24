@@ -363,7 +363,15 @@ async function auditScenario(browser, scenario, opts = {}) {
       try {
         const axe = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .disableRules(['color-contrast'])
+          .disableRules([
+            // Layer A scanContrast 已覆蓋且知 canonical ladder exemption;axe 無 exemption 會
+            // 誤報 disabled/incidental text
+            'color-contrast',
+            // Radix portal 開啟時對 trigger 容器設 aria-hidden=true,其內 focusable 不 DOM-
+            // hide(Radix canonical a11y pattern:screen reader 靠 aria-hidden 跳過,鍵盤由
+            // focus trap 控)。axe 過度 flag,已知社群 false positive(axe-core issue #3259)。
+            'aria-hidden-focus',
+          ])
           .analyze()
         a11yViolations = axe.violations.map((v) => ({
           id: v.id,
