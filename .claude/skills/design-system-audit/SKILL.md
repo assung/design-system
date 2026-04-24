@@ -298,7 +298,7 @@ After all commits:
   - Deferred items with reasons
   - Next re-audit trigger
 
-**Self-improvement capture(強制,CLAUDE.md `# 自我升級機制`)**:
+**Self-improvement capture(強制,CLAUDE.md `# 資訊治理 canonical` → Audit skill Phase F 節)**:
 
 ```markdown
 ## Self-improvement capture

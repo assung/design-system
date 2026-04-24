@@ -96,42 +96,50 @@
 `/design-system-audit` / `/visual-audit` 的 consistency 類 phase **一律 Phase 0 = 全掃 → Phase 1+ = 判 → Phase F = 報告**。無例外。
 
 
-# 自我升級機制(Claude Code 最佳實務:知錯能改,不斷改善)
 
-本 DS 的治理系統設計為**活文件**,每次 audit / commit / user 糾正都有機制回填到 canonical home,讓出錯率隨時間**降低**而非累積。
+# 資訊治理 canonical(anti-bloat)
 
-## 4 個 feedback loop
+**本 DS governance 自身也遵循 SSOT + anti-bloat 原則**。規則 / spec / memory 不斷 append 會讓 CLAUDE.md 每次載入成本失控,meta 上游失效。3 層 pipeline 確保知識**可壓縮可 retire**:
 
-### 1. Audit false positive 回填
-每次 audit 的 sub-agent 回報 finding 時,若 main agent 驗證為 FP(通常因 scope default / spec rationale / Radix 內建)→ **必回填**到 `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 的「常見 FP 記憶」節 + 視情況 `audit-prompts.md`。
+| Layer | 觸發 | 目的 | Artifact |
+|-------|------|------|---------|
+| **L1 — Pre-write**(每次 Write)| PreToolUse hook | 新檔 / 超 budget 時警告 | `pre_write_subsumption_check.sh` / `check_file_size_budget.sh` |
+| **L2 — Per-commit**(每次 PostToolUse)| 寫治理檔自動 log | 累積 fire 資料供 L3 判斷 | `log_governance_fires.sh` → `.claude/logs/hook-fires.jsonl` |
+| **L3 — Periodic deep**(季度 / `/design-system-audit --deep`)| `/knowledge-prune` skill | 掃 duplicate / dead / contradiction;強制 retire ≥ 5% | Phase F report |
 
-下次 sub-agent 讀 prompt → 看到 FP 記憶 → 同類不再誤報。
+## 行數預算(hook 自動攔)
 
-### 2. 新 canonical discovery 回填
-Audit 發現新的 meta-pattern(例:2026-04-21 Inline Action icon colored host 分兩支)→ 提議 + user sign-off → 寫到對應 `pattern.spec.md` + 視情況 `# Meta-Pattern 預警` 加新條目。
+| 檔案 | 硬上限 | 過渡上限 | Why |
+|------|--------|---------|-----|
+| CLAUDE.md | 400 行 | 800(過渡期) | 每 turn 載入,每行都是成本 |
+| spec.md(單檔) | 300 行 | 500 | 可拆 references/ 或 pattern |
+| SKILL.md | 250 行 | 400 | references/ 延伸,SKILL.md 骨架 |
+| memory 單檔 | 100 行 | 100 | memory 本來就該精簡 |
 
-Meta-pattern 長大 = 未來同類 bug 被預警規則吸收,不再靠 case-by-case 修。
+**過渡期**:2026-04-24 → 2026-07-24 CLAUDE.md soft cap 800,期間跑 `/knowledge-prune` 收斂到 400。
 
-### 3. User 糾正回填(critical — 知錯能改)
-User 糾正 AI 的判斷 → AI **必**把糾正內容寫到 `memory/` 或 CLAUDE.md feedback anchor:
-- 短期(session 內):memory `feedback_*.md`
-- 長期(影響所有未來 session):CLAUDE.md 的 Mindset / Meta-Pattern / 具體 rule
+## 加規則前必過 3 題(Pre-write subsumption)
 
-判斷 home:
-- 「這個 user 的個人偏好」 → memory
-- 「這是 DS 本質規則」 → CLAUDE.md / spec
-- 「這是 audit skill 的改進」 → audit-prompts / principle-audit-protocol
+1. **既有 Meta-Pattern / 近親 spec / canonical chapter 有命中嗎?** → 有 → 只 append pointer,不新寫
+2. **Rule-of-3**:同概念已在 3+ 處?→ 是 → 選 SSOT,其他必 pointer only
+3. **7 天後還會 fire 嗎?**(頻率 test)→ 否 / 不確定 → 不寫,寫進 session 記憶觀察一陣
 
-**本 session 2026-04-21 例**:
-- User 抓到「applicable-where-meaningful 是省工 policy」→ revert anatomy-standard + 記入 memory project_world_class_sweep
-- User 抓到「audit 沒 scan 矛盾」→ 新建 principle-audit-protocol.md + 更新 D6 定義
+## Retire 鐵律(反 append-only)
 
-### 4. Canonical drift 自動回填
-Spec 跟 tsx 不同步(drift) → AUTO 修讓 spec 對齊 tsx(tsx 是 source of truth)+ commit 紀錄 drift 類型供未來分析。
+- 季度 `/knowledge-prune` 必 retire ≥ 5% 條目(M1-Mn / MEMORY / skills / hooks)
+- Retire 候選:6 月無 fire 的 hook / 3 月無 invoke 的 skill / 被上游 Meta 吸收的具體 bug 條目
+- **上游加 = 下游減**:新增 Meta-Pattern 時必檢討「哪些具體條目現在冗餘」
 
-## 每個 audit skill Phase F 強制 step
+## 違反 trigger
 
-所有 audit skill 的 final report(Phase F / Phase 4)**強制**包含 "Self-improvement capture" section:
+- ❌ `# Meta-Pattern 預警` 新增條目卻未檢討舊條目合併(違反「上游加 = 下游減」)
+- ❌ `MEMORY.md` 條目 6 月無更新且現況已變(stale memory = drift source)
+- ❌ 同概念在 CLAUDE.md + spec.md + skill 三處都寫完整(違反 Rule-of-3,必選 SSOT)
+- ❌ 聲稱「持續 / 定期 / 自動」卻無 fire log / schedule trigger(違反 M18,Commit 5 上線後)
+
+## Audit skill Phase F 強制「Self-improvement capture」
+
+所有 audit skill 的 final report 必含(無 learning 也必寫「無新 pattern」確保 step 被執行):
 
 ```markdown
 ## Self-improvement capture
@@ -140,20 +148,12 @@ Spec 跟 tsx 不同步(drift) → AUTO 修讓 spec 對齊 tsx(tsx 是 source of 
 - 修完的矛盾 / 糾正: {list + 回填位置} OR "無糾正"
 ```
 
-**無 learning 的 audit 要寫 "無新 pattern"**(不是省略),確保 step 被執行。
+## User 糾正回填 home 判斷
 
-## 自我升級的衡量
-
-| 指標 | 成功訊號 |
-|------|---------|
-| FP 記憶條目數 | 長但增速遞減(早期每 audit 新增 N,成熟後幾 audit 才新增 1) |
-| Meta-Pattern 數 | M1-M15 逐漸擴充,新條目代表根因發現 |
-| User 糾正次數 | 同類糾正遞減(meta-pattern 生效) |
-| Audit 找到的真 bug 數 | 隨系統成熟遞減 |
-
-**紅旗**:FP 記憶沒長 + user 糾正不減 → 表示 feedback loop 沒跑好,check 是否有 audit skill 漏 Phase F。
-
----
+User 糾正 AI 的瞬間 → 必寫入對應 home(忘了 = M10 違反):
+- **個人偏好 / 短期** → `memory/feedback_*.md`
+- **DS 本質 / 長期** → CLAUDE.md Mindset / Meta-Pattern / 具體章節
+- **Audit skill 改進** → `.claude/skills/*/references/`(FP 記憶 / principle-audit-protocol)
 
 
 # 稽核 vs 執行 分權 canonical
@@ -298,7 +298,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | **Stakeholder-visible 產出**(新元件 / 新功能 / 新產品頁 / 比稿) | `# 稽核 6 維 + 2 模式 + 觸發 canonical` → 進階強制 |
 | **稽核結論 = 修實作 or 改原則?** | `# 稽核 vs 執行 分權 canonical`(auto vs STOP 判斷公式 + 表) |
 | **跑 D6 設計原則稽核** | `.claude/skills/design-system-audit/references/principle-audit-protocol.md`(4 子維 scan + 判斷表 + FP 記憶) |
-| **User 糾正 AI 後** | `# 自我升級機制`(判斷 home + 寫到 memory / CLAUDE.md / skill reference) |
+| **User 糾正 AI 後** | `# 資訊治理 canonical`(判斷 home + 寫到 memory / CLAUDE.md / skill reference) |
 | **spec 跟 code 結論衝突** | `# Spec 規則`(主動提出討論,不默默改) |
 | **在 classification-sensitive dir 建新檔** | **先 Read 該 dir 的 `README.md` charter**(硬規則,見 `# 規則分層`) |
 

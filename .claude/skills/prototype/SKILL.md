@@ -249,7 +249,7 @@ Storybook title 慣例(不與 Components/ 衝突):
 4. Chain `/ux-audit`(D4)scope 到該 exploration
 5. Chain `/visual-audit`(D5 Layer B AI judgement)讀 `snapshots/*.png`
 6. **D6 真 scan**:chain `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 對 exploration code 是否牴觸 DS canonical 跑 4 子維(合理 / 一致 / 無矛盾 / 完整);依判斷公式 auto / STOP
-7. **Self-improvement capture**(強制 Phase F step):見 CLAUDE.md `# 自我升級機制`
+7. **Self-improvement capture**(強制 Phase F step):見 CLAUDE.md `# 資訊治理 canonical` → Audit skill Phase F 節
 
 **Output**:per candidate 的 6 維 report,彙整成一份 Phase 3.5 gate report
 

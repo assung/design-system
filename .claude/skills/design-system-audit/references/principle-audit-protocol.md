@@ -352,15 +352,13 @@ skill 不再重複 scan 方法 / 判斷表。
 
 ---
 
-## 自我升級機制(Claude Code 最佳實務)
+## 本 protocol 自己也是活文件
 
-本 protocol 設計為**活文件**:每次 audit 結束,main agent 自動回填:
+每次 audit 結束,main agent 自動回填 4 類學習(對齊 CLAUDE.md `# 資訊治理 canonical` → Audit skill Phase F 節):
 
-1. **新 false positive 發現** → 加到上方「常見 FP 記憶」
-2. **新 meta-pattern 確立** → 提議加到 CLAUDE.md `# Meta-Pattern 預警`
-3. **新 canonical SSOT 擴張**(例:Inline Action colored host 2026-04-21) → 提議加到對應 pattern spec
-4. **User 糾正的錯誤類型** → memory 寫 feedback anchor
+1. 新 FP → 加到上方「常見 FP 記憶」
+2. 新 meta-pattern → 提議加到 CLAUDE.md `# Meta-Pattern 預警`
+3. 新 canonical SSOT 擴張 → 提議加到對應 pattern spec
+4. User 糾正 → memory `feedback_*.md`
 
-每個 audit skill 的 Phase F(final report)結尾**強制**「Self-improvement capture」step:main agent 寫下「這次 audit 學到什麼」。無新 learning → 該 step 寫 "無新 pattern"。
-
-**目標**:隨時間推移,FP 記憶長大 / meta-pattern 完善 / canonical 更精準 — 不再靠 user 人工抓漏。
+無新 learning 必寫 "無新 pattern"(不省略,確保 step 被執行)。
