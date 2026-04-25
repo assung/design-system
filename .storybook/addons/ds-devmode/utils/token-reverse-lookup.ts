@@ -140,6 +140,70 @@ export interface SourceVar {
 }
 
 /**
+ * 從 element 所有 matched stylesheet rules + inline style 中抓**全部 author-written
+ * declarations**(2026-04-25 擴 — 不限 var-containing)。
+ * 回傳 property → AuthorDecl(含 raw value / source selector / 是否含 token)。
+ *
+ * 對齊 user 底線「完整顯示原本 CSS」+ Chrome DevTools「Styles」panel 全 author 顯示 idiom。
+ */
+export interface AuthorDecl {
+  property: string
+  /** Author 在 stylesheet 寫的原 declaration value(可能是 var / calc / plain px / color / 等任何 CSS value)*/
+  rawValue: string
+  /** 來源 selector(從哪 rule 取) */
+  fromSelector: string
+  /** Var token names(有的話)*/
+  tokens: string[]
+}
+
+export function extractAllAuthorDecls(el: Element): Map<string, AuthorDecl> {
+  const map = new Map<string, AuthorDecl>()
+
+  const captureDecl = (property: string, value: string, fromSelector: string) => {
+    const trimmed = value.trim()
+    if (!trimmed) return
+    // 不過濾 — 全 capture(含 var / calc / plain / numeric)
+    const tokens: string[] = []
+    const re = /var\((--[a-zA-Z0-9-_]+)/g
+    let m: RegExpExecArray | null
+    while ((m = re.exec(trimmed))) tokens.push(m[1])
+    // 後寫覆蓋前寫(CSS cascade);用 set 不 setdefault
+    map.set(property, { property, rawValue: trimmed, fromSelector, tokens })
+  }
+
+  if ((el as HTMLElement).style) {
+    const inline = (el as HTMLElement).style
+    for (let i = 0; i < inline.length; i++) {
+      const prop = inline.item(i)
+      captureDecl(prop, inline.getPropertyValue(prop), 'inline')
+    }
+  }
+
+  function walk(rules: CSSRuleList | undefined) {
+    if (!rules) return
+    for (const rule of Array.from(rules)) {
+      const nested = (rule as { cssRules?: CSSRuleList }).cssRules
+      if (nested) walk(nested)
+      if (!(rule instanceof CSSStyleRule)) continue
+      let matches = false
+      try { matches = el.matches(rule.selectorText) } catch { continue }
+      if (!matches) continue
+      const decl = rule.style
+      for (let i = 0; i < decl.length; i++) {
+        const prop = decl.item(i)
+        captureDecl(prop, decl.getPropertyValue(prop), rule.selectorText)
+      }
+    }
+  }
+
+  for (const sheet of Array.from(document.styleSheets)) {
+    try { walk(sheet.cssRules) } catch { continue }
+  }
+
+  return map
+}
+
+/**
  * 從 element 所有 matched stylesheet rules + inline style 中抓含 var(...) 的
  * declarations。回傳 property → SourceVar map。
  *

@@ -44,6 +44,20 @@ export interface InspectPayload {
     id: string
     className: string
   }>
+  /** **完整 author CSS**(2026-04-25 加)— Author 在 stylesheet / inline 寫的所有
+   * declarations(不限 var-containing,不限 whitelist)。對齊 user 底線「完整
+   * 顯示原本 css」+ Chrome DevTools Styles panel idiom。
+   *
+   * Property → { rawValue (author 原文)/ resolved (browser computed) / tokens
+   * (var token names) / fromSelector (哪 rule)}。
+   */
+  authorCss: Array<{
+    property: string
+    rawValue: string
+    resolved: string
+    tokens: string[]
+    fromSelector: string
+  }>
   /** Auto-layout context — element 是 flex / grid container 時填,讓 inspector 顯示 layout intent(對齊 Figma Inspect / Chrome layout panel idiom)。 */
   autoLayout: {
     display: 'flex' | 'grid' | null

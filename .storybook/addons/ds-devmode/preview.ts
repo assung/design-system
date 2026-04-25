@@ -6,7 +6,7 @@
 import { addons } from '@storybook/preview-api'
 import { measureElement } from './utils/dom-geometry'
 import { extractComputed } from './utils/computed-style'
-import { annotateWithTokens, extractSourceVars } from './utils/token-reverse-lookup'
+import { annotateWithTokens, extractSourceVars, extractAllAuthorDecls } from './utils/token-reverse-lookup'
 import { drawOverlay, clearOverlay } from './utils/overlay'
 import { EVENTS, type DevmodeMode, type ForceState, type InspectPayload } from './constants'
 
@@ -136,6 +136,26 @@ const build = (el: Element): InspectPayload => {
     return null
   }).filter((x): x is NonNullable<typeof x> => x !== null)
 
+  // 完整 author CSS(2026-04-25):每個 author-written declaration 配 resolved 值
+  const allAuthorDecls = extractAllAuthorDecls(el)
+  const fullCs = getComputedStyle(el)
+  const authorCss: InspectPayload['authorCss'] = []
+  for (const [prop, decl] of allAuthorDecls) {
+    authorCss.push({
+      property: prop,
+      rawValue: decl.rawValue,
+      resolved: fullCs.getPropertyValue(prop).trim() || decl.rawValue,
+      tokens: decl.tokens,
+      fromSelector: decl.fromSelector,
+    })
+  }
+  // Sort:含 token 的 author tokens 先,其餘 plain value 後;property name alphabetical 內排
+  authorCss.sort((a, b) => {
+    if (a.tokens.length && !b.tokens.length) return -1
+    if (!a.tokens.length && b.tokens.length) return 1
+    return a.property.localeCompare(b.property)
+  })
+
   // Auto-layout context(2026-04-25):flex / grid container 才填
   const csForLayout = getComputedStyle(el)
   const display = csForLayout.display
@@ -182,6 +202,7 @@ const build = (el: Element): InspectPayload => {
     tokenUsage,
     breadcrumb,
     autoLayout,
+    authorCss,
   }
 }
 

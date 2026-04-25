@@ -611,6 +611,57 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
             <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>CSS</span>
           </div>
 
+          {/* Author CSS — 完整顯示 author 寫的所有 properties(對齊 user 底線「完整顯示原本 css」)*/}
+          {payload.authorCss && payload.authorCss.length > 0 && (
+            <>
+              <div style={styles.sectionHead}>
+                <span>Author CSS({payload.authorCss.length})</span>
+                <button
+                  style={styles.copy}
+                  onClick={() => {
+                    const text = payload.authorCss
+                      .map(d => d.rawValue === d.resolved ? `${d.property}: ${d.rawValue};` : `${d.property}: ${d.rawValue}; /* → ${d.resolved} */`)
+                      .join('\n')
+                    copyText(text)
+                  }}
+                  title="Copy all author CSS"
+                  aria-label="Copy author CSS"
+                >
+                  ⧉
+                </button>
+              </div>
+              <div style={styles.code}>
+                {payload.authorCss.map((d, i) => (
+                  <div key={`${d.property}-${i}`} style={styles.codeRow}>
+                    <span style={styles.codeLn}>{i + 1}</span>
+                    <span>
+                      <span style={{ color: 'var(--sb-fg-muted, #7A8896)' }}>{d.property}</span>
+                      {': '}
+                      {d.tokens.length > 0
+                        ? renderAuthorRaw(d.rawValue, d.resolved, { tokens: d.tokens, resolved: d.resolved, source: 'author', raw: d.rawValue })
+                        : d.rawValue !== d.resolved
+                        ? <>
+                            <span style={{ fontFamily: '"SF Mono", Menlo, monospace' }}>{d.rawValue}</span>
+                            <span style={{ color: 'var(--sb-fg-muted, #888)', margin: '0 6px' }}>→</span>
+                            <strong>{d.resolved}</strong>
+                          </>
+                        : <span>{d.rawValue}</span>}
+                      {';'}
+                      {d.fromSelector !== 'inline' && (
+                        <span title={`from rule: ${d.fromSelector}`} style={{ marginLeft: 6, fontSize: 9, color: 'var(--sb-fg-muted, #aaa)' }}>
+                          ← .{d.fromSelector.split(/\s+/).find(s => s.startsWith('.'))?.slice(1).split(':')[0] || d.fromSelector.slice(0, 20)}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div style={styles.sectionHead}>
+            <span>Computed CSS(filtered)</span>
+          </div>
           <Section title="Layout" entries={sortEntries(groups.layout)} view={view} tokenByProp={tokenByProp} />
           <Section title="Style" entries={sortEntries(groups.style)} view={view} tokenByProp={tokenByProp} />
 
