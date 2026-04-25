@@ -8,11 +8,14 @@ const config: StorybookConfig = {
     // essentials 含 Controls, Actions, Viewport, Backgrounds, **Measure**(Alt+hover 顯示
     // spacing / margin / padding / border pixel overlay,類 Figma Dev Mode 的 spacing inspector),
     // Highlight, Toolbars, Docs。
-    // **Outline + Grid disabled**(user 2026-04-24 / 2026-04-25 判定 outline / grid
-    //   overlay 對 DS audit 沒實際用 — 我們用 token 量值,不靠 grid 估)。
+    // **Outline + Backgrounds disabled**(user 2026-04-24 / 2026-04-25):
+    //   outline overlay / backgrounds 切換對 DS audit 沒用(我們用 token 量值)。
+    //   `backgrounds: false` 同時關掉該 addon 內建的 **Grid toolbar 按鈕**(田字 icon)
+    //   — 這 grid 功能由 addon-backgrounds 提供(非 essentials 自身),沒 `grid` 獨立
+    //   options key,只能整包關 backgrounds 才連 grid 一起消失。
     {
       name: "@storybook/addon-essentials",
-      options: { outline: false, grid: false },
+      options: { outline: false, backgrounds: false },
     },
     "@storybook/addon-a11y",         // 無障礙檢查(對 DS 很重要)
     "@storybook/addon-docs",         // 自動生成文件
