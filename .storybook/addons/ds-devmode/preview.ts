@@ -203,11 +203,31 @@ const build = (el: Element): InspectPayload => {
     breadcrumb,
     autoLayout,
     authorCss,
+    siblingDistance: null,
   }
+}
+
+/** Sibling distance helper(對齊 overlay.ts drawSiblingDistance 兩軸獨立邏輯) */
+const computeSiblingDistance = (
+  a: DOMRect,
+  b: DOMRect,
+): { horizontal: number | null; vertical: number | null } | null => {
+  if (a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom) return null  // overlap
+  let h: number | null = null
+  let v: number | null = null
+  if (b.left >= a.right) h = b.left - a.right
+  else if (b.right <= a.left) h = a.left - b.right
+  if (b.top >= a.bottom) v = b.top - a.bottom
+  else if (b.bottom <= a.top) v = a.top - b.bottom
+  if (h === null && v === null) return null
+  return { horizontal: h, vertical: v }
 }
 
 const emit = (el: Element, sibling: Element | null = null) => {
   const payload = build(el)
+  if (sibling && sibling !== el) {
+    payload.siblingDistance = computeSiblingDistance(el.getBoundingClientRect(), sibling.getBoundingClientRect())
+  }
   channel.emit(EVENTS.INSPECT, payload)
   drawOverlay({
     element: el,

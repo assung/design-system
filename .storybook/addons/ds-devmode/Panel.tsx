@@ -404,14 +404,23 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
         )}
         <div style={styles.borderBox}>
           <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px' }}>Border</span>
-          <span style={styles.edgeLabel}>{padding.left}</span>
+          <span style={{ ...styles.edgeLabel, color: '#0065EA' }}>{padding.left}</span>
           <div style={styles.paddingBox}>
             <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#0065EA' }}>
               Padding
             </span>
+            {/* Padding top — center 上方(對齊 Chrome devtools-frontend Box Model 4 邊全顯示
+                 idiom;canvas 不畫 per-side padding 數字,Panel 必須是 canonical) */}
+            <span style={{ ...styles.edgeLabel, position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)', color: '#0065EA' }}>
+              {padding.top}
+            </span>
             <span style={{ color: 'var(--sb-fg, #1F2532)', fontWeight: 500 }}>{`${iw} × ${ih}`}</span>
+            {/* Padding bottom — center 下方 */}
+            <span style={{ ...styles.edgeLabel, position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)', color: '#0065EA' }}>
+              {padding.bottom}
+            </span>
           </div>
-          <span style={styles.edgeLabel}>{padding.right}</span>
+          <span style={{ ...styles.edgeLabel, color: '#0065EA' }}>{padding.right}</span>
         </div>
         <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
           border-box
@@ -600,6 +609,20 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
             <span>Layer properties</span>
           </div>
           <AnatomyBox payload={payload} />
+
+          {/* Sibling distance(pin mode hover 另一元素時顯示)— Panel canonical:
+              canvas 小距離 hide label 時 user 仍能在此讀數。對齊 Figma Inspect
+              「Distance to selected」idiom。*/}
+          {payload.siblingDistance && (
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '4px 12px', fontSize: 11, padding: '8px 0', marginTop: 8, borderTop: '1px solid rgba(128,128,128,0.15)' }}>
+              <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>Sibling distance</span>
+              <span style={{ color: '#EC4436', fontWeight: 600 }}>
+                {payload.siblingDistance.horizontal !== null && `H: ${Math.round(payload.siblingDistance.horizontal)}px`}
+                {payload.siblingDistance.horizontal !== null && payload.siblingDistance.vertical !== null && '  ·  '}
+                {payload.siblingDistance.vertical !== null && `V: ${Math.round(payload.siblingDistance.vertical)}px`}
+              </span>
+            </div>
+          )}
 
           {payload.autoLayout && <AutoLayoutSection autoLayout={payload.autoLayout} />}
 

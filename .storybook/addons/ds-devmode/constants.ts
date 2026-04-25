@@ -58,6 +58,10 @@ export interface InspectPayload {
     tokens: string[]
     fromSelector: string
   }>
+  /** Sibling-to-sibling 距離(pin mode hover 另一元素時填)— 對齊 Panel canonical
+   * invariant:canvas 小距離 hide label 時,user 仍能在 panel 讀數。null = 無 sibling
+   * hover OR 兩元素 overlap / contain(不適用測距)。 */
+  siblingDistance: { horizontal: number | null; vertical: number | null } | null
   /** Auto-layout context — element 是 flex / grid container 時填,讓 inspector 顯示 layout intent(對齊 Figma Inspect / Chrome layout panel idiom)。 */
   autoLayout: {
     display: 'flex' | 'grid' | null

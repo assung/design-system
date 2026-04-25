@@ -1,8 +1,24 @@
 /**
  * Redline overlay rendered inside the canvas iframe document.
  * Built imperatively (no React) — cheap + no iframe bundling concerns.
+ *
+ * Occlusion canonical(2026-04-25,對齊 Chrome DevTools `tool_highlight.ts`):
+ * - **Canvas overlay = visual hint**(允許粗糙,絕不遮 element)。
+ * - **Panel = canonical**(任何 value 都能在 Panel 看到 — 4-rect anatomy / 4 邊 padding /
+ *   margin / distancesToParent / Author CSS)。
+ *
+ * 落地規則:
+ * - Property badge:rect.width < 18 OR rect.height < 12 → suppress(Chrome 18px 同源)。
+ * - Distance label(parent / sibling):line length < 12 → 不畫數字,只畫 line + T-cap。
+ * - Padding 數字 label:**完全不畫**(對齊 Chrome — Chrome 的 padding/margin 也是只有色塊,
+ *   per-side 數字僅在 panel)。色塊 hatch 保留。
  */
 const OVERLAY_ID = '__ds_devmode_overlay__'
+
+// Threshold constants(對齊 Chrome inspector_overlay/tool_highlight.ts)
+const BADGE_MIN_W = 18  // Chrome 同值:arrowWidth + 2 * arrowInset
+const BADGE_MIN_H = 12  // 我們 redline 派 minimum;< 12 連 outline 視覺都太小,badge 多餘
+const LABEL_MIN_LINE = 12  // distance label 寬約 22-24px,< 12px 線時 label 必越界遮元件
 
 interface DrawOptions {
   element: Element
@@ -103,14 +119,6 @@ const paddingHatch = (left: number, top: number, width: number, height: number) 
   )
 }
 
-const paddingLabel = (val: number, left: number, top: number) =>
-  makeDiv(
-    `position:absolute;left:${left}px;top:${top}px;transform:translate(-50%,-50%);
-     color:#fff;font-weight:500;font-size:11px;text-shadow:0 1px 2px rgba(0,0,0,0.5);
-     pointer-events:none;`,
-    String(Math.round(val)),
-  )
-
 export function clearOverlay() {
   const root = document.getElementById(OVERLAY_ID)
   if (root) root.remove()
@@ -162,7 +170,9 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
         const eyBot = Math.max(b.top, y)
         root.appendChild(extensionLine(`left:${b.left - 1}px;top:${eyTop}px;width:2px;height:${eyBot - eyTop}px;`))
       }
-      root.appendChild(distanceLabel(gap, `${a.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'))
+      if (gap >= LABEL_MIN_LINE) {
+        root.appendChild(distanceLabel(gap, `${a.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'))
+      }
     }
   } else if (b.right <= a.left) {
     // B 在 A 左邊
@@ -184,7 +194,9 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
         const eyBot = Math.max(b.bottom, y)
         root.appendChild(extensionLine(`left:${b.right - 1}px;top:${eyTop}px;width:2px;height:${eyBot - eyTop}px;`))
       }
-      root.appendChild(distanceLabel(gap, `${b.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'))
+      if (gap >= LABEL_MIN_LINE) {
+        root.appendChild(distanceLabel(gap, `${b.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'))
+      }
     }
   }
 
@@ -214,7 +226,9 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
         const exRight = Math.max(b.left, x)
         root.appendChild(extensionLine(`left:${exLeft}px;top:${b.top - 1}px;height:2px;width:${exRight - exLeft}px;`))
       }
-      root.appendChild(distanceLabel(gap, `${x}px`, `${a.bottom + gap / 2}px`, 'translate(-50%,-50%)'))
+      if (gap >= LABEL_MIN_LINE) {
+        root.appendChild(distanceLabel(gap, `${x}px`, `${a.bottom + gap / 2}px`, 'translate(-50%,-50%)'))
+      }
     }
   } else if (b.bottom <= a.top) {
     // B 在 A 上方
@@ -241,7 +255,9 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
         const exRight = Math.max(b.right, x)
         root.appendChild(extensionLine(`left:${exLeft}px;top:${b.bottom - 1}px;height:2px;width:${exRight - exLeft}px;`))
       }
-      root.appendChild(distanceLabel(gap, `${x}px`, `${b.bottom + gap / 2}px`, 'translate(-50%,-50%)'))
+      if (gap >= LABEL_MIN_LINE) {
+        root.appendChild(distanceLabel(gap, `${x}px`, `${b.bottom + gap / 2}px`, 'translate(-50%,-50%)'))
+      }
     }
   }
 }
@@ -295,14 +311,8 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     if (n) root.appendChild(n)
   }
 
-  // Padding value labels (center of each hatch)
-  if (pad.top >= 10) root.appendChild(paddingLabel(pad.top, rect.left + rect.width / 2, rect.top + pad.top / 2))
-  if (pad.bottom >= 10)
-    root.appendChild(paddingLabel(pad.bottom, rect.left + rect.width / 2, rect.bottom - pad.bottom / 2))
-  if (pad.left >= 10)
-    root.appendChild(paddingLabel(pad.left, rect.left + pad.left / 2, rect.top + rect.height / 2))
-  if (pad.right >= 10)
-    root.appendChild(paddingLabel(pad.right, rect.right - pad.right / 2, rect.top + rect.height / 2))
+  // (Padding 數字 label 不畫 — Chrome idiom:per-side padding 只在 panel anatomy box 顯示,
+  //  canvas 留 hatch 色塊作 visual hint。Panel.tsx AnatomyBox 已含 4 邊 padding 數值。)
 
   // 3. Distance to parent (red lines + T-caps + labels)
   if (parent) {
@@ -310,50 +320,52 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     const cx = rect.left + rect.width / 2
     // top
     if (rect.top > parent.top) {
-      root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:2px;height:${rect.top - parent.top}px;`))
+      const dist = rect.top - parent.top
+      root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:2px;height:${dist}px;`))
       root.appendChild(tCapHorizontal(cx, parent.top))
       root.appendChild(tCapHorizontal(cx, rect.top))
-      root.appendChild(
-        distanceLabel(rect.top - parent.top, `${cx}px`, `${parent.top + (rect.top - parent.top) / 2}px`, 'translate(-50%,-50%)'),
-      )
+      if (dist >= LABEL_MIN_LINE) {
+        root.appendChild(
+          distanceLabel(dist, `${cx}px`, `${parent.top + dist / 2}px`, 'translate(-50%,-50%)'),
+        )
+      }
     }
     // bottom
     if (rect.bottom < parent.bottom) {
-      root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:2px;height:${parent.bottom - rect.bottom}px;`))
+      const dist = parent.bottom - rect.bottom
+      root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:2px;height:${dist}px;`))
       root.appendChild(tCapHorizontal(cx, rect.bottom))
       root.appendChild(tCapHorizontal(cx, parent.bottom))
-      root.appendChild(
-        distanceLabel(
-          parent.bottom - rect.bottom,
-          `${cx}px`,
-          `${rect.bottom + (parent.bottom - rect.bottom) / 2}px`,
-          'translate(-50%,-50%)',
-        ),
-      )
+      if (dist >= LABEL_MIN_LINE) {
+        root.appendChild(
+          distanceLabel(dist, `${cx}px`, `${rect.bottom + dist / 2}px`, 'translate(-50%,-50%)'),
+        )
+      }
     }
     const cy = rect.top + rect.height / 2
     // left
     if (rect.left > parent.left) {
-      root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${rect.left - parent.left}px;height:2px;`))
+      const dist = rect.left - parent.left
+      root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${dist}px;height:2px;`))
       root.appendChild(tCapVertical(parent.left, cy))
       root.appendChild(tCapVertical(rect.left, cy))
-      root.appendChild(
-        distanceLabel(rect.left - parent.left, `${parent.left + (rect.left - parent.left) / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
-      )
+      if (dist >= LABEL_MIN_LINE) {
+        root.appendChild(
+          distanceLabel(dist, `${parent.left + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
+        )
+      }
     }
     // right
     if (rect.right < parent.right) {
-      root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${parent.right - rect.right}px;height:2px;`))
+      const dist = parent.right - rect.right
+      root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${dist}px;height:2px;`))
       root.appendChild(tCapVertical(rect.right, cy))
       root.appendChild(tCapVertical(parent.right, cy))
-      root.appendChild(
-        distanceLabel(
-          parent.right - rect.right,
-          `${rect.right + (parent.right - rect.right) / 2}px`,
-          `${cy}px`,
-          'translate(-50%,-50%)',
-        ),
-      )
+      if (dist >= LABEL_MIN_LINE) {
+        root.appendChild(
+          distanceLabel(dist, `${rect.right + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
+        )
+      }
     }
     // parent outline (faint dashed)
     root.appendChild(
@@ -370,7 +382,10 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
   }
 
   // 4. Property badge(默認 top,若太靠頂邊切換到 bottom 防 clip)
-  if (label) {
+  // 對齊 Chrome inspector_overlay/tool_highlight.ts:元件過小(< BADGE_MIN_W × BADGE_MIN_H)
+  // → 整個 badge suppress(避免 badge 比 element 還大造成「badge 吃掉 element」)。
+  // 此情況 user 可看 panel 的 Element 段落讀 selector / 尺寸。
+  if (label && rect.width >= BADGE_MIN_W && rect.height >= BADGE_MIN_H) {
     const badgeAbove = rect.top - 24 >= 4
     const badgeTop = badgeAbove ? rect.top - 24 : rect.bottom + 4
     const badge = makeDiv(
