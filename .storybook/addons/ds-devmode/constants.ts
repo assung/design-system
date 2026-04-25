@@ -30,4 +30,10 @@ export interface InspectPayload {
     /** 'author' = 從 source stylesheet/inline 抓的(可信);'speculative' = reverse-lookup 候選(同值多 token 推測,可能 misleading) */
     source: 'author' | 'speculative'
   }>
+  /** Element ancestor chain(html → body → ... → element)。Click 任一 breadcrumb 可 pin parent。Chrome DevTools idiom。 */
+  breadcrumb: Array<{
+    tag: string
+    id: string
+    className: string
+  }>
 }

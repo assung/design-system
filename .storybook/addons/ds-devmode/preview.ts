@@ -16,6 +16,19 @@ let hoverEl: Element | null = null
 /** pin 模式下的 sibling hover target(Figma-style distance measurement) */
 let siblingHoverEl: Element | null = null
 
+/**
+ * Touch device detection(2026-04-25 mobile 支援):
+ * - 觸控裝置上 hover 不 fire,Live 模式無效;改 default tap-to-pin UX
+ * - 從 hover events 第一次觸發起計次,搭配 navigator 偵測
+ */
+const isTouchDevice = (): boolean => {
+  return (
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    window.matchMedia('(hover: none)').matches
+  )
+}
+
 const channel = addons.getChannel()
 
 const isInspectableTarget = (t: EventTarget | null): t is Element => {
@@ -61,10 +74,23 @@ const build = (el: Element): InspectPayload => {
     return null
   }).filter((x): x is NonNullable<typeof x> => x !== null)
 
+  // Element breadcrumb chain(2026-04-25):從 storybook-root 父鏈到 element
+  const breadcrumb: InspectPayload['breadcrumb'] = []
+  let cur: Element | null = el
+  while (cur && cur.id !== 'storybook-root' && cur !== document.body) {
+    breadcrumb.unshift({
+      tag: cur.tagName.toLowerCase(),
+      id: cur.id || '',
+      className: typeof cur.className === 'string' ? cur.className : (cur.className as SVGAnimatedString | undefined)?.baseVal ?? '',
+    })
+    cur = cur.parentElement
+  }
+
   return {
     ...geom,
     computed: merged,
     tokenUsage,
+    breadcrumb,
   }
 }
 
@@ -123,18 +149,46 @@ const onKey = (e: KeyboardEvent) => {
   // Alt+I toggles inspect
   if (e.altKey && (e.key === 'i' || e.key === 'I')) {
     e.preventDefault()
-    const next: DevmodeMode = mode === 'off' ? 'live' : 'off'
+    const next: DevmodeMode = mode === 'off' ? (isTouchDevice() ? 'pin' : 'live') : 'off'
     setMode(next)
   }
   // Esc clears pin
   if (e.key === 'Escape' && mode === 'pin') {
     pinnedEl = null
-    setMode('live')
+    setMode(isTouchDevice() ? 'off' : 'live')
+  }
+  // Arrow keys walk DOM tree(when pinned;Chrome DevTools idiom)
+  if (mode === 'pin' && pinnedEl) {
+    let next: Element | null = null
+    if (e.key === 'ArrowUp') {
+      // Parent
+      next = pinnedEl.parentElement
+      if (next?.id === 'storybook-root') next = null  // 不超過 storybook root
+    } else if (e.key === 'ArrowDown') {
+      // First child
+      next = pinnedEl.firstElementChild
+    } else if (e.key === 'ArrowLeft') {
+      // Previous sibling
+      next = pinnedEl.previousElementSibling
+    } else if (e.key === 'ArrowRight') {
+      // Next sibling
+      next = pinnedEl.nextElementSibling
+    }
+    if (next) {
+      e.preventDefault()
+      pinnedEl = next
+      siblingHoverEl = null
+      emit(pinnedEl)
+    }
   }
 }
 
 const bind = () => {
-  document.addEventListener('mouseover', onMouseOver, true)
+  // Touch device: skip mouseover binding(hover doesn't fire on touch),
+  // 仍綁 click 為 tap-to-pin。Click event 在 touch 上會自動 synthesize 從 tap 來。
+  if (!isTouchDevice()) {
+    document.addEventListener('mouseover', onMouseOver, true)
+  }
   document.addEventListener('click', onClick, true)
   document.addEventListener('keydown', onKey, true)
 }

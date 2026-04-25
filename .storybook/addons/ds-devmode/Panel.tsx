@@ -391,7 +391,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
           <button style={styles.toggleBtn(mode === 'live')} onClick={() => setModeAndBroadcast('live')}>Live</button>
           <button style={styles.toggleBtn(mode === 'pin')} onClick={() => setModeAndBroadcast('pin')} disabled={!payload}>Pin</button>
         </div>
-        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>Alt+I toggle · Esc unpin · Pin 後 hover 其他元素測距</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>Alt+I toggle · Esc unpin · ↑↓→← walk DOM · Pin 後 hover 測距 · 觸控:tap 即 pin</span>
       </div>
 
       {!payload && (
@@ -406,6 +406,24 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
 
       {payload && (
         <>
+          {/* Element tree breadcrumb(Chrome DevTools 風)*/}
+          {payload.breadcrumb && payload.breadcrumb.length > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 8, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
+              {payload.breadcrumb.map((crumb, i) => {
+                const isLast = i === payload.breadcrumb.length - 1
+                const label = `${crumb.tag}${crumb.id ? `#${crumb.id}` : ''}${crumb.className ? `.${String(crumb.className).split(/\s+/).filter(Boolean)[0]}` : ''}`
+                return (
+                  <React.Fragment key={i}>
+                    {i > 0 && <span>›</span>}
+                    <span style={{ color: isLast ? 'var(--sb-fg, #1F2532)' : undefined, fontWeight: isLast ? 600 : 400 }}>
+                      {label}
+                    </span>
+                  </React.Fragment>
+                )
+              })}
+            </div>
+          )}
+
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
             <span style={styles.badge}>{payload.tag}</span>
             {payload.id && <code style={{ fontSize: 11 }}>#{payload.id}</code>}
@@ -414,6 +432,25 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
                 .{String(payload.className).split(/\s+/).filter(Boolean).join(' .')}
               </code>
             )}
+            <button
+              style={{ ...styles.copy, marginLeft: 'auto' }}
+              onClick={() => {
+                const allCss = Object.entries(payload.computed)
+                  .map(([k, v]) => {
+                    const hit = tokenByProp.get(k)
+                    return hit && hit.tokens.length && hit.source === 'author'
+                      ? `${k}: var(${hit.tokens[0]}, ${hit.resolved});`
+                      : `${k}: ${v};`
+                  })
+                  .join('\n')
+                const sel = `${payload.tag}${payload.id ? `#${payload.id}` : ''}${payload.className ? `.${String(payload.className).split(/\s+/).filter(Boolean).join('.')}` : ''}`
+                copyText(`${sel} {\n${allCss}\n}`)
+              }}
+              title="Copy all CSS as rule"
+              aria-label="Copy all CSS"
+            >
+              ⧉ Copy all CSS
+            </button>
           </div>
 
           <div style={styles.sectionHead}>
