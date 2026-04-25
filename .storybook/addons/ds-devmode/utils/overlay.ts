@@ -147,7 +147,7 @@ const paddingHatch = (left: number, top: number, width: number, height: number) 
   if (width <= 0 || height <= 0) return null
   return makeDiv(
     `position:absolute;left:${left}px;top:${top}px;width:${width}px;height:${height}px;
-     background:repeating-linear-gradient(-45deg,rgba(0,101,234,0.55) 0 4px,rgba(0,101,234,0.2) 4px 8px);
+     background:repeating-linear-gradient(-45deg,rgba(147,196,125,0.55) 0 4px,rgba(147,196,125,0.2) 4px 8px);
      pointer-events:none;`,
   )
 }

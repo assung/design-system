@@ -53,7 +53,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   borderBox: {
     position: 'relative',
-    border: '1px dashed rgba(128,128,128,0.5)',
+    border: '1px dashed rgba(184, 152, 0, 0.6)',
     padding: 10,
     display: 'flex',
     alignItems: 'center',
@@ -61,9 +61,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   paddingBox: {
     position: 'relative',
-    border: '1px dashed rgba(0,101,234,0.55)',
+    border: '1px dashed rgba(147,196,125,0.7)',
     padding: 8,
-    background: 'repeating-linear-gradient(-45deg, rgba(0,101,234,0.12) 0 3px, transparent 3px 6px)',
+    background: 'repeating-linear-gradient(-45deg, rgba(147,196,125,0.18) 0 3px, transparent 3px 6px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -420,23 +420,23 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
           <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px' }}>
             Border {border.top}/{border.right}/{border.bottom}/{border.left}
           </span>
-          <span style={{ ...styles.edgeLabel, color: '#0065EA' }}>{padding.left}</span>
+          <span style={{ ...styles.edgeLabel, color: '#558B2F' }}>{padding.left}</span>
           <div style={styles.paddingBox}>
-            <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#0065EA' }}>
+            <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#558B2F' }}>
               Padding
             </span>
             {/* Padding top — center 上方(對齊 Chrome devtools-frontend Box Model 4 邊全顯示
                  idiom;canvas 不畫 per-side padding 數字,Panel 必須是 canonical) */}
-            <span style={{ ...styles.edgeLabel, position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)', color: '#0065EA' }}>
+            <span style={{ ...styles.edgeLabel, position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)', color: '#558B2F' }}>
               {padding.top}
             </span>
             <span style={{ color: 'var(--sb-fg, #1F2532)', fontWeight: 500 }}>{`${iw} × ${ih}`}</span>
             {/* Padding bottom — center 下方 */}
-            <span style={{ ...styles.edgeLabel, position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)', color: '#0065EA' }}>
+            <span style={{ ...styles.edgeLabel, position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)', color: '#558B2F' }}>
               {padding.bottom}
             </span>
           </div>
-          <span style={{ ...styles.edgeLabel, color: '#0065EA' }}>{padding.right}</span>
+          <span style={{ ...styles.edgeLabel, color: '#558B2F' }}>{padding.right}</span>
         </div>
         <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
           border-box
