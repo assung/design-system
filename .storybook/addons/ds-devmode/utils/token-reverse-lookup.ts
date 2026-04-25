@@ -179,12 +179,30 @@ export function extractAllAuthorDecls(el: Element): Map<string, AuthorDecl> {
     }
   }
 
+  // Filter:skip framework-internal universal selector(Tailwind v4 用 `*, ::before, ::after`
+  // /  `*, ::after, ::before, ::backdrop, ::file-selector-button` 等 變體 註冊
+  // 一堆 `--tw-*` @property tokens — 非 author design intent,顯示 = noise)。
+  // 對齊 Chrome DevTools「Filter / Hide inherited」idiom。
+  //
+  // Heuristic:selector 開頭是 `*` 且僅含 `*` + `::pseudo` 元素(無 element / class / id selector)
+  // → 視為 framework universal property registration,skip。
+  const isFrameworkUniversalSelector = (sel: string): boolean => {
+    const normalized = sel.replace(/\s+/g, ' ').trim()
+    // 開頭必 `*,` 且整個 selector 只含 `*` / `::pseudo` / `,` / 空白
+    if (!normalized.startsWith('*,') && normalized !== '*') return false
+    // Tokenize by comma,每個 token 必須是 `*` or `::xxx`
+    const tokens = normalized.split(',').map(t => t.trim())
+    return tokens.every(t => t === '*' || /^::[a-z-]+$/.test(t))
+  }
+
   function walk(rules: CSSRuleList | undefined) {
     if (!rules) return
     for (const rule of Array.from(rules)) {
       const nested = (rule as { cssRules?: CSSRuleList }).cssRules
       if (nested) walk(nested)
       if (!(rule instanceof CSSStyleRule)) continue
+      // Skip framework universal selector(Tailwind --tw-* infrastructure,non-author)
+      if (isFrameworkUniversalSelector(rule.selectorText)) continue
       let matches = false
       try { matches = el.matches(rule.selectorText) } catch { continue }
       if (!matches) continue
