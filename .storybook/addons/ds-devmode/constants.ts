@@ -22,5 +22,12 @@ export interface InspectPayload {
   margin: { top: number; right: number; bottom: number; left: number }
   border: { top: number; right: number; bottom: number; left: number }
   computed: Record<string, string>
-  tokenUsage: Array<{ property: string; raw: string; tokens: string[]; resolved: string }>
+  tokenUsage: Array<{
+    property: string
+    raw: string
+    tokens: string[]
+    resolved: string
+    /** 'author' = 從 source stylesheet/inline 抓的(可信);'speculative' = reverse-lookup 候選(同值多 token 推測,可能 misleading) */
+    source: 'author' | 'speculative'
+  }>
 }

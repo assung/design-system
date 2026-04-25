@@ -206,14 +206,18 @@ const copyText = async (text: string) => {
   }
 }
 
+type TokenByPropEntry = { tokens: string[]; resolved: string; source: 'author' | 'speculative' }
+
 const renderValue = (
   prop: string,
   v: string,
-  tokenByProp: Map<string, { tokens: string[]; resolved: string }>,
+  tokenByProp: Map<string, TokenByPropEntry>,
 ): React.ReactNode => {
   const hit = tokenByProp.get(prop)
   const color = extractColor(v)
-  if (hit && hit.tokens.length) {
+
+  // 'author' source = stylesheet 真實寫的 var(),顯示為 authoritative purple
+  if (hit && hit.tokens.length && hit.source === 'author') {
     const token = hit.tokens[0]
     return (
       <>
@@ -221,7 +225,7 @@ const renderValue = (
           <span style={{ ...styles.tokenChip, background: color }} />
         )}
         <span style={{ color: '#7A4EE8' }}>{`var(`}</span>
-        <span title={`resolved: ${hit.resolved}`} style={{ color: '#C4423A', textDecoration: 'underline', textDecorationStyle: 'dotted' }}>
+        <span title={`source:author,resolved:${hit.resolved}`} style={{ color: '#C4423A', textDecoration: 'underline', textDecorationStyle: 'solid' }}>
           {token}
         </span>
         <span style={{ color: '#7A4EE8' }}>{`, `}</span>
@@ -230,6 +234,27 @@ const renderValue = (
       </>
     )
   }
+
+  // 'speculative' source = reverse-lookup 推測,作 hint 顯示為淡灰 + 註記 candidate
+  if (hit && hit.tokens.length && hit.source === 'speculative') {
+    const allTokens = hit.tokens.length > 1 ? `${hit.tokens.length} candidates` : hit.tokens[0]
+    return (
+      <>
+        {color && isColor(color) && (
+          <span style={{ ...styles.tokenChip, background: color }} />
+        )}
+        <span>{v}</span>
+        <span
+          title={`同值 token candidates(speculative,author 沒寫 var()):${hit.tokens.join(', ')}`}
+          style={{ marginLeft: 6, fontSize: 10, color: 'var(--sb-fg-muted, #888)', fontStyle: 'italic' }}
+        >
+          ⓘ {allTokens}
+        </span>
+      </>
+    )
+  }
+
+  // No token info — pure computed value
   return (
     <>
       {color && isColor(color) && (
@@ -244,13 +269,17 @@ const Section: React.FC<{
   title: string
   entries: [string, string][]
   view: ViewMode
-  tokenByProp: Map<string, { tokens: string[]; resolved: string }>
+  tokenByProp: Map<string, TokenByPropEntry>
 }> = ({ title, entries, view, tokenByProp }) => {
   if (!entries.length) return null
   const codeText = entries
     .map(([k, v]) => {
       const hit = tokenByProp.get(k)
-      const display = hit && hit.tokens.length ? `var(${hit.tokens[0]}, ${hit.resolved})` : v
+      // Code view 只用 author source 顯示 var(),speculative 不顯示避免 misleading copy-paste
+      const display =
+        hit && hit.tokens.length && hit.source === 'author'
+          ? `var(${hit.tokens[0]}, ${hit.resolved})`
+          : v
       return `${k}: ${display};`
     })
     .join('\n')
@@ -343,8 +372,8 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
 
   if (!active) return null
 
-  const tokenByProp = new Map<string, { tokens: string[]; resolved: string }>()
-  payload?.tokenUsage.forEach(t => tokenByProp.set(t.property, { tokens: t.tokens, resolved: t.resolved }))
+  const tokenByProp = new Map<string, TokenByPropEntry>()
+  payload?.tokenUsage.forEach(t => tokenByProp.set(t.property, { tokens: t.tokens, resolved: t.resolved, source: t.source }))
   const groups = payload ? splitByGroup(payload.computed) : { layout: {}, style: {} }
 
   const setModeAndBroadcast = (next: DevmodeMode) => {

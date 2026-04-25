@@ -6,7 +6,7 @@
 import { addons } from '@storybook/preview-api'
 import { measureElement } from './utils/dom-geometry'
 import { extractComputed } from './utils/computed-style'
-import { annotateWithTokens } from './utils/token-reverse-lookup'
+import { annotateWithTokens, extractSourceVars } from './utils/token-reverse-lookup'
 import { drawOverlay, clearOverlay } from './utils/overlay'
 import { EVENTS, type DevmodeMode, type InspectPayload } from './constants'
 
@@ -30,16 +30,41 @@ const build = (el: Element): InspectPayload => {
   const geom = measureElement(el)
   const computed = extractComputed(el)
   const merged: Record<string, string> = { ...computed.layout, ...computed.style }
-  const tokens = annotateWithTokens(merged)
+  // Source-first(2026-04-25):author 在 stylesheet / inline style 寫的 var() 直接抓
+  const sourceVars = extractSourceVars(el)
+  // Reverse-lookup 降為 fallback hint(只在無 source var 時 candidates 用)
+  const candidates = annotateWithTokens(merged)
+  // Merge:source(authoritative)優先,reverse-lookup 補無 source 的 property
+  const tokenUsage = Object.keys(merged).map(prop => {
+    const src = sourceVars.get(prop)
+    if (src) {
+      // Author 寫了 token(可信)
+      return {
+        property: prop,
+        raw: src.rawValue,
+        tokens: src.tokens,
+        resolved: src.resolved,
+        source: 'author' as const,
+      }
+    }
+    const cand = candidates.find(c => c.property === prop)
+    if (cand) {
+      // Reverse-lookup candidates(speculative,標明)
+      return {
+        property: prop,
+        raw: cand.raw,
+        tokens: cand.tokens,
+        resolved: cand.resolved,
+        source: 'speculative' as const,
+      }
+    }
+    return null
+  }).filter((x): x is NonNullable<typeof x> => x !== null)
+
   return {
     ...geom,
     computed: merged,
-    tokenUsage: tokens.map(t => ({
-      property: t.property,
-      raw: t.raw,
-      tokens: t.tokens,
-      resolved: t.resolved,
-    })),
+    tokenUsage,
   }
 }
 
