@@ -29,10 +29,45 @@ const tests = [
     targetSelector: 'button:has-text("前往設定") span.px-1',
     desc: 'Button link variant span — distance ~7-13px, expects:compact label fits',
   },
+  {
+    name: 'tag-with-border',
+    storyId: 'design-system-components-tag-展示--all-variants',
+    targetSelector: 'span[class*="rounded"]',
+    desc: 'Tag — has border, expects:Border 1/1/1/1 visible + yellow dashed',
+  },
 ]
 
 const browser = await chromium.launch()
 fs.mkdirSync('tmp', { recursive: true })
+
+// Extra test:sibling distance(pin 1 element, hover another)
+const siblingTest = async (browser) => {
+  console.log(`\n=== sibling-distance: pin 新增 button + hover 取消 button → 元件↔元件 distance ===`)
+  const ctx = await browser.newContext({ viewport: { width: 1600, height: 1000 } })
+  const page = await ctx.newPage()
+  await page.goto(`http://localhost:${PORT}/?path=/story/design-system-components-button-展示--all-variants`, { waitUntil: 'networkidle' })
+  await page.waitForTimeout(1500)
+  const btn = page.locator('button[title*="DS Devmode"]').first()
+  await btn.waitFor({ state: 'visible', timeout: 5000 })
+  await btn.click()
+  await page.waitForTimeout(500)
+  const iframe = page.frameLocator('#storybook-preview-iframe')
+  const pinTarget = iframe.locator('button:has-text("新增")').first()
+  await pinTarget.evaluate(el => el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })))
+  await page.waitForTimeout(500)
+  const hoverTarget = iframe.locator('button:has-text("取消")').first()
+  await hoverTarget.evaluate(el => el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, cancelable: true })))
+  await page.waitForTimeout(800)
+  const iframeRect = await page.locator('#storybook-preview-iframe').boundingBox()
+  if (iframeRect) {
+    await page.screenshot({
+      path: 'tmp/visual-sibling-distance-canvas.png',
+      clip: { x: iframeRect.x, y: iframeRect.y, width: Math.min(iframeRect.width, 800), height: 200 },
+    })
+    console.log('  Canvas: tmp/visual-sibling-distance-canvas.png')
+  }
+  await ctx.close()
+}
 
 for (const t of tests) {
   console.log(`\n=== ${t.name}: ${t.desc} ===`)
@@ -126,6 +161,8 @@ for (const t of tests) {
 
   await ctx.close()
 }
+
+await siblingTest(browser)
 
 await browser.close()
 console.log('\n=== Done ===')

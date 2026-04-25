@@ -83,13 +83,18 @@ const HALO_LABEL = '0 0 0 1px #fff, 0 1px 3px rgba(0,0,0,0.35)'
 const HALO_OUTLINE = '0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(0,0,0,0.15)'
 
 const distanceLabel = (value: number, left: string, top: string, transform: string) => {
-  // Compact style(2026-04-25)— font 10px / padding 1x4 / halo 1px,實測 label 寬 ~14px,
-  // 比舊樣式(11px / 2x7 / halo 2px → ~26px)省 ~12px,小距離 occlusion 大幅降。
+  // White-bg + red-text(2026-04-25 v4)— 對齊 addon-measure canvas-rendered 派
+  //(canvas fillRect 形成 opaque bg 自然遮 line,我們 DOM 同效果)。
+  // 為什麼不純文字 Figma 派:純文字無 bg,redline 紅 line 穿過 label 中心,文字看似
+  // 被「1-3」切割(line color = text color)。Figma 用獨立 SVG 分層才避免衝突,
+  // DOM 場景白 bg + 紅字最省視覺體積又不衝突。
+  // 寬度:font 10 + padding 0×3 = ~13-15px(兩位數),比舊 ~14px 微減,字體更醒目。
   const d = makeDiv(
     `position:absolute;left:${left};top:${top};transform:${transform};
-     background:#EC4436;color:#fff;padding:1px 4px;border-radius:2px;
-     font-weight:600;font-size:10px;line-height:1.3;
-     box-shadow:${HALO_LABEL};white-space:nowrap;z-index:1;`,
+     background:#fff;color:#EC4436;padding:0 3px;border-radius:2px;
+     font-weight:700;font-size:10px;line-height:1.4;
+     box-shadow:0 0 0 1px rgba(236,68,54,0.35);
+     white-space:nowrap;z-index:1;`,
     String(Math.round(value)),
   )
   d.className = '__ds-label'

@@ -551,7 +551,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
           <button style={styles.toggleBtn(mode === 'live')} onClick={() => setModeAndBroadcast('live')}>Live</button>
           <button style={styles.toggleBtn(mode === 'pin')} onClick={() => setModeAndBroadcast('pin')} disabled={!payload}>Pin</button>
         </div>
-        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>Alt+I toggle · Esc unpin · ↑↓→← walk DOM · Pin 後 hover 測距 · 觸控:tap 即 pin</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>Alt+I toggle · Esc unpin · ↑↓→← walk DOM · <b style={{ color: '#EC4436' }}>Pin 後 hover 任一元素 → 顯示元件↔元件 edge-to-edge 距離</b> · H 暫清 label · 觸控:tap 即 pin</span>
       </div>
 
       {!payload && (
