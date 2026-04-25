@@ -13,6 +13,7 @@
     "visual-audit": "node scripts/visual-audit.mjs --auto-start",
     "visual-audit:headed": "node scripts/visual-audit.mjs --auto-start --headed",
     "icons:scan": "node scripts/scan-asymmetric-icons.mjs",
+    "devmode:test": "node scripts/test-devmode-visual.mjs",
     "hooks:test": "bash .claude/hooks/tests/run-all.sh",
     "postinstall": "node scripts/ensure-playwright-browsers.mjs"
   },

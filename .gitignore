@@ -39,3 +39,6 @@ snapshots/
 ref/
 snapshots-devmode/
 storybook-static-dev/
+
+# DS Devmode visual test artifacts(per-run regenerated)
+tmp/
