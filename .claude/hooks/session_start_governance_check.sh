@@ -94,6 +94,36 @@ if [ -d "$BENCH_DIR" ]; then
   fi
 fi
 
+# Check 6: Fix commits without /scan-similar-bugs invoke(M10 mechanical 落地)
+# Detect 24h 內 fix( commit 但 skill-invokes log 沒對應 scan-similar-bugs invoke
+RECENT_FIX_COMMITS=$(git log --since='24 hours ago' --grep='^fix(\|^bugfix:\|^fix:' --oneline 2>/dev/null | head -5 || true)
+if [ -n "$RECENT_FIX_COMMITS" ]; then
+  SKILL_LOG="$PROJECT_DIR/.claude/logs/skill-invokes.jsonl"
+  RECENT_SCAN_INVOKE=0
+  if [ -f "$SKILL_LOG" ]; then
+    # Check 24h 內有 scan-similar-bugs invoke
+    NOW_EPOCH=$(date -u +%s)
+    DAY_AGO_EPOCH=$(( NOW_EPOCH - 86400 ))
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      if echo "$line" | grep -q "scan-similar-bugs"; then
+        TS=$(echo "$line" | jq -r '.ts // empty' 2>/dev/null)
+        if [ -n "$TS" ]; then
+          TS_EPOCH=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$TS" +%s 2>/dev/null || echo 0)
+          if [ "$TS_EPOCH" -gt "$DAY_AGO_EPOCH" ]; then
+            RECENT_SCAN_INVOKE=1
+            break
+          fi
+        fi
+      fi
+    done < "$SKILL_LOG"
+  fi
+  if [ "$RECENT_SCAN_INVOKE" = "0" ]; then
+    FIX_LIST=$(echo "$RECENT_FIX_COMMITS" | sed 's/^/  - /' | head -3)
+    REMINDERS="${REMINDERS}\n- 24h 內 fix commit(s) 未 follow /scan-similar-bugs(M10 mechanical 落地):\n${FIX_LIST}\n  考慮 invoke /scan-similar-bugs 確認 DS-wide 同類 bug 全清。"
+  fi
+fi
+
 # Check 5: Fire-weighted test gap(G7)— hooks with fires > 100 but no test
 FIRES_LOG="$PROJECT_DIR/.claude/logs/hook-fires-per-hook.jsonl"
 TESTS_DIR="$PROJECT_DIR/.claude/hooks/tests"
