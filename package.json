@@ -12,6 +12,7 @@
     "tokens:export": "node scripts/export-tokens.mjs",
     "visual-audit": "node scripts/visual-audit.mjs --auto-start",
     "visual-audit:headed": "node scripts/visual-audit.mjs --auto-start --headed",
+    "hooks:test": "bash .claude/hooks/tests/run-all.sh",
     "postinstall": "node scripts/ensure-playwright-browsers.mjs"
   },
   "dependencies": {

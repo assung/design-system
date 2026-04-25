@@ -7,13 +7,18 @@
 # entries not yet codified → user / Claude should know at session start, not
 # discover later when things break.
 #
-# Checks:
-#   1. CLAUDE.md line count vs transition cap (800)
-#   2. Days since last /knowledge-prune commit(based on git log)
-#   3. user-corrections.jsonl pending count (last harvested)
-#   4. benchmarks/ freshness(> 30 days = stale)
+# Two-tier thresholds(2026-04-25 G1):
+#   • Soft — inject reminder,non-blocking
+#   • Hard(2x soft)— inject BLOCKER context requiring Claude's first action
+#     to be /knowledge-prune(SessionStart hooks cannot truly block session,
+#     but hard-tier context is prefixed with 🚨 BLOCKER / REQUIRED_FIRST_ACTION
+#     so Claude reads it as must-address-first instruction)
 #
-# Non-blocking; injects context only when thresholds breached.
+# Checks + thresholds:
+#   1. CLAUDE.md line count     — soft 800  / hard 1000
+#   2. Days since last prune    — soft 90   / hard 180
+#   3. user-corrections pending — soft 20   / hard 40
+#   4. Benchmarks freshness     — auto-fetch at 30 days(no hard tier)
 
 # Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
 source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
@@ -24,30 +29,37 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 cd "$PROJECT_DIR" || exit 0
 
 REMINDERS=""
+BLOCKERS=""
 
-# Check 1: CLAUDE.md size
+# Check 1: CLAUDE.md size(soft 800 / hard 1000)
 if [ -f CLAUDE.md ]; then
   LINES=$(wc -l < CLAUDE.md | tr -d ' ')
-  if [ "$LINES" -gt 800 ]; then
+  if [ "$LINES" -gt 1000 ]; then
+    BLOCKERS="${BLOCKERS}\n- CLAUDE.md is ${LINES} lines(HARD THRESHOLD 1000 breached). /knowledge-prune REQUIRED FIRST ACTION this session."
+  elif [ "$LINES" -gt 800 ]; then
     REMINDERS="${REMINDERS}\n- CLAUDE.md is ${LINES} lines (transition cap 800). Consider /knowledge-prune to consolidate."
   fi
 fi
 
-# Check 2: Last /knowledge-prune commit
+# Check 2: Last /knowledge-prune commit(soft 90d / hard 180d)
 LAST_PRUNE=$(git log --format='%ct' --grep='knowledge-prune\|prune:\|governance.*prune' -1 2>/dev/null || echo "")
 if [ -n "$LAST_PRUNE" ]; then
   NOW=$(date +%s)
   DAYS=$(( (NOW - LAST_PRUNE) / 86400 ))
-  if [ "$DAYS" -gt 90 ]; then
+  if [ "$DAYS" -gt 180 ]; then
+    BLOCKERS="${BLOCKERS}\n- Last /knowledge-prune was ${DAYS} days ago(HARD THRESHOLD 180 breached). /knowledge-prune REQUIRED FIRST ACTION this session."
+  elif [ "$DAYS" -gt 90 ]; then
     REMINDERS="${REMINDERS}\n- Last /knowledge-prune commit was ${DAYS} days ago (target: quarterly ≤ 90 days)."
   fi
 fi
 
-# Check 3: user-corrections pending
+# Check 3: user-corrections pending(soft 20 / hard 40)
 CORRECTIONS_LOG="$PROJECT_DIR/.claude/logs/user-corrections.jsonl"
 if [ -f "$CORRECTIONS_LOG" ]; then
   CORRECTION_COUNT=$(wc -l < "$CORRECTIONS_LOG" | tr -d ' ')
-  if [ "$CORRECTION_COUNT" -gt 20 ]; then
+  if [ "$CORRECTION_COUNT" -gt 40 ]; then
+    BLOCKERS="${BLOCKERS}\n- ${CORRECTION_COUNT} user-corrections pending(HARD THRESHOLD 40 breached). /codify-corrections REQUIRED FIRST ACTION this session."
+  elif [ "$CORRECTION_COUNT" -gt 20 ]; then
     REMINDERS="${REMINDERS}\n- ${CORRECTION_COUNT} user-correction signals pending codification (.claude/logs/user-corrections.jsonl). Review + codify pending ones."
   fi
 fi
@@ -82,9 +94,20 @@ if [ -d "$BENCH_DIR" ]; then
   fi
 fi
 
-[ -z "$REMINDERS" ] && exit 0
+[ -z "$REMINDERS" ] && [ -z "$BLOCKERS" ] && exit 0
 
-MSG="🧭 Governance hygiene reminders (SessionStart):${REMINDERS}\n\nThese are not blocking — address them inline when timing permits, or defer with explicit reason."
+if [ -n "$BLOCKERS" ]; then
+  # Hard-tier:must-address-first framing,user can override but Claude reads as REQUIRED
+  MSG="🚨 BLOCKER — governance hard thresholds breached (SessionStart):${BLOCKERS}\n\n"
+  MSG="${MSG}⚠️ REQUIRED_FIRST_ACTION:先 invoke 上述 skill(/knowledge-prune 或 /codify-corrections)"
+  MSG="${MSG}把 governance 帶回健康區間,再處理 user 的實際請求。不可 silent defer —— 若 user "
+  MSG="${MSG}明示要先做其他任務,你 acknowledge 這些 blocker + 記 tech-debt pointer 再繼續。"
+  if [ -n "$REMINDERS" ]; then
+    MSG="${MSG}\n\n額外 soft reminder:${REMINDERS}"
+  fi
+else
+  MSG="🧭 Governance hygiene reminders (SessionStart):${REMINDERS}\n\nThese are not blocking — address them inline when timing permits, or defer with explicit reason."
+fi
 ESCAPED=$(printf '%b' "$MSG" | jq -Rs .)
 printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$ESCAPED"
 exit 0
