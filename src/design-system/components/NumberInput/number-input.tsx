@@ -60,6 +60,12 @@ export interface NumberInputProps
   onChange?: (value: number | null) => void
   /** 右側 inline action — 宣告式 API，Field 根據 size 自動渲染。 */
   endAction?: InlineActionConfig
+  /**
+   * 右側 slot(ReactNode)— escape hatch 供 consumer 放自訂元素(如 stepper button group / 自訂 popover trigger)。
+   * 跟 `endAction` 互斥(同時傳 endSlot 會優先,endAction 被忽略)。
+   * 規則對齊 Input.endSlot:90% case 用 endAction 宣告式 API,10% config 表達不出時走 endSlot。
+   */
+  endSlot?: React.ReactNode
 }
 
 // ── Component ───────────────────────────────────────────────────────────────
@@ -78,6 +84,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       suffix,
       locale,
       endAction,
+      endSlot,
       className,
       disabled: disabledProp,
       readOnly,
@@ -155,9 +162,12 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           className={bareInputStyles}
           {...props}
         />
-        {endAction && (
+        {endSlot ? (
+          // endSlot escape hatch:consumer 自控右側 slot(對齊 Input.endSlot canonical)
+          endSlot
+        ) : endAction ? (
           <ItemInlineAction action={endAction} size={size ?? 'md'} />
-        )}
+        ) : null}
       </div>
     )
   }

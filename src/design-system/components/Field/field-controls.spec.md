@@ -232,6 +232,8 @@ Icon 色彩遵循 Inline Action 統一規則:預設 `fg-muted`,hover 時 `foregr
 
 **特例:Tag dismiss**——Tag 的 dismiss button 需要 chromatic hover bg(跟 tag 的 solid variant 色相一致),不是中性的 neutral-hover,因此**沒有**用 `ItemInlineAction`,維持自己的內部 JSX。這是合理特例,見 `tag.tsx:104` 的詳細註解。
 
+**Escape hatch**(10% case config 表達不出時):每 Field host 提供 `endSlot?: React.ReactNode`,規則 SSOT 見 `patterns/element-anatomy/inline-action.spec.md`「Escape hatch」節。
+
 ---
 
 ## Display — 格式化顯示

@@ -718,6 +718,17 @@ export interface TreeItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    */
   inlineActions?: InlineActionConfig[]
   /**
+   * 右側 actions slot(ReactNode)— escape hatch 供 consumer 放自訂元素
+   * (如 DropdownMenu trigger / 自訂 popover / 多 tier 動作)。
+   *
+   * 跟 `inlineActions` 互斥(同時傳 `inlineActionsSlot` 會優先,`inlineActions` 被忽略)。
+   *
+   * 規則對齊 Input.endSlot canonical:90% case 用 `inlineActions` 宣告式 API,
+   * 10% config 表達不出時走 slot。視覺一致性由 consumer 負責(可使用 host 內部 helper
+   * — 但禁止 app-code 直接 import L3 primitive,見 `check_l3_primitive_import.sh`)。
+   */
+  inlineActionsSlot?: React.ReactNode
+  /**
    * Inline actions 的顯示模式:
    * - `"hover"`(預設):row hover 或鍵盤 focus(focus-visible)時才淡入
    * - `false`:常駐顯示
@@ -738,7 +749,7 @@ export interface TreeItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
-  ({ id, label, icon: Icon, checkbox, inlineActions, actionsReveal = 'hover', indicator, disabled, children, className, ...props }, ref) => {
+  ({ id, label, icon: Icon, checkbox, inlineActions, inlineActionsSlot, actionsReveal = 'hover', indicator, disabled, children, className, ...props }, ref) => {
     const ctx = useTreeView()
     const depth = React.useContext(DepthContext)
     const {
@@ -937,8 +948,17 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             {/* Suffix inline actions——宣告式 API,用 `<ItemInlineAction>` 渲染。
                 actionsReveal="hover"(預設):row hover 或 keyboard focus-visible 才顯示。
                 actionsReveal=false:常駐顯示。
-                跟 SidebarMenuButton 共用同一條規則,行為一致。 */}
-            {inlineActions && inlineActions.length > 0 && (
+                跟 SidebarMenuButton 共用同一條規則,行為一致。
+                inlineActionsSlot escape hatch 優先(consumer 自控 JSX,reveal 一樣套外層 group)。 */}
+            {inlineActionsSlot ? (
+              <span className={cn(
+                "h-[1lh] shrink-0 ml-auto flex items-center gap-2",
+                actionsReveal === 'hover' &&
+                  "opacity-0 group-hover/tree-item:opacity-100 group-has-[:focus-visible]/tree-item:opacity-100 transition-opacity duration-150"
+              )}>
+                {inlineActionsSlot}
+              </span>
+            ) : inlineActions && inlineActions.length > 0 ? (
               <span className={cn(
                 "h-[1lh] shrink-0 ml-auto flex items-center gap-2",
                 actionsReveal === 'hover' &&
@@ -948,7 +968,7 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
                   <ItemInlineAction key={action.label + i} action={action} />
                 ))}
               </span>
-            )}
+            ) : null}
           </div>
 
           {/* Drop indicator — after: 藍色細線 */}

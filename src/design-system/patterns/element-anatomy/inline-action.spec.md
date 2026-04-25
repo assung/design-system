@@ -265,3 +265,51 @@ hook `check_story_anatomy.sh` 規則 B 已在 stories 層攔 label Button 作 di
 
 ---
 
+## Escape hatch — config 表達不出時的 10% case
+
+**90% case 走 `InlineActionConfig` 宣告式 API**(host 根據 size tier 自動渲染 — 視覺一致 / a11y 內建 / drift 杜絕)。
+
+少數 config 結構表達不出的場景:
+- 自訂 popover trigger(DropdownMenuTrigger asChild + 自家 anchor)
+- 多 tier 動作(stepper button group / 多個 chevron)
+- 跟 host 自帶 chrome 互動的元素(如 Combobox 的 ChevronDown 不屬 endAction)
+
+**Canonical**:每個 inline-action host 必須提供 `xxxSlot?: React.ReactNode` 作 escape hatch:
+
+| Host family | Config prop | Escape hatch slot prop |
+|---|---|---|
+| Field family(Input / NumberInput / DatePicker / Combobox / LinkInput / TimePicker) | `endAction?: InlineActionConfig` | `endSlot?: React.ReactNode` |
+| Row family(TreeView.TreeItem / SidebarMenuButton)| `inlineActions?: InlineActionConfig[]` | `inlineActionsSlot?: React.ReactNode` |
+
+```tsx
+// ✅ 90% case
+<Input endAction={{ icon: X, label: '清除', onClick: handleClear }} />
+<TreeItem inlineActions={[{ icon: MoreVertical, label: '更多', onClick: ... }]} />
+
+// ✅ 10% case(escape hatch)
+<Input endSlot={<DropdownMenuTrigger asChild><MyChevron /></DropdownMenuTrigger>} />
+<TreeItem inlineActionsSlot={<MyCustomActionGroup />} />
+```
+
+**規則**:
+- Slot 跟 config 互斥(slot 優先,config 被忽略)
+- `disabled / readonly` 模式 / Sidebar `collapsible=icon` 模式跟 config 一致(slot 也要被相同條件隱藏)
+- Reveal 模式(`actionsReveal="hover"`)、絕對定位 chrome 跟 config 共用,consumer 不需重做
+- Padding budget(Sidebar)slot mode 預設按 1 icon 寬度預留,多 icon 寬度需 consumer 自控 className
+- 視覺一致性 by consumer — 但 **app-code 不可直接 import L3 primitive**(`ItemInlineActionButton` / `ItemInlineAction` / `RowSizeProvider`),由 `check_l3_primitive_import.sh` 攔截。需要視覺一致 inline-action button 時,(a) 用 host 自帶 slot(此 escape hatch)、(b) 用 `<Button iconOnly variant="text" />`、(c) 走 spec rationale 例外申請
+
+**現況清單**(2026-04-25 補完):
+- ✅ Input.endSlot
+- ✅ NumberInput.endSlot(2026-04-25 add)
+- ✅ TreeView.TreeItem.inlineActionsSlot(2026-04-25 add)
+- ✅ SidebarMenuButton.inlineActionsSlot(2026-04-25 add)
+- 待加(按需):DatePicker / Combobox / LinkInput / TimePicker / Select.endSlot — canonical 已就緒,首次 consumer 需求時加
+
+**世界級對照**:
+- Material UI:`InputAdornment` ReactNode slot(無 config,純 escape hatch 派 — 我們的 90/10 比 Material 更有結構)
+- Polaris:`TextField.connectedRight` ReactNode 只接 Button,但無 config-based 簡化,API 一致性差
+- Ant Design:`Input.suffix` ReactNode slot,跟 Material 同派
+- Atlassian:`Textfield.elementAfterInput` ReactNode
+
+我們採「config-first + slot escape hatch」屬刻意 deviation,rationale:90% case 宣告式 API 阻止 visual drift / a11y 漏失;10% case 仍提供逃生口,不強迫 consumer fork 元件。
+

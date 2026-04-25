@@ -870,6 +870,18 @@ const SidebarMenuButton = React.forwardRef<
      */
     inlineActions?: InlineActionConfig[]
     /**
+     * 右側 actions slot(ReactNode)— escape hatch 供 consumer 放自訂元素
+     * (如 DropdownMenu trigger / 自訂 popover trigger / 多 tier 動作)。
+     *
+     * 跟 `inlineActions` 互斥(同時傳 `inlineActionsSlot` 會優先,`inlineActions` 被忽略)。
+     * 規則對齊 Input.endSlot canonical:90% case 用 `inlineActions` 宣告式 API,
+     * 10% config 表達不出時走 slot。
+     *
+     * Padding budget:slot mode 預留 1 icon 寬度的 paddingRight(覆寫多 icon 寬度需 consumer 自控 className)。
+     * Reveal / collapsed-hide / 絕對定位 chrome 跟 inlineActions 共用,consumer 不需重做。
+     */
+    inlineActionsSlot?: React.ReactNode
+    /**
      * Inline actions 的顯示模式:
      * - `false`(預設):永遠顯示
      * - `"hover"`:row hover 時才淡入(TreeView 模式)
@@ -887,6 +899,7 @@ const SidebarMenuButton = React.forwardRef<
       startIcon: StartIcon,
       tooltip,
       inlineActions,
+      inlineActionsSlot,
       actionsReveal = false,
       className,
       children,
@@ -938,11 +951,13 @@ const SidebarMenuButton = React.forwardRef<
       </>
     )
 
-    const hasActions = !!inlineActions && inlineActions.length > 0
+    const hasSlot = !!inlineActionsSlot
+    const hasActions = hasSlot || (!!inlineActions && inlineActions.length > 0)
 
     // 計算 suffix 所佔寬度:N×icon + (N-1)×gap-2(8px),再加 gap-2 跟 label 之間的間隔
+    // Slot mode 預設按 1 icon 預留(consumer 寬度自控)
     const iconSz = ICON_SIZE[size ?? "md"]
-    const n = inlineActions?.length ?? 0
+    const n = hasSlot ? 1 : (inlineActions?.length ?? 0)
     const suffixContentWidth = n > 0 ? n * iconSz + (n - 1) * 8 : 0
     // Button 的 paddingRight = loose + suffix 寬度 + gap-2
     // 用 CSS calc 表達 loose token,不硬寫 px(loose 會隨 density 變)
@@ -982,9 +997,11 @@ const SidebarMenuButton = React.forwardRef<
             "opacity-0 group-hover/menu-item:opacity-100 group-has-[:focus-visible]/menu-item:opacity-100 transition-opacity duration-150"
         )}
       >
-        {inlineActions!.map((action, i) => (
-          <ItemInlineAction key={action.label + i} action={action} />
-        ))}
+        {hasSlot
+          ? inlineActionsSlot
+          : inlineActions!.map((action, i) => (
+              <ItemInlineAction key={action.label + i} action={action} />
+            ))}
       </span>
     ) : null
 
