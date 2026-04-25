@@ -32,6 +32,11 @@ for (const s of STORIES) {
         return { w: cs.width, h: cs.height }
       }).catch(() => null)
       if (!r || r.w === 'auto' || r.h === 'auto') continue
+      // Filter:icon SVGs are 12-48px;skip chart canvases / illustration SVGs
+      // (recharts / d3 / svg illustrations 都不在 icon symmetry scope)
+      const wPx = parseFloat(r.w), hPx = parseFloat(r.h)
+      if (Number.isNaN(wPx) || Number.isNaN(hPx)) continue
+      if (wPx > 64 || hPx > 64) continue
       totalIcons++
       if (r.w !== r.h) {
         totalAsym++
