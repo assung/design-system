@@ -191,7 +191,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
   if (b.left >= a.right) {
     // B 在 A 右邊
     const gap = b.left - a.right
-    if (gap >= 1) {
+    if (gap >= 1 && gap <= MAX_LINE) {
       const yTop = Math.max(a.top, b.top)
       const yBot = Math.min(a.bottom, b.bottom)
       const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
@@ -218,7 +218,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
   } else if (b.right <= a.left) {
     // B 在 A 左邊
     const gap = a.left - b.right
-    if (gap >= 1) {
+    if (gap >= 1 && gap <= MAX_LINE) {
       const yTop = Math.max(a.top, b.top)
       const yBot = Math.min(a.bottom, b.bottom)
       const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
@@ -245,7 +245,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
   if (b.top >= a.bottom) {
     // B 在 A 下方
     const gap = b.top - a.bottom
-    if (gap >= 1) {
+    if (gap >= 1 && gap <= MAX_LINE) {
       const xLeft = Math.max(a.left, b.left)
       const xRight = Math.min(a.right, b.right)
       const x = xLeft <= xRight ? (xLeft + xRight) / 2 : (a.left + a.right + b.left + b.right) / 4
@@ -274,7 +274,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
   } else if (b.bottom <= a.top) {
     // B 在 A 上方
     const gap = a.top - b.bottom
-    if (gap >= 1) {
+    if (gap >= 1 && gap <= MAX_LINE) {
       const xLeft = Math.max(a.left, b.left)
       const xRight = Math.min(a.right, b.right)
       const x = xLeft <= xRight ? (xLeft + xRight) / 2 : (a.left + a.right + b.left + b.right) / 4

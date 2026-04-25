@@ -38,8 +38,15 @@ const tests = [
   {
     name: 'tag-with-border',
     storyId: 'design-system-components-tag-展示--with-icon',
-    targetSelector: '[class*="rounded-full"][class*="border"]',
-    desc: 'Tag with border:1 — expects Border 1/1/1/1',
+    targetSelector: 'span[class*="inline-flex"][class*="border"]',
+    desc: 'Tag — has border-transparent 1px, expects Border 1/1/1/1',
+  },
+  {
+    name: 'far-sibling',
+    storyId: 'design-system-components-button-展示--all-variants',
+    targetSelector: 'button:has-text("新增")',
+    desc: 'Pin 新增 + hover 前往設定(far sibling 600+ px)— check sibling MAX_LINE 一致性',
+    siblingHover: 'button:has-text("前往設定")',
   },
 ]
 
@@ -122,6 +129,15 @@ for (const t of tests) {
     el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
   })
   await page.waitForTimeout(800)
+
+  // Optional sibling hover for cross-element distance test
+  if (t.siblingHover) {
+    const sib = iframe.locator(t.siblingHover).first()
+    if (await sib.count() > 0) {
+      await sib.evaluate(el => el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, cancelable: true })))
+      await page.waitForTimeout(500)
+    }
+  }
 
   // Click DS Devmode tab
   const tab = page.locator('button[role="tab"]:has-text("DS Devmode")').first()
