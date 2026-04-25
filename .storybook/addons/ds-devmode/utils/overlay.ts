@@ -8,6 +8,8 @@ interface DrawOptions {
   element: Element
   mode: 'live' | 'pin'
   label?: string
+  /** Figma-style sibling distance:pin mode hover 到其他元素時畫 edge-to-edge gap */
+  sibling?: Element | null
 }
 
 const ensureRoot = (): HTMLElement => {
@@ -67,13 +69,108 @@ export function clearOverlay() {
   if (root) root.remove()
 }
 
-export function drawOverlay({ element, mode, label }: DrawOptions) {
+/**
+ * Sibling-to-sibling edge-to-edge 距離計算 + 繪製(Figma-style)。
+ *
+ * 4 種空間關係:
+ * - B 在 A 右邊(B.left ≥ A.right) → horizontal gap = B.left - A.right
+ * - B 在 A 左邊(B.right ≤ A.left) → horizontal gap = A.left - B.right
+ * - B 在 A 下方(B.top ≥ A.bottom) → vertical gap = B.top - A.bottom
+ * - B 在 A 上方(B.bottom ≤ A.top) → vertical gap = A.top - B.bottom
+ *
+ * 兩軸獨立計算,可能都畫(diagonal)或只一軸(aligned)或都不畫(overlap / contain)。
+ */
+function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
+  // sibling outline(青 cyan,跟主元素 purple 對比,Figma 慣例)
+  root.appendChild(
+    makeDiv(
+      `position:absolute;left:${b.left - 1}px;top:${b.top - 1}px;
+       width:${b.width}px;height:${b.height}px;
+       border:1px solid #00A8B3;box-shadow:0 0 0 1px rgba(0,168,179,0.3);
+       box-sizing:content-box;pointer-events:none;`,
+    ),
+  )
+
+  // Horizontal axis(左 / 右)
+  if (b.left >= a.right) {
+    // B 在 A 右邊
+    const gap = b.left - a.right
+    if (gap >= 1) {
+      const yTop = Math.max(a.top, b.top)
+      const yBot = Math.min(a.bottom, b.bottom)
+      const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
+      root.appendChild(
+        redLine(`left:${a.right}px;top:${y}px;width:${gap}px;height:1px;`),
+      )
+      root.appendChild(
+        distanceLabel(gap, `${a.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'),
+      )
+    }
+  } else if (b.right <= a.left) {
+    // B 在 A 左邊
+    const gap = a.left - b.right
+    if (gap >= 1) {
+      const yTop = Math.max(a.top, b.top)
+      const yBot = Math.min(a.bottom, b.bottom)
+      const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
+      root.appendChild(
+        redLine(`left:${b.right}px;top:${y}px;width:${gap}px;height:1px;`),
+      )
+      root.appendChild(
+        distanceLabel(gap, `${b.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'),
+      )
+    }
+  }
+
+  // Vertical axis(上 / 下)
+  if (b.top >= a.bottom) {
+    // B 在 A 下方
+    const gap = b.top - a.bottom
+    if (gap >= 1) {
+      const xLeft = Math.max(a.left, b.left)
+      const xRight = Math.min(a.right, b.right)
+      const x = xLeft <= xRight ? (xLeft + xRight) / 2 : (a.left + a.right + b.left + b.right) / 4
+      root.appendChild(
+        makeDiv(
+          `position:absolute;left:${x}px;top:${a.bottom}px;width:1px;height:${gap}px;
+           background:repeating-linear-gradient(to bottom,#EC4436 0 4px,transparent 4px 7px);
+           pointer-events:none;`,
+        ),
+      )
+      root.appendChild(
+        distanceLabel(gap, `${x}px`, `${a.bottom + gap / 2}px`, 'translate(-50%,-50%)'),
+      )
+    }
+  } else if (b.bottom <= a.top) {
+    // B 在 A 上方
+    const gap = a.top - b.bottom
+    if (gap >= 1) {
+      const xLeft = Math.max(a.left, b.left)
+      const xRight = Math.min(a.right, b.right)
+      const x = xLeft <= xRight ? (xLeft + xRight) / 2 : (a.left + a.right + b.left + b.right) / 4
+      root.appendChild(
+        makeDiv(
+          `position:absolute;left:${x}px;top:${b.bottom}px;width:1px;height:${gap}px;
+           background:repeating-linear-gradient(to bottom,#EC4436 0 4px,transparent 4px 7px);
+           pointer-events:none;`,
+        ),
+      )
+      root.appendChild(
+        distanceLabel(gap, `${x}px`, `${b.bottom + gap / 2}px`, 'translate(-50%,-50%)'),
+      )
+    }
+  }
+}
+
+export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
   clearOverlay()
   const root = ensureRoot()
   root.dataset.mode = mode
 
   const rect = element.getBoundingClientRect()
-  const parent = element.parentElement?.getBoundingClientRect() ?? null
+  const siblingRect = sibling && sibling !== element ? sibling.getBoundingClientRect() : null
+  // 當 sibling 存在時,不畫 parent distance(避免視覺混亂),專注 A↔B 測量
+  const parent = siblingRect ? null : (element.parentElement?.getBoundingClientRect() ?? null)
   const cs = getComputedStyle(element)
   const pad = {
     top: parseFloat(cs.paddingTop) || 0,
@@ -177,10 +274,17 @@ export function drawOverlay({ element, mode, label }: DrawOptions) {
     )
   }
 
-  // 4. Property badge above element
+  // 3b. Sibling distance(Figma-style,只在 sibling 存在時畫)
+  if (siblingRect) {
+    drawSiblingDistance(root, rect, siblingRect)
+  }
+
+  // 4. Property badge(默認 top,若太靠頂邊切換到 bottom 防 clip)
   if (label) {
+    const badgeAbove = rect.top - 24 >= 4
+    const badgeTop = badgeAbove ? rect.top - 24 : rect.bottom + 4
     const badge = makeDiv(
-      `position:absolute;left:${rect.left}px;top:${rect.top - 24}px;
+      `position:absolute;left:${rect.left}px;top:${badgeTop}px;
        background:#B668FF;color:#fff;padding:2px 8px;border-radius:4px;
        font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px;
        box-shadow:0 2px 6px rgba(0,0,0,0.2);pointer-events:none;white-space:nowrap;`,

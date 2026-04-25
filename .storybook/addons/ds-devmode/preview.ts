@@ -13,6 +13,8 @@ import { EVENTS, type DevmodeMode, type InspectPayload } from './constants'
 let mode: DevmodeMode = 'off'
 let pinnedEl: Element | null = null
 let hoverEl: Element | null = null
+/** pin 模式下的 sibling hover target(Figma-style distance measurement) */
+let siblingHoverEl: Element | null = null
 
 const channel = addons.getChannel()
 
@@ -41,22 +43,44 @@ const build = (el: Element): InspectPayload => {
   }
 }
 
-const emit = (el: Element) => {
+const emit = (el: Element, sibling: Element | null = null) => {
   const payload = build(el)
   channel.emit(EVENTS.INSPECT, payload)
   drawOverlay({
     element: el,
     mode: mode === 'pin' ? 'pin' : 'live',
     label: payload.id ? `#${payload.id}` : payload.className ? `.${String(payload.className).split(/\s+/)[0]}` : payload.tag,
+    sibling,
   })
 }
 
 const onMouseOver = (e: MouseEvent) => {
-  if (mode !== 'live') return
   if (!isInspectableTarget(e.target)) return
-  if (hoverEl === e.target) return
-  hoverEl = e.target as Element
-  emit(hoverEl)
+  const target = e.target as Element
+
+  if (mode === 'live') {
+    if (hoverEl === target) return
+    hoverEl = target
+    emit(hoverEl)
+    return
+  }
+
+  // Pin mode:hover 其他元素時畫 sibling distance(Figma-style)
+  if (mode === 'pin' && pinnedEl) {
+    // Skip self / 不是 document body 層的 target 才畫
+    if (target === pinnedEl) return
+    // 避免 sibling 是 pinned 的祖先 / 後代(overlap 情況 Figma 也不畫 distance)
+    if (pinnedEl.contains(target) || target.contains(pinnedEl)) {
+      if (siblingHoverEl) {
+        siblingHoverEl = null
+        emit(pinnedEl)
+      }
+      return
+    }
+    if (siblingHoverEl === target) return
+    siblingHoverEl = target
+    emit(pinnedEl, siblingHoverEl)
+  }
 }
 
 const onClick = (e: MouseEvent) => {
@@ -103,10 +127,12 @@ const setMode = (next: DevmodeMode) => {
     clearOverlay()
     pinnedEl = null
     hoverEl = null
+    siblingHoverEl = null
     channel.emit(EVENTS.CLEAR)
     unbind()
   } else {
     bind()
+    siblingHoverEl = null
     if (next === 'live' && hoverEl) emit(hoverEl)
     if (next === 'pin' && pinnedEl) emit(pinnedEl)
   }
@@ -120,14 +146,16 @@ channel.on(EVENTS.TOGGLE, (next: DevmodeMode) => {
 channel.on(EVENTS.CLEAR, () => {
   pinnedEl = null
   hoverEl = null
+  siblingHoverEl = null
   clearOverlay()
 })
 
-// Keep overlay accurate on scroll / resize when pinned
+// Keep overlay accurate on scroll / resize(含 sibling distance 同步)
 window.addEventListener('scroll', () => {
-  if (mode === 'pin' && pinnedEl) emit(pinnedEl)
+  if (mode === 'pin' && pinnedEl) emit(pinnedEl, siblingHoverEl)
+  else if (mode === 'live' && hoverEl) emit(hoverEl)
 }, true)
 window.addEventListener('resize', () => {
-  if (mode === 'pin' && pinnedEl) emit(pinnedEl)
+  if (mode === 'pin' && pinnedEl) emit(pinnedEl, siblingHoverEl)
   else if (mode === 'live' && hoverEl) emit(hoverEl)
 })

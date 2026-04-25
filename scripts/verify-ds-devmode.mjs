@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT = join(__dirname, '..', 'snapshots-devmode')
 const SB = 'http://localhost:6006'
-const STORY = '/?path=/story/design-system-components-button-%E5%B1%95%E7%A4%BA--primary&viewMode=story'
+const STORY = '/?path=/story/design-system-components-button-%E5%B1%95%E7%A4%BA--all-variants&viewMode=story'
 
 await mkdir(OUT, { recursive: true })
 
@@ -114,6 +114,77 @@ if (bbox) {
       }
     }
   }
+}
+
+// ── Stage 5: Sibling distance (Figma-style, 2026-04-25) ──
+console.log('[8/8] Sibling distance — navigate to AllVariants(多按鈕同 row)')
+const ALL_VARIANTS_STORY =
+  '/?path=/story/design-system-components-button-%E5%B1%95%E7%A4%BA--all-variants&viewMode=story'
+await page.goto(`${SB}${ALL_VARIANTS_STORY}`, { waitUntil: 'networkidle' })
+await page.waitForTimeout(1500)
+
+// Re-open devmode panel + Live mode
+const tab2 = page.locator('button[role="tab"]:has-text("DS Devmode")').first()
+if (await tab2.count()) {
+  await tab2.click()
+  await page.waitForTimeout(400)
+}
+await page.locator('button:has-text("Live")').first().click()
+await page.waitForTimeout(300)
+
+// Pin first button
+const buttons = iframe.locator('#storybook-root button')
+const btnCount = await buttons.count()
+console.log(`    found ${btnCount} buttons in AllVariants canvas`)
+if (btnCount >= 2) {
+  const first = buttons.nth(0)
+  await first.waitFor({ state: 'visible', timeout: 8000 })
+  const firstBox = await first.boundingBox()
+  const secondBox = await buttons.nth(1).boundingBox()
+
+  // Click first button → Pin
+  if (firstBox) {
+    await page.mouse.click(firstBox.x + firstBox.width / 2, firstBox.y + firstBox.height / 2)
+    await page.waitForTimeout(600)
+  }
+
+  // Move mouse over second button → sibling distance should appear
+  if (secondBox) {
+    await page.mouse.move(secondBox.x + secondBox.width / 2, secondBox.y + secondBox.height / 2)
+    await page.waitForTimeout(600)
+  }
+
+  // Full page screenshot(含 panel + overlay)
+  await page.screenshot({ path: join(OUT, '08-sibling-distance-full.png'), fullPage: false })
+
+  // Canvas-only 截 — 看 overlay 細節
+  const canvasBox2 = await page.locator('#storybook-preview-iframe').boundingBox()
+  if (canvasBox2) {
+    await page.screenshot({
+      path: join(OUT, '09-sibling-distance-canvas.png'),
+      clip: { x: canvasBox2.x, y: canvasBox2.y, width: canvasBox2.width, height: canvasBox2.height },
+    })
+  }
+
+  // Hover 3rd button(不同 sibling,驗距離會變)
+  if (btnCount >= 3) {
+    const thirdBox = await buttons.nth(2).boundingBox()
+    if (thirdBox) {
+      await page.mouse.move(thirdBox.x + thirdBox.width / 2, thirdBox.y + thirdBox.height / 2)
+      await page.waitForTimeout(500)
+      const canvasBox3 = await page.locator('#storybook-preview-iframe').boundingBox()
+      if (canvasBox3) {
+        await page.screenshot({
+          path: join(OUT, '10-sibling-distance-canvas-3rd.png'),
+          clip: { x: canvasBox3.x, y: canvasBox3.y, width: canvasBox3.width, height: canvasBox3.height },
+        })
+      }
+    }
+  }
+
+  console.log('    ✓ sibling distance 截圖完成')
+} else {
+  console.log('    ✗ AllVariants 按鈕不足 2 個,跳過 sibling 測試')
 }
 
 await browser.close()

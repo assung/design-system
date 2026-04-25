@@ -362,7 +362,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
           <button style={styles.toggleBtn(mode === 'live')} onClick={() => setModeAndBroadcast('live')}>Live</button>
           <button style={styles.toggleBtn(mode === 'pin')} onClick={() => setModeAndBroadcast('pin')} disabled={!payload}>Pin</button>
         </div>
-        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>Alt+I toggle · Esc unpin</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>Alt+I toggle · Esc unpin · Pin 後 hover 其他元素測距</span>
       </div>
 
       {!payload && (
@@ -371,7 +371,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
             ? 'Off. Toggle Live/Pin, click an element to inspect.'
             : mode === 'live'
               ? 'Hover any canvas element.'
-              : 'Click a canvas element to pin.'}
+              : 'Click a canvas element to pin — 之後 hover 其他元素自動測距(Figma-style)。'}
         </div>
       )}
 
