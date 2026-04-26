@@ -22,6 +22,7 @@ const LANGUAGES = [
 // ── Default ──────────────────────────────────────────────────────────────────
 
 export const Default: Story = {
+  name: 'Default',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript'])
     return (
@@ -39,6 +40,7 @@ export const Default: Story = {
 // ── States ───────────────────────────────────────────────────────────────────
 
 export const States: Story = {
+  name: 'States',
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
@@ -59,6 +61,7 @@ export const States: Story = {
 // 對齊 Polaris pattern(單一 `icon` prop + Controls 切方向)。
 
 export const WithIcon: Story = {
+  name: 'With Icon',
   render: () => {
     const [filter, setFilter] = useState<string[]>(['react'])
     const [sort, setSort] = useState<string[]>([])
@@ -88,6 +91,7 @@ export const WithIcon: Story = {
 // ── With badge ──────────────────────────────────────────────────────────────
 
 export const WithBadge: Story = {
+  name: 'With Badge',
   render: () => {
     const [value, setValue] = useState<string[]>(['all'])
     return (
@@ -103,6 +107,7 @@ export const WithBadge: Story = {
 // ── Single type ─────────────────────────────────────────────────────────────
 
 export const SingleSelection: Story = {
+  name: 'Single Selection',
   render: () => {
     const [value, setValue] = useState('typescript')
     return (
@@ -118,6 +123,7 @@ export const SingleSelection: Story = {
 // ── Layout: wrap (default) ──────────────────────────────────────────────────
 
 export const LayoutWrap: Story = {
+  name: 'Layout Wrap',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript', 'Rust'])
     return (

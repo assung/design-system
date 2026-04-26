@@ -183,6 +183,7 @@ export const WithBadge: Story = {
 // ── Icon-only ──────────────────────────────────────────────────
 
 export const IconOnly: Story = {
+  name: 'Icon Only',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -236,6 +237,7 @@ export const AllSizes: Story = {
 // ── 狀態 ────────────────────────────────────────────────────────
 
 export const Disabled: Story = {
+  name: 'Disabled',
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
@@ -280,6 +282,7 @@ export const Disabled: Story = {
 }
 
 export const Loading: Story = {
+  name: 'Loading',
   render: () => (
     <div className="flex flex-col gap-6">
       {/* 行為對照 */}

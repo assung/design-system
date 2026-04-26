@@ -27,6 +27,7 @@ type Story = StoryObj<typeof Breadcrumb>
 // ── Default ──────────────────────────────────────────────────────────────────
 
 export const Default: Story = {
+  name: 'Default',
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
@@ -162,6 +163,7 @@ export const AllSizes: Story = {
 // ── Deep hierarchy (不折疊, 完整顯示) ──────────────────────────────────────
 
 export const Deep: Story = {
+  name: 'Deep',
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
@@ -192,6 +194,7 @@ export const Deep: Story = {
 // ── Two levels (最小合理深度) ─────────────────────────────────────────────
 
 export const TwoLevels: Story = {
+  name: 'Two Levels',
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>

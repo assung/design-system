@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
+import LinkTo from '@storybook/addon-links/react'
 import { MessageCircle, Phone, ChevronDown } from 'lucide-react'
 import { NameCard } from './name-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
@@ -78,7 +79,7 @@ export const WhenToUse: Story = {
   name: '何時使用',
   render: () => (
     <div className="prose prose-sm max-w-prose">
-      <p>適用情境見「展示」頁的真實業務場景範例。</p>
+      <p>適用情境見<LinkTo kind="Design System/Components/NameCard/展示" name="Default"><span className="text-primary hover:underline font-medium cursor-pointer">展示頁</span></LinkTo>的真實業務場景範例。</p>
       <p>判斷時對照 spec.md「何時用 / 何時不用」段落。</p>
     </div>
   ),

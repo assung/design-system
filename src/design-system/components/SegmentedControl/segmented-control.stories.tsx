@@ -14,6 +14,7 @@ export default meta
 type Story = StoryObj<typeof SegmentedControl>
 
 export const Default: Story = {
+  name: 'Default',
   render: () => {
     const [value, setValue] = useState('list')
     return (
@@ -27,6 +28,7 @@ export const Default: Story = {
 }
 
 export const WithStartIcon: Story = {
+  name: 'With Start Icon',
   render: () => {
     const [value, setValue] = useState('list')
     return (
@@ -40,6 +42,7 @@ export const WithStartIcon: Story = {
 }
 
 export const WithBadge: Story = {
+  name: 'With Badge',
   render: () => {
     const [value, setValue] = useState('all')
     return (
@@ -53,6 +56,7 @@ export const WithBadge: Story = {
 }
 
 export const IconOnly: Story = {
+  name: 'Icon Only',
   render: () => {
     const [value, setValue] = useState('left')
     return (
@@ -66,6 +70,7 @@ export const IconOnly: Story = {
 }
 
 export const AllSizes: Story = {
+  name: 'All Sizes',
   render: () => (
     <div className="flex flex-col gap-4">
       {(['xs', 'sm', 'md', 'lg'] as const).map((size) => (
@@ -84,6 +89,7 @@ export const AllSizes: Story = {
 }
 
 export const FullWidth: Story = {
+  name: 'Full Width',
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
@@ -107,6 +113,7 @@ export const FullWidth: Story = {
 }
 
 export const Disabled: Story = {
+  name: 'Disabled',
   render: () => (
     <div className="flex flex-col gap-4">
       <SegmentedControl defaultValue="a" disabled>

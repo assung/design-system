@@ -13,6 +13,7 @@ export default meta
 type Story = StoryObj<typeof Tabs>
 
 export const Default: Story = {
+  name: 'Default',
   render: () => (
     <Tabs defaultValue="overview" className="w-[600px]">
       <TabsList>
@@ -30,6 +31,7 @@ export const Default: Story = {
 }
 
 export const AllSizes: Story = {
+  name: 'All Sizes',
   render: () => (
     <div className="flex flex-col gap-8 w-[600px]">
       {(['sm', 'md', 'lg'] as const).map((size) => (
@@ -50,6 +52,7 @@ export const AllSizes: Story = {
 }
 
 export const WithSuffix: Story = {
+  name: 'With Suffix',
   render: () => (
     <Tabs defaultValue="notifications" className="w-[700px]">
       <TabsList>
@@ -125,6 +128,7 @@ export const OverflowMenu: Story = {
 }
 
 export const Disabled: Story = {
+  name: 'Disabled',
   render: () => (
     <Tabs defaultValue="a" className="w-[600px]">
       <TabsList>
