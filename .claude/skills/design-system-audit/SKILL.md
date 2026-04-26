@@ -261,75 +261,22 @@ When audit finds spec.md describes behavior different from tsx actual, STOP — 
 
 Any new naming proposal MUST pass CLAUDE.md `## 命名必過三重 test` before Checkpoint 2. Tests defined in CLAUDE.md (SSOT) — **do not re-spec here**. Historical example:`text/picture` failed test 3(collides with Button `variant="text"`)→ changed to `compact/rich`。
 
-### Phase 3.5 — 進階 6 維稽核 D3-D5(scope 依稽核模式)
+### Phase 3.5 — 進階 6 維稽核 D3-D6(對齊 CLAUDE.md `# 稽核 canonical`)
 
-對齊 **CLAUDE.md `# 稽核 canonical`**:本 skill 完成 Phase 1-3 後,已覆蓋 D1 設計語言 + D2 程式語言;D3 效能 / D4 UX / D5 視覺 需 chain 專門 skill。**進階模式必跑全 D3-D5**;高效模式可只跑 D5。
+Phase 1-3 覆蓋 D1+D2;D3-D6 chain 專門 skill。**模式**:高效(default)scope=changed 只跑 D5;進階 scope=all 跑全 D3-D6(trigger:`--deep` / 動 tokens|patterns/ / user 要求「完整 audit」)。
 
-**模式判定**:
-- **高效(default,Tier 2 daily)**:scope=changed,只跑 D5(visual)
-- **進階(Tier 3 periodic)**:scope=all,**D3 + D4 + D5 全跑**
-  - Trigger 條件:user 顯式 invoke `/design-system-audit --deep`,OR 本次 Phase 3 commits 動到 `tokens/` / `patterns/element-anatomy/` / `patterns/overlay-surface/`(擴散多元件),OR user 要求「整個 DS 大稽核」「完整 audit」「進階模式」
-- **Component focus**:audit 集中在單一元件 → `--scope=component:<Name>`
+| Sub | 維度 | Skill | 規則 |
+|-----|------|-------|------|
+| 3.5a | D5 視覺 | `npm run visual-audit` Layer A → `/visual-audit` Layer B | violation 開新 commit 修回圈 |
+| 3.5b | D3 效能 | `/performance-audit` | 修實作 auto / 改 canonical STOP |
+| 3.5c | D4 UX | `/ux-audit` | P0 a11y 必修 / P1 triage |
+| 3.5d | D6 原則自檢 | `references/principle-audit-protocol.md` 4 子維(合理 / 一致 / 無矛盾 / 完整)| 動 canonical substantive STOP / 對齊 / 補 pointer AUTO;scan 前必讀「常見 FP 記憶」節 |
 
-**Process(進階模式完整 6 維)**:
+**跳過**:spec.md 純文字改 / 高效模式只跑 3.5a。
 
-**Phase 3.5a — D5 視覺品質**
-1. Auto 選 scope + run `npm run visual-audit --` with scope flag(Layer A:contrast + geometry + screenshot)
-2. Layer A violation 有 → 開新 commit 修,回圈到 Phase 2 triage
-3. Layer A 過 → chain `/visual-audit` skill 做 Layer B AI judgement,讀 `snapshots/*.png`
+### Phase 4.5 — Governance sprawl check(進階強制 chain `/knowledge-prune`)
 
-**Phase 3.5b — D3 元件效能(進階模式強制)**
-- Chain `/performance-audit` scope 同上
-- 檢查:render count / memo gap / bundle impact / useEffect 鏈 / context thrashing
-- 高 impact finding → Phase 2 triage;`# 稽核 vs 執行 分權 canonical`:修實作類 auto,改 canonical 類 STOP
-
-**Phase 3.5c — D4 UX 行為(進階模式強制)**
-- Chain `/ux-audit` scope 同上
-- 檢查:keyboard nav / focus / ARIA / animation / interaction canonical / 三態
-- P0(完全 block a11y)必修;P1 Phase 2 triage
-
-**Phase 3.5d — D6 原則自檢(進階模式,真 scan 非只 triage)**
-
-chain `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 跑 4 子維 scan:
-- **D6a 合理性**:每條 canonical 是否有世界級對照 + rationale
-- **D6b 一致性**:同概念跨 spec 表達 / 術語是否一致(token 用法 / prop value literal / 命名三 test)
-- **D6c 無矛盾**:spec↔spec / CLAUDE.md↔spec / canonical 聲明衝突
-- **D6d 完整性**:原則有無覆蓋 applicable state / scope / edge case
-
-**判斷 auto vs STOP**:走 protocol 的判斷公式 —
-- 動 canonical **substantive meaning** → **STOP**(提議,等 user sign-off)
-- 對齊 canonical / 表達統一 / 補 pointer → **AUTO**(直接修)
-
-**scan 前必讀 protocol 的「常見 FP 記憶」節**,避免重複過去 false positive。每次找到新 FP → 回填。
-
-**為什麼在 Phase 3 後**:先讓 20 dim code audit 修完,再跑 D3-D5 — 避免 D3-D5 抓到的 finding 其實是 code audit 該抓的(例如 token leak 影響視覺)。
-
-**跳過條件**:
-- 本次 audit commits 都是 spec.md 純文字修正(無 tsx / token 改動)→ D3-D5 無變,可跳 Phase 3.5
-- 高效模式:只跑 Phase 3.5a(D5),跳 3.5b / 3.5c
-
-### Phase 4.5 — Governance sprawl check(進階模式強制 chain `/knowledge-prune`)
-
-對齊 CLAUDE.md `# 資訊治理 canonical`:進階模式 DS audit 結束後,若治理文件(CLAUDE.md / specs / skills / MEMORY.md)有膨脹信號,chain `/knowledge-prune`。
-
-**Trigger 判定**(任一命中就 chain):
-- CLAUDE.md > 800 行(讀 `wc -l CLAUDE.md`)
-- MEMORY.md > 20 entries
-- 本次 audit commits 動過 `# Meta-Pattern 預警` 條目(新增 meta → 必檢討下游冗餘,「上游加 = 下游減」)
-- `.claude/logs/hook-fires.jsonl` 有 6 月 0 fire 的 hook(死 hook 提名)
-- `.claude/logs/user-corrections.jsonl` 有 > 10 條未 codify pending
-
-**流程**:
-1. Main agent 跑上述 trigger 判定
-2. 命中 → invoke `/knowledge-prune` skill,scope = full 8-home
-3. `/knowledge-prune` 自身有 checkpoint,遇 P2(動 canonical 意思)STOP 等 user
-4. Prune 完成 → 回到本 audit 的 Phase 4 Final report 繼續
-
-**不 trigger 的條件**:
-- 高效模式(scope=changed / component)— governance 改動範圍小,不值得全掃
-- 本次 audit 無新增 Meta-Pattern + 所有 file size 在 budget 內 + logs 無 dead 指標
-
-**為什麼在 Phase 4.5**:Phase 3-4 改完 DS code / spec,此時是 governance 最新狀態,可準確判斷哪些 rule 被 consolidation 後冗餘。先 prune 再 final report,避免下次 audit 又撞同樣 sprawl。
+**Trigger**:CLAUDE.md > 800 / MEMORY > 20 / 動 Meta-Pattern / hook-fires 6 月 0 fire / corrections > 10 — 任一 chain `/knowledge-prune` scope=full;P2 STOP 等 user;prune 完回 Phase 4。**不 trigger**:高效模式 / 無 Meta + sizes OK + logs 無 dead。Phase 3-4 後跑因 governance 已最新狀態。
 
 ### Phase 4 — Final report + memory update + Self-improvement capture(強制)
 
