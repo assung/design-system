@@ -228,6 +228,10 @@
           },
           {
             "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/extract-canonical-rules.mjs\" 2>&1 | grep -E 'GAPS|✅|keywords missing' | head -8 || true"
+          },
+          {
+            "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_harvest_corrections.sh\""
           },
           {
