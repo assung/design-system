@@ -29,19 +29,28 @@ const Rule = ({
 )
 
 const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }) => (
-  <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
+  <p className={`text-footnote leading-normal mt-2 ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
 )
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-// ── WhenToUse — 何時使用 Rating ──────────────────────
-
 // ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
-// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+// 合併自舊 WhenToUse / WhenNotToUse / InteractiveVsReadOnly / RatingVsAlternatives(2026-04-26 v3 canonical)
 
 export const UsageGuidance: Story = {
   name: '使用指引',
-  render: () => (
+  render: () => {
+    const SubmitFlow = () => {
+      const [v, setV] = useState(0)
+      return (
+        <div className="flex flex-col gap-2 w-[300px] p-4 border border-border rounded-md">
+          <div className="text-caption text-fg-secondary font-medium">送出評分 — interactive</div>
+          <Rating value={v} onChange={setV} size="lg" aria-label="為這次用餐評分" />
+          <Label>使用者正在給分，hover 預覽 + click 送出</Label>
+        </div>
+      )
+    }
+    return (
     <div className="flex flex-col gap-12">
       {/* 何時用 — 原 WhenToUse */}
       <div className="prose prose-sm max-w-prose">
@@ -111,24 +120,8 @@ export const UsageGuidance: Story = {
         </div>
       </Rule>
     </div>
-    </div>
-  ),
-}
 
-export const InteractiveVsReadOnly: Story = {
-  name: 'interactive vs readOnly',
-  render: () => {
-    const SubmitFlow = () => {
-      const [v, setV] = useState(0)
-      return (
-        <div className="flex flex-col gap-2 w-[300px] p-4 border border-border rounded-md">
-          <div className="text-caption text-fg-secondary font-medium">送出評分 — interactive</div>
-          <Rating value={v} onChange={setV} size="lg" aria-label="為這次用餐評分" />
-          <Label>使用者正在給分，hover 預覽 + click 送出</Label>
-        </div>
-      )
-    }
-    return (
+      {/* vs 近親 — 原 InteractiveVsReadOnly + RatingVsAlternatives */}
       <div>
         <Rule
           title="送出前 → interactive，送出後 / 他人評分 → readOnly"
@@ -157,7 +150,58 @@ export const InteractiveVsReadOnly: Story = {
             <Label warn>使用者會以為點下去能改平均分 → 改 readOnly</Label>
           </div>
         </Rule>
+
+        <Rule
+          title="Rating — 離散 1–5 分評分"
+          note="星等是使用者對商品 / 服務的 graded 量化評價。5 顆是世界級共識（超過 7 使用者無法快速掃視）。"
+        >
+          <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+            <div className="text-caption text-fg-secondary font-medium">商品評分</div>
+            <Rating value={4.7} readOnly precision="half" size="md" aria-label="4.7 星" />
+            <Label>離散 tier:1 / 2 / 3 / 4 / 5(或 0.5 step)</Label>
+          </div>
+        </Rule>
+
+        <Rule
+          title="Slider — 連續數值（非 1–5 評分）"
+          note="音量、亮度、價格區間、百分比調整。Slider 是連續值，Rating 是離散 tier——完全不同語意。"
+        >
+          <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+            <div className="text-caption text-fg-secondary font-medium">音量（連續值）</div>
+            <Slider defaultValue={[65]} max={100} aria-label="音量" />
+            <Label>0–100 任何值都合理 → 用 Slider，不是 Rating</Label>
+          </div>
+        </Rule>
+
+        <Rule
+          title="Badge — 靜態分類標記（非量化）"
+          note="「熱門」「Beta」「必填」「NEW」是 categorical label，不是 1–5 評分。Badge 傳達「屬於哪類」，Rating 傳達「值多少分」。"
+        >
+          <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+            <div className="text-caption text-fg-secondary font-medium">商品標記</div>
+            <div className="flex items-center gap-2">
+              <Badge count={0} variant="critical" />
+              <span className="text-caption text-fg-muted">或文字 Badge（分類）</span>
+            </div>
+            <Label>分類 / 狀態 / 通知計數 → Badge，不是 Rating</Label>
+          </div>
+        </Rule>
+
+        <Rule
+          title="Like / ThumbsUp — 二元喜歡（非 graded）"
+          note="愛心 / 豎拇指是 binary（喜歡 / 不喜歡），不是 1–5 分。用 Button iconOnly + pressed，不用 Rating 換 icon。"
+        >
+          <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+            <div className="text-caption text-fg-secondary font-medium">收藏（binary）</div>
+            <div className="flex items-center gap-2">
+              <Button variant="text" iconOnly startIcon={Heart} aria-label="收藏" />
+              <Button variant="text" iconOnly startIcon={ThumbsUp} aria-label="喜歡" />
+            </div>
+            <Label>二元切換 → Button + pressed，不是 Rating 換 Heart icon</Label>
+          </div>
+        </Rule>
       </div>
+    </div>
     )
   },
 }
@@ -246,61 +290,3 @@ export const YellowStarConvention: Story = {
     </div>
   ),
 }
-
-export const RatingVsAlternatives: Story = {
-  name: 'Rating vs Slider vs Badge vs Like',
-  render: () => (
-    <div>
-      <Rule
-        title="Rating — 離散 1–5 分評分"
-        note="星等是使用者對商品 / 服務的 graded 量化評價。5 顆是世界級共識（超過 7 使用者無法快速掃視）。"
-      >
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <div className="text-caption text-fg-secondary font-medium">商品評分</div>
-          <Rating value={4.7} readOnly precision="half" size="md" aria-label="4.7 星" />
-          <Label>離散 tier：1 / 2 / 3 / 4 / 5（或 0.5 step）</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="Slider — 連續數值（非 1–5 評分）"
-        note="音量、亮度、價格區間、百分比調整。Slider 是連續值，Rating 是離散 tier——完全不同語意。"
-      >
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <div className="text-caption text-fg-secondary font-medium">音量（連續值）</div>
-          <Slider defaultValue={[65]} max={100} aria-label="音量" />
-          <Label>0–100 任何值都合理 → 用 Slider，不是 Rating</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="Badge — 靜態分類標記（非量化）"
-        note="「熱門」「Beta」「必填」「NEW」是 categorical label，不是 1–5 評分。Badge 傳達「屬於哪類」，Rating 傳達「值多少分」。"
-      >
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <div className="text-caption text-fg-secondary font-medium">商品標記</div>
-          <div className="flex items-center gap-2">
-            <Badge count={0} variant="critical" />
-            <span className="text-caption text-fg-muted">或文字 Badge（分類）</span>
-          </div>
-          <Label>分類 / 狀態 / 通知計數 → Badge，不是 Rating</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="Like / ThumbsUp — 二元喜歡（非 graded）"
-        note="愛心 / 豎拇指是 binary（喜歡 / 不喜歡），不是 1–5 分。用 Button iconOnly + pressed，不用 Rating 換 icon。"
-      >
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <div className="text-caption text-fg-secondary font-medium">收藏（binary）</div>
-          <div className="flex items-center gap-2">
-            <Button variant="text" iconOnly startIcon={Heart} aria-label="收藏" />
-            <Button variant="text" iconOnly startIcon={ThumbsUp} aria-label="喜歡" />
-          </div>
-          <Label>二元切換 → Button + pressed，不是 Rating 換 Heart icon</Label>
-        </div>
-      </Rule>
-    </div>
-  ),
-}
-

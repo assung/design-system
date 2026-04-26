@@ -1,3 +1,4 @@
+// @principles-rationale: UsageGuidance merges WhenToUse + WhenNotToUse + Vs*Rule into single 使用指引 story per refactor task (2026-04-26)
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import LinkTo from '@storybook/addon-links/react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -37,6 +38,13 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
   <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
 )
 
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <section className="mb-12">
+    <h2 className="text-heading-3 font-bold text-foreground mb-4 pb-2 border-b border-border">{title}</h2>
+    {children}
+  </section>
+)
+
 const Gradient = ({ label, gradient, height = 160 }: { label: string; gradient: string; height?: number }) => (
   <div
     className="rounded-lg overflow-hidden flex items-end p-5 text-white"
@@ -55,188 +63,146 @@ const cityGradients = [
 
 // ── Stories ──────────────────────────────────────────────────────────────────
 
-// ── WhenToUse — 何時使用 Carousel ──────────────────────
-
-// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
-// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
-
 export const UsageGuidance: Story = {
   name: '使用指引',
   render: () => (
-    <div className="flex flex-col gap-12">
-      {/* 何時用 — 原 WhenToUse */}
-      <div className="prose prose-sm max-w-prose">
-      <p>適合 Carousel 的真實業務場景(點擊跳轉「展示」頁範例):</p>
-      <ul className="space-y-1">
-        <li>
-          <LinkTo kind="Design System/Components/Carousel/展示" name="首頁 Hero Banner"><span className="text-primary hover:underline font-medium cursor-pointer">首頁 Hero Banner</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Carousel/展示" name="商品圖片輪播"><span className="text-primary hover:underline font-medium cursor-pointer">商品圖片輪播</span></LinkTo>
-        </li>
-      </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
-    </div>
-
-      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
-      <div>
-      <Rule
-        title="❌ 不用 Carousel 做命名視圖切換"
-        note="『訂單 / 顧客 / 產品』每塊結構完全不同,該用 Tabs——Carousel 把它們壓成順序性的同類視覺,使用者會困惑為什麼要按順序看。"
-      >
-        <Label warn>
-          電商後台「訂單 / 顧客 / 產品」→ 應使用 Tabs;carousel 的順序性暗示錯誤
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Carousel 做資料表格"
-        note="表格需要 columns / sorting / filtering / row selection——這些全是 DataTable 的 affordance,carousel 提供不了。把 rows 包進 CarouselItem 是結構性誤用。"
-      >
-        <Label warn>
-          訂單列表應該用 DataTable,不能用 carousel 讓使用者「一次看一筆」
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不預設啟用 auto-play"
-        note="違反 WCAG 2.2.2 Pause, Stop, Hide——超過 5 秒自動變動的內容必須可暫停。使用者常需要時間閱讀 testimonial 文字、看清產品細節,自動跳過打斷閱讀。Polaris / Material 皆建議不使用 auto-playing carousel。"
-      >
-        <Label warn>
-          若專案必須 auto-play,consumer 自行引入 embla-autoplay 並**同時提供暫停按鈕**,spec 不預設處理
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ Active dot 不要只靠顏色區分"
-        note="色弱使用者無法靠色相辨識。本 DS 的 active dot 加寬至 24px(4 倍 inactive 寬度),是 Ant Design / Swiper 的世界級慣例——寬度變化更容易被感知。"
-      >
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-caption text-fg-muted">✅</span>
-            <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <span className="w-6 h-1.5 rounded-full bg-white" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-            </div>
-            <span className="text-footnote text-fg-muted">寬度變化</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-caption text-error">❌</span>
-            <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <span className="w-1.5 h-1.5 rounded-full bg-info" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-            </div>
-            <Label warn>只靠顏色</Label>
-          </div>
-        </div>
-      </Rule>
-    </div>
-    </div>
-  ),
-}
-
-export const CarouselVsTabs: Story = {
-  name: 'Carousel vs Tabs',
-  render: () => (
     <div>
-      <Rule
-        title="✅ Carousel — 同類視覺的多張輪播"
-        note="每張 slide 是同類內容(同為旅遊推薦目的地圖),無需命名。使用者按順序推進或點 dot 跳張,視覺階層是 content 不是 navigation。"
-      >
-        <div className="w-[480px]">
-          <Carousel opts={{ loop: true }}>
-            <CarouselContent>
-              {cityGradients.map((c) => (
-                <CarouselItem key={c.label}>
-                  <Gradient label={c.label} gradient={c.g} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-            <CarouselDots />
-          </Carousel>
-          <Label>4 張同類大圖 · 無個別命名 · 底部 dots 指示進度</Label>
+      <Section title="何時用">
+        <div className="prose prose-sm max-w-prose mb-8">
+          <p>適合 Carousel 的真實業務場景(點擊跳轉「展示」頁範例):</p>
+          <ul className="space-y-1">
+            <li><LinkTo kind="Design System/Components/Carousel/展示" name="首頁 Hero Banner"><span className="text-primary hover:underline font-medium cursor-pointer">首頁 Hero Banner</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/Carousel/展示" name="商品圖片輪播"><span className="text-primary hover:underline font-medium cursor-pointer">商品圖片輪播</span></LinkTo></li>
+          </ul>
+          <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親 段)。</p>
         </div>
-      </Rule>
+      </Section>
 
-      <Rule
-        title="✅ Tabs — 互斥切換命名視圖"
-        note="每個 tab 有獨立名稱(總覽 / 成員 / 設定),內容結構不同,使用者依名稱直接跳。Tabs 是 section header 等級的 navigation anchor。"
-      >
-        <div className="w-[480px]">
-          <Tabs defaultValue="overview">
-            <TabsList>
-              <TabsTrigger value="overview">總覽</TabsTrigger>
-              <TabsTrigger value="members">成員</TabsTrigger>
-              <TabsTrigger value="settings">設定</TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview" className="pt-4">
-              <p className="text-body">專案狀態、最近活動、關鍵指標</p>
-            </TabsContent>
-            <TabsContent value="members" className="pt-4">
-              <p className="text-body">團隊成員列表、角色權限</p>
-            </TabsContent>
-            <TabsContent value="settings" className="pt-4">
-              <p className="text-body">通知、整合、危險區</p>
-            </TabsContent>
-          </Tabs>
-          <Label>3 個獨立命名視圖 · 每個 tab 結構與內容不同</Label>
-        </div>
-      </Rule>
+      <Section title="何時不用 + 替代方案">
+        <Rule
+          title="❌ 不用 Carousel 做命名視圖切換"
+          note="『訂單 / 顧客 / 產品』每塊結構完全不同,該用 Tabs——Carousel 把它們壓成順序性的同類視覺,使用者會困惑為什麼要按順序看。"
+        >
+          <Label warn>
+            電商後台「訂單 / 顧客 / 產品」→ 應使用 Tabs;carousel 的順序性暗示錯誤
+          </Label>
+        </Rule>
 
-      <Rule
-        title="判斷法"
-        note="每個項目都有獨立標題且內容結構不同 → Tabs;每個項目是同類視覺的多張 → Carousel;一眼要看到所有項目 → 都不是,用 Grid。"
-      >
-        <Label>
-          商品 4 張角度照 = Carousel(同類視覺)· 電商後台「訂單 / 顧客 / 產品」= Tabs(命名視圖)· 20 張商品列表 = Grid(總覽)
-        </Label>
-      </Rule>
-    </div>
-  ),
-}
+        <Rule
+          title="❌ 不用 Carousel 做資料表格"
+          note="表格需要 columns / sorting / filtering / row selection——這些全是 DataTable 的 affordance,carousel 提供不了。把 rows 包進 CarouselItem 是結構性誤用。"
+        >
+          <Label warn>
+            訂單列表應該用 DataTable,不能用 carousel 讓使用者「一次看一筆」
+          </Label>
+        </Rule>
 
-export const CarouselVsScrollArea: Story = {
-  name: 'Carousel vs 列表捲動',
-  render: () => (
-    <div>
-      <Rule
-        title="✅ Carousel — snap-to 一次一張"
-        note="輪播感:使用者按箭頭 / dot 切換,每次移動一張固定位置。適合 hero banner、product image、testimonial——讀者需要『完整看一張再看下一張』。"
-      >
-        <div className="w-[480px]">
-          <Carousel>
-            <CarouselContent>
-              {cityGradients.slice(0, 3).map((c) => (
-                <CarouselItem key={c.label}>
-                  <Gradient label={c.label} gradient={c.g} height={140} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-            <CarouselDots />
-          </Carousel>
-          <Label>snap-to · 一次一張 · 使用者視覺焦點單一</Label>
-        </div>
-      </Rule>
+        <Rule
+          title="❌ 不預設啟用 auto-play"
+          note="違反 WCAG 2.2.2 Pause, Stop, Hide——超過 5 秒自動變動的內容必須可暫停。使用者常需要時間閱讀 testimonial 文字、看清產品細節,自動跳過打斷閱讀。Polaris / Material 皆建議不使用 auto-playing carousel。"
+        >
+          <Label warn>
+            若專案必須 auto-play,consumer 自行引入 embla-autoplay 並**同時提供暫停按鈕**,spec 不預設處理
+          </Label>
+        </Rule>
 
-      <Rule
-        title="❌ 不要用 Carousel 做列表捲動"
-        note="如果使用者想同時看到多個項目、在任意位置停下、掃視後挑選——那是列表的 affordance,不是輪播的。用水平 ScrollArea / flex + overflow-x-auto 更符合使用者直覺。"
-      >
-        <div className="w-[480px] flex gap-3 overflow-x-auto pb-2">
-          {['🍜 拉麵', '🍕 披薩', '🍔 漢堡', '🥗 沙拉', '🌮 墨西哥捲', '🍣 壽司', '🍛 咖哩'].map((t) => (
-            <div key={t} className="shrink-0 w-28 h-20 rounded-lg border border-border bg-surface-raised flex items-center justify-center text-body">
-              {t}
+        <Rule
+          title="❌ Active dot 不要只靠顏色區分"
+          note="色弱使用者無法靠色相辨識。本 DS 的 active dot 加寬至 24px(4 倍 inactive 寬度),是 Ant Design / Swiper 的世界級慣例——寬度變化更容易被感知。"
+        >
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-caption text-fg-muted">✅</span>
+              <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+                <span className="w-6 h-1.5 rounded-full bg-white" />
+                <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+              </div>
+              <span className="text-footnote text-fg-muted">寬度變化</span>
             </div>
-          ))}
-        </div>
-        <Label warn>↑ 聊天室的「常用食物標籤」應用自由捲動,不用 carousel 逼使用者一次看一張</Label>
-      </Rule>
+            <div className="flex items-center gap-2">
+              <span className="text-caption text-error">❌</span>
+              <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+                <span className="w-1.5 h-1.5 rounded-full bg-info" />
+                <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+              </div>
+              <Label warn>只靠顏色</Label>
+            </div>
+          </div>
+        </Rule>
+      </Section>
+
+      <Section title="vs 近親元件">
+        <Rule
+          title="✅ Carousel — 同類視覺的多張輪播"
+          note="每張 slide 是同類內容(同為旅遊推薦目的地圖),無需命名。使用者按順序推進或點 dot 跳張,視覺階層是 content 不是 navigation。"
+        >
+          <div className="w-[480px]">
+            <Carousel opts={{ loop: true }}>
+              <CarouselContent>
+                {cityGradients.map((c) => (
+                  <CarouselItem key={c.label}>
+                    <Gradient label={c.label} gradient={c.g} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+              <CarouselDots />
+            </Carousel>
+            <Label>4 張同類大圖 · 無個別命名 · 底部 dots 指示進度</Label>
+          </div>
+        </Rule>
+
+        <Rule
+          title="✅ Tabs — 互斥切換命名視圖"
+          note="每個 tab 有獨立名稱(總覽 / 成員 / 設定),內容結構不同,使用者依名稱直接跳。Tabs 是 section header 等級的 navigation anchor。"
+        >
+          <div className="w-[480px]">
+            <Tabs defaultValue="overview">
+              <TabsList>
+                <TabsTrigger value="overview">總覽</TabsTrigger>
+                <TabsTrigger value="members">成員</TabsTrigger>
+                <TabsTrigger value="settings">設定</TabsTrigger>
+              </TabsList>
+              <TabsContent value="overview" className="pt-4">
+                <p className="text-body">專案狀態、最近活動、關鍵指標</p>
+              </TabsContent>
+              <TabsContent value="members" className="pt-4">
+                <p className="text-body">團隊成員列表、角色權限</p>
+              </TabsContent>
+              <TabsContent value="settings" className="pt-4">
+                <p className="text-body">通知、整合、危險區</p>
+              </TabsContent>
+            </Tabs>
+            <Label>3 個獨立命名視圖 · 每個 tab 結構與內容不同</Label>
+          </div>
+        </Rule>
+
+        <Rule
+          title="✅ ScrollArea / 列表捲動 — 自由瀏覽多項"
+          note="使用者想同時看到多個項目、在任意位置停下、掃視後挑選——那是列表的 affordance。用水平 ScrollArea / flex + overflow-x-auto 更符合使用者直覺。"
+        >
+          <div className="w-[480px] flex gap-3 overflow-x-auto pb-2">
+            {['🍜 拉麵', '🍕 披薩', '🍔 漢堡', '🥗 沙拉', '🌮 墨西哥捲', '🍣 壽司', '🍛 咖哩'].map((t) => (
+              <div key={t} className="shrink-0 w-28 h-20 rounded-lg border border-border bg-surface-raised flex items-center justify-center text-body">
+                {t}
+              </div>
+            ))}
+          </div>
+          <Label>聊天室的「常用食物標籤」應用自由捲動,不用 carousel 逼使用者一次看一張</Label>
+        </Rule>
+
+        <Rule
+          title="判斷法"
+          note="每個項目都有獨立標題且內容結構不同 → Tabs;每個項目是同類視覺的多張 → Carousel;一眼要看到所有項目 → 都不是,用 Grid。"
+        >
+          <Label>
+            商品 4 張角度照 = Carousel(同類視覺)· 電商後台「訂單 / 顧客 / 產品」= Tabs(命名視圖)· 20 張商品列表 = Grid(總覽)
+          </Label>
+        </Rule>
+      </Section>
     </div>
   ),
 }
@@ -361,10 +327,3 @@ export const ItemCountLimit: Story = {
     </div>
   ),
 }
-
-// TestimonialExample 移除(2026-04-21):
-// 原範例把 arrow overlay 壓在「純文字 quote card」之上,違反 Carousel arrow overlay
-// 「只覆蓋圖 / 背景,不壓文字」的原則——arrow 會遮到 quote 內文或 avatar byline。
-// 純文字 carousel 若真要做,arrow 應該放在 card 外側(非 overlay),但該 layout 少見,
-// DS 不主動 demo 避免教壞 consumer。對齊 carousel.stories.tsx 底部同期移除的
-// TestimonialCarousel 的相同理由。

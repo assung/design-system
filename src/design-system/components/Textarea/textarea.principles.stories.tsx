@@ -31,12 +31,18 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── 定位與分界 ───────────────────────────────────────────────────────────────
 
-// ── WhenToUse — 何時使用 Textarea ──────────────────────
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsInputRule(2026-04-26 v3 canonical)
 
-export const WhenToUse: Story = {
-  name: '何時使用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose">
+export const UsageGuidance: Story = {
+  name: '使用指引',
+  render: () => {
+    const [comment, setComment] = React.useState('')
+    const [title, setTitle] = React.useState('')
+    return (
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Textarea 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -51,18 +57,11 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsInputRule: Story = {
-  name: '定位：多行 vs 單行',
-  render: () => {
-    const [comment, setComment] = React.useState('')
-    const [title, setTitle] = React.useState('')
-    return (
+      {/* vs 近親 — 原 VsInputRule */}
       <div>
         <Rule
-          title="Textarea — 多行自由輸入（可能有換行、段落）"
+          title="Textarea — 多行自由輸入(可能有換行、段落)"
           note="評論、描述、備註、bio、issue content 等場景:內容可能多行,使用者需要看到全貌邊寫邊 review。Enter 在 Textarea 裡是換行,不是 submit"
         >
           <div>
@@ -77,11 +76,11 @@ export const VsInputRule: Story = {
         </Rule>
 
         <Rule
-          title="❌ 單行內容（標題 / 姓名 / URL）用 Textarea"
+          title="❌ 單行內容(標題 / 姓名 / URL)用 Textarea"
           note="單行內容使用者預期 Enter 提交 form,Textarea 的 Enter 是換行會破壞預期。使用 Input,鍵盤行為對齊 form submit"
         >
           <div>
-            <Label>✅ 專案標題用 Input（單行,Enter 提交）</Label>
+            <Label>✅ 專案標題用 Input(單行,Enter 提交)</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -89,12 +88,13 @@ export const VsInputRule: Story = {
             />
           </div>
           <div>
-            <Label warn>❌ 錯用：把單行標題做成 Textarea</Label>
+            <Label warn>❌ 錯用:把單行標題做成 Textarea</Label>
             <Textarea rows={1} placeholder="輸入專案名稱" />
             <Label warn>↑ 使用者按 Enter 會換行,無法提交 form</Label>
           </div>
         </Rule>
       </div>
+    </div>
     )
   },
 }
@@ -117,7 +117,7 @@ export const ResizeRule: Story = {
         title="❌ 啟用 resize-x 或 resize: both"
         note="Textarea 橫向撐開會破壞 form 佈局、影響旁邊欄位。世界級 DS 都只開 vertical。TS 型別擋不了 className 覆蓋,但設計上禁止"
       >
-        <Label warn>（設計規則）不覆寫 resize-y 成 resize-x / resize-both</Label>
+        <Label warn>(設計規則)不覆寫 resize-y 成 resize-x / resize-both</Label>
       </Rule>
     </div>
   ),
@@ -126,7 +126,7 @@ export const ResizeRule: Story = {
 // ── Readonly 保留邊框 ───────────────────────────────────────────────────
 
 export const ReadonlyRule: Story = {
-  name: 'Readonly 保留邊框（不同於 Input）',
+  name: 'Readonly 保留邊框(不同於 Input)',
   render: () => (
     <div>
       <Rule
@@ -138,10 +138,10 @@ export const ReadonlyRule: Story = {
       </Rule>
 
       <Rule
-        title="對比：Input readonly（無邊框、緊湊）"
+        title="對比:Input readonly(無邊框、緊湊)"
         note="單行內容跟文字段落視覺可分,移除邊框不會混淆。兩者的 readonly 策略差異源自「單行 vs 多行」的閱讀需求"
       >
-        <Input mode="readonly" value="已送出的單行 URL：https://github.com/user/repo" onChange={() => {}} />
+        <Input mode="readonly" value="已送出的單行 URL:https://github.com/user/repo" onChange={() => {}} />
       </Rule>
     </div>
   ),
@@ -150,18 +150,18 @@ export const ReadonlyRule: Story = {
 // ── Icon / endAction 禁止 ────────────────────────────────────────────
 
 export const NoIconRule: Story = {
-  name: '禁止：內部不放 icon / endAction',
+  name: '禁止:內部不放 icon / endAction',
   render: () => (
     <div>
       <Rule
         title="Textarea 不支援 startIcon / endAction"
         note="Textarea 是多行閱讀區,icon 放在框內會跟多行文字位置衝突(icon 是跟第一行對齊還是 center?)。世界級 DS(Material / Chakra / Ant)textarea 都不放內嵌 icon。需要 icon 請放 Field 外(例如 Field 的 startIcon 或標題旁)"
       >
-        <Label warn>（型別設計）TextareaProps 不接受 startIcon / endAction,設計上就擋住</Label>
+        <Label warn>(型別設計)TextareaProps 不接受 startIcon / endAction,設計上就擋住</Label>
       </Rule>
 
       <Rule
-        title="需要 action button → 放 Field 外（Textarea 下方或旁邊）"
+        title="需要 action button → 放 Field 外(Textarea 下方或旁邊)"
         note="例如 comment box 的「送出」按鈕放 Textarea 下方,不塞進框內"
       >
         <div className="flex flex-col gap-2">

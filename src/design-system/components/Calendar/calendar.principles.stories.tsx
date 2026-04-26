@@ -1,3 +1,6 @@
+// @principles-rationale: Merged WhenToUse + WhenNotToUse + VsDatePicker into a single
+// `UsageGuidance` story (3 sections) per 2026-04-26 user mandate to consolidate
+// decision-related stories. ColorSemantic + MvpScope kept as separate principles.
 import type { Meta, StoryObj } from '@storybook/react'
 import LinkTo from '@storybook/addon-links/react'
 import { Calendar, type CalendarEvent } from './calendar'
@@ -14,6 +17,13 @@ type Story = StoryObj
 const now = new Date()
 const thisMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0')
 
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <section className="mb-12">
+    <h2 className="text-body-lg font-semibold text-foreground mb-3 pb-1 border-b border-divider">{title}</h2>
+    <div>{children}</div>
+  </section>
+)
+
 const Rule: React.FC<{ title: string; note: string; children: React.ReactNode }> = ({ title, note, children }) => (
   <div className="mb-8 max-w-5xl">
     <div className="text-body-lg font-medium text-foreground mb-1">{title}</div>
@@ -22,77 +32,71 @@ const Rule: React.FC<{ title: string; note: string; children: React.ReactNode }>
   </div>
 )
 
-// ── 原則 1:Calendar vs DatePicker ─────────────────────────────────────────
-// ── WhenToUse — 何時使用 Calendar ──────────────────────
-
-// ── 原則 2:Event color 是類別語意,不是 severity ─────────────────────────────
-// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
-// 合併自舊 WhenToUse / WhenNotToUse / VsDatePicker(2026-04-26 v3 canonical)
-
 export const UsageGuidance: Story = {
   name: '使用指引',
   render: () => (
-    <div className="flex flex-col gap-12">
-      {/* 何時用 — 原 WhenToUse */}
-      <div className="prose prose-sm max-w-prose">
-      <p>適合 Calendar 的真實業務場景(點擊跳轉「展示」頁範例):</p>
-      <ul className="space-y-1">
-        <li>
-          <LinkTo kind="Design System/Components/Calendar/展示" name="團隊行事曆"><span className="text-primary hover:underline font-medium cursor-pointer">團隊行事曆</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Calendar/展示" name="內容發佈月曆"><span className="text-primary hover:underline font-medium cursor-pointer">內容發佈月曆</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Calendar/展示" name="空行事曆"><span className="text-primary hover:underline font-medium cursor-pointer">空行事曆</span></LinkTo>
-        </li>
-      </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
-    </div>
+    <div>
+      <Section title="何時用">
+        <div className="prose prose-sm max-w-prose">
+          <p>適合 Calendar 的真實業務場景(點擊跳轉「展示」頁範例):</p>
+          <ul className="space-y-1">
+            <li>
+              <LinkTo kind="Design System/Components/Calendar/展示" name="團隊行事曆"><span className="text-primary hover:underline font-medium cursor-pointer">團隊行事曆</span></LinkTo>
+            </li>
+            <li>
+              <LinkTo kind="Design System/Components/Calendar/展示" name="內容發佈月曆"><span className="text-primary hover:underline font-medium cursor-pointer">內容發佈月曆</span></LinkTo>
+            </li>
+            <li>
+              <LinkTo kind="Design System/Components/Calendar/展示" name="空行事曆"><span className="text-primary hover:underline font-medium cursor-pointer">空行事曆</span></LinkTo>
+            </li>
+          </ul>
+          <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親」)。</p>
+        </div>
+      </Section>
 
-      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
-      <div className="space-y-4 text-body text-fg-secondary max-w-3xl">
-      <div className="text-body-lg font-medium text-foreground">何時不用 Calendar</div>
-      <ul className="list-disc pl-5 space-y-2">
-        <li><b>選單一日期</b>(Due date / Birthday)→ 用 <code>DatePicker</code></li>
-        <li><b>選日期範圍</b>(訂單 from-to)→ 用 <code>DatePicker mode="range"</code></li>
-        <li><b>任務看板</b>(非時間軸 view)→ 用 <code>DataTable</code> + status column</li>
-        <li><b>時段可用性</b>(會議訂房 slot picker)→ 獨立 time-slot picker(未來 primitive)</li>
-        <li><b>Mini month widget</b>(sidebar 小月曆)→ 用 <code>DateGrid</code>(不 fullscreen)</li>
-      </ul>
-    </div>
+      <Section title="何時不用 + 替代">
+        <div className="space-y-4 text-body text-fg-secondary max-w-3xl">
+          <ul className="list-disc pl-5 space-y-2">
+            <li><b>選單一日期</b>(Due date / Birthday)→ 用 <code>DatePicker</code></li>
+            <li><b>選日期範圍</b>(訂單 from-to)→ 用 <code>DatePicker mode="range"</code></li>
+            <li><b>任務看板</b>(非時間軸 view)→ 用 <code>DataTable</code> + status column</li>
+            <li><b>時段可用性</b>(會議訂房 slot picker)→ 獨立 time-slot picker(未來 primitive)</li>
+            <li><b>Mini month widget</b>(sidebar 小月曆)→ 用 <code>DateGrid</code>(不 fullscreen)</li>
+          </ul>
+        </div>
+      </Section>
 
-      {/* vs 近親 — VsDatePicker — 原 VsDatePicker */}
-      <div className="space-y-6">
-      <Rule
-        title="Calendar 是「看事件」的 page canvas,DatePicker 是「選日期」的 form control"
-        note="名字相近,職責完全不同。Calendar 是行事曆檢視(月 / 週 / 日 view);DatePicker 是欄位,選單一日期寫入 form state。"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <div className="text-body font-medium mb-2">DatePicker(form control)</div>
-            <Field>
-              <FieldLabel>Due date</FieldLabel>
-              <DatePicker />
-            </Field>
-          </div>
-          <div>
-            <div className="text-body font-medium mb-2">Calendar(event canvas)</div>
-            <div className="h-80 border border-divider rounded-md overflow-hidden">
-              <Calendar
-                events={[
-                  { id: 'a', title: 'Design review', start: `${thisMonth}-05`, end: `${thisMonth}-05`, color: 'blue' },
-                ] as CalendarEvent[]}
-              />
+      <Section title="vs 近親 — Calendar vs DatePicker">
+        <Rule
+          title="Calendar 是「看事件」的 page canvas,DatePicker 是「選日期」的 form control"
+          note="名字相近,職責完全不同。Calendar 是行事曆檢視(月 / 週 / 日 view);DatePicker 是欄位,選單一日期寫入 form state。"
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="text-body font-medium mb-2">DatePicker(form control)</div>
+              <Field>
+                <FieldLabel>Due date</FieldLabel>
+                <DatePicker />
+              </Field>
+            </div>
+            <div>
+              <div className="text-body font-medium mb-2">Calendar(event canvas)</div>
+              <div className="h-80 border border-divider rounded-md overflow-hidden">
+                <Calendar
+                  events={[
+                    { id: 'a', title: 'Design review', start: `${thisMonth}-05`, end: `${thisMonth}-05`, color: 'blue' },
+                  ] as CalendarEvent[]}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </Rule>
-    </div>
+        </Rule>
+      </Section>
     </div>
   ),
 }
 
+// ── 原則 — Event color 是類別語意,不是 severity ─────────────────────────────
 export const ColorSemantic: Story = {
   name: 'Event color 類別語意',
   render: () => (
@@ -116,7 +120,7 @@ export const ColorSemantic: Story = {
   ),
 }
 
-// ── 原則 3:MVP scope — 月 view only ─────────────────────────────────────────
+// ── 原則 — MVP scope:月 view only ─────────────────────────────────────────
 export const MvpScope: Story = {
   name: 'MVP scope',
   render: () => (
@@ -136,5 +140,3 @@ export const MvpScope: Story = {
     </div>
   ),
 }
-
-// ── 原則 4:What NOT to put in Calendar ─────────────────────────────────────────
