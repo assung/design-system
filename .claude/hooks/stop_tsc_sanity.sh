@@ -42,10 +42,13 @@ ERROR_COUNT=$(echo "$ERROR_LINES" | grep -c "error TS" || true)
 ERROR_COUNT=${ERROR_COUNT:-0}
 
 if [ "$ERROR_COUNT" -gt 0 ]; then
-  SAMPLE=$(echo "$ERROR_LINES" | head -3 | sed 's/^/  /')
-  MSG="⚠️ Turn touched .ts/.tsx but tsc -b has $ERROR_COUNT error(s). Sample:\n${SAMPLE}\nCLAUDE.md L276: tsc clean ≠ runtime clean. Fix or acknowledge before ending."
-  ESCAPED=$(printf '%s' "$MSG" | jq -Rs .)
-  printf '{"hookSpecificOutput":{"hookEventName":"Stop","additionalContext":%s}}\n' "$ESCAPED"
+  # Stop hook JSON schema 不接受 additionalContext → log only
+  SAMPLE=$(echo "$ERROR_LINES" | head -3)
+  mkdir -p .claude/logs 2>/dev/null
+  printf '{"ts":"%s","tsc_errors":%s,"sample":%s}\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$ERROR_COUNT" \
+    "$(echo "$SAMPLE" | jq -Rs .)" \
+    >> .claude/logs/tsc-errors.jsonl 2>/dev/null || true
 fi
 
 exit 0

@@ -61,8 +61,7 @@ ESCAPED_SAMPLE=$(echo "$CORRECTIONS" | head -2 | jq -Rs .)
 printf '{"ts":"%s","session":"%s","count":%s,"sample":%s}\n' \
   "$TIMESTAMP" "$SESSION_ID" "$COUNT" "$ESCAPED_SAMPLE" >> "$LOG_FILE"
 
-# Remind Claude to codify if any corrections detected
-MSG="📝 Session harvested ${COUNT} user correction signal(s) → .claude/logs/user-corrections.jsonl. Before ending, verify: is there a pattern worth codifying now(memory / CLAUDE.md / skill)? Don't leave for future to rediscover."
-ESCAPED=$(printf '%s' "$MSG" | jq -Rs .)
-printf '{"hookSpecificOutput":{"hookEventName":"Stop","additionalContext":%s}}\n' "$ESCAPED"
+# Stop hook JSON schema 不接受 additionalContext。Silent log only — corrections
+# already saved to user-corrections.jsonl line 62. /codify-corrections skill 會在
+# threshold 時 SessionStart hook 提醒。
 exit 0
