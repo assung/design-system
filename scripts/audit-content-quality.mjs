@@ -45,6 +45,10 @@ const violations = {
   perSizeSplit: [],         // hasSizes 卻拆 Small/Medium/Large(該 AllSizes grid)
   principlesCore: [],       // principles 缺 ≥ 2 universal core(periodic verify)
   asciiArt: [],             // 視覺符號(│─└┤ box drawing / ASCII arrow flow)
+  // === 「人話」 proxies(2026-04-26 補)===
+  noRealBrand: [],          // showcase story render 缺真實業務 brand reference
+  thinDescription: [],      // parameters.docs.description.{component,story} stub / 太短 / 缺
+  abstractName: [],         // story name 抽象代號(無描述性)
 };
 let autoFixed = 0;
 
@@ -265,6 +269,45 @@ for (const file of walk(COMPONENTS_DIR)) {
     });
   }
 
+  // === Check 5g: noRealBrand check DROPPED ===
+  // 原規則檢查 scenario stories 缺 brand,但太多 false positive(視覺軸 demo
+  // 如 Badge Dot / Avatar Shapes 不該需要 brand)。改靠 abstractName 為更精準
+  // proxy(description 化命名 = 人話 / camelCase identifier copy = 抽象)。
+
+  // === Check 5h: 「人話」proxy — story description 太薄 / stub ===
+  // parameters.docs.description.{component,story} 缺或極短 → likely 沒寫 vs 寫人話
+  if (!isAnatomy) {
+    const compDescMatch = content.match(/description:\s*\{[\s\S]{0,400}component:\s*['"`]([^'"`]+)['"`]/);
+    if (compDescMatch) {
+      const desc = compDescMatch[1];
+      // Stub indicators:< 15 chars,純英技術詞,只 component name
+      if (desc.length < 15 || /^\s*(TODO|WIP|FIXME)/i.test(desc)) {
+        violations.thinDescription.push({
+          file: basename(file),
+          where: 'component',
+          desc: desc.slice(0, 40),
+        });
+      }
+    }
+  }
+
+  // === Check 5i: 「人話」proxy — story name 抽象代號 ===
+  // name 是純 PascalCase identifier copy(沒中文 + 沒空格 + ≥ 2 連續大寫詞)
+  // e.g. `name: 'MultiStepTour'`(直接 copy export id)vs `name: '多步驟導覽'`
+  if (!isAnatomy && !file.endsWith('.principles.stories.tsx')) {
+    const names = [...content.matchAll(/name:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+    const abstractNames = names.filter(n =>
+      // No Chinese, no space, looks like CamelCase identifier
+      !/[\u4e00-\u9fa5]/.test(n) && !/\s/.test(n) && /^[A-Z][a-z]+[A-Z]/.test(n)
+    );
+    if (abstractNames.length > 0) {
+      violations.abstractName.push({
+        file: basename(file),
+        names: abstractNames.slice(0, 4),
+      });
+    }
+  }
+
   // === Check 6: Missing `name:` zh-CN(showcase + principles)===
   if (!isAnatomy) {
     const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)(?:\s*:\s*Story)?\s*=\s*\{/gm)];
@@ -346,6 +389,21 @@ if (violations.principlesCore.length > 0) {
 if (violations.asciiArt.length > 0) {
   console.log(`\n[P0] ASCII art / box-drawing chars in JSX: ${violations.asciiArt.length}`);
   violations.asciiArt.slice(0, 10).forEach(v => console.log(`  • ${v.file}: "${v.sample}"`));
+}
+
+if (violations.noRealBrand.length > 0) {
+  console.log(`\n[P1] Showcase scenarios 缺真實業務 brand(human-readable proxy): ${violations.noRealBrand.length}`);
+  violations.noRealBrand.slice(0, 10).forEach(v => console.log(`  • ${v.file}: ${v.missingBrand.length}/${v.total} stories no brand: [${v.missingBrand.join(', ')}]`));
+}
+
+if (violations.thinDescription.length > 0) {
+  console.log(`\n[P1] Component description thin / stub: ${violations.thinDescription.length}`);
+  violations.thinDescription.slice(0, 10).forEach(v => console.log(`  • ${v.file}: "${v.desc}..."`));
+}
+
+if (violations.abstractName.length > 0) {
+  console.log(`\n[P1] Story name 抽象代號(直接 copy identifier): ${violations.abstractName.length}`);
+  violations.abstractName.slice(0, 10).forEach(v => console.log(`  • ${v.file}: [${v.names.join(', ')}]`));
 }
 
 if (violations.linkTo.length > 0) {
