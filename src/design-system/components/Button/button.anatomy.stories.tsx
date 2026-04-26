@@ -295,7 +295,7 @@ const InspectorInner = () => {
   const [variant, setVariant] = useState<VariantKey>('primary')
   const [danger, setDanger] = useState(false)
   const [state, setState] = useState<StateKey>('default')
-  const [size, setSize] = useState<SizeKey>('sm')
+  const [size, setSize] = useState<SizeKey>('md')
   const [iconOnly, setIconOnly] = useState(false)
 
   const canDanger = DANGER_VARIANTS.includes(variant)

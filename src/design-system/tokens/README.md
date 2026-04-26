@@ -21,8 +21,8 @@
 | 疑似要放這但其實不是 | 實際應去 | 為什麼 |
 |-------------------|---------|--------|
 | 元件消費 token 的 code | `../components/{Name}/` | token 被 consume,不在 token home 寫 consumer |
-| cross-cutting design rule(如「何時用 semantic token vs primitive」)| `CLAUDE.md` `# Token 命名原則` | 系統級 rule,不只關某個 token |
-| shadcn compat alias 遷移規則 | `CLAUDE.md` `# Tailwind 使用規則` | 技術陷阱屬 UI 開發 |
+| cross-cutting design rule(如「何時用 semantic token vs primitive」)| `.claude/rules/ui-development.md`「Token 命名 4 條硬規則」 | 系統級 rule,不只關某個 token |
+| shadcn compat alias 遷移規則 | `.claude/rules/ui-development.md`「Tailwind 5 條核心」 | 技術陷阱屬 UI 開發 |
 
 ## 新增 token 的 criteria
 

@@ -252,7 +252,7 @@ export const Overview = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const InspectorInner = () => {
-  const [variant, setVariant] = useState<VariantKey>('blue')
+  const [variant, setVariant] = useState<VariantKey>('neutral')
   const [size, setSize] = useState<SizeKey>('md')
   const [withIcon, setWithIcon] = useState(false)
   const [withDismiss, setWithDismiss] = useState(false)

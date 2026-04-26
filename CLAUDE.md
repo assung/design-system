@@ -82,7 +82,7 @@ CLAUDE.md ≤ 200 / SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 80
 | 按鈕排列 / Action bar | `patterns/action-bar/action-bar.spec.md` |
 | Chrome header 高度 | `tokens/uiSize/uiSize.spec.md` |
 | Overlay 結構 | `patterns/overlay-surface/overlay-surface.spec.md` |
-| Variant / prop 命名 | 既有 grep + `# 命名 三 test` |
+| Variant / prop 命名 | 既有 grep + `# 命名與語言一致性` |
 
 **強制 checklist**:新元件 tsx 開頭必含「── 消費的 SSOT ──」段。
 
@@ -90,15 +90,15 @@ CLAUDE.md ≤ 200 / SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 80
 
 | 任務 | 必讀 |
 |------|------|
-| **新增元件** | `# 建立 UI 前必讀` → `# shadcn 元件規範` → `# Spec 規則` → `/component-quality-gate` |
+| **新增元件** | `.claude/rules/ui-development.md` 「建立 UI 前必讀 / shadcn 元件規範」 + `.claude/rules/spec-rules.md` → `/component-quality-gate` |
 | **修 variant / size / state** | 該元件 `spec.md` → `/story-writing` |
-| **新增 token** | `tokens/README.md` → `# Token 命名` → `tokens/xxx.spec.md` |
+| **新增 token** | `tokens/README.md` → `.claude/rules/ui-development.md`「Token 命名 4 條硬規則」→ `tokens/xxx.spec.md` |
 | **寫 story / 視覺 code** | `/story-writing` + `# SSOT 消費 canonical` |
-| **命名新檔 / 變數 / prop** | `# 命名與語言一致性` + `# 元件 Props 命名原則` |
-| **新元件 layout** | `# 系統內部 Layout — 4-Family Model` |
+| **命名新檔 / 變數 / prop** | `# 命名與語言一致性` + `.claude/rules/ui-development.md`「元件 Props 命名」 |
+| **新元件 layout** | `# 4-Family Layout Model` |
 | **新 skill / hook / command** | `.claude/{home}/README.md` charter |
 | **無前例設計決策** | `# 遇不確定時的協議` |
-| **Tailwind 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` |
+| **Tailwind 出怪事** | `.claude/rules/ui-development.md`「Tailwind 5 條核心」+ `# 失敗記憶索引` |
 | **Stakeholder 產出 / 稽核** | `# 稽核 canonical` |
 | **User 糾正後** | `# 治理 canonical`(home 判斷) |
 
