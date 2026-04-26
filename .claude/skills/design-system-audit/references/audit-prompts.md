@@ -916,3 +916,38 @@ Report format:
 
 End: `N components scanned, M violations, by type: V1=X V2=Y V3=Z V4=W`. Under 400 words. Don't fix.
 
+## 29. Trait-based展示 stories compliance(2026-04-26 — M19 ensure-canonical pipeline)
+
+**Type**: Absolute
+**Canonical source**: `.claude/skills/story-writing/references/category-templates.md` v2(trait-based typology)
+**Rationale home**: 元件 spec.md frontmatter + 邊界案例 scope-N/A 段
+
+Working directory: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+
+對 `src/design-system/components/*/` 每元件:
+
+1. 讀 `{name}.spec.md` frontmatter `traits:` array(若無則記為「P2 migration pending」)
+2. 讀 `{name}.stories.tsx`(展示 only,排除 anatomy/principles)的 `export const X` 列表
+3. 對照 v2 trait→required stories 表(讀 category-templates.md):
+   - `hasVariants` → AllVariants 或 ≥ 2 per-variant exports
+   - `hasSizes` → AllSizes(merged grid)
+   - `hasInteractiveStates` → Disabled / States
+   - `isOverlay` → OpenSnapshot 或 defaultOpen scenario + ≥ 3 業務 scenarios
+   - `isInputLike` → WithError / ErrorState
+   - `isSelectionMulti` → States + VerticalGroup + Disabled
+   - `isSelectionSingle` → States only
+   - `isMatrixHeavy` → ≥ 4 matrix stories
+   - `isStructural` → 結構變體 stories(無固定數,過 earn-existence)
+   - `isInternal` → 1 Default + ≤ 1 composition scenario
+4. 缺哪個 → 過 spec.md「邊界案例 scope」找 N/A rationale。**有 rationale = `deviation ✓`,無 rationale = P0**
+5. universal `Default` 缺 → P1 warn
+6. 多餘 stories → 過 earn-existence 2-test → 失敗 retire 候選 P1
+
+Report format:
+```
+[P0] {component}({file}):trait `{trait}` declared but missing `{required-story}`,no scope-N/A rationale in spec
+[P2] {component}:no `traits:` frontmatter — pending migration via /story-auto-compile-migrate
+deviation ✓: {component} `{trait}` 在 spec.md L{n} 標 N/A,因 {rationale}
+```
+
+End: `N components scanned, M with traits, K P0 violations, J P2 pending migration, I retire candidates`. Under 400 words. Don't fix.

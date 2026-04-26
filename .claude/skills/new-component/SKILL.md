@@ -108,7 +108,33 @@ description: Create-phase workflow for building a new design-system component fr
 
 chain `/story-writing` skill(如果 user 沒自己啟,本 skill 自動走其規則):
 
-1. **`{name}.stories.tsx` 展示**:3-5 個真實業務場景(Jira / Stripe / Notion / Figma / Slack / Airbnb 等真實產品情境),禁 Option A/B/C / 抽象代號 / 極端不現實。
+**Phase 5.0 — Trait 宣告**(2026-04-26 M19 ensure-canonical pipeline):
+
+寫 stories 前,在 spec.md frontmatter 宣告元件 traits(對齊 `category-templates.md` v2):
+
+```yaml
+---
+component: {Name}
+family: {1|2|3|4|self-contained}
+traits:
+  - hasVariants       # 若 cva 有 ≥ 2 visual variants
+  - hasSizes          # 若 cva 有 ≥ 2 sizes
+  - hasInteractiveStates  # 若有 hover/focus/disabled/loading
+  - isOverlay         # 若是 portal-rendered overlay
+  - isInputLike       # 若是 text/number field
+  - isSelectionMulti  # 若是 Checkbox/Radio 多選
+  - isSelectionSingle # 若是 Switch 單一 toggle
+  - isMatrixHeavy     # 若 token × size 正交視覺軸(Avatar/Skeleton)
+  - isStructural      # 若結構主導(DataTable/Steps/Tabs)
+  - isInternal        # 若 L3 building block
+---
+```
+
+**判斷法**:讀本元件 cva variants / 行為 → 對照 traits 表 → 列適用的。**scope-N/A 的 trait 在 spec.md「邊界案例 scope」段明寫 rationale**(例:「Toast `hasSizes=false`,單尺寸對齊 Sonner idiom」)。
+
+**Phase 5.1-5.3 — 三層 stories**:
+
+1. **`{name}.stories.tsx` 展示**:per Phase 5.0 declared traits → 對照 `category-templates.md` 衍生 required core stories(`hasVariants` → AllVariants / `hasSizes` → AllSizes / `isOverlay` → OpenSnapshot 等)。再加 1-2 真實業務 scenario(Jira / Stripe / Notion 過 earn-existence)。Hook `check_story_category.sh` write-time 攔不符 trait core。
 2. **`{name}.anatomy.stories.tsx` 設計規格**:5-story 標準(Overview + SizeMatrix + ColorMatrix + StateBehavior + Inspector)或合理 subset + rationale。
 3. **`{name}.principles.stories.tsx` 設計原則**:do / don't 情境對照,每則 Rule title + Rule note + 範例。
 

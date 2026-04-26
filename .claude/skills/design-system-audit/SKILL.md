@@ -140,6 +140,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 | # | Audit | What it catches |
 |---|-------|-----------------|
 | 28 | **Manual story 拆分原則 alignment**(對齊 Polaris / Carbon / Storybook 官方)| Per-component grep `*.stories.tsx`(non-anatomy/principles)反 pattern:(1) `WithStartIcon`+`WithEndIcon` 拆兩 story(同 slot rule 違規,該 `WithIcon` 對照 grid)(2) `Default`+`AllVariants` 同檔(冗餘)(3) ≥2 個 variant 拆細(`Primary`+`Secondary`+`Tertiary` 各自 — 該合 `AllVariants`)。`// @story-split-rationale: <reason>` 檔首 allowlist 例外。Hook `check_story_slot_split.sh` write-time block 同源,本 dim 對既有元件 batch verify。對應 CLAUDE.md `# Story` 「Manual story 拆分原則」+ `/story-writing` skill Phase 0 |
+| 29 | **Trait-based展示 stories compliance**(對齊 M19 ensure-canonical pipeline + Polaris/Material/Carbon/Ant/Storybook)| Per-component verify(a)spec.md frontmatter 有 `traits:` 宣告(b)展示 stories.tsx 包含每 trait 的 required core stories(c)scope-N/A 的 trait 在 spec.md 邊界案例段有 rationale。違反列 P0 修。對應 `category-templates.md` v2 + hook `check_story_category.sh`。Hook 是 write-time block,本 dim 對既有 47 元件 batch verify + 找未宣告 traits 的元件(P2 migration pending) |
 
 ---
 
