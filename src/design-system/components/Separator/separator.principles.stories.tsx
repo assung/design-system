@@ -221,3 +221,31 @@ export const NotAsBorderRule: Story = {
     </div>
   ),
 }
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div>
+      <Rule
+        title="❌ 不用 Separator 元件做元件固定結構的邊框"
+        note="Dialog / Sidebar header-footer 的邊界用 CSS border，不用 Separator 元件。Separator 只用 consumer 手動放置的分隔。Notion dialog 的 header bottom 邊界是 CSS，不是 Separator"
+      >
+        <Label warn>固定結構邊界 → CSS border-divider，不用元件</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 --border token 做分隔線"
+        note="分隔線一律用 --divider（較淡），--border 只用控件邊框。Jira menu 項目間的線用 --divider"
+      >
+        <Label warn>分隔線 → --divider，--border 只用容器邊框</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Separator 做裝飾性邊框"
+        note="輪廓邊框（Input / Card / DataTable 邊線）用 CSS border-border，不用 Separator。Separator 有 role 語意，裝飾邊不需要"
+      >
+        <Label warn>裝飾邊框 → CSS border-border，Separator 只用分隔內容</Label>
+      </Rule>
+    </div>
+  ),
+}

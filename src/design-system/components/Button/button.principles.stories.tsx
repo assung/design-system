@@ -309,3 +309,58 @@ export const OrderRule: Story = {
     </div>
   ),
 }
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div>
+      <Rule
+        title="❌ 不用 Button 做標籤或指示器"
+        note="Button 語義是「可點擊動作」。如果只是顯示狀態、不需使用者互動，用 Badge 或 Tag 代替。Jira 的「已解決」標籤、Stripe 的「active」指示不會設計成按鈕"
+      >
+        <div className="flex gap-2 items-center">
+          <Button variant="primary" size="sm">Active</Button>
+          <Label warn>❌ 當標籤用 → 下方才對</Label>
+        </div>
+        <div className="flex gap-2 items-center mt-3">
+          <Badge count={1} />
+          <Label>✅ Badge 表達計數 / 狀態</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 不用多個 primary 按鈕搶焦點"
+        note="Primary 語義是「這個畫面最重要的動作」。多個 primary 時使用者無法判斷優先順序，改用 primary + secondary + tertiary。Notion 對話框永遠只有一個藍色按鈕"
+      >
+        <div>
+          <div className="mb-4">
+            <Button variant="primary">保存</Button>
+            <Button variant="primary" className="ml-2">另存新檔</Button>
+            <Label warn>❌ 兩個都搶焦點</Label>
+          </div>
+          <div>
+            <Button variant="primary">保存</Button>
+            <Button variant="secondary" className="ml-2">另存新檔</Button>
+            <Label>✅ 主次分明</Label>
+          </div>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 primary + danger 做可反悔的操作"
+        note="primary + danger 語義是「立即不可逆」。如移至垃圾桶還能復原，改用 secondary + danger。Linear 的刪除先確認"
+      >
+        <div>
+          <div className="mb-4">
+            <Button variant="primary" danger startIcon={Trash2}>刪除</Button>
+            <Label warn>❌ 風險高，無法復原</Label>
+          </div>
+          <div>
+            <Button variant="secondary" danger startIcon={Trash2}>移至垃圾桶</Button>
+            <div><Label>✅ secondary + danger，後續可復原</Label></div>
+          </div>
+        </div>
+      </Rule>
+    </div>
+  ),
+}

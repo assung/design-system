@@ -170,3 +170,38 @@ export const ClearableRule: Story = {
     )
   },
 }
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div>
+      <Rule
+        title="❌ 不用 DatePicker 選擇日期範圍（from-to）"
+        note="日期範圍用 DatePicker.Range（雙 input + 共用 calendar，對齊 Ant DatePicker.RangePicker）。Stripe 的 date range filter 用雙 picker"
+      >
+        <Label warn>日期範圍 → DatePicker.Range，不是單一 DatePicker × 2</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 DatePicker 選時間（時 / 分 / 秒）"
+        note="時間改用 TimePicker。如需同時選日期 + 時間 → DatePicker + TimePicker 並列。Notion calendar event 的 time 欄是獨立 TimePicker"
+      >
+        <Label warn>時間用 TimePicker，日期 + 時間用並列組合</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 DatePicker 做月檢視 event calendar"
+        note="Event 檢視（看某月有哪些事件）改用 Calendar 元件（是頁面 canvas 不是 form field）。Notion calendar 檢視用 Calendar，不用 DatePicker"
+      >
+        <Label warn>Event calendar 檢視 → Calendar 元件，DatePicker 只選日期</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 DatePicker 做純文字日期輸入（API debug）"
+        note="API 表單不需 picker 互動 → 用 Input type='text'。開發者工具的日期欄用純文字"
+      >
+        <Label warn>純文字 ISO date → Input，不需 picker UI</Label>
+      </Rule>
+    </div>
+  ),
+}

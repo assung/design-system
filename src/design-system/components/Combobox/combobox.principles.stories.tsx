@@ -119,7 +119,7 @@ export const WrapRule: Story = {
   },
 }
 
-export const ComponentChoiceRule: Story = {
+export const WhenNotToUse: Story = {
   name: '何時用 Combobox vs 近親元件',
   render: () => {
     const [tags, setTags] = React.useState(['electronics', 'food'])

@@ -276,3 +276,38 @@ export const CopyRule: Story = {
     </div>
   ),
 }
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div>
+      <Rule
+        title="❌ 不用 Empty 做載入中狀態"
+        note="Empty 是「確定沒有」。載入中 → Skeleton / CircularProgress。Notion 首次開啟資料庫時先 Skeleton，載完才變 Empty 或有資料"
+      >
+        <Label warn>載入中 → Skeleton / CircularProgress，不是 Empty</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Empty 做錯誤或失敗狀態"
+        note="Empty 是中性提示。錯誤改用 Alert + 重試按鈕。Stripe 付款失敗用 Alert，不用 Empty"
+      >
+        <Label warn>錯誤狀態 → Alert + 重試，Empty 是中性</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Empty 做整頁級 404 / 無權限"
+        note="整頁錯誤需要完整頁面佈局（navigation + hero 錯誤訊息）。Empty 是容器內提示。GitHub 的 404 頁是整頁設計"
+      >
+        <Label warn>整頁 404 → 專屬錯誤頁面設計，Empty 只用容器內</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Empty 表達 disabled 狀態"
+        note="Disabled 是「禁用元件」的視覺，不是「沒內容」的提示。改用禁用該元件本身。Toggle off 的搜尋結果不用 Empty，而是禁用 SearchInput"
+      >
+        <Label warn>禁用 → disable 元件本身，不用 Empty</Label>
+      </Rule>
+    </div>
+  ),
+}

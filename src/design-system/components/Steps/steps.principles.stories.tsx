@@ -280,3 +280,20 @@ export const LinearBackClickDoesNotMutate: Story = {
     )
   },
 }
+
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose space-y-4">
+      <p>Steps 表達線性進度,以下情境改用其他元件:</p>
+      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
+        <li><strong>平行視圖切換</strong> → Tabs / SegmentedControl。Asana 的檢視模式用 SegmentedControl</li>
+        <li><strong>選擇器（選一個值）</strong> → Select / RadioGroup / SegmentedControl。Steps 只顯示進度</li>
+        <li><strong>時間軸或歷史紀錄</strong> → Timeline（未來）。時序事件和進度語義不同</li>
+        <li><strong>超過 7 步的流程</strong> → ProgressBar + 計數。Steps 會視覺過長</li>
+        <li><strong>使用者可自由跳步</strong> → Tabs。Steps 暗示線性順序,可跳步改用 Tabs</li>
+      </ul>
+    </div>
+  ),
+}

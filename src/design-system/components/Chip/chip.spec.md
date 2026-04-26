@@ -31,6 +31,7 @@ Chip 是 **Material Design Filter Chip** 的實作——用於從多個選項裡
 | 2–5 個互斥單選且視覺要 compact 連體 | `SegmentedControl` | Chip 各自獨立，SegmentedControl 連體表達互斥更強 |
 | 單一按鈕 on/off | `Button pressed` | 單個 toggle 不需要 Chip 的 group 語意 |
 | 純顯示不可互動 | `Tag` | Chip 是 control，Tag 是 label |
+| 計數 / 狀態指示器（不可互動）| `Badge`(`../Badge/badge.spec.md`) | Badge 是純視覺 indicator(count / status dot),Chip 是 selectable control |
 | 使用者已輸入的 token（收件人、filter summary）| Input chip 系列（`LinkInput` / `PeoplePicker`）| 那些是 input 內的 token，不是獨立選擇器 |
 
 ---

@@ -243,3 +243,38 @@ export const FullWidthRule: Story = {
     </div>
   ),
 }
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div>
+      <Rule
+        title="❌ 不用 SegmentedControl 做 5 個以上選項"
+        note="選項多 → Select / RadioGroup。SegmentedControl 視覺會過窄，label 被截斷。Stripe filter 若超過 5 選項會用 Select"
+      >
+        <Label warn>5+ 選項 → Select / RadioGroup，SegmentedControl 空間受限</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 SegmentedControl 做多選（checkboxes 語義）"
+        note="SegmentedControl 是「選恰好一個」。多選改用 Checkbox 群組。Notion 的權限欄（read / edit / owner）是 radio，不用 SegmentedControl"
+      >
+        <Label warn>多選 → CheckboxGroup，SegmentedControl 是互斥</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 SegmentedControl 做整塊 view 切換"
+        note="大規模 view 切換（各有 header / toolbar）改用 Tabs。小內容切換（chart type、list layout）才用 SegmentedControl。Figma 的頁面切換用 Tabs"
+      >
+        <Label warn>整塊 view → Tabs，SegmentedControl 只切局部內容</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 SegmentedControl 選項需要複雜描述"
+        note="複雜選項（多行文字、icon + 說明）改用 RadioGroup。SegmentedControl 是 compact control，content 受限"
+      >
+        <Label warn>複雜選項 → RadioGroup，SegmentedControl 文字簡短</Label>
+      </Rule>
+    </div>
+  ),
+}

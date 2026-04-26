@@ -180,3 +180,31 @@ export const DataTypeMatchRule: Story = {
     </div>
   ),
 }
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div>
+      <Rule
+        title="❌ 不用 NumberInput 做電話號碼或郵遞區號"
+        note="電話不是算術數字。改用 Input + type='tel'。Stripe 的電話欄用 Input，不用 NumberInput（不該加千分位或用 step）"
+      >
+        <Label warn>電話 / 郵遞區號 → Input，不是數值</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 NumberInput 做音量 / 亮度滑動調整"
+        note="視覺調整用 Slider。NumberInput 是「輸入精確值」的 form field。Material 音量控制用 Slider"
+      >
+        <Label warn>音量 / 亮度 → Slider，使用者目標是「感受」而非「輸入精確值」</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 NumberInput 做 DataTable 列表展示"
+        note="Table cell 用 Display 子元件，不用輸入元件。DataTable 的 currency 欄位自動消費 NumberInputDisplay"
+      >
+        <Label warn>Table cell 顯示值 → Display 元件，不用 Input</Label>
+      </Rule>
+    </div>
+  ),
+}

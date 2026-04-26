@@ -476,3 +476,20 @@ export const ActiveState: Story = {
     </div>
   ),
 }
+
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose space-y-4">
+      <p>Sidebar 是垂直持久導覽,以下情境改用其他元件:</p>
+      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
+        <li><strong>頁面頂部水平導覽</strong> → 自訂 Nav / NavigationMenu。Netflix 的頂部導覽用自訂組件</li>
+        <li><strong>同層內容切換</strong> → Tabs。Slack 的 channel 內容切換用 Tabs，不用 Sidebar</li>
+        <li><strong>暫時性側面板</strong> → Sheet / Drawer。Notion 的 filter panel 用 Sheet</li>
+        <li><strong>跨頁搜尋 / 快速跳轉</strong> → Command palette。Figma 的快速搜尋用 Command</li>
+        <li><strong>少於 3 項導覽</strong> → 頂部 tab bar。Sidebar 視覺成本對小 app 過高</li>
+      </ul>
+    </div>
+  ),
+}

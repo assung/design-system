@@ -114,7 +114,7 @@ export const DisplayModeRule: Story = {
   },
 }
 
-export const ComponentChoiceRule: Story = {
+export const WhenNotToUse: Story = {
   name: '何時用 Select vs 近親元件',
   render: () => {
     const [status, setStatus] = React.useState('in_stock')

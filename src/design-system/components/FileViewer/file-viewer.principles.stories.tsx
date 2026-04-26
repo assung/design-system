@@ -122,7 +122,7 @@ export const WhenToUse: Story = {
   ),
 }
 
-export const ComponentChoiceRule: Story = {
+export const WhenNotToUse: Story = {
   name: '何時用 FileViewer vs Dialog',
   render: () => {
     const [fvOpen, setFvOpen] = React.useState(false)

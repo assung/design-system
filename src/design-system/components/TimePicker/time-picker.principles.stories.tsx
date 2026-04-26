@@ -109,3 +109,19 @@ export const RuleClearNoLabelButton: Story = {
     )
   },
 }
+
+
+export const WhenNotToUse: Story = {
+  name: '何時不用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose space-y-4">
+      <p>TimePicker 只管時間,以下情境改用其他元件:</p>
+      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
+        <li><strong>同時選日期和時間</strong> → DatePicker + TimePicker 並列。Jira 的 due date 用 DatePicker，time 用 TimePicker</li>
+        <li><strong>時間範圍（from-to）</strong> → 兩個 TimePicker 並列。Google Calendar 的 event time 是兩個 picker</li>
+        <li><strong>純文字時間輸入</strong> → Input + validation。開發者工具用 Input</li>
+        <li><strong>倒數計時或相對時間</strong> → 自訂計時器。TimePicker 是 wall-clock time（09:30），不是 duration</li>
+      </ul>
+    </div>
+  ),
+}

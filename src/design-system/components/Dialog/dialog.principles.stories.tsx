@@ -63,7 +63,7 @@ export const WhenToUse: Story = {
   ),
 }
 
-export const ComponentChoiceRule: Story = {
+export const WhenNotToUse: Story = {
   name: '何時用 Dialog vs 近親元件',
   render: () => (
     <div>
