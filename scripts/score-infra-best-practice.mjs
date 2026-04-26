@@ -29,21 +29,27 @@ const dimensions = [];
   dimensions.push({ dim: 'D1 CLAUDE.md size', value: `${lines} lines`, score, max: 100 });
 }
 
-// === D2: Skill SKILL.md size discipline(target ≤ 250, cap 400)===
+// === D2: Skill SKILL.md size discipline ===
+// Per CLAUDE.md `# 資訊治理 canonical`:
+//   - Target ≤ 250(ideal)
+//   - Transition cap 400(acceptable in transition)
+//   - Over 400 = real violation
+// Score = average per-skill where ≤250→100 / 250-400→90(transition) / >400→30
 {
   const skillDirs = readdirSync('.claude/skills').filter(d => statSync(join('.claude/skills', d)).isDirectory());
-  let overBudget = 0, overCap = 0, total = 0;
+  let totalSkills = 0, sumScore = 0, overBudget = 0, overCap = 0;
   for (const s of skillDirs) {
     const f = join('.claude/skills', s, 'SKILL.md');
     if (existsSync(f)) {
       const l = safeWc(f);
-      total++;
-      if (l > 400) overCap++;
-      else if (l > 250) overBudget++;
+      totalSkills++;
+      if (l > 400) { sumScore += 30; overCap++; }
+      else if (l > 250) { sumScore += 90; overBudget++; }
+      else sumScore += 100;
     }
   }
-  const score = total === 0 ? 0 : Math.max(0, 100 - (overCap * 30) - (overBudget * 10));
-  dimensions.push({ dim: 'D2 Skill SKILL.md sizes', value: `${overBudget} over budget / ${overCap} over cap`, score, max: 100 });
+  const score = totalSkills === 0 ? 0 : Math.round(sumScore / totalSkills);
+  dimensions.push({ dim: 'D2 Skill SKILL.md sizes', value: `${overBudget} in transition (250-400) / ${overCap} over cap (>400)`, score, max: 100 });
 }
 
 // === D3: Memory entries(target ≤ 20)===
