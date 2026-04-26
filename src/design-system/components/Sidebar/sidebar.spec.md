@@ -641,6 +641,18 @@ Item-level default / hover / active / selected / disabled **色彩**完全共用
 
 ---
 
+## A11y 預設
+
+- **Landmark**:`<Sidebar>` 渲染 `<nav aria-label="Main">`(或 consumer 傳入更精確的 label,例「Workspace navigation」),作為 page-level navigation landmark,讓 SR user 直接跳轉。
+- **Active item**:`SidebarMenuButton` 帶 `id` + 命中 `activeId` 時自動加 `aria-current="page"`,SR 朗讀「current page」。`variant="meta"` 不參與 selection 不加此 attribute。
+- **快捷鍵不衝突**:`Cmd+B` / `Ctrl+B` 是 industry-standard(VS Code / Linear / shadcn),DS 內建並 `preventDefault` 避免穿透到 browser bookmark bar(`Cmd+B` 在 Safari 是 favorites);若 consumer 已有同鍵其他語意需 opt-out 透過 `SidebarProvider` `disableShortcut` prop。
+- **Mobile sheet focus trap**:`md` breakpoint 以下切 Sheet 模式時,Radix Dialog 自帶 focus trap + Esc dismiss + restore focus to trigger(詳 sheet.spec.md)。
+- **Collapsible group**:`<SidebarGroup collapsible>` 的 label trigger 帶 `aria-expanded` + `aria-controls` 指向 GroupContent id,SR 可朗讀展開狀態。
+- **Sticky header / footer focus order**:Tab 順序按 DOM 順序 — Header → Content → Footer,SidebarTrigger 在 Pattern A/B 都位於 page top-left,Tab 第一站即可達。
+- **不使用 `SidebarMenuSub`**:避免 nested menu aria-tree 複雜度,階層交給 TreeView(`role="tree"` + `aria-level`)。
+
+---
+
 ## 相關
 
 - `../TreeView/tree-view.spec.md` — 階層樹元件（user data、任意深度）

@@ -1,4 +1,12 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   ColorMatrix N/A — Empty 是純 layout pattern,色彩固定(title foreground、
+//     description fg-secondary / fg-muted、Avatar 48px neutral),無 variant ×
+//     state 色彩。
+//   SizeMatrix N/A — 不提供 size prop;由 slot 組合決定外觀,SlotCombinations
+//     已涵蓋 4 種強度從 minimal 到 full。
+//   StateBehavior N/A — Empty 是純展示 layout,本身無 hover / focus / disabled。
+//     互動由 action slot 的 Button 提供,屬 Button 元件範疇。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Inbox, Search, FileText, FolderOpen, Bell, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'

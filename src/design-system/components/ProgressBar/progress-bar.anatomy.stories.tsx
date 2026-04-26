@@ -1,3 +1,11 @@
+// @anatomy-rationale:
+//   SizeMatrix N/A — Track 高度固定 4px(無 size prop),與 Material / Carbon /
+//     Atlassian 共識一致(progress bar 是 micro-indicator,size 由 affix 文字 /
+//     icon 決定行高,track 本體不縮放)。
+//   StateBehavior represented as AffixBehavior — ProgressBar 的非互動元件,沒
+//     有 hover / focus / active / disabled。實際「狀態」是 status prop(inProgress /
+//     success / error)的色彩切換已於 ColorMatrix 展示;affix 三種模式(value /
+//     status-icon / ReactNode)的行為差異由 AffixBehavior(4.)涵蓋。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { CircleCheck, XCircle, X } from 'lucide-react'

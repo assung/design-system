@@ -1,3 +1,7 @@
+// @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   StateBehavior 涵蓋 fallback chain(src 失敗 → icon → alt 首字 → User icon)
+//   與 status presence dot 三態,屬資料載入的視覺降級而非互動狀態。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Building2, Folder, Globe } from 'lucide-react'
@@ -618,6 +622,62 @@ export const SizeMatrix = {
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  ),
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. 狀態行為
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const StateBehavior = {
+  name: '5. 狀態行為',
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-1">
+        <H3>Fallback chain（src 失敗 → icon → alt → User）</H3>
+        <Desc>Avatar 不是互動元件,沒有 hover / focus / active。實際「狀態」是內容降級——src 載入失敗時自動依優先順序往下回退,確保永遠不會出現破圖。</Desc>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="border-collapse text-caption">
+          <thead><tr><Th>來源</Th><Th>渲染</Th><Th>條件</Th></tr></thead>
+          <tbody>
+            <tr>
+              <Td mono>src 載入成功</Td>
+              <td className="p-3 border-b border-divider"><Avatar size={32} src="https://i.pravatar.cc/64?u=state-ok" alt="Alice" /></td>
+              <Td>{'有 src + 載入成功 → 圖片'}</Td>
+            </tr>
+            <tr>
+              <Td mono>src 失敗 → icon</Td>
+              <td className="p-3 border-b border-divider"><Avatar size={32} src="https://invalid.local/x.jpg" alt="Bob" icon={Building2} color="blue" /></td>
+              <Td>{'有 icon prop → 圖片失敗時顯示 icon'}</Td>
+            </tr>
+            <tr>
+              <Td mono>src 失敗 → alt 首字</Td>
+              <td className="p-3 border-b border-divider"><Avatar size={32} src="https://invalid.local/y.jpg" alt="Carol" color="purple" /></td>
+              <Td>{'無 icon → 取 alt 第一個字大寫'}</Td>
+            </tr>
+            <tr>
+              <Td mono>無 src 無 alt</Td>
+              <td className="p-3 border-b border-divider"><Avatar size={32} /></td>
+              <Td>{'最終 fallback → 預設 User icon(neutral 底色)'}</Td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <H3>Status presence dot(線上 / 離開 / 忙碌 / 離線)</H3>
+        <Desc>傳 status prop 在 Avatar 右下角加 6px 狀態點,色彩語意對齊 Slack / Teams 業界共識(見 NameCard ColorMatrix「四種狀態對應色彩」)。狀態本身為唯讀,Avatar 不擁有切換邏輯。</Desc>
+      </div>
+      <div className="flex items-center gap-6">
+        {(['online', 'away', 'busy', 'offline'] as const).map(s => (
+          <div key={s} className="flex flex-col items-center gap-2">
+            <Avatar size={40} alt="Ada" color="indigo" status={s} />
+            <span className="text-[11px] font-mono text-fg-muted">{s}</span>
+          </div>
+        ))}
       </div>
     </div>
   ),

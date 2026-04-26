@@ -1,3 +1,9 @@
+// @anatomy-rationale:
+//   ColorMatrix N/A — AspectRatio 是 pure layout primitive,bg / radius 由
+//     consumer 透過 className 決定,本身無色彩 token。
+//   SizeMatrix N/A — 寬度由父層決定、高度由 ratio 算出;非離散 size tier。
+//     5 個 DS 標準 ratio 由 StandardRatios 涵蓋。
+//   StateBehavior N/A — 容器 primitive 無 hover / focus / active 狀態。
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { AspectRatio } from './aspect-ratio'

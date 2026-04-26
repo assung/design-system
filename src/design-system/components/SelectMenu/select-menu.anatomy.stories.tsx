@@ -1,3 +1,10 @@
+// @anatomy-rationale:
+//   ColorMatrix represented as ModeMatrix — SelectMenu 是 Internal composite
+//     primitive(Popover + Command + MenuItem),本身無色彩變體——容器色彩
+//     固定(surface-raised + border + elevation-200 + divider),items 色彩由
+//     消費的 MenuItem 決定(見 menu-item.anatomy「State 色彩對照」)。實際決策
+//     面向是 4 個功能 flag 的組合(multiple / searchable / creatable / groups)
+//     × consumer 場景,由 ModeMatrix(3.)6 種模式對照涵蓋。
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { Mail, Folder, Users, Settings } from 'lucide-react'

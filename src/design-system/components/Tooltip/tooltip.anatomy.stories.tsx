@@ -1,3 +1,14 @@
+// @anatomy-rationale:
+//   ColorMatrix N/A — Tooltip 色彩固定(--tooltip bg + white text,內部 wrapper
+//     強制 data-theme="dark"),無 variant × state 色彩矩陣。所有色彩 token 已
+//     於 Inspector「Token Details」面板列出。
+//   SizeMatrix N/A — Tooltip 不提供 size prop;尺寸固定 text-body(14px)+
+//     px-3 py-2 + max-w-[280px],對齊 Polaris / Material / Atlassian「tooltip
+//     是 micro UI、不縮放」共識。
+//   StateBehavior represented as PlacementReference + Inspector — Tooltip 無
+//     hover / focus / active(自身就是 hover affordance);實際行為差異在
+//     placement(top / right / bottom / left + 動畫方向)由 PlacementReference(3.)
+//     涵蓋,warm-up timing 由 Overview 段落涵蓋。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Info, Settings } from 'lucide-react'

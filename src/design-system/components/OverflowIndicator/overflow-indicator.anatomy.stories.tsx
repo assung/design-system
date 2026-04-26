@@ -1,3 +1,12 @@
+// @anatomy-rationale:
+//   ColorMatrix represented as ShapeMatrix — Trigger pill 色彩由 shape 決定
+//     (circle = bg-muted、tag = tagVariants neutral),非獨立色彩變體。
+//     ShapeMatrix(3.)已對照 shape × 色彩 token + consumer 場景。HoverCard
+//     content 走深色 tooltip,色彩繼承 tooltip token。
+//   StateBehavior N/A — Trigger pill 本身無 hover 視覺(hover 觸發 HoverCard
+//     展開即是 state 表達);無 focus / active / disabled。openDelay /
+//     closeDelay 等行為已於 Inspector 展示。HoverCard 內容互動由消費的內容
+//     元件(Avatar / Tag)各自負責。
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { OverflowIndicator } from './overflow-indicator'

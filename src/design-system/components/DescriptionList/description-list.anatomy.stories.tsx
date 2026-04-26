@@ -1,4 +1,11 @@
 // @anatomy-exempt: inspector 規格表格(token / prop 對照)用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   ColorMatrix N/A — 純 typography 元件,色彩固定為 fg-secondary(label)+
+//     foreground(value),無 variant × state 色彩矩陣。色彩 token 已於
+//     Overview「Typography(閱讀模式)」段列出。
+//   SizeMatrix N/A — 不提供 size prop;大小固定 text-body(14px reading mode),
+//     由 layout(cols / direction / divided)而非 size 決定差異。ColsMatrix 已
+//     涵蓋 layout 變化。
 import type { Meta, StoryObj } from '@storybook/react'
 import { DescriptionList, DescriptionItem } from './description-list'
 import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'

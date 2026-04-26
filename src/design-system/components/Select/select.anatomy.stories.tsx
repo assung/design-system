@@ -1,3 +1,8 @@
+// @anatomy-rationale:
+//   StateBehavior covered by ColorMatrix「Mode x State 色彩對照」段(3 mode ×
+//     4 state + edit error 3 sub-states + text vs tag 模式色彩差異)。Select
+//     的狀態本身就是 mode × state 的色彩 token 組合,集中於 ColorMatrix 比拆
+//     5. 更直觀。
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
 import { Flag } from 'lucide-react'

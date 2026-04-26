@@ -1,4 +1,8 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   SizeMatrix N/A — Alert 固定 md tier(由消費的 Notice primitive 決定),
+//     不隨 density 縮放。Placement(inline / fixed)取代 size 作為佈局決策,
+//     已由 PlacementMatrix 涵蓋。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Alert, type AlertProps } from './alert'
 import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'

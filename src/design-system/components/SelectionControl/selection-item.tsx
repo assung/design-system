@@ -125,6 +125,75 @@ function lineClampClass(maxLines: number | 'none'): string {
   return ''
 }
 
+// ── PrefixSlot — 24px 閾值規則 ──
+// icon(永遠 ≤24px)→ inline;avatar + 無 desc → inline;avatar + 有 desc → block(centered on text block)
+type PrefixSlotProps = {
+  icon: LucideIcon | undefined
+  avatar: AvatarData | undefined
+  sizeKey: SizeKey
+  alignClass: string
+  avatarPx: number
+  disabled: boolean | undefined
+}
+function PrefixSlot({ icon: Icon, avatar, sizeKey, alignClass, avatarPx, disabled }: PrefixSlotProps) {
+  if (!Icon && !avatar) return null
+  return (
+    <div className={cn(alignClass, 'flex items-center shrink-0')}>
+      {Icon && (
+        <Icon
+          size={ICON_SIZE[sizeKey]}
+          className={cn('shrink-0', disabled && 'text-fg-disabled')}
+          aria-hidden
+        />
+      )}
+      {!Icon && avatar && (
+        <Avatar src={avatar.src} alt={avatar.alt} color={avatar.color} hoverCard={avatar.hoverCard} size={avatarPx} />
+      )}
+    </div>
+  )
+}
+
+// ── ContentSlot — label + optional description ──
+// inline-style fontSize 繞 tailwind-merge 把 text-body / text-fg-secondary 誤判同組衝突的 bug
+type ContentSlotProps = {
+  htmlFor: string | undefined
+  disabled: boolean | undefined
+  label: React.ReactNode
+  description: React.ReactNode | undefined
+  sizeKey: SizeKey
+  labelClampClass: string
+  descClampClass: string
+}
+function ContentSlot({ htmlFor, disabled, label, description, sizeKey, labelClampClass, descClampClass }: ContentSlotProps) {
+  return (
+    <div className="min-w-0 flex-1">
+      <label
+        htmlFor={htmlFor}
+        className={cn(
+          'cursor-pointer block break-words',
+          labelClampClass,
+          disabled ? 'text-fg-disabled cursor-not-allowed' : 'text-foreground',
+        )}
+      >
+        {label}
+      </label>
+      {description && (
+        <p
+          className={cn(
+            sizeKey === 'lg' ? 'mt-[var(--item-gap-label-desc-reading-lg)]' : 'mt-[var(--item-gap-label-desc-reading)]',
+            'break-words',
+            descClampClass,
+            disabled ? 'text-fg-disabled' : 'text-fg-secondary',
+          )}
+          style={{ fontSize: 'var(--font-body-size)' }}
+        >
+          {description}
+        </p>
+      )}
+    </div>
+  )
+}
+
 const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
   (
     {
@@ -144,96 +213,28 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
     ref
   ) => {
     const sizeKey: SizeKey = size ?? 'md'
-    const labelClampClass = lineClampClass(labelMaxLines)
-    const descClampClass = lineClampClass(descMaxLines)
-
-    // ── Prefix slot(24px 閾值規則) ──
-    // - icon(永遠 ≤24px)→ inline
-    // - avatar + 無 desc → inline(20/24/24px)
-    // - avatar + 有 desc → block(32/32/40px,centered on text block)
-    //
-    // Block 模式的 control 對齊:
-    //   control 跟 prefix 一起走 block 高度(都在 text block center),
-    //   不固定在 label 第一行——因為整列可點擊,checkbox 跟 avatar 是
-    //   「selection + identity」的視覺單元,不能歪斜。
     if (process.env.NODE_ENV !== 'production' && Icon && avatar) {
       // eslint-disable-next-line no-console
       console.warn('[SelectionItem] `icon` 和 `avatar` 互斥,只會渲染 icon。')
     }
-    const hasPrefix = !!Icon || !!avatar
+    // Block 對齊:control 跟 prefix(avatar)一起走 block 高度,「selection + identity」視覺單元不歪斜
     const useBlock = !!avatar && !Icon && !!description && AVATAR_PX.block[sizeKey] > 24
     const avatarPx = useBlock ? AVATAR_PX.block[sizeKey] : AVATAR_PX.inline[sizeKey]
-
-    // control 和 prefix 共用同一個對齊高度:inline → h-[1lh],block → blockAlignClass
     const alignClass = useBlock ? blockAlignClass[sizeKey] : 'h-[1lh]'
 
     return (
       <div ref={ref} className={cn(selectionItemStyles({ size }), className)} {...props}>
-        {/* Control: 跟 prefix 同高度(inline → label 第一行;block → text block center) */}
-        <div className={cn(alignClass, 'flex items-center shrink-0')}>
-          {control}
-        </div>
-
-        {/* Optional prefix (icon/avatar): 跟 control 同高度,24px 閾值規則 */}
-        {hasPrefix && (
-          <div className={cn(alignClass, 'flex items-center shrink-0')}>
-            {Icon && (
-              <Icon
-                size={ICON_SIZE[sizeKey]}
-                className={cn('shrink-0', disabled && 'text-fg-disabled')}
-                aria-hidden
-              />
-            )}
-            {!Icon && avatar && (
-              <Avatar
-                src={avatar.src}
-                alt={avatar.alt}
-                color={avatar.color}
-                hoverCard={avatar.hoverCard}
-                size={avatarPx}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="min-w-0 flex-1">
-          <label
-            htmlFor={htmlFor}
-            className={cn(
-              'cursor-pointer block break-words',
-              labelClampClass,
-              disabled ? 'text-fg-disabled cursor-not-allowed' : 'text-foreground',
-            )}
-          >
-            {label}
-          </label>
-          {description && (
-            <p
-              className={cn(
-                // sm/md: reading mode(body+body 14/1.5)/ lg: reading-lg(body-lg+body 14/1.5)
-                sizeKey === 'lg'
-                  ? 'mt-[var(--item-gap-label-desc-reading-lg)]'
-                  : 'mt-[var(--item-gap-label-desc-reading)]',
-                'break-words',
-                descClampClass,
-                disabled ? 'text-fg-disabled' : 'text-fg-secondary',
-              )}
-              // ── 規則(item-anatomy.spec.md 閱讀模式) ──
-              // - Description 字體:**最小 14px**(spec「14→14px, 16→14px」)
-              //   sm/md/lg 全部 14px,跟 label 不一定同字級,但永遠 ≥ 14px
-              // - Description 行高:跟 label 同(reading mode 預設 1.5,**不套 leading-compact**)
-              //
-              // ── 為什麼用 inline style ──
-              // tailwind-merge 把 font-size utility(text-body)和 color utility
-              // (text-fg-secondary)誤判成同組衝突,strip 掉 text-body 導致 description
-              // 從父層繼承字級。用 CSS variable inline style 直接繞過 utility 衝突。
-              style={{ fontSize: 'var(--font-body-size)' }}
-            >
-              {description}
-            </p>
-          )}
-        </div>
+        <div className={cn(alignClass, 'flex items-center shrink-0')}>{control}</div>
+        <PrefixSlot icon={Icon} avatar={avatar} sizeKey={sizeKey} alignClass={alignClass} avatarPx={avatarPx} disabled={disabled} />
+        <ContentSlot
+          htmlFor={htmlFor}
+          disabled={disabled}
+          label={label}
+          description={description}
+          sizeKey={sizeKey}
+          labelClampClass={lineClampClass(labelMaxLines)}
+          descClampClass={lineClampClass(descMaxLines)}
+        />
       </div>
     )
   }

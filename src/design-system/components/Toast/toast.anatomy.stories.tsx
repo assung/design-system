@@ -1,3 +1,8 @@
+// @anatomy-rationale:
+//   SizeMatrix N/A — Toast 消費 Notice primitive,固定 md tier(text-body 14px、
+//     px-4 py-3、icon 16px),不提供 size prop——通知是跨 density 一致的訊息
+//     載體(對齊 Polaris / Material / Sonner 共識)。Toast 本身無尺寸決策,
+//     由 sonner Provider 控制 viewport position 與 stacking。
 import type { Meta, StoryObj } from '@storybook/react'
 import { toast } from './toast'
 import { Button } from '@/design-system/components/Button/button'

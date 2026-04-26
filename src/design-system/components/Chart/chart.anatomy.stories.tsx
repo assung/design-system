@@ -1,3 +1,10 @@
+// @anatomy-rationale:
+//   SizeMatrix N/A — Chart 寬度由 ResponsiveContainer 自動填滿父層,高度由
+//     consumer className 決定(無離散 size tier)。資料密度由 categorical token
+//     --chart-1..5 限制,不靠 size。
+//   StateBehavior N/A — Chart 是 data viz 容器,互動(hover tooltip / legend
+//     toggle)由 Recharts library 處理且為內部行為。已由 Inspector 的 tooltip
+//     indicator 切換涵蓋,無 DS 層級的 hover / focus / disabled state。
 import type { Meta, StoryObj } from '@storybook/react'
 import {
   Area,

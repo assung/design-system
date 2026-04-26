@@ -1,3 +1,13 @@
+// @anatomy-rationale:
+//   ColorMatrix represented as VariantIconMap — Notice 不擁有底色 / 邊框,只
+//     負責 layout + status icon 選擇。色彩由消費方(Alert subtle shell、Toast
+//     solid bg + data-theme)決定;icon 色 token 由 SUBTLE_ICON_COLOR 對照表
+//     提供。VariantIconMap(6.)展示 5 variant × icon × subtle text token,
+//     等同於 ColorMatrix 的功能。Solid 色彩請查 alert.anatomy / toast.anatomy。
+//   SizeMatrix N/A — Notice 是 Toast / Alert 共用的 layout primitive,固定
+//     md tier(text-body 14px、px-4 py-3、gap-2、icon 16px),不隨 density 縮放
+//     ——通知是跨 density 一致的訊息載體,業界共識(Polaris / Material 同樣
+//     單一 size)。Inspector 已展示尺寸藍圖。
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import {

@@ -1,8 +1,9 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
-//
-// Canonical 5 偏離 rationale(見 calendar.spec.md「Anatomy N/A rationale」):
-// - 無 SizeMatrix:MVP 只支援 view="month" + 固定 size="md",無多 size tier
-// - 無 StateBehavior:page-composite 本身無 hover/focus/disabled,屬內部 primitive 的 StateBehavior
+// @anatomy-rationale:
+//   SizeMatrix N/A — MVP 只支援 view="month" + 固定 size="md",無多 size tier
+//     (lg 為後續增量,見 calendar.spec.md「MVP vs 後續增量」)。
+//   StateBehavior 已存在(today / outside month / hover / event tile 等狀態
+//     已由 StateBehavior 5. 涵蓋)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Calendar, type CalendarEvent } from './calendar'
 import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'

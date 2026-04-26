@@ -1,3 +1,9 @@
+// @anatomy-rationale:
+//   Inspector / ColorMatrix / SizeMatrix / StateBehavior N/A — Skeleton 是極簡
+//   animation primitive(單一 div + pulse animation),刻意沒有 size / color /
+//   variant prop。形狀 / 尺寸完全由 consumer 的 className 決定;色彩透過
+//   bg-secondary 從 theme 繼承;loading 是唯一狀態(無 hover / focus / active)。
+//   本檔僅保留 Overview + CommonShapes + DesignPrinciple 三個 story。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Skeleton } from './skeleton'
 import { H3, Desc } from '@/design-system/stories-helpers/anatomy/anatomy-utils'

@@ -1,3 +1,9 @@
+// @anatomy-rationale:
+//   StateBehavior covered by ColorMatrix「四種 mode / state × 色彩 Token」段
+//     (5 state:edit default / edit focus / readonly / disabled / error)
+//     + ModeMatrix(6.)edit / readonly / disabled / error 視覺對照。Textarea
+//     的狀態本質就是 mode × state 的色彩 token 組合,集中於 ColorMatrix 比拆
+//     5. 更直觀。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Textarea } from './textarea'
 import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'

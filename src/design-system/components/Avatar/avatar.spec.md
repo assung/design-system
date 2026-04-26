@@ -277,6 +277,17 @@ Avatar `badgeCount` 內部消費 DS `<Badge variant="critical" max={99}>`,加上
 
 ---
 
+## A11y 預設
+
+- **`alt` 必傳**:即使有 `src`,`alt` 是 image fallback / SR 訊號雙重來源。Person avatar `alt` 應含 name + presence(例 `"Alan Chen (online)"`),entity avatar 用品牌 / 專案名,純裝飾(極罕見)用空字串 `alt=""`(`aria-hidden`)。
+- **無 `alt` 時 fallback**:image 模式自動降級 initials / icon;一律不靜默渲染無 SR 標的元素。
+- **Status dot SR 處理**:status dot 內部 span `aria-hidden`(presence 訊號整合進 parent `alt`),避免 `role="status"` live region 在 member list 造成 SR 洪水(詳「Status dot a11y」段)。
+- **`badgeCount` 語意**:內部消費 `<Badge>`,Badge 自帶 `aria-label="N 則未讀"` 等語義(詳 `badge.spec.md`);`badgeCount={0}` 不渲染避免空 announce。
+- **HoverCard 整合**:Avatar 帶 `hoverCard` prop 時自動 `tabIndex=0` + `role="button"` + `aria-haspopup="dialog"` + `focus-visible:ring-2`,確保 keyboard user 能 Tab 進入觸發 NameCard popover(詳「Keyboard 可達 canonical」段)。
+- **Image alt 語意**:meaningful image(person photo / brand logo)用實質 `alt`;decorative-only(極少)走 `alt=""`,但 Avatar 本質是身份識別,decorative 用法應改用 Icon 元件。
+
+---
+
 ## 為何無 StateBehavior
 
 Avatar 是**身份視覺 primitive**(顯示人 / 組織 / 物件的代表視覺),本身**非互動元件**:

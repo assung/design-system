@@ -1,3 +1,8 @@
+// @anatomy-rationale:
+//   StateBehavior covered by ColorMatrix「Dismiss 按鈕色彩」段(default /
+//     hover / active × subtle / solid 兩模式)。Tag 本身是非互動展示元件
+//     ——沒有 hover / focus / active state(對齊 Material Chip / Ant Tag 慣例),
+//     唯一 interactive 部位是 onDismiss button,其狀態色彩集中於 ColorMatrix 比拆 5. 直觀。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Hash } from 'lucide-react'

@@ -1,3 +1,9 @@
+// @anatomy-rationale:
+//   Inspector / ColorMatrix / SizeMatrix / StateBehavior N/A — HoverCard 是
+//   純行為 primitive(基於 Radix HoverCard),不含視覺樣式。bg / border /
+//   shadow / padding / size 全由 consumer 透過 className 決定;無 own variant /
+//   state / size。Overview + VisualVariants 兩個 story 已涵蓋 consumer 兩種
+//   常見視覺(NameCard 亮色 vs OverflowIndicator 深色 tooltip)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from './hover-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'

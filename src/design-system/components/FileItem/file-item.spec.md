@@ -426,6 +426,44 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
 | compact（預設） | Button xs = 24px ≤ 24px | — | `h-[1lh]` inline |
 | rich | Button sm = 28px > 24px | block | `h-[calc(1lh+2px+desc_lh)]` |
 
+## A11y 預設
+
+- **`aria-busy` for uploading**:`status="uploading"` 時 row 自動 `aria-busy="true"`,SR 朗讀「busy」避免 user 嘗試互動已 in-flight item。
+- **Error state live region**:`status="error"` row 自動 `role="status"` + `aria-live="polite"`,error 訊息(label + description)即時 announce,user 不用主動 navigate 過去。`polite` 不打斷既有 SR 朗讀,適合 file upload 非緊急情境。
+- **Action button labels**:Download / retry / remove 等 inline action 必傳 `aria-label`(中文 / consumer locale)— 「下載 report.pdf」/「重試上傳」/「移除附件」,單純「下載」/「刪除」缺檔名 context SR user 無法區分多 row。
+- **ProgressBar 整合**:消費的 `<ProgressBar>` 自帶 `role="progressbar"` + `aria-valuenow` / `aria-valuemax`,本元件不再重複;keyboard 不需 focus progress bar(被動指示器,非互動元素)。
+- **Row clickable**:傳 `onClick` 時自動 `role="button"` + `tabIndex=0` + Enter / Space activate,keyboard user 與 mouse user 等價可達 FileViewer / download。
+- **Status icon hover-swap a11y**:hover-swap 不改變 SR 語意 — passive icon `aria-hidden`,active action button 自帶 `aria-label`,避免 SR user 收到視覺 swap 噪音。
+
+---
+
+## 與 FileUpload 的分界
+
+| 元件 | 職責 | 場景 |
+|------|------|------|
+| **FileItem** | 單一檔案 row primitive — 顯示一個檔案的 name / status / progress / actions | List 內的單筆 / detail / preview / message attachment |
+| **FileUpload** | Dropzone + file list orchestrator — 拖放區 + 多 FileItem 排列 + 上傳狀態管理 | 完整上傳流程入口 |
+
+**判斷**:
+
+- **完整上傳流程**(drag-drop / validate / list multiple files)→ 用 `FileUpload`(內部消費多個 `FileItem`)
+- **單一檔案展示 / preview**(message bubble 附件 / detail page header / FileViewer 觸發點)→ 直接用 `FileItem`
+- **Form attachment field**(留言區附件、ticket attachments)→ 視場景:有上傳行為走 `FileUpload`,只展示既有附件走 `FileItem` list(Type B)
+
+**簡單記**:**有 dropzone 用 FileUpload,沒 dropzone 用 FileItem**。FileItem 不應自帶 dropzone(會跟 FileUpload 重複職責)。
+
+---
+
+## 禁止事項
+
+- ❌ **不用 FileItem 做 generic list row**(menu / settings 列表 / nav)→ 改 `MenuItem`。FileItem prefix(paperclip / Avatar 48 thumbnail)、status pattern(uploading / error)、ProgressBar slot 都是檔案專屬語義,套到 generic row 會視覺 / 語意誤導。
+- ❌ **不用 FileItem 做 selection picker**(選檔案、選 template)→ 改 `Combobox` / `Select` / `Listbox`。FileItem 設計是「展示已存在的檔案 row」,不是「從候選池挑一個」;hover / selected state 與 picker 語義不對齊。
+- ❌ **不在 FileItem 內塞自組 ProgressBar**(`<div className="bg-primary h-1" style={{width: `${progress}%`}} />`)→ 必消費內建 `<ProgressBar>` SSOT。自組會視覺漂移(高度 / 動畫 / status 色不一致)+ 失去 a11y attributes。
+- ❌ **不混用 rich + compact 在同一 list**(詳「Invariant 1」)— 高度差破壞 row rhythm,prefix 視覺語言衝突。
+- ❌ **不用 FileItem 做下載進度**(瀏覽器原生下載 UX 已足夠)— FileItem 為 upload narrative 設計,download progress 走自訂元件。
+
+---
+
 ## 為何無 Inspector
 
 FileItem 決策維度是 `mode`(compact / rich)× `status`(uploading / completed / error / static)× `size`——已在 `ColorMatrix` / `ModeMatrix` / `SizeMatrix` / `StateBehavior` 四張矩陣完整覆蓋。互動 Inspector 不會比結構性矩陣對照更有教學價值——「選 mode 的 test / 選 status 的 test」是需要 side-by-side 比對的決策,不是單值試玩。

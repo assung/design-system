@@ -1,3 +1,13 @@
+// @anatomy-rationale:
+//   Inspector N/A — size 為自由 number prop,互動決策點少(僅 value / size /
+//     affix),由 Overview + UsageInButton + UsageInline 三個 consumer-context
+//     story 直接示範比建 inspector 更實用。
+//   ColorMatrix N/A — color 透過 className="text-current" 繼承 host(Button
+//     foreground),無 own variant × state 色彩;不會隨狀態變色(完成 / 失敗由
+//     consumer swap 整個元件,見 spec「不設 status prop」)。
+//   SizeMatrix N/A — size 為自由 number,Button / Input 等 consumer 內部依規
+//     則程式化縮放(field iconSize),由 UsageInButton / UsageInline 涵蓋。
+//   StateBehavior N/A — 無 hover / focus / active 狀態(載入中是唯一狀態)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { CircularProgress } from './circular-progress'
 import { Button } from '@/design-system/components/Button/button'

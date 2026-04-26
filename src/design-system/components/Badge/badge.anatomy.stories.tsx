@@ -1,3 +1,8 @@
+// @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   StateBehavior N/A — Badge 是純展示元件(無互動),無 hover / focus / active /
+//     disabled。唯一行為層 logic 是 max overflow(99+),已由 SizeMatrix 與 Inspector
+//     涵蓋。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Badge } from './badge'

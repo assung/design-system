@@ -1,4 +1,11 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   StateBehavior covered by ColorMatrix「Trigger Field family + Panel item
+//     SelectMenu family」雙層狀態對照(trigger:default / hover / focus / open /
+//     disabled / error,panel:default / hover / selected / disabled)+ ModeMatrix(6.)
+//     edit / readonly / disabled / empty / error / clearable 6 模式視覺對照。
+//     TimePicker 的色彩繼承上游 SSOT(Field + SelectMenu),無 own state 變化,
+//     集中於 ColorMatrix + ModeMatrix 比拆 5. 更直觀。
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { TimePicker } from './time-picker'

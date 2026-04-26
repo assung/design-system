@@ -57,6 +57,27 @@ Button 是最基礎的互動元件，用於觸發操作或導覽。
 
 ---
 
+## 何時用
+
+- **觸發 primary action / CTA**:Submit form、Save、Publish、Send、Confirm 等改變 system state 的動作
+- **次要 navigation in flow**:Wizard 的 Next / Back、Modal 的 Continue、Onboarding 的 Get started
+- **Submit form**:`<Button type="submit">` form 結尾的提交鍵
+- **Confirm dialog**:Dialog footer 的 Confirm / Cancel pair(action-bar.spec.md SSOT)
+- **Toolbar utility**(xs / sm icon-only):text editor / canvas toolbar 的格式化 / 工具切換
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 純 navigation 跨頁(無 state change)| `Link` / HTML `<a>` | Button 語義是「觸發動作」,navigation 用 anchor SR 朗讀「link」而非「button」 |
+| Inline 段落內可點文字 | HTML `<a>` 或 `link` variant standalone | `link` variant 不嵌入段落(見 link variant 規則),段落內用原生 `<a>` |
+| Tab-style 同層切換(總覽 / 成員 / 設定)| `Tabs` / `SegmentedControl` | 「多選一」radio 語義,不是動作觸發 |
+| Toggle filter / view-mode 多選一(列表 / 看板 / 時間軸)| `SegmentedControl` | 同上,不是 `pressed` button |
+| Status / data indicator(non-action,例「3 件待處理」label)| `Tag` / `Badge` | Indicator passive 語義(font-normal / cursor-text),Button 是 action(font-medium / cursor-pointer) |
+| Avatar / icon 純展示(non-clickable)| `Avatar` / `Icon` | 無 interactive 語義不應 Button |
+
+---
+
 ## Pill Layout（Family 3 SSOT）
 
 **結構**：

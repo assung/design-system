@@ -1,3 +1,11 @@
+// @anatomy-rationale:
+//   SizeMatrix represented as RowHeightMatrix per row-density semantics —
+//     DataTable 的 size 不是字級放大而是 row-height tier(compact / cozy /
+//     comfortable),語意對應「掃描 vs 閱讀」資料密度而非元件大小。命名沿用
+//     Linear / Notion / Airtable 業界共識(row density,非 component size)。
+//   StateBehavior covered by ColorMatrix「Row 狀態色彩」段(default / hover /
+//     selected / striped / disabled)+ Features「排序」段。Row 互動是 row-level
+//     而非元件 level,集中於 Row 色彩展示更直觀。
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { DataTable } from './data-table'

@@ -1,3 +1,8 @@
+// @anatomy-rationale:
+//   StateBehavior covered by ColorMatrix「State 色彩對照」段(default / hover /
+//     selected / disabled,單選 × 多選 = 8 組合)+ Header 子段。Menu item
+//     狀態本身就是色彩變化(bg / text / icon / desc 四 token),分到獨立 5.
+//     會與 ColorMatrix 重複。
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
 import { Mail, Bell, FileText } from 'lucide-react'

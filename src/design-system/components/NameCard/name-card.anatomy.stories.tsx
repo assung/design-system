@@ -1,4 +1,9 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   SizeMatrix N/A — NameCard 是固定寬度(320px)hover content template,
+//     不提供 size prop;所有尺寸 token 已於 Overview「Layout Token」段列出
+//     (avatar 64px / padding / gap)。SectionMatrix 已涵蓋 minimal → full 五
+//     種組合的視覺差異。
 import type { Meta, StoryObj } from '@storybook/react'
 import { MessageCircle, UserPlus } from 'lucide-react'
 import { NameCard, NameCardDefaultActions } from './name-card'

@@ -1,3 +1,9 @@
+// @anatomy-rationale:
+//   ColorMatrix represented as StateBehavior「視覺狀態對照」段 — SegmentedControl
+//     不分 variant 色彩(全 DS 統一 surface / fg-secondary unselected,primary
+//     selected),色彩變化僅由 state 驅動。State 色彩矩陣(unselected / hover /
+//     selected / disabled × bg / text / border / z-index)已由 StateBehavior(5.)
+//     完整對照,獨立 ColorMatrix 會與 StateBehavior 重複。
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { AlignLeft, AlignCenter, AlignRight, List, LayoutGrid, Calendar } from 'lucide-react'

@@ -1,4 +1,10 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
+// @anatomy-rationale:
+//   ColorMatrix represented as StateBehavior「視覺狀態對照」段 — Switch 不分
+//     variant 色彩(全 DS 統一 track bg-border / bg-primary,thumb 白色),色彩
+//     僅由 state 驅動(OFF / ON / Disabled OFF / Disabled ON / Readonly)。
+//     色彩 token 矩陣已由 StateBehavior(5.)「Track / Thumb / Check icon」三欄
+//     對照涵蓋,獨立 ColorMatrix 會與 StateBehavior 重複。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Switch, type SwitchProps } from './switch'
 import { H3, Desc, Td, Th, Swatch, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'

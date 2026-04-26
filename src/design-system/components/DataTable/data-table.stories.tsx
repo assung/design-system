@@ -184,9 +184,9 @@ export const NumberAlignment: Story = {
   ),
 }
 
-/* ── 行高模式 ── */
-export const RowHeightModes: Story = {
-  name: '行高模式',
+/* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
+export const RowAutoHeight: Story = {
+  name: 'Row 行高 — autoRowHeight',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -226,27 +226,10 @@ export const EmptyState: Story = {
   ),
 }
 
-/* ── 外框規則 ── */
-export const Bordered: Story = {
-  name: '外框',
-  render: () => (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h3 className="text-body font-bold text-foreground mb-2">有外框（預設）</h3>
-        <DataTable columns={baseColumns} data={sampleData.slice(0, 3)} height="auto" />
-      </div>
-      <div>
-        <h3 className="text-body font-bold text-foreground mb-2">無外框</h3>
-        <p className="text-caption text-fg-muted mb-3">少數嵌入式場景可關閉外框</p>
-        <DataTable columns={baseColumns} data={sampleData.slice(0, 3)} height="auto" bordered={false} />
-      </div>
-    </div>
-  ),
-}
-
-/* ── 高度模式 ── */
-export const HeightModes: Story = {
-  name: '高度模式',
+/* ── Container 高度模式 — height prop(table 容器約束) ── */
+// Bordered showcase retired — anatomy.BorderedProp 已 canonical 涵蓋(prop table + 何時用 false 的 rationale + 對照),showcase 純重複
+export const ContainerHeight: Story = {
+  name: 'Container 高度 — height prop',
   render: () => {
     const manyRows = React.useMemo(() => generateLargeData(50), [])
     return (
