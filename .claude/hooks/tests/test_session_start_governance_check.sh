@@ -48,26 +48,26 @@ else
 fi
 teardown_proj
 
-# Test 2: CLAUDE.md > 800 (soft) → REMINDERS only
-echo "Test 2: CLAUDE.md soft threshold"
+# Test 2: CLAUDE.md > 600 (strong-warn) → REMINDERS only(2026-04-26 tightened)
+echo "Test 2: CLAUDE.md strong-warn threshold (601)"
 setup_proj
-yes '.' | head -850 > "$TMP_PROJ/CLAUDE.md"
+yes '.' | head -650 > "$TMP_PROJ/CLAUDE.md"
 run_hook
-if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "transition cap 800" && ! echo "$STDOUT_TEXT" | grep -q "BLOCKER"; then
-  echo "  PASS  Test 2 soft 800 reminder"; PASS=$((PASS+1))
+if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "strongly recommended" && ! echo "$STDOUT_TEXT" | grep -q "BLOCKER"; then
+  echo "  PASS  Test 2 strong-warn 600 reminder"; PASS=$((PASS+1))
 else
   echo "  FAIL  Test 2 (output: $STDOUT_TEXT)"
   FAIL=$((FAIL+1)); FAILED="${FAILED}\n  - Test 2"
 fi
 teardown_proj
 
-# Test 3: CLAUDE.md > 1000 (hard) → BLOCKERS
-echo "Test 3: CLAUDE.md hard threshold"
+# Test 3: CLAUDE.md > 800 (transition cap breach) → BLOCKERS(2026-04-26 tightened)
+echo "Test 3: CLAUDE.md transition cap breach (801)"
 setup_proj
-yes '.' | head -1100 > "$TMP_PROJ/CLAUDE.md"
+yes '.' | head -850 > "$TMP_PROJ/CLAUDE.md"
 run_hook
-if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "BLOCKER" && echo "$STDOUT_TEXT" | grep -q "HARD THRESHOLD 1000"; then
-  echo "  PASS  Test 3 hard 1000 BLOCKER"; PASS=$((PASS+1))
+if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "BLOCKER" && echo "$STDOUT_TEXT" | grep -q "transition cap 800 breached"; then
+  echo "  PASS  Test 3 transition-cap 800 BLOCKER"; PASS=$((PASS+1))
 else
   echo "  FAIL  Test 3 (output: $STDOUT_TEXT)"
   FAIL=$((FAIL+1)); FAILED="${FAILED}\n  - Test 3"

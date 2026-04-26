@@ -14,7 +14,7 @@ type Story = StoryObj<typeof Slider>
 // ── Single value ─────────────────────────────────────────────────────────
 
 export const Default: Story = {
-  name: '預設(單一值)',
+  name: '預設',
   render: () => {
     const [value, setValue] = React.useState([50])
     return (
@@ -29,7 +29,7 @@ export const Default: Story = {
 // ── Range mode ───────────────────────────────────────────────────────────
 
 export const Range: Story = {
-  name: '範圍模式(雙 thumb)',
+  name: '範圍模式',
   render: () => {
     const [value, setValue] = React.useState([20, 80])
     return (
@@ -46,7 +46,7 @@ export const Range: Story = {
 // ── Sizes(容器對齊)───────────────────────────────────────────────────
 
 export const SizeAlignment: Story = {
-  name: '容器尺寸對齊(視覺不變,高度跟 Field 對齊)',
+  name: '容器尺寸對齊',
   render: () => (
     <div className="w-[360px] flex flex-col gap-6">
       <p className="text-caption text-fg-secondary max-w-[480px]">
@@ -112,7 +112,7 @@ export const Disabled: Story = {
 // ── With live value commit ──────────────────────────────────────────────
 
 export const OnCommit: Story = {
-  name: 'onValueCommit(放開時才觸發)',
+  name: 'On Value Commit',
   render: () => {
     const [live, setLive] = React.useState([50])
     const [committed, setCommitted] = React.useState([50])

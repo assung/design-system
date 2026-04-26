@@ -84,7 +84,7 @@ export const HomepageHeroBanner = {
 }
 
 export const ProductImageGallery = {
-  name: '商品圖片輪播(Stripe product page 風格)',
+  name: '商品圖片輪播',
   render: () => (
     <div className="max-w-[480px]">
       <p className="text-caption text-fg-muted mb-3">

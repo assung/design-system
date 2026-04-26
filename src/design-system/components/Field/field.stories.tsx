@@ -22,7 +22,7 @@ type Story = StoryObj
 // ── Vertical（預設） ────────────────────────────────────────────────────
 
 export const Vertical: Story = {
-  name: 'Vertical（預設）',
+  name: 'Vertical',
   render: () => (
     <div className="max-w-sm">
       <FieldGroup>
@@ -56,7 +56,7 @@ export const Vertical: Story = {
 // ── Horizontal ──────────────────────────────────────────────────────────
 
 export const Horizontal: Story = {
-  name: 'Horizontal（label 在左）',
+  name: 'Horizontal',
   render: () => (
     <div className="max-w-2xl">
       <FieldGroup>
@@ -353,7 +353,7 @@ export const States: Story = {
 // ── Block Control: RadioGroup ───────────────────────────────────────────
 
 export const BlockControlRadioGroup: Story = {
-  name: 'Block control — RadioGroup(自動偵測)',
+  name: 'Block control — RadioGroup',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>
@@ -426,7 +426,7 @@ export const BlockControlRadioGroup: Story = {
 // ── Button as Data Input Affordance ─────────────────────────────────────
 
 export const ButtonAsControl: Story = {
-  name: 'Button 作為 control(upload / picker)',
+  name: 'Button 作為 control',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>
@@ -468,7 +468,7 @@ export const ButtonAsControl: Story = {
 // ── Label Width 變化 ────────────────────────────────────────────────────
 
 export const LabelWidth: Story = {
-  name: 'labelWidth 變化',
+  name: 'Label Width',
   render: () => (
     <div className="max-w-2xl flex flex-col gap-4">
       <p className="text-caption text-fg-muted">labelWidth 支援任何 CSS length 值</p>
@@ -495,7 +495,7 @@ export const LabelWidth: Story = {
 // ── Slider in Field ──────────────────────────────────────────────────────
 
 export const WithSlider: Story = {
-  name: '包 Slider(垂直對齊驗證)',
+  name: '包 Slider',
   render: () => {
     const [volume, setVolume] = React.useState([60])
     const [priceRange, setPriceRange] = React.useState([2000, 8000])
@@ -537,7 +537,7 @@ export const WithSlider: Story = {
 // ── Slider 跟 Input 並排:驗證 field-height 對齊 ─────────────────────────
 
 export const SliderAlignsWithOtherFields: Story = {
-  name: 'Slider 跟 Input / NumberInput 並排(size 對齊)',
+  name: 'Slider 跟 Input / NumberInput 並排',
   render: () => (
     <div className="flex flex-col gap-8">
       <p className="text-caption text-fg-secondary max-w-[560px]">

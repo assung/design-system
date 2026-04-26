@@ -52,7 +52,7 @@ export const ProductSpec: Story = {
 
 /* ── 訂單明細(Stripe checkout 風格)────────────────────────────────── */
 export const OrderSummary: Story = {
-  name: '訂單明細(Stripe 風格)',
+  name: '訂單明細',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-md">
       <div className="text-body font-medium mb-3">訂單摘要</div>
@@ -73,7 +73,7 @@ export const OrderSummary: Story = {
 
 /* ── Detail panel(三欄 dense)────────────────────────────────────── */
 export const DetailPanel: Story = {
-  name: 'Detail panel(cols=3)',
+  name: 'Detail panel',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-3xl">
       <DescriptionList cols={3}>
@@ -90,7 +90,7 @@ export const DetailPanel: Story = {
 
 /* ── Horizontal direction(label 左 / value 右,divided=false)──────── */
 export const Horizontal: Story = {
-  name: 'Horizontal(label ↔ value 左右對齊)',
+  name: 'Horizontal',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-md">
       {/* title 到第一個 item 的間距 = item 之間間距(Gestalt proximity canonical,見 spec) */}
@@ -107,7 +107,7 @@ export const Horizontal: Story = {
 
 /* ── Horizontal + divided(row 下分隔線,對齊格線)──────────────────── */
 export const HorizontalDivided: Story = {
-  name: 'Horizontal + divided(FileViewer / Google Drive info panel 風格)',
+  name: 'Horizontal + divided',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-md">
       {/* title 到第一個 item 的間距 = item 之間間距(Gestalt proximity canonical,見 spec) */}

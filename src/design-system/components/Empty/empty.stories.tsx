@@ -36,7 +36,7 @@ export const SearchNoResults: Story = {
 
 /* ── 空清單 — Jira 無 task ────────────────────────────────────────── */
 export const NoTasks: Story = {
-  name: '空清單(Jira 無 task)',
+  name: '空清單',
   render: () => (
     <div className="border border-border rounded-lg p-8 max-w-md">
       <Empty
@@ -51,7 +51,7 @@ export const NoTasks: Story = {
 
 /* ── 空清單 — Notion 無 document ─────────────────────────────────── */
 export const NoDocuments: Story = {
-  name: '空清單(Notion 無 document)',
+  name: '空清單',
   render: () => (
     <div className="border border-border rounded-lg p-8 max-w-md">
       <Empty

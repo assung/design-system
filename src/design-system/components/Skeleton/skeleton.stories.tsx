@@ -28,7 +28,7 @@ export const Default: Story = {
 }
 
 export const UserProfileCard: Story = {
-  name: '個人資料卡載入(Linear 專案成員)',
+  name: '個人資料卡載入',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-sm flex items-center gap-3">
       <Skeleton className="h-12 w-12 rounded-full" />
@@ -41,7 +41,7 @@ export const UserProfileCard: Story = {
 }
 
 export const TaskListLoading: Story = {
-  name: 'Task 列表載入(Linear issue list)',
+  name: 'Task 列表載入',
   render: () => (
     <div className="flex flex-col gap-1 max-w-2xl border border-border rounded-lg divide-y divide-border">
       {Array.from({ length: 5 }).map((_, i) => (
@@ -58,7 +58,7 @@ export const TaskListLoading: Story = {
 }
 
 export const TableRowLoading: Story = {
-  name: '表格列載入(Stripe 交易列表)',
+  name: '表格列載入',
   render: () => (
     <div className="border border-border rounded-lg overflow-hidden max-w-3xl">
       <table className="w-full">
@@ -91,7 +91,7 @@ export const TableRowLoading: Story = {
 }
 
 export const DocumentLoading: Story = {
-  name: '文件載入(Notion 頁面)',
+  name: '文件載入',
   render: () => (
     <div className="flex flex-col gap-4 max-w-2xl">
       <Skeleton className="h-8 w-1/2" />
@@ -113,7 +113,7 @@ export const DocumentLoading: Story = {
 }
 
 export const CardGridLoading: Story = {
-  name: '卡片網格載入(Figma 檔案庫)',
+  name: '卡片網格載入',
   render: () => (
     <div className="grid grid-cols-3 gap-4 max-w-4xl">
       {Array.from({ length: 6 }).map((_, i) => (

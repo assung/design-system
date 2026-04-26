@@ -145,7 +145,7 @@ export const WithForm = {
 }
 
 export const LongContent = {
-  name: '長內容（body 捲動）',
+  name: '長內容',
   render: () => {
     // 30 avatar + title + description(ROLE｜EMP_ID｜EMP_NUM,full-width 「｜」 separator)
     // 對齊 user 要求 + NameCard 資訊量:
@@ -298,7 +298,7 @@ export const Destructive = {
  * 以下三個 item-size 範例對應不同 list-item tier(item-anatomy Family 1 reading mode):
  */
 export const ListBody = {
-  name: 'Body 放 list(3 種 item 尺寸)',
+  name: 'Body 放 list',
   render: () => (
     <div className="flex flex-col gap-6 items-start">
       {/* 大 item:avatar 40 + title + description(對齊 user 期望 + Material M3 + FileItem rich) */}
@@ -417,7 +417,7 @@ export const ListBody = {
  * 涵蓋 title + description + footer 雙 action 的完整 chrome。
  */
 export const OpenSnapshot = {
-  name: '開啟狀態(視覺稽核用)',
+  name: '開啟狀態',
   tags: ['!autodocs'],
   render: () => (
     <Dialog defaultOpen>

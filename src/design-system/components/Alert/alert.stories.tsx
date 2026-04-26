@@ -103,7 +103,7 @@ export const CornerActionGroup = {
 }
 
 export const Fixed = {
-  name: 'Fixed（全域警告）',
+  name: 'Fixed',
   render: () => (
     <div className="flex flex-col gap-6">
       <span className="text-caption text-fg-muted">固定在 header 底下,無圓角,full-width。</span>

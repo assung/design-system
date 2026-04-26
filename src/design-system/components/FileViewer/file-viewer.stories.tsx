@@ -70,7 +70,7 @@ const jiraScreenshots: FileInfo[] = [
 ]
 
 export const JiraAttachments: Story = {
-  name: 'Jira — 附件多圖檢視(filmstrip + info panel)',
+  name: 'Jira — 附件多圖檢視',
   render: () => {
     const [open, setOpen] = React.useState(false)
     const [index, setIndex] = React.useState(0)
@@ -150,7 +150,7 @@ const notionInlinePics: FileInfo[] = [
 ]
 
 export const NotionGallery: Story = {
-  name: 'Notion — 頁內配圖 gallery(filmstrip)',
+  name: 'Notion — 頁內配圖 gallery',
   render: () => {
     const [open, setOpen] = React.useState(false)
     const [startIdx, setStartIdx] = React.useState(0)
@@ -214,7 +214,7 @@ const figmaDesignFile: FileInfo[] = [
 ]
 
 export const FigmaDesignReview: Story = {
-  name: 'Figma — 單檔 zoom focus(無 filmstrip)',
+  name: 'Figma — 單檔 zoom focus',
   render: () => {
     const [open, setOpen] = React.useState(false)
 
@@ -268,7 +268,7 @@ const gmailAttachments: FileInfo[] = [
 ]
 
 export const GmailAttachmentPreview: Story = {
-  name: 'Gmail — 多附件預覽(filmstrip + download)',
+  name: 'Gmail — 多附件預覽',
   render: () => {
     const [open, setOpen] = React.useState(false)
 
@@ -312,7 +312,7 @@ const eventPhotos: FileInfo[] = Array.from({ length: 6 }, (_, i) => ({
 }))
 
 export const EventPhotosCollection: Story = {
-  name: '活動相集 — filmstrip on(6 張照片)',
+  name: '活動相集 — filmstrip on',
   render: () => {
     const [open, setOpen] = React.useState(false)
     const [index, setIndex] = React.useState(0)
@@ -389,7 +389,7 @@ export const FallbackUnknownType: Story = {
  * toolbar + image renderer + action-bar。對齊 Dialog / Sheet / Popover OpenSnapshot canonical。
  */
 export const OpenSnapshot: Story = {
-  name: '開啟狀態(視覺稽核用)',
+  name: '開啟狀態',
   tags: ['!autodocs'],
   render: () => {
     const [open, setOpen] = React.useState(true)

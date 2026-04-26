@@ -144,7 +144,7 @@ const PaletteDemo = () => {
 }
 
 export const CommandPalette: Story = {
-  name: '全域指令面板(Cmd+K)',
+  name: '全域指令面板',
   render: () => <PaletteDemo />,
 }
 

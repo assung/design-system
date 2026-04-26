@@ -74,7 +74,7 @@ type Story = StoryObj<typeof Button>
 // 「何時用哪 variant」由 principles.VariantRule + DangerRule + OrderRule 教。
 
 export const AllVariants: Story = {
-  name: 'All variants(對照)',
+  name: 'All variants',
   render: () => (
     <div className="flex flex-wrap items-center gap-3">
       <Button variant="primary">新增</Button>
@@ -87,7 +87,7 @@ export const AllVariants: Story = {
 }
 
 export const Pressed: Story = {
-  name: 'Pressed (toggle)',
+  name: 'Pressed',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -139,7 +139,7 @@ export const Danger: Story = {
 export const WithIcon: Story = {
   // Manual story 拆分原則(CLAUDE.md `# Story`)— startIcon / endIcon 同 slot rule
   // (LucideIcon prop slot,size 由元件控)→ 合併對照 grid。
-  name: 'icon slots',
+  name: 'Icon Slots',
   args: { size: 'sm' },
   render: (args) => (
     <div className="flex flex-col gap-4">
@@ -162,7 +162,7 @@ export const WithIcon: Story = {
 export const WithBadge: Story = {
   // badge 是獨立 slot rule(inline 在 pill 內),不合進 WithIcon — 對齊 Chip 一致。
   // Compound(badge + endIcon)順帶展示 layering 真實情境(教 layering coexistence)。
-  name: 'badge slot',
+  name: 'Badge Slot',
   args: { size: 'sm' },
   render: (args) => (
     <div className="flex flex-col gap-4">
@@ -365,7 +365,7 @@ export const FullWidth: Story = {
 // 詳見 .claude/skills/visual-audit/SKILL.md 的「Layer A interactive state coverage」。
 
 export const HoverFocusState: Story = {
-  name: 'Hover / Focus 狀態(視覺稽核用)',
+  name: 'Hover / Focus',
   tags: ['!autodocs'],
   render: () => (
     <div className="flex gap-4">
@@ -386,7 +386,7 @@ export const HoverFocusState: Story = {
 }
 
 export const TooltipVisible: Story = {
-  name: 'Tooltip 顯示(icon-only 自動 tooltip,視覺稽核用)',
+  name: 'Tooltip on Icon Only',
   tags: ['!autodocs'],
   render: () => (
     <div className="p-12">

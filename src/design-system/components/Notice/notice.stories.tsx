@@ -196,7 +196,7 @@ export const InlineVariants: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ToastLikeSolid: Story = {
-  name: 'Toast 樣式(solid + 無 dismiss)',
+  name: 'Toast 樣式',
   render: () => (
     <div className="flex flex-col gap-3 max-w-md">
       <p className="text-caption text-fg-muted">
@@ -238,7 +238,7 @@ export const ToastLikeSolid: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const NeutralTitleOnly: Story = {
-  name: 'Neutral 純文字(無 icon / 無 description)',
+  name: 'Neutral 純文字',
   render: () => (
     <div className="max-w-2xl">
       <SubtleShell variant="neutral">

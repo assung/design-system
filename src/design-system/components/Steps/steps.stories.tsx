@@ -23,7 +23,7 @@ type Story = StoryObj<typeof Steps>
 // ── 典型 wizard ──────────────────────────────────────────────────────────
 
 export const Default: Story = {
-  name: '預設(垂直 / 線性 / md / Pattern A)',
+  name: '預設',
   render: () => {
     const [value, setValue] = React.useState('info')
     const [completed, setCompleted] = React.useState<string[]>([])
@@ -142,7 +142,7 @@ export const Default: Story = {
 // ── Sizes ────────────────────────────────────────────────────────────────
 
 export const AllSizes: Story = {
-  name: '尺寸(sm / md / lg)',
+  name: '尺寸',
   render: () => (
     <div className="flex gap-12">
       {(['sm', 'md', 'lg'] as const).map(size => (
@@ -178,7 +178,7 @@ export const AllSizes: Story = {
 // ── All content states ──────────────────────────────────────────────────
 
 export const AllStates: Story = {
-  name: '所有狀態(upcoming / current / completed / error)',
+  name: '所有狀態',
   render: () => (
     <div className="flex gap-12">
       {(['sm', 'md', 'lg'] as StepsSize[]).map(size => (
@@ -218,7 +218,7 @@ export const AllStates: Story = {
 // Ring 跟 content state 正交:任何 state + focused 都能組合
 
 export const FocusRingCombinations: Story = {
-  name: 'Ring 正交示範(value 指向不同 state 的 step)',
+  name: 'Ring 正交示範',
   render: () => {
     const [value, setValue] = React.useState('step-2')
     return (
@@ -271,7 +271,7 @@ export const FocusRingCombinations: Story = {
 // ── Non-linear ──────────────────────────────────────────────────────────
 
 export const NonLinear: Story = {
-  name: '非線性(可任意跳)',
+  name: '非線性',
   render: () => {
     const [value, setValue] = React.useState('overview')
     return (
@@ -307,7 +307,7 @@ export const NonLinear: Story = {
 // ── Horizontal ──────────────────────────────────────────────────────────
 
 export const Horizontal: Story = {
-  name: '水平(horizontal)',
+  name: '水平',
   render: () => {
     const [value, setValue] = React.useState('shipping')
     return (
@@ -346,7 +346,7 @@ export const Horizontal: Story = {
 // ── Multiple expansion ─────────────────────────────────────────────────
 
 export const MultipleExpansion: Story = {
-  name: 'Multiple 展開模式(可同時展開多個)',
+  name: 'Multiple 展開模式',
   render: () => (
     <div className="w-[480px]">
       <p className="text-caption text-fg-secondary mb-4">
@@ -401,7 +401,7 @@ export const MultipleExpansion: Story = {
 // 驗證 column rhythm:混用有/無 description 的 step,indicator y 位置不變
 
 export const MixedDescription: Story = {
-  name: 'Column rhythm 驗證(部分有 description 部分無)',
+  name: 'Column rhythm 驗證',
   render: () => (
     <div className="flex gap-12">
       {(['md', 'lg'] as const).map(size => (

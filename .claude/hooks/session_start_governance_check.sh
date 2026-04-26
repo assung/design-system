@@ -34,10 +34,14 @@ BLOCKERS=""
 # Check 1: CLAUDE.md size(soft 800 / hard 1000)
 if [ -f CLAUDE.md ]; then
   LINES=$(wc -l < CLAUDE.md | tr -d ' ')
-  if [ "$LINES" -gt 1000 ]; then
-    BLOCKERS="${BLOCKERS}\n- CLAUDE.md is ${LINES} lines(HARD THRESHOLD 1000 breached). /knowledge-prune REQUIRED FIRST ACTION this session."
-  elif [ "$LINES" -gt 800 ]; then
-    REMINDERS="${REMINDERS}\n- CLAUDE.md is ${LINES} lines (transition cap 800). Consider /knowledge-prune to consolidate."
+  # 2026-04-26 tightened thresholds(對應 M19 + user 質問「auto self-improve」要更主動):
+  # 400 hard target / 500 soft / 600 strong-warn / 800 transition-cap blocker
+  if [ "$LINES" -gt 800 ]; then
+    BLOCKERS="${BLOCKERS}\n- CLAUDE.md is ${LINES} lines(transition cap 800 breached). /knowledge-prune REQUIRED FIRST ACTION this session."
+  elif [ "$LINES" -gt 600 ]; then
+    REMINDERS="${REMINDERS}\n- CLAUDE.md is ${LINES} lines(50% over 400 hard target). /knowledge-prune strongly recommended this session."
+  elif [ "$LINES" -gt 500 ]; then
+    REMINDERS="${REMINDERS}\n- CLAUDE.md is ${LINES} lines(approaching 600 strong-warn). Consider /knowledge-prune."
   fi
 fi
 

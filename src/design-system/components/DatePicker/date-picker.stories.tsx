@@ -122,7 +122,7 @@ export const RangePicker: Story = {
 
 /* ── Display（DataTable cell 用）── */
 export const Display: Story = {
-  name: 'Display（cell 用）',
+  name: 'Display',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">

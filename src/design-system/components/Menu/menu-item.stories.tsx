@@ -56,7 +56,7 @@ export const Default: Story = {
 // ── startIcon ──
 
 export const WithStartIcon: Story = {
-  name: 'startIcon',
+  name: 'Start Icon',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem startIcon={Mail}>電子郵件</MenuItem>
@@ -69,7 +69,7 @@ export const WithStartIcon: Story = {
 // ── startIcon + description ──
 
 export const WithDescription: Story = {
-  name: 'startIcon + description',
+  name: 'Start Icon + Description',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem startIcon={Mail} description="每日摘要信件">電子郵件通知</MenuItem>
@@ -82,7 +82,7 @@ export const WithDescription: Story = {
 // ── Avatar（無 description → inline 20/24px）──
 
 export const AvatarInline: Story = {
-  name: 'Avatar（inline)',
+  name: 'Avatar',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem avatar={{ alt: "Alice Chen", color: "indigo", hoverCard: personHover('Alice Chen') }}>Alice Chen</MenuItem>
@@ -95,7 +95,7 @@ export const AvatarInline: Story = {
 // ── Avatar + description（block 32/40px) ──
 
 export const AvatarBlock: Story = {
-  name: 'Avatar + description(block)',
+  name: 'Avatar + description',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem avatar={{ alt: "Alice Chen", color: "indigo", hoverCard: personHover('Alice Chen', '設計部門') }} description="設計部門">Alice Chen</MenuItem>
@@ -149,7 +149,7 @@ const MultiSelectDemo = () => {
 }
 
 export const MultiSelect: Story = {
-  name: '多選（checkbox）',
+  name: '多選',
   render: () => <MenuContainer><MultiSelectDemo /></MenuContainer>,
 }
 
@@ -177,7 +177,7 @@ export const Groups: Story = {
 // ── Creatable ──
 
 export const Creatable: Story = {
-  name: 'Creatable（搜尋無結果）',
+  name: 'Creatable',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem startIcon={Plus}>直接使用「新標籤」</MenuItem>

@@ -26,7 +26,7 @@ type Story = StoryObj<typeof Accordion>
 // ── FAQ(single + collapsible)——Stripe / Notion 類說明頁 ─────────
 
 export const FAQ: Story = {
-  name: 'FAQ(single + collapsible)',
+  name: 'FAQ',
   render: () => (
     <div className="max-w-[640px]">
       <Accordion type="single" collapsible>
@@ -62,7 +62,7 @@ export const FAQ: Story = {
 // ── Settings sections(multiple)——Jira / Linear 類設定頁 ──────────
 
 export const SettingsSections: Story = {
-  name: '設定分組(multiple)',
+  name: '設定分組',
   render: () => (
     <div className="max-w-[640px]">
       <Accordion type="multiple" defaultValue={['notifications']}>

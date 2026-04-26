@@ -39,7 +39,7 @@ const deleteBtn = <Button size="xs" iconOnly variant="text" startIcon={Trash2} a
 const deleteBtnXs = deleteBtn
 
 export const Rich = {
-  name: 'Rich(Type A upload manager)',
+  name: 'Rich',
   render: () => (
     // Type A upload manager:所有 item 都有 status + progress bar(含 completed 100%)
     // 也可傳 onClick/onDownload 讓整 row 點開(預設 FileViewer,consumer 決定)
@@ -58,7 +58,7 @@ export const Rich = {
 }
 
 export const Compact = {
-  name: 'Compact(Type A upload manager)',
+  name: 'Compact',
   render: () => (
     // Compact + status(永遠有 progress bar)= Type A upload manager
     // list wrapper `gap-1`(4px)簡化 canonical — compact list 統一 gap-1,不論純/混合(2026-04-23)
@@ -72,7 +72,7 @@ export const Compact = {
 }
 
 export const HoverSwap = {
-  name: 'Hover swap(狀態 ↔ 操作)',
+  name: 'Hover swap',
   render: () => (
     <div className="flex flex-col max-w-md gap-4">
       <div>
@@ -144,7 +144,7 @@ const attachmentFiles: FileInfo[] = [
 ]
 
 export const Clickable = {
-  name: '已上傳(Type B form attachment — click 開 FileViewer)',
+  name: '已上傳',
   render: () => {
     // Real FileViewer wiring:click → 打開 FileViewer at 對應 index
     const [open, setOpen] = React.useState(false)
@@ -187,7 +187,7 @@ export const Clickable = {
 }
 
 export const CompactMixed = {
-  name: 'Compact 混合(上傳中 Type A + 已存附件 Type B)',
+  name: 'Compact 混合',
   render: () => (
     // Real-world:email 草稿 — 新上傳中(Type A active)+ 舊已存附件(Type B 靜態)混在同 list
     // **重要 invariant**:Type A **completed**(bar 100% + ✓)跟 Type B(無 bar)不共存

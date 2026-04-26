@@ -74,7 +74,7 @@ const MANY_TABS = [
 ]
 
 export const OverflowScroll: Story = {
-  name: 'Overflow: scroll（拖拉右下角調整寬度）',
+  name: 'Overflow Scroll',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="text-caption text-fg-muted max-w-xl">
@@ -99,7 +99,7 @@ export const OverflowScroll: Story = {
 }
 
 export const OverflowMenu: Story = {
-  name: 'Overflow: menu（拖拉右下角調整寬度）',
+  name: 'Overflow Menu',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="text-caption text-fg-muted max-w-xl">

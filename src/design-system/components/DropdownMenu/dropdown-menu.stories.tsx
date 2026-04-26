@@ -222,7 +222,7 @@ export const RadioItems: StoryObj = {
 // separator / danger item 等 row-anatomy 核心 slot。
 
 export const OpenSnapshot: StoryObj = {
-  name: '開啟狀態(視覺稽核用)',
+  name: '開啟狀態',
   tags: ['!autodocs'],
   render: () => (
     <DropdownMenu defaultOpen>
@@ -252,7 +252,7 @@ export const OpenSnapshot: StoryObj = {
 // 詳見 .claude/skills/visual-audit/SKILL.md 的「Layer A interactive state coverage」。
 
 export const ItemHover: StoryObj = {
-  name: 'Item Hover 高亮(視覺稽核用)',
+  name: 'Item Hover 高亮',
   tags: ['!autodocs'],
   render: () => (
     <DropdownMenu defaultOpen>

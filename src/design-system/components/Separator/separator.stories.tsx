@@ -33,7 +33,7 @@ type Story = StoryObj<typeof Separator>
 // 正式消費者),有 icon prefix + label + description;Separator 切出 row group 之間的視覺分段。
 // 對應 iOS Settings / Notion Workspace settings / Linear user settings canonical。
 export const Horizontal: Story = {
-  name: 'Horizontal(settings row group 分段)',
+  name: 'Horizontal',
   render: () => (
     <div role="listbox" aria-label="settings sections demo" className="border border-border rounded-lg max-w-md overflow-hidden">
       <MenuItem
@@ -62,7 +62,7 @@ export const Horizontal: Story = {
 
 /* ── Vertical（垂直分隔，toolbar 間隔）──────────────────────────────────── */
 export const Vertical: Story = {
-  name: 'Vertical（垂直分隔）',
+  name: 'Vertical',
   render: () => (
     <div className="flex items-center gap-2 border border-border rounded-lg px-3 py-2 w-fit">
       <Button variant="text" size="sm">編輯</Button>

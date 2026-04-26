@@ -49,7 +49,7 @@ export const Default: Story = {
 // ── Interactive ellipsis (折疊路徑 → DropdownMenu) ─────────────────────────
 
 export const InteractiveEllipsis: Story = {
-  name: 'Interactive ellipsis(可點擊展開折疊路徑)',
+  name: 'Interactive ellipsis',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="text-caption text-fg-muted max-w-xl">
@@ -99,7 +99,7 @@ export const InteractiveEllipsis: Story = {
 // ── Sizes (配對 page title) ────────────────────────────────────────────────
 
 export const AllSizes: Story = {
-  name: 'Sizes(配對 page title)',
+  name: 'Sizes',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -210,7 +210,7 @@ export const TwoLevels: Story = {
 // ── asChild (整合 router Link) ─────────────────────────────────────────────
 
 export const AsChildRouterLink: Story = {
-  name: 'asChild (整合 router)',
+  name: 'asChild prop',
   render: () => (
     <div className="flex flex-col gap-2">
       <div className="text-caption text-fg-muted">

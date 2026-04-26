@@ -24,7 +24,7 @@ export default meta
 type Story = StoryObj
 
 export const CreateProjectRight: Story = {
-  name: '右側建立 project(Linear / Stripe style)',
+  name: '右側建立 project',
   render: () => (
     <Sheet>
       <SheetTrigger asChild>
@@ -72,7 +72,7 @@ export const CreateProjectRight: Story = {
 }
 
 export const EditUserRight: Story = {
-  name: '右側編輯 user detail(Jira issue drawer)',
+  name: '右側編輯 user detail',
   render: () => (
     <Sheet>
       <SheetTrigger asChild>
@@ -130,7 +130,7 @@ export const EditUserRight: Story = {
  * 世界級 Polaris / Atlassian chromatic 稽核共通 pattern。
  */
 export const OpenSnapshot: Story = {
-  name: '開啟狀態(視覺稽核用)',
+  name: '開啟狀態',
   tags: ['!autodocs'],
   render: () => (
     <Sheet defaultOpen>

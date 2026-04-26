@@ -52,7 +52,7 @@ const StepActive = () => <Circle size={16} className="text-primary" />
 const StepPending = () => <Minus size={16} className="text-fg-muted" />
 
 export const Stepper: Story = {
-  name: 'Stepper（步驟）',
+  name: 'Stepper',
   render: () => (
     <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden py-2">
       <TreeView
@@ -123,14 +123,14 @@ const CheckboxTree = () => {
 }
 
 export const WithCheckbox: Story = {
-  name: '多選(Checkbox)',
+  name: '多選',
   render: () => <CheckboxTree />,
 }
 
 // ── Long label (wrap test) ──────────────────────────────────────────────
 
 export const LongLabel: Story = {
-  name: '長 label（truncate vs wrap）',
+  name: '長 label',
   render: () => (
     <div className="flex gap-8 items-start">
       <div className="flex flex-col gap-2">
@@ -263,7 +263,7 @@ export const DragAndDrop: Story = {
 // ── Size Comparison ─────────────────────────────────────────────────────
 
 export const AllSizes: Story = {
-  name: 'Size 對比（sm / md / lg）',
+  name: 'Size 對比',
   render: () => (
     <div className="flex gap-8 items-start">
       {(['sm', 'md', 'lg'] as const).map((sz) => (

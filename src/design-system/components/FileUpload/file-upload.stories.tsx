@@ -16,7 +16,7 @@ const noop = () => {}
 
 // 單檔上傳:履歷(PDF / Word),5 MB 上限 — LinkedIn / 104 Job 慣例
 export const ResumeUpload = {
-  name: '單檔上傳(履歷 CV)',
+  name: '單檔上傳',
   render: () => (
     <div className="max-w-lg">
       <FileUpload
@@ -33,7 +33,7 @@ export const ResumeUpload = {
 
 // 批次上傳:相簿匯入 — Figma / Google Photos / Instagram 慣例
 export const BulkImageUpload = {
-  name: '批次上傳(相簿匯入)',
+  name: '批次上傳',
   render: () => {
     const [files, setFiles] = useState<File[]>([])
     return (
@@ -79,7 +79,7 @@ export const BulkImageUpload = {
 
 // 2026-04-24 canonical:內建 `files` prop — FileUpload own success state display
 export const WithFileList = {
-  name: '內建 files prop(DS canonical success state)',
+  name: '內建 files prop',
   render: () => {
     type UploadItem = { id: string; name: string; size?: number; status?: 'uploading' | 'completed' | 'error'; progress?: number; description?: string }
     const [items, setItems] = useState<UploadItem[]>([
@@ -116,7 +116,7 @@ export const WithFileList = {
 
 // children 覆寫:Figma 匯入資產客製文案 / 品牌 logo
 export const CustomChildren = {
-  name: 'Custom children(完全客製)',
+  name: 'Custom children',
   render: () => (
     <div className="max-w-lg">
       <FileUpload accept="image/*,.svg,.fig" multiple onUpload={noop}>

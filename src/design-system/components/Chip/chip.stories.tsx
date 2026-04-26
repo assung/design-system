@@ -136,7 +136,7 @@ export const LayoutWrap: Story = {
 // ── Layout: scroll ──────────────────────────────────────────────────────────
 
 export const LayoutScroll: Story = {
-  name: 'Layout: scroll（拖拉右下角調整寬度）',
+  name: 'Layout Scroll',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript'])
     return (
@@ -163,7 +163,7 @@ export const LayoutScroll: Story = {
 // ── Layout: menu ────────────────────────────────────────────────────────────
 
 export const LayoutMenu: Story = {
-  name: 'Layout: menu（拖拉右下角調整寬度）',
+  name: 'Layout Menu',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript', 'Rust'])
     return (

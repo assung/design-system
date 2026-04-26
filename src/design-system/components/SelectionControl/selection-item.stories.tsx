@@ -26,7 +26,7 @@ type Story = StoryObj<typeof SelectionItem>
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const NotificationPreferences: Story = {
-  name: '通知偏好(Checkbox consumer)',
+  name: '通知偏好',
   render: () => (
     <div className="flex flex-col gap-2 max-w-md">
       <p className="text-caption text-fg-muted mb-2">
@@ -45,7 +45,7 @@ export const NotificationPreferences: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const PlanPicker: Story = {
-  name: '方案選擇(RadioGroup consumer)',
+  name: '方案選擇',
   render: () => (
     <div className="flex flex-col gap-2 max-w-md">
       <p className="text-caption text-fg-muted mb-2">
@@ -65,7 +65,7 @@ export const PlanPicker: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const WithPrefixIcon: Story = {
-  name: 'Prefix icon(權限範圍選擇)',
+  name: 'Prefix icon',
   render: () => (
     <div className="flex flex-col gap-2 max-w-md">
       <p className="text-caption text-fg-muted mb-2">
@@ -104,7 +104,7 @@ export const WithPrefixIcon: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const WithPrefixAvatarBlock: Story = {
-  name: 'Prefix avatar(成員指派)',
+  name: 'Prefix avatar',
   render: () => (
     <div className="flex flex-col gap-2 max-w-md">
       <p className="text-caption text-fg-muted mb-2">

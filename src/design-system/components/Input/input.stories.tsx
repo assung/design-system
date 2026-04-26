@@ -63,7 +63,7 @@ export const SizeAlignment: Story = {
 
 /* ── startIcon ── */
 export const WithStartIcon: Story = {
-  name: 'startIcon',
+  name: 'Start Icon',
   render: () => (
     <div className="flex flex-col gap-4 max-w-sm">
       <Input startIcon={Search} placeholder="搜尋商品..." />
@@ -74,7 +74,7 @@ export const WithStartIcon: Story = {
 
 /* ── endAction（Inline Action 宣告式 API） ── */
 export const EndAction: Story = {
-  name: 'endAction',
+  name: 'End Action',
   render: () => {
     const [showPwd, setShowPwd] = React.useState(false)
     const [query, setQuery] = React.useState('Bluetooth')

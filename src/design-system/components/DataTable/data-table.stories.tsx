@@ -365,7 +365,7 @@ export const PinnedColumns: Story = {
 
 /* ── Inline Edit（視覺模式）── */
 export const InlineEdit: Story = {
-  name: 'Inline Edit（視覺）',
+  name: 'Inline Edit',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -389,7 +389,7 @@ export const InlineEdit: Story = {
 
 /* ── 虛擬捲動（大量資料）── */
 export const VirtualScroll: Story = {
-  name: '虛擬捲動（10,000 行）',
+  name: '虛擬捲動',
   render: () => {
     const largeData = React.useMemo(() => generateLargeData(10000), [])
     return (

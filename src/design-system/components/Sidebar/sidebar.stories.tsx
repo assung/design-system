@@ -135,7 +135,7 @@ const PageContent = ({ title, description }: { title: string; description: React
 // ── 1. 完整佈局(icon 收合模式,預設推薦)────────────────────────────────
 
 export const IconCollapse: Story = {
-  name: '完整佈局(icon 收合)',
+  name: '完整佈局',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('dashboard')
 
@@ -204,7 +204,7 @@ const PROJECTS_TREE = [
 ]
 
 export const MixedContent: Story = {
-  name: '混合內容(SidebarMenu + TreeView)',
+  name: '混合內容',
   render: () => {
     // 單一 active state 跨整個 sidebar——SidebarProvider 內建 single-selection,
     // 每個 SidebarMenuButton 只要傳 `id`,點擊自動 setActiveId、isActive 自動算。
@@ -387,7 +387,7 @@ export const Offcanvas: Story = {
 // ── 4. Mixed prefix(uniformPrefix:nav icon + brand logo)──────────────
 
 export const IntegrationSidebar: Story = {
-  name: 'Mixed prefix(icon + brand logo)',
+  name: 'Mixed prefix',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('home')
 

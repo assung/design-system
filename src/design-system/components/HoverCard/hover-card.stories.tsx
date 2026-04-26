@@ -119,7 +119,7 @@ export const LinkPreview: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const OverflowList: Story = {
-  name: '溢出清單(深色樣式)',
+  name: '溢出清單',
   render: () => {
     const hidden = [
       { name: '黃怡君', color: 'turquoise' as const },

@@ -43,7 +43,7 @@ const MediaGradient = ({
 // ── Single Coachmark: Intercom-style feature discovery ──────────────────────
 
 export const FeatureDiscovery: Story = {
-  name: '單步驟新功能介紹(Intercom / Slack 風格)',
+  name: '單步驟新功能介紹',
   render: () => {
     const [open, setOpen] = React.useState(true)
     return (
@@ -94,7 +94,7 @@ const tourSteps = [
 ]
 
 export const MultiStepTour: Story = {
-  name: '多步 Onboarding Tour(Linear / Notion / Figma 風格)',
+  name: '多步 Onboarding Tour',
   render: () => {
     const [step, setStep] = React.useState(0)
     const [open, setOpen] = React.useState(true)
@@ -182,7 +182,7 @@ const tipSteps = [
 ]
 
 export const TipsMultiStep: Story = {
-  name: '多步 Tips(快捷鍵教學 / kind="tips")',
+  name: '多步 Tips',
   render: () => {
     const [step, setStep] = React.useState(0)
     const [open, setOpen] = React.useState(true)

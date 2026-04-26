@@ -20,7 +20,7 @@ export default meta
 type Story = StoryObj
 
 export const FilterPanel: Story = {
-  name: '篩選面板(Jira / Linear)',
+  name: '篩選面板',
   render: () => (
     <Popover>
       <PopoverTrigger asChild>
@@ -79,7 +79,7 @@ export const FilterPanel: Story = {
  * action 整組 chrome。
  */
 export const OpenSnapshot: Story = {
-  name: '開啟狀態(視覺稽核用)',
+  name: '開啟狀態',
   tags: ['!autodocs'],
   render: () => (
     <Popover defaultOpen>

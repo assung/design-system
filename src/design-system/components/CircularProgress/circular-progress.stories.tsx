@@ -26,7 +26,7 @@ export default meta
 type Story = StoryObj
 
 export const Default: Story = {
-  name: '預設(indeterminate)',
+  name: '預設',
   render: () => (
     <div className="flex items-center gap-6">
       {/* CircularProgress 只提供一種預設尺寸(24);其他尺寸由 consumer context 自動縮放
@@ -41,7 +41,7 @@ export const Default: Story = {
 }
 
 export const ButtonLoading: Story = {
-  name: 'Button loading(Stripe 付款送出)',
+  name: 'Button loading',
   render: () => (
     <div className="flex items-center gap-3">
       <Button variant="primary" loading>處理付款中</Button>
@@ -52,7 +52,7 @@ export const ButtonLoading: Story = {
 }
 
 export const InlineAction: Story = {
-  name: 'Inline action(搜尋 / upload 進行中)',
+  name: 'Inline action',
   render: () => (
     <div className="flex flex-col gap-4 max-w-sm">
       <Input
@@ -106,7 +106,7 @@ const syncData: SyncRow[] = [
 ]
 
 export const InlineCellLoading: Story = {
-  name: 'Cell 局部載入(Figma 雲端同步)',
+  name: 'Cell 局部載入',
   render: () => (
     <div className="max-w-2xl">
       <DataTable columns={syncColumns} data={syncData} />
@@ -115,7 +115,7 @@ export const InlineCellLoading: Story = {
 }
 
 export const FullScreenOverlay: Story = {
-  name: '全頁 overlay(Notion workspace 切換中)',
+  name: '全頁 overlay',
   render: () => (
     <div className="relative border border-border rounded-lg w-full h-80 overflow-hidden flex items-center justify-center">
       <Empty
@@ -128,7 +128,7 @@ export const FullScreenOverlay: Story = {
 }
 
 export const Determinate: Story = {
-  name: 'Determinate(檔案上傳進度 - inline)',
+  name: 'Determinate',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-6">
