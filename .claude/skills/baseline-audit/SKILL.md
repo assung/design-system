@@ -62,7 +62,7 @@ CLAUDE.md 根目錄「Consistency Audit 原則」規定:任何跨元件 consiste
 | 13 | **Spec 7 維度覆蓋** | 7 個維度(何時用/何時不用/近親分界/常見誤解/相關/空值/驗證時機/Loading+a11y)各自 `有 / 缺`,寫成 `7/7` / `5/7 (缺:空值, 驗證)` 格式 |
 | 14 | **視覺對齊(本 skill 不涵蓋)** | 固定寫 `需 /visual-audit`(提醒讀者這面向必須另走 pixel-level audit)|
 
-**禁止新增未列於上的面向**——若 baseline 階段要擴面向,走 CLAUDE.md `# 規則分層` flowchart 先確認是否屬 scan-only 性質(能 mechanical grep / 讀 spec 固定段落),若需要「審美判斷」則它屬 `/design-system-audit` Phase 2,不是本 skill。
+**禁止新增未列於上的面向**——若 baseline 階段要擴面向,走 CLAUDE.md `# 治理 canonical` flowchart 先確認是否屬 scan-only 性質(能 mechanical grep / 讀 spec 固定段落),若需要「審美判斷」則它屬 `/design-system-audit` Phase 2,不是本 skill。
 
 ---
 

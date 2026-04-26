@@ -54,7 +54,7 @@
 
 **FAIL 範例**:DatePicker 箭頭按鈕 top=12px 但最後一排日期 bottom=4px → 差異 8px 違反上下對稱
 
-**對應規則**:該元件 spec.md + CLAUDE.md `# 建立 UI 前必讀` layout-space token
+**對應規則**:該元件 spec.md + `.claude/rules/ui-development.md`「建立 UI 前必讀」 layout-space token
 
 ---
 
@@ -74,7 +74,7 @@
 
 **FAIL 範例**:FileItem 2026-04-19 bug,Button hover-bg 24px 超出 16px box,`gap-2`(8px)實際剩 ~4px
 
-**對應規則**:CLAUDE.md `# UI 開發規則` → `# 同 flex 列的互動 slot 幾何鐵律`(必讀)
+**對應規則**:`.claude/rules/ui-development.md` → `# 同 flex 列的互動 slot 幾何鐵律`(必讀)
 
 ---
 
@@ -98,7 +98,7 @@
 
 **FAIL 範例**:Carousel prev/next 箭頭覆蓋 carousel item content;Badge 疊 Button 距離離譜用硬寫 px
 
-**對應規則**:對應元件 spec;CLAUDE.md `# 元件 Props 命名原則`「常用 icon canonical」(若箭頭用錯 icon);CLAUDE.md `# 建立 UI 前必讀` overlay-surface pattern
+**對應規則**:對應元件 spec;`.claude/rules/ui-development.md`「元件 Props 命名」「常用 icon canonical」(若箭頭用錯 icon);`.claude/rules/ui-development.md`「建立 UI 前必讀」 overlay-surface pattern
 
 ---
 
@@ -136,7 +136,7 @@
 
 **FAIL 範例**:5 個 MenuItem 有 4 個 gap=8px,1 個 gap=12px(consumer 手動加了 `gap-3`)
 
-**對應規則**:`item-anatomy.spec.md`;CLAUDE.md `# UI 開發規則`「新增數值前必須先查既有 pattern」
+**對應規則**:`item-anatomy.spec.md`;`.claude/rules/ui-development.md`「新增數值前必須先查既有 pattern」
 
 ---
 
@@ -175,13 +175,13 @@
 
 **FAIL 範例**:Input(size=md, 36px)+ Button(size=md, 36px)+ Select(誤用 size=sm, 28px)→ Select 偏低 8px
 
-**對應規則**:`uiSize.spec.md` field-height family;CLAUDE.md `# 建立 UI 前必讀` → uiSize token
+**對應規則**:`uiSize.spec.md` field-height family;`.claude/rules/ui-development.md`「建立 UI 前必讀」 → uiSize token
 
 ---
 
 ## 9. 跨 OS 一致 scrollbar
 
-**Canonical source**: CLAUDE.md `# 建立 UI 前必讀` 「overflow 使用三規則」;`components/ScrollArea/`
+**Canonical source**: `.claude/rules/ui-development.md`「建立 UI 前必讀」 「overflow 使用三規則」;`components/ScrollArea/`
 
 **怎麼量**:
 1. 找 screenshot 內的 scrollable area
@@ -197,7 +197,7 @@
 
 **FAIL 範例**:DataTable 水平捲動用 native overflow-x-auto → Windows user 看到 15px scrollbar 吃 cell 寬度
 
-**對應規則**:CLAUDE.md `# 建立 UI 前必讀` → overflow 使用三規則
+**對應規則**:`.claude/rules/ui-development.md`「建立 UI 前必讀」 → overflow 使用三規則
 
 ---
 
@@ -241,7 +241,7 @@
 
 **FAIL 範例**:Popover 在 dark mode 下 shadow 消失(用了 `shadow-md` 硬寫);FileViewer 工具列在 light theme 變白(dark-mode override 失效)
 
-**對應規則**:`color.spec.md`;CLAUDE.md `# Tailwind 使用規則`「shadow 一律用 `--elevation-*` token」;元件 spec 的 dark mode 段
+**對應規則**:`color.spec.md`;`.claude/rules/ui-development.md`「Tailwind 5 條核心」「shadow 一律用 `--elevation-*` token」;元件 spec 的 dark mode 段
 
 ---
 

@@ -17,6 +17,7 @@ paths:
 - 所有元件遵循 shadcn 框架(forwardRef / Slot / data-* / cva),不從零重寫
 - 每個元件 spec「定位」段必明確宣告實作基礎:`基於 Radix X` / `基於 cmdk / sonner` / native / `自建 + 理由`(自建必說明為何不用現有 primitive)
 - Spec 文字品質:不描述視覺形狀 / 實作細節(「窄長形」「會變寬」「zero layout shift」屬 story 不進 spec);術語一致;「禁止事項(❌)」列所有常見誤用
+- **a11y 段強制**:互動元件 spec.md 必含 `## A11y 預設` 段(列 ARIA + Keyboard map);純視覺 indicator(Badge / Tag / Separator / Skeleton)豁免明文寫「本元件無互動」
 
 ## SSOT + 邊界案例覆蓋 + 職責分離
 

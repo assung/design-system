@@ -13,7 +13,7 @@
 
 ## 1. Layout Family 宣告
 
-**Canonical source**: CLAUDE.md `# 系統內部 Layout — 4-Family Model` + 各元件 `spec.md` 第一段
+**Canonical source**: CLAUDE.md `# 4-Family Layout Model` + 各元件 `spec.md` 第一段
 
 **Heuristic**:
 
@@ -35,7 +35,7 @@ head -40 src/design-system/components/{Name}/{name}.spec.md
 
 ## 2. Size prop 對齊
 
-**Canonical source**: CLAUDE.md `# 建立 UI 前必讀` → `uiSize.spec.md` + `field-controls.spec.md`;field-height family 用 `sm / md / lg`
+**Canonical source**: `.claude/rules/ui-development.md`「建立 UI 前必讀」 → `uiSize.spec.md` + `field-controls.spec.md`;field-height family 用 `sm / md / lg`
 
 **Heuristic**:
 
@@ -104,7 +104,7 @@ grep -nE '^\s*badge\??:|badge\s*=' src/design-system/components/{Name}/{name}.ts
 
 ## 5. Padding token 使用
 
-**Canonical source**: CLAUDE.md `# Token 命名原則` + `layoutSpace.spec.md` + `uiSize.spec.md`;elements 用 Tailwind spacing scale,layout 用 `--layout-space-*`
+**Canonical source**: `.claude/rules/ui-development.md`「Token 命名 4 條硬規則」 + `layoutSpace.spec.md` + `uiSize.spec.md`;elements 用 Tailwind spacing scale,layout 用 `--layout-space-*`
 
 **Heuristic**:
 
@@ -122,7 +122,7 @@ grep -nE 'p-[0-9]|px-[0-9]|py-[0-9]|p-\[|layout-space' src/design-system/compone
 
 ## 6. Gap token 使用
 
-**Canonical source**: CLAUDE.md `# UI 開發規則` → 新增數值前查既有 pattern;常見 `gap-2`(item-anatomy inline action)/ `gap-1`(tight) / `gap-3`(loose)
+**Canonical source**: `.claude/rules/ui-development.md` → 新增數值前查既有 pattern;常見 `gap-2`(item-anatomy inline action)/ `gap-1`(tight) / `gap-3`(loose)
 
 **Heuristic**:
 
@@ -139,7 +139,7 @@ grep -nE 'gap-[0-9]|gap-\[' src/design-system/components/{Name}/{name}.tsx | sor
 
 ## 7. Icon size
 
-**Canonical source**: CLAUDE.md `# UI 開發規則` → `ICON_SIZE` 常數(sm/md=16, lg=20);`patterns/element-anatomy/item-anatomy.spec.md` Inline Action 規格
+**Canonical source**: `.claude/rules/ui-development.md` → `ICON_SIZE` 常數(sm/md=16, lg=20);`patterns/element-anatomy/item-anatomy.spec.md` Inline Action 規格
 
 **Heuristic**:
 
@@ -181,7 +181,7 @@ grep -nE 'hover:bg-|data-\[hover|:hover.*background' src/design-system/component
 
 ## 9. Typography 對應
 
-**Canonical source**: `tokens/typography/typography.spec.md` + CLAUDE.md `# Tailwind 使用規則` 禁止清單(Tailwind 預設 `text-xs/sm/base/lg` 禁用)
+**Canonical source**: `tokens/typography/typography.spec.md` + `.claude/rules/ui-development.md`「Tailwind 5 條核心」 禁止清單(Tailwind 預設 `text-xs/sm/base/lg` 禁用)
 
 **Heuristic**:
 
@@ -201,7 +201,7 @@ grep -nE 'text-(caption|body|h[1-6])|text-(xs|sm|base|lg|xl)|text-\[' src/design
 
 ## 10. 既有 DS element 消費
 
-**Canonical source**: CLAUDE.md `# 建立 UI 前必讀`「既有 DS 元件 / primitive 優先消費」表 + `# 失敗記憶索引`「hand-craft 繞 DS canonical」
+**Canonical source**: `.claude/rules/ui-development.md`「建立 UI 前必讀」「既有 DS 元件 / primitive 優先消費」表 + `# 失敗記憶索引`「hand-craft 繞 DS canonical」
 
 **Heuristic**:
 
@@ -221,7 +221,7 @@ grep -nE '<table|<input|<hr|<button(?!\s+type)' src/design-system/components/{Na
 
 ## 11. Shadow / elevation
 
-**Canonical source**: `tokens/elevation/elevation.spec.md` + CLAUDE.md `# UI 開發規則` → shadow 一律用 `--elevation-*`;禁 `shadow-{sm,md,lg,xl,2xl}`
+**Canonical source**: `tokens/elevation/elevation.spec.md` + `.claude/rules/ui-development.md` → shadow 一律用 `--elevation-*`;禁 `shadow-{sm,md,lg,xl,2xl}`
 
 **Heuristic**:
 
@@ -240,7 +240,7 @@ grep -nE 'shadow-|elevation-' src/design-system/components/{Name}/{name}.tsx
 
 ## 12. Tailwind v4 arbitrary shortcut
 
-**Canonical source**: CLAUDE.md `# Tailwind 使用規則` → `[--foo]` shorthand 在 v4 失效,必用 `var(--foo)`
+**Canonical source**: `.claude/rules/ui-development.md`「Tailwind 5 條核心」 → `[--foo]` shorthand 在 v4 失效,必用 `var(--foo)`
 
 **Heuristic**:
 
@@ -257,7 +257,7 @@ grep -nE 'className=.*\[--[a-z]' src/design-system/components/{Name}/{name}.tsx 
 
 ## 13. Spec 7 維度覆蓋
 
-**Canonical source**: CLAUDE.md `# Spec 規則` → 7 世界級 DS 判斷維度
+**Canonical source**: `.claude/rules/spec-rules.md` → 7 世界級 DS 判斷維度
 
 **Heuristic**:對 `{name}.spec.md` 搜以下 heading keywords(繁中或英文都算):
 
@@ -283,7 +283,7 @@ done
 **記錄格式**:
 - `7/7` — 全覆蓋(最多)
 - `5/7 (缺: 空值, 驗證)` — 缺漏明列
-- `N/A - scope 繼承 field-controls` — 按 CLAUDE.md `# Spec 規則` 的 scope 預設,可 pointer 繼承 family 時記 N/A
+- `N/A - scope 繼承 field-controls` — 按 `.claude/rules/spec-rules.md` 的 scope 預設,可 pointer 繼承 family 時記 N/A
 
 **Scope 預設**(不算缺漏):
 - Field family 元件的 mode / disabled / readonly → 可 pointer `field-controls.spec.md`

@@ -33,4 +33,4 @@
 
 ## 建立前必 Read
 
-CLAUDE.md `# Token 命名原則` + 對應 family 的 spec(如 `color/color.spec.md`)。
+`.claude/rules/ui-development.md`「Token 命名 4 條硬規則」+ 對應 family 的 spec(如 `color/color.spec.md`)。

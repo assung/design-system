@@ -55,4 +55,4 @@
 
 ## 建立前必 Read
 
-本 README + 該元件所在 pattern spec(若屬 Family) + CLAUDE.md `# 元件 Props 命名原則` + `.claude/skills/component-quality-gate/`。
+本 README + 該元件所在 pattern spec(若屬 Family) + `.claude/rules/ui-development.md`「元件 Props 命名」 + `.claude/skills/component-quality-gate/`。

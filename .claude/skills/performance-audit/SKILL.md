@@ -91,7 +91,7 @@ description: Performance audit for design-system components and product UI. Chec
 - {若發現 canonical 本身有問題,列於此,不自改}
 ```
 
-**STOP 點**:report 寫完**不自動修**。分權對齊 CLAUDE.md `# 稽核 vs 執行 分權 canonical`。
+**STOP 點**:report 寫完**不自動修**。分權對齊 CLAUDE.md `# 稽核 canonical`(內含「Audit-vs-execute 分權」inline rule)。
 
 ## Non-goals
 

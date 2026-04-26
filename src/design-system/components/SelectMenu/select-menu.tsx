@@ -96,6 +96,12 @@ export interface SelectMenuProps {
   /** 攔截 PopoverContent 的 onOpenAutoFocus（如 Select searchable 需阻止 focus 搶走） */
   onOpenAutoFocus?: (e: Event) => void
 
+  /**
+   * Popover 內容容器的 DOM id。Combobox / 自定 trigger 用 `aria-controls` 指向此 id 時,
+   * 需傳入相同 id 讓 AT 能找到對應的 listbox。
+   */
+  contentId?: string
+
   className?: string
 }
 
@@ -124,6 +130,7 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
   onOpenChange: controlledOnOpenChange,
   renderLabel,
   onOpenAutoFocus,
+  contentId,
   className,
 }, _ref) {
   // ── State ──
@@ -217,6 +224,7 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <RowSizeProvider value={size}>
       <PopoverContent
+        id={contentId}
         className={cn(
           'p-0 rounded-lg border border-border bg-surface-raised overflow-hidden',
           className

@@ -140,7 +140,7 @@ Skill 自動:
 1. Parse:scope=cross-component,type=Absolute(可機械驗 prop pair)
 2. M8:Polaris/Material/Atlassian React form lib 都支援 dual-mode ✓ (3/3 ≥3)
 3. Draft layer:
-   - SSOT:CLAUDE.md `# 元件 Props 命名原則` + form spec
+   - SSOT:`.claude/rules/ui-development.md`「元件 Props 命名」 + form spec
    - Hook:`.claude/hooks/check_form_dual_mode.sh` 偵測 missing pair
    - Audit dim:Dim 31「Dual-mode coherence」(已存在 Dim 26 — STOP 提議擴充而非新增)
    - Scaffold:`/new-component` Phase 4 加 dual-mode template

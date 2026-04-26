@@ -31,11 +31,11 @@
 
 ## 行數預算(Anthropic 對齊)
 
-CLAUDE.md ≤ 200 / SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200) / memory ≤ 100。
+CLAUDE.md ≤ 400(Anthropic 推薦 thresholds)/ SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200) / memory ≤ 100。
 
 ## Anti-bloat L1-L3
 
-- **L1 Pre-write**:`pre_write_subsumption_check.sh` / `check_file_size_budget.sh` / `check_governance_compliance.sh`
+- **L1 Pre-write**:`check_file_size_budget.sh` / `check_l3_primitive_import.sh` / `check_principles_canonical.sh`
 - **L2 Per-commit**:`log_governance_fires.sh` → `.claude/logs/hook-fires.jsonl`
 - **L3 Periodic**(季度 / `--deep`):`/knowledge-prune` skill,retire ≥ 5%
 

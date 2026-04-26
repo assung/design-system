@@ -1,6 +1,6 @@
 # cva 適用範圍 完整對照(從 CLAUDE.md 拆出)
 
-CLAUDE.md `# shadcn 元件規範` 留判斷法 + 禁止一句話;完整對照表和 documented 例外在本檔。
+`.claude/rules/ui-development.md`「shadcn 元件規範」 留判斷法 + 禁止一句話;完整對照表和 documented 例外在本檔。
 
 ---
 

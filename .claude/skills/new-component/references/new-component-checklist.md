@@ -21,7 +21,7 @@
 
 ## Phase 2 — Layout Family 判定
 
-- [ ] 走 CLAUDE.md `# 系統內部 Layout — 4-Family Model` 判斷流程
+- [ ] 走 CLAUDE.md `# 4-Family Layout Model` 判斷流程
 - [ ] 若 Family 1/2 → 確認消費 `<MenuItem>` + slot components(不重寫 row 結構)
 - [ ] 若 Family 3 → follow `Button Pill Layout` canonical(見 button.spec.md)
 - [ ] 若 Family 4 → follow field-controls.spec.md
@@ -43,7 +43,7 @@
 - [ ] 結構 shadcn + forwardRef + cva + VariantProps + cn()
 - [ ] cva 適用正確(見 `.claude/references/cva-patterns.md`;style prop / 結構性 variant 不硬塞 cva)
 - [ ] Props 命名按「是什麼」不按「在哪裡」(startIcon / endIcon / avatar / onDismiss / onClose / onClear / onRemove)
-- [ ] callback 命名分層正確(CLAUDE.md `# 元件 Props 命名原則` 的 canonical)
+- [ ] callback 命名分層正確(`.claude/rules/ui-development.md`「元件 Props 命名」 的 canonical)
 - [ ] Token 消費三層分層(chrome/layout-space / 元件內/Tailwind p-N / 精確幾何/calc)
 - [ ] Icon size 三層分層(row 走 RowSizeContext / Button 走 Button mapping / 一次性 inline size={n} 對齊 uiSize)
 - [ ] 無 shadcn compat alias(bg-popover 等)

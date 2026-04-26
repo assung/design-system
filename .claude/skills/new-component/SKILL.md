@@ -60,7 +60,7 @@ description: Create-phase workflow for building a new design-system component fr
 
 ### Phase 2 — Layout Family 判定
 
-對齊 CLAUDE.md `# 系統內部 Layout — 4-Family Model`。
+對齊 CLAUDE.md `# 4-Family Layout Model`。
 
 **判斷流程**(照 CLAUDE.md 既有):
 1. 垂直列表裡? → Family 1(menu)/ Family 2(reading)
@@ -77,7 +77,7 @@ description: Create-phase workflow for building a new design-system component fr
 
 ### Phase 3 — 寫 spec.md 7 維度(先 spec 後 code,spec 是 judgment home)
 
-對齊 CLAUDE.md `# Spec 規則`。7 維度缺一不可(除非元件本質無該面向,寫「本元件無 X 狀態」):
+對齊 `.claude/rules/spec-rules.md`。7 維度缺一不可(除非元件本質無該面向,寫「本元件無 X 狀態」):
 
 1. **定位**(positioning + 實作基礎 + Layout Family + 世界級對照)
 2. **何時用**(3-5 個情境,真實業務,不 generic)
@@ -91,7 +91,7 @@ description: Create-phase workflow for building a new design-system component fr
 
 ### Phase 4 — 寫 tsx(shadcn 結構 + cva + 對齊 spec)
 
-對齊 CLAUDE.md `# shadcn 元件規範` + `.claude/references/cva-patterns.md`。
+對齊 `.claude/rules/ui-development.md`「shadcn 元件規範」 + `.claude/references/cva-patterns.md`。
 
 1. **結構**:`forwardRef + cva + VariantProps + cn() + { Component, componentVariants } export`
 2. **cva 適用法**:className variant 用 cva;style prop variant 用 object map;結構 variant 用 conditional rendering(見 cva-patterns.md)
@@ -99,7 +99,7 @@ description: Create-phase workflow for building a new design-system component fr
    - 行為 → `onDismiss` / `onClose` / `onClear` / `onRemove`(語意分層,見 CLAUDE.md)
    - Slot icon → `startIcon` / `endIcon`(type `LucideIcon`)
    - Slot media → `avatar`(type `ReactNode`)
-4. **Token 消費**:Padding / icon size / hover bg / shadow 全走 token(見 CLAUDE.md `# UI 開發規則` 三層分層)
+4. **Token 消費**:Padding / icon size / hover bg / shadow 全走 token(見 `.claude/rules/ui-development.md` 三層分層)
 5. **禁止 shadcn compat alias**(`bg-popover` / `text-muted-foreground` 等)—— 用 direct token
 6. **Field 家族元件**:default `size="md"` 對齊 field-height family(見 `tokens/uiSize/uiSize.spec.md`)
 7. **cva defaultVariants 異動**:改之後必 grep 元件所有檔案同步三方(spec / docblock / anatomy story)
@@ -156,7 +156,7 @@ traits:
 
 - 不自動進入 `src/design-system/components/`(explorations/ 才是實驗場;prototype 階段跑 `/prototype` skill)
 - 不替 user 決定 positioning(Checkpoint 1 必須 user 點頭)
-- 不跳過 spec(CLAUDE.md `# Spec 規則`:先 spec 後 code,spec 是 judgment home)
+- 不跳過 spec(`.claude/rules/spec-rules.md`:先 spec 後 code,spec 是 judgment home)
 - 不省略 quality-gate(Phase 6 chain mandatory,merge 前必過)
 
 ## References

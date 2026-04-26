@@ -274,6 +274,9 @@ function CustomCombobox({
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
+  // a11y: 為 listbox 容器(SelectMenu 內 PopoverContent)建立穩定 id,讓 trigger 的
+  // aria-controls 能指向它(WAI-ARIA combobox pattern 要求)。React.useId 在 SSR/CSR 都穩定。
+  const listboxId = React.useId()
 
   React.useEffect(() => { if (!open) setSearch('') }, [open])
 
@@ -309,7 +312,7 @@ function CustomCombobox({
   const trigger = (
     <div
       id={fieldCtx?.id}
-      role="combobox" aria-expanded={open} tabIndex={0}
+      role="combobox" aria-expanded={open} aria-controls={listboxId} tabIndex={0}
       aria-label={ariaLabel}
       aria-invalid={error || undefined}
       aria-required={fieldCtx?.required || undefined}
@@ -369,6 +372,7 @@ function CustomCombobox({
       open={open}
       onOpenChange={setOpen}
       onOpenAutoFocus={searchIn === 'trigger' ? (e) => e.preventDefault() : undefined}
+      contentId={listboxId}
     >
       {trigger}
     </SelectMenu>

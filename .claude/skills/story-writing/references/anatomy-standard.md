@@ -60,6 +60,26 @@ export const Overview = {
 
 ### 允許的偏離(CLAUDE.md「Consistency Audit 原則」公式)
 
+#### `@anatomy-rationale:` 檔頭註解(scope-N/A 的 canonical escape)
+
+當某 section(Inspector / ColorMatrix / SizeMatrix / StateBehavior / Accessibility)是**設計上 N/A**(非「未做完」),於 `*.anatomy.stories.tsx` 檔頭以**多行註解**列出 N/A 段 + 一行原因:
+
+```ts
+// @anatomy-rationale:
+// SizeMatrix N/A — Skeleton 為純結構 placeholder,寬高由 consumer 控制,無 size tier
+// StateBehavior N/A — Skeleton 無互動 state(僅 loading 一態,Overview 已示範)
+import type { Meta, StoryObj } from '@storybook/react'
+// ...
+```
+
+**何時用**:section 是**設計範圍外**的 N/A — 例:Skeleton 無互動 state / Separator 為結構元件 / 無參數的 layout primitive。
+**何時不用**:section 只是還沒填完 — 補完內容,不要拿 escape 規避。
+**世界級對照**:對齊 ESLint `eslint-disable-next-line {rule}` 的 per-line allowlist idiom — 每個豁免必有具名 rule + 一行 rationale,不允許整檔默默繞過。
+
+`check_story_anatomy.sh` 識別 `@anatomy-rationale:` block:列出的 section 視為 legitimately N/A;未列出的 missing section 仍 violation。
+
+#### 其他允許的偏離
+
 1. **追加第 6+ 個元件特有 story**:OK,不需 rationale。命名遵循以下格式:
    - `export const` 用 PascalCase 英文(如 `StandardRatios` / `LayoutMatrix` / `ColorBindingRule`)
    - 中文 `name:` 必須用編號前綴 + 中文描述:`'6. 標準比例'` / `'6. 佈局矩陣'` / `'6. 色彩綁定規則'`

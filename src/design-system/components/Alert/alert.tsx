@@ -87,6 +87,15 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     const isSolid = appearance === 'solid'
     const iconClassName = !isSolid ? SUBTLE_ICON_COLOR[variant] : undefined
 
+    // ── Live region 由 wrapping consumer 擁有(WAI-ARIA + Atlassian / Polaris / Material 共識) ──
+    // Alert 是 outer host —— 自己擁有 role + aria-live;Notice(inner layout)不再帶 role,
+    // 避免 nested live region 造成 screen reader 重複朗讀。
+    // - error / warning → role="alert" + aria-live="assertive"(中斷,使用者必須立刻知道)
+    // - info / success / neutral → role="status" + aria-live="polite"(空閒朗讀,不打斷)
+    const isCritical = variant === 'error' || variant === 'warning'
+    const liveRole = isCritical ? 'alert' : 'status'
+    const liveLevel = isCritical ? 'assertive' : 'polite'
+
     const noticeEl = (
       <Notice
         variant={variant}
@@ -104,7 +113,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       return (
         <div
           ref={ref}
-          role="alert"
+          role={liveRole}
+          aria-live={liveLevel}
           className={cn(alertVariants({ placement }), SUBTLE_CONTAINER[variant], className)}
           {...props}
         >
@@ -118,7 +128,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       return (
         <div
           ref={ref}
-          role="alert"
+          role={liveRole}
+          aria-live={liveLevel}
           data-theme={inverseTheme}
           className={cn(alertVariants({ placement }), 'bg-surface-raised text-foreground', className)}
           {...props}
@@ -132,7 +143,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     return (
       <div
         ref={ref}
-        role="alert"
+        role={liveRole}
+        aria-live={liveLevel}
         className={cn(alertVariants({ placement }), SOLID_HUE_BG[variant], className)}
         {...props}
       >

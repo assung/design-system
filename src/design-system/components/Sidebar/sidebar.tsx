@@ -330,7 +330,7 @@ const Sidebar = React.forwardRef<
         {/* Gap div:佔據 sidebar 實際寬度,推開主內容 */}
         <div
           className={cn(
-            "relative w-[var(--sidebar-width)] min-w-[var(--sidebar-width-min)] bg-transparent transition-[width,min-width] duration-200 ease-linear",
+            "relative w-[var(--sidebar-width)] min-w-[var(--sidebar-width-min)] bg-transparent transition-[width,min-width] duration-200 ease-linear motion-reduce:duration-0",
             "group-data-[collapsible=offcanvas]:!w-0 group-data-[collapsible=offcanvas]:!min-w-0",
             "group-data-[side=right]:rotate-180",
             "group-data-[collapsible=icon]:!w-[var(--sidebar-width-icon)] group-data-[collapsible=icon]:!min-w-0"
@@ -338,7 +338,7 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            "fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] min-w-[var(--sidebar-width-min)] transition-[left,right,width,min-width] duration-200 ease-linear md:flex",
+            "fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] min-w-[var(--sidebar-width-min)] transition-[left,right,width,min-width] duration-200 ease-linear motion-reduce:duration-0 md:flex",
             "group-data-[collapsible=icon]:!min-w-0",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
@@ -432,7 +432,7 @@ const SidebarHeader = React.forwardRef<
         "flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider px-[var(--layout-space-loose)]",
         // Icon 模式:拿掉水平 padding 讓內容(Avatar 24px)置中於 48px 正方形
         "group-data-[collapsible=icon]:!px-0 group-data-[collapsible=icon]:!justify-center",
-        "transition-[padding] duration-200 ease-linear",
+        "transition-[padding] duration-200 ease-linear motion-reduce:duration-0",
         className
       )}
       {...props}
@@ -691,7 +691,7 @@ const SidebarGroupLabel = React.forwardRef<
             icon={ChevronDown}
             aria-label={toggleAriaLabel}
             className="pointer-events-auto ml-auto"
-            iconClassName="transition-transform duration-150 [[data-state=open]_&]:rotate-180"
+            iconClassName="transition-transform duration-150 motion-reduce:duration-0 [[data-state=open]_&]:rotate-180"
           />
         </CollapsiblePrimitive.Trigger>
       </div>
@@ -796,7 +796,7 @@ const sidebarMenuButtonVariants = cva(
     "font-medium text-fg-secondary",
     "cursor-pointer select-none outline-none",
     // 同時 transition 顏色 / 寬高 / padding / gap——sidebar 收合時一起動,視覺連續
-    "transition-[width,height,padding,gap,background-color,color] duration-200 ease-linear",
+    "transition-[width,height,padding,gap,background-color,color] duration-200 ease-linear motion-reduce:duration-0",
     "hover:bg-neutral-hover hover:text-foreground",
     "focus-visible:bg-neutral-hover focus-visible:text-foreground",
     "disabled:pointer-events-none disabled:opacity-disabled",

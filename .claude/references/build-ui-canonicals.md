@@ -1,6 +1,6 @@
 # 建立 UI 前的 DS canonical 對照(從 CLAUDE.md 拆出的完整對照)
 
-本檔是 CLAUDE.md `# 建立 UI 前必讀` 的**完整對照表**。CLAUDE.md 只留「超級規則 + 自我檢查腳本」,遇到具體情境要查對照時讀本檔。
+本檔是 `.claude/rules/ui-development.md`「建立 UI 前必讀」的**完整對照表**。Rule 主章只留「超級規則 + 自我檢查腳本」,遇到具體情境要查對照時讀本檔。
 
 ---
 

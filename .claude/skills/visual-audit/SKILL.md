@@ -295,7 +295,7 @@ Spec 依據: {src/design-system/components/{Name}/{name}.spec.md}
 - 實測: top=12px, right=12px, bottom=8px, left=12px
 - 預期: 4 邊 = layout-space-loose(16px)或 spec 明文 asymmetric
 - 差異: bottom 少 4px,且非 spec 明文例外
-- 對應規則: CLAUDE.md `# 建立 UI 前必讀` → layout-space token + 該元件 spec.md 第 N 段
+- 對應規則: `.claude/rules/ui-development.md`「建立 UI 前必讀」 → layout-space token + 該元件 spec.md 第 N 段
 - 建議修法方向(不自己改): 調整 bottom padding 對齊 layout-space-loose,或在 spec 記 rationale 為何 asymmetric
 
 ### 2. 垂直對稱
@@ -371,5 +371,5 @@ FAIL 項摘要:
 - `.claude/skills/product-ui-audit/SKILL.md` — consumer UI 對 DS 消費 audit(code 層),不處理視覺
 - `.claude/skills/component-quality-gate/SKILL.md` — 元件合入 DS 前的 45 項 checklist;Ship phase 可 chain 本 skill
 - CLAUDE.md `# 同 flex 列的互動 slot 幾何鐵律` — 本 skill checklist #3 的主要 canonical 來源
-- CLAUDE.md `# 建立 UI 前必讀` → layout primitive / token spec 清單 — 本 skill「合格標準」的對照錨
+- `.claude/rules/ui-development.md`「建立 UI 前必讀」 → layout primitive / token spec 清單 — 本 skill「合格標準」的對照錨
 - `memory/project_pending_tasks`「視覺 regression 基建」條目 — 長期 tech debt(Chromatic / screenshot-diff)

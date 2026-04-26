@@ -133,7 +133,9 @@ const CircularProgress = React.forwardRef<HTMLSpanElement, CircularProgressProps
           // align-middle:inline context 內讓 SVG 對齊 adjacent text 的 x-height 中線
           //(不加會按 baseline 對齊,在 inline-flex cell 裡視覺下沉 1-2px 看起來歪)
           'inline-flex shrink-0 align-middle text-primary',
-          !isDeterminate && 'animate-spin',
+          // motion-reduce:Material 流派 — prefers-reduced-motion 時不停止旋轉(loading 仍需可見回饋),
+          // 而是放慢到 3s/cycle(預設 1s),保留資訊不刺激前庭。
+          !isDeterminate && 'animate-spin motion-reduce:[animation-duration:3s]',
           className,
         )}
         style={{ width: size, height: size }}

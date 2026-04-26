@@ -2,7 +2,7 @@
 
 **此檔是 D6「設計原則自檢」的唯一執行 SSOT**。所有 audit skill(design-system-audit / component-quality-gate / prototype / product-ui-audit)的 D6 phase 都 chain 本檔,不重複寫邏輯。
 
-對齊 CLAUDE.md `# 稽核 canonical` + `# 稽核 vs 執行 分權 canonical`。
+對齊 CLAUDE.md `# 稽核 canonical`(內含「Audit-vs-execute 分權」inline rule)。
 
 ---
 

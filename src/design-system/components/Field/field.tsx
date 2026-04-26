@@ -390,14 +390,13 @@ const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
           {info && !disabled && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span
-                  role="img"
+                <button
+                  type="button"
                   aria-label={info}
-                  tabIndex={0}
-                  className="inline-flex items-center text-fg-muted hover:text-fg-secondary"
+                  className="inline-flex items-center text-fg-muted hover:text-fg-secondary bg-transparent border-0 p-0 cursor-pointer"
                 >
                   <InfoIcon size={16} aria-hidden />
-                </span>
+                </button>
               </TooltipTrigger>
               <TooltipContent>{info}</TooltipContent>
             </Tooltip>

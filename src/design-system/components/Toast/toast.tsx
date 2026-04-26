@@ -42,13 +42,21 @@ function ToastInner({
     <Button variant="tertiary" size="xs" onClick={action.onClick}>{action.label}</Button>
   ) : undefined
 
+  // ── Live region 由 outer Toast wrapper 擁有(WAI-ARIA + spec L59-60 canonical) ──
+  // Notice(inner layout)不再帶 role,避免 nested live region。
+  // - error / warning → role="alert" + aria-live="assertive"(中斷朗讀)
+  // - info / success / neutral → role="status" + aria-live="polite"(空閒朗讀)
+  const isCritical = variant === 'error' || variant === 'warning'
+  const liveRole = isCritical ? 'alert' : 'status'
+  const liveLevel = isCritical ? 'assertive' : 'polite'
+
   // ── 1. Shadow wrapper（統一,永遠在頁面 theme） ──
   // ── 2+3. Bg + theme layer ──
 
   if (isInverse) {
     // bg-surface-raised 需要跟 data-theme 同層翻轉
     return (
-      <div className="rounded-lg overflow-hidden" style={{ boxShadow: 'var(--elevation-200)' }}>
+      <div role={liveRole} aria-live={liveLevel} className="rounded-lg overflow-hidden" style={{ boxShadow: 'var(--elevation-200)' }}>
         <div data-theme={inverseTheme} className="bg-surface-raised text-foreground">
           <Notice variant={variant} iconClassName={variant === 'success' ? 'text-success' : undefined}
             endContent={actionButton} onDismiss={dismiss} {...rest} />
@@ -61,7 +69,7 @@ function ToastInner({
   const theme = variant === 'warning' ? 'light' : 'dark'
 
   return (
-    <div className="rounded-lg overflow-hidden" style={{ boxShadow: 'var(--elevation-200)' }}>
+    <div role={liveRole} aria-live={liveLevel} className="rounded-lg overflow-hidden" style={{ boxShadow: 'var(--elevation-200)' }}>
       <div className={bg}>
         <div data-theme={theme} className="text-foreground">
           <Notice variant={variant} endContent={actionButton} onDismiss={dismiss} {...rest} />

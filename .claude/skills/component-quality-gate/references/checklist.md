@@ -7,7 +7,7 @@
 ---
 
 ## Phase 1 — Spec(`{name}.spec.md`)
-> 規則定義:CLAUDE.md `# Spec 規則`
+> 規則定義:`.claude/rules/spec-rules.md`
 
 - [ ] 元件定位一句話(是什麼 / 不是什麼)
 - [ ] 定位段落宣告實作基礎(基於 Radix X / cmdk / sonner / native / 自建 + 理由)
@@ -25,7 +25,7 @@
 ---
 
 ## Phase 2 — Code(`{name}.tsx`)
-> 規則定義:CLAUDE.md `# UI 開發規則` / `# shadcn 元件規範` / `# Tailwind 使用規則` / `# Token 命名原則` / `# 元件 Props 命名原則`
+> 規則定義:`.claude/rules/ui-development.md` / `# shadcn 元件規範` / `# Tailwind 使用規則` / `# Token 命名原則` / `# 元件 Props 命名原則`
 
 - [ ] 以 shadcn 為基底,forwardRef / displayName / asChild / ...props spread 齊全
 - [ ] variants 用 cva(),不條件拼字串(或 documented 例外:style-prop variant → object map / 結構性 variant → if-branches)

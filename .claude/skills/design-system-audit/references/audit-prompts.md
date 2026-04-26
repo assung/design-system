@@ -76,7 +76,7 @@ End: `N components checked, M mismatches.` Under 400 words. Don't fix.
 ## 2. SSOT dead link
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# Spec 規則` SSOT anchors list; every pointer must resolve to an actual `##`/`###` heading OR actual filesystem path
+**Canonical source**: `.claude/rules/spec-rules.md` SSOT anchors list; every pointer must resolve to an actual `##`/`###` heading OR actual filesystem path
 **Rationale home**: N/A — dead link is never acceptable
 
 ```
@@ -123,7 +123,7 @@ End: `N pointers checked, M heading-dead, K path-dead, L self-placement drift.` 
 ## 3. SSOT reciprocal
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# Spec 規則` → "reciprocal 必須存在,不可單向"
+**Canonical source**: `.claude/rules/spec-rules.md` → "reciprocal 必須存在,不可單向"
 **Rationale home**: N/A — single-direction SSOT is a bug
 
 ```
@@ -142,7 +142,7 @@ Common patterns of reverse pointer:
 
 Report: `A.spec.md → B.spec.md:N — B 未指回 A`
 
-Focus on current SSOT anchors (CLAUDE.md `# Spec 規則` lists them):
+Focus on current SSOT anchors (`.claude/rules/spec-rules.md` lists them):
 - tabs ↔ segmented-control
 - select ↔ radio-group
 - checkbox ↔ switch
@@ -156,7 +156,7 @@ End: `N pointers checked, M non-reciprocal.` Under 400 words. Don't fix.
 ## 4. Tailwind v4 / tailwind-merge grep
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# Tailwind 使用規則` → "Tailwind v4 任意值" + "tailwind-merge 自訂 utility 註冊" bug patterns
+**Canonical source**: `.claude/rules/ui-development.md`「Tailwind 5 條核心」 → "Tailwind v4 任意值" + "tailwind-merge 自訂 utility 註冊" bug patterns
 **Rationale home**: N/A — these are technical bugs (Sidebar `[--foo]` / `text-body` misclassification)
 
 ```
@@ -183,7 +183,7 @@ End: `N .tsx files checked, M violations.` Under 400 words. Don't fix.
 ## 5. Token 消費紀律
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# UI 開發規則` + `# Tailwind 使用規則` → 禁止清單 (hex / rgb / shadow-md/sm / raw px 等)
+**Canonical source**: `.claude/rules/ui-development.md` + `# Tailwind 使用規則` → 禁止清單 (hex / rgb / shadow-md/sm / raw px 等)
 **Rationale home**: N/A — tokens bypass breaks dark mode / density / brand-swap
 
 ```
@@ -213,11 +213,11 @@ End: `N component .tsx files checked, M violations.` Under 500 words. Don't fix.
 ## 6. Spec Rule A 文字品質
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# Spec 規則` → Spec 文字品質 (不描述視覺形狀 / 實作細節 / 術語一致)
+**Canonical source**: `.claude/rules/spec-rules.md` → Spec 文字品質 (不描述視覺形狀 / 實作細節 / 術語一致)
 **Rationale home**: N/A — visual metaphors / raw px / Tailwind class dumps in spec are always defects
 
 ```
-Your job: audit all .spec.md under src/design-system/ against Rule A in CLAUDE.md `# Spec 規則`.
+Your job: audit all .spec.md under src/design-system/ against Rule A in `.claude/rules/spec-rules.md`.
 
 Rule A — no visual-form / implementation pollution. Flag:
 - Visual: 「窄長形」/ 「圓圓的」/ 「凸起」/ 「扁平」/ 「跳動」/ 「崩潰」/ 「看不出 X 邊界」/「看起來像 Y」
@@ -236,11 +236,11 @@ End: `N specs checked, V violations, top offenders: [list]` Under 500 words. Don
 ## 7. Spec Rule B 邊界案例
 
 **Type**: Consistency
-**Canonical source**: CLAUDE.md `# Spec 規則` → 邊界案例覆蓋 + Scope 預設 (Field family delegates to field-controls, Separator/Skeleton/CircularProgress/ProgressBar claim 無互動狀態, etc.)
+**Canonical source**: `.claude/rules/spec-rules.md` → 邊界案例覆蓋 + Scope 預設 (Field family delegates to field-controls, Separator/Skeleton/CircularProgress/ProgressBar claim 無互動狀態, etc.)
 **Rationale home**: element .spec.md —「本元件無 X 狀態」/「由 {family} spec 繼承」 one-liner acceptable
 
 ```
-Your job: audit all .spec.md against Rule B in CLAUDE.md `# Spec 規則` → 邊界案例覆蓋 (apply Scope 預設).
+Your job: audit all .spec.md against Rule B in `.claude/rules/spec-rules.md` → 邊界案例覆蓋 (apply Scope 預設).
 
 For each spec check:
 - disabled / loading / empty
@@ -261,11 +261,11 @@ End: `N specs checked, M genuine gaps, L scope-N/A accepted.` Under 500 words. D
 ## 8. 7-維度 對標覆蓋
 
 **Type**: Consistency
-**Canonical source**: CLAUDE.md `# Spec 規則` → 對標世界級 DS 七維度 (何時用 / 不用 / 近親分界 / 誤解 / 相關 / 空值 / 驗證時機 / Loading / a11y)
+**Canonical source**: `.claude/rules/spec-rules.md` → 對標世界級 DS 七維度 (何時用 / 不用 / 近親分界 / 誤解 / 相關 / 空值 / 驗證時機 / Loading / a11y)
 **Rationale home**: element .spec.md — 某維度 N/A 時須一行說明 (「本元件為純版面 primitive,無驗證時機」)
 
 ```
-Your job: for each .spec.md, verify coverage of the 7 world-class DS dimensions (CLAUDE.md `# Spec 規則` → 對標世界級 DS).
+Your job: for each .spec.md, verify coverage of the 7 world-class DS dimensions (`.claude/rules/spec-rules.md` → 對標世界級 DS).
 
 The 7 dimensions:
 1. 何時用 / 何時不用 (when to use / not use)
@@ -292,7 +292,7 @@ End: `N specs checked, average dimensions covered: X/7. Specs needing most atten
 ## 9. shadcn passthrough 完整度
 
 **Type**: Consistency
-**Canonical source**: CLAUDE.md `# shadcn 元件規範` — forwardRef / displayName / ...props / cva / Radix data-attrs / asChild
+**Canonical source**: `.claude/rules/ui-development.md`「shadcn 元件規範」 — forwardRef / displayName / ...props / cva / Radix data-attrs / asChild
 **Rationale home**: element .spec.md — internal helper / non-Slot primitives may skip asChild with documented reason
 
 ```
@@ -319,7 +319,7 @@ Report: `N components checked, M with holes.` Under 500 words. Don't fix.
 ## 10. a11y 基本覆蓋
 
 **Type**: Consistency (mostly Absolute)
-**Canonical source**: WCAG + CLAUDE.md `# UI 開發規則` (keyboard handlers / aria-label on icon-only / form labels)
+**Canonical source**: WCAG + `.claude/rules/ui-development.md` (keyboard handlers / aria-label on icon-only / form labels)
 **Rationale home**: element .spec.md — decorative/internal primitives may document aria-hidden or omitted role with reason
 
 ```
@@ -518,13 +518,13 @@ After all return:
 ## 16. Layout Family 宣告
 
 **Type**: Consistency
-**Canonical source**: CLAUDE.md `# 系統內部 Layout — 4-Family Model`
+**Canonical source**: CLAUDE.md `# 4-Family Layout Model`
 **Rationale home**: element .spec.md — 聲明「本元件不屬於 4-Family Model」+ reason (self-contained / composite) is an acceptable rationale
 
 ```
 Your job: verify every component spec.md under src/design-system/components/ has a「Layout Family」declaration in its first section (after 定位/實作基礎, before 何時用).
 
-The 4-Family Model (CLAUDE.md `# 系統內部 Layout — 4-Family Model`):
+The 4-Family Model (CLAUDE.md `# 4-Family Layout Model`):
 - Family 1: Menu item layout
 - Family 2: List item layout
 - Family 3: Pill layout
@@ -571,7 +571,7 @@ End: `N cva/prop definitions scanned, M genuine collisions found. Historical: te
 ## 18. shadcn compat alias 回流檢查
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# Tailwind 使用規則` → 「shadcn compat aliases — 不給我們元件用」
+**Canonical source**: `.claude/rules/ui-development.md`「Tailwind 5 條核心」 → 「shadcn compat aliases — 不給我們元件用」
 **Rationale home**: N/A — aliases are migration safety net only; human-edited / new code must use direct tokens
 
 ```
@@ -643,7 +643,7 @@ End: `N folders audited, M rename candidates, top 3: [list]`. Under 400 words. D
 ## 20. Spec 硬寫機械化值檢查
 
 **Type**: Consistency
-**Canonical source**: CLAUDE.md `# Spec 規則` →「spec 只記錄設計原則,可程式化規則寫 .tsx」
+**Canonical source**: `.claude/rules/spec-rules.md` →「spec 只記錄設計原則,可程式化規則寫 .tsx」
 **Rationale home**: element/pattern .spec.md — token spec 本身 / pattern rationale 節 / historical bug anchor 可合法保留具體數值,需有一行說明為何在此
 
 ```
@@ -674,7 +674,7 @@ End: `N specs checked, M hardcoded violations, top 5: [list]`. Under 400 words. 
 ## 21. Stories / consumer code 手刻繞 DS canonical(視覺對齊盲點的可機械化前哨)
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# UI 開發規則`「Story / consumer code 禁止手刻既有 DS 元件已支援的 pattern」+ 元件 spec.md(提供的 API)
+**Canonical source**: `.claude/rules/ui-development.md`「Story / consumer code 禁止手刻既有 DS 元件已支援的 pattern」+ 元件 spec.md(提供的 API)
 **Rationale home**: N/A — hand-craft 繞 DS canonical 是 absolute bug,不容 rationale 例外
 
 **背景**:pixel-level 視覺對齊無法 grep(需 visual regression 工具,長期基建 tech debt)。但「stories 自刻 `absolute + translate-y-1/2` 繞過 DS 元件的 loading / overlay / search 等 pattern」是**強信號**——這類 hand-craft 在不同 size / density 下視覺對齊跑掉,是視覺 bug 的上游。本 dim 抓 hand-craft 反 canonical 路徑,預防視覺 bug 進 production。

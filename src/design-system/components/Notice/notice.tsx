@@ -69,6 +69,16 @@ export interface NoticeProps
   /** ARIA label for the dismiss button. Override for i18n. Default: "關閉通知" */
   dismissAriaLabel?: string
   iconClassName?: string
+  /**
+   * ARIA role 由 wrapping consumer 決定(Alert / Toast / 自管 host),Notice 預設不帶 role。
+   * Notice 是 layout primitive,Alert / Toast 是 live region 擁有者——避免 nested live region
+   * 造成 screen reader 重複朗讀。明文傳遞才覆寫。
+   */
+  role?: 'status' | 'alert'
+  /**
+   * 對應 role 的 aria-live 策略,wrapping consumer 決定;Notice 預設 undefined 不帶 live region。
+   */
+  'aria-live'?: 'polite' | 'assertive' | 'off'
 }
 
 const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
@@ -92,7 +102,6 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
     return (
       <div
         ref={ref}
-        role="status"
         className={cn(NOTICE_LAYOUT, className)}
         {...props}
       >
