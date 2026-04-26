@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verify(tsc + tests + compile + build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: tsc -b(0 errors required)
+        run: |
+          if npx tsc -b 2>&1 | grep -q "error TS"; then
+            echo "❌ tsc errors found"
+            exit 1
+          fi
+
+      - name: Hook test suite
+        run: |
+          shopt -s nullglob
+          fail=0
+          for t in .claude/hooks/tests/test_*.sh; do
+            chmod +x "$t"
+            if ! bash "$t" > /tmp/test.log 2>&1; then
+              echo "❌ $t failed:"
+              tail -10 /tmp/test.log
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then exit 1; fi
+          echo "✅ all hook tests passed"
+
+      - name: Story compile-drift check
+        run: |
+          if ! node scripts/compile-stories.mjs --all --check 2>&1 | tail -3 | grep -q "0 skipped"; then
+            echo "❌ compile-stories drift detected"
+            node scripts/compile-stories.mjs --all --check 2>&1 | tail -20
+            exit 1
+          fi
+
+      - name: Storybook build
+        run: npm run build-storybook 2>&1 | tail -20
+
+      - name: Vite build
+        run: npm run build 2>&1 | tail -10
+
+      - name: File-size budget enforcement
+        run: |
+          fail=0
+          claude_lines=$(wc -l < CLAUDE.md | tr -d ' ')
+          if [ "$claude_lines" -gt 800 ]; then
+            echo "❌ CLAUDE.md ${claude_lines} lines exceeds 800 transition cap"
+            fail=1
+          fi
+          for f in src/design-system/components/*/*.spec.md; do
+            l=$(wc -l < "$f" | tr -d ' ')
+            case "$f" in
+              */item-anatomy.spec.md) cap=1200 ;;
+              */color.spec.md|*/sidebar.spec.md|*/tree-view.spec.md|*/field.spec.md|*/field-controls.spec.md|*/button.spec.md|*/overlay-surface.spec.md|*/action-bar.spec.md|*/uiSize.spec.md) cap=800 ;;
+              *) cap=500 ;;
+            esac
+            if [ "$l" -gt "$cap" ]; then
+              echo "❌ $f ${l}/${cap} cap exceeded"
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then exit 1; fi
+          echo "✅ all files under cap"

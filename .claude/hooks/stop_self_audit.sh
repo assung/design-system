@@ -104,11 +104,19 @@ fi
 # Silent if nothing
 [ -z "$WARNINGS" ] && exit 0
 
-# Inject warning to next-turn context
+# Inject MAXIMUM-strength warning to next-turn context
+# (Stop hook 無法 BLOCK exit code,但用 STRONG language 強制下輪 priority address)
 cat <<EOJSON
-{"hookSpecificOutput":{"hookEventName":"Stop","additionalContext":$(jq -Rs . <<<"🤖 Self-audit signals(stop_self_audit.sh):${WARNINGS}
+{"hookSpecificOutput":{"hookEventName":"Stop","additionalContext":$(jq -Rs . <<<"🚨 BLOCKER — Self-audit detected violations:${WARNINGS}
 
-下輪採取對應 action 或解釋為何不適用,不 silent skip。對齊 M14/M19 mechanical 落地。")}}
+⛔ MANDATORY action(下輪 must 在做其他事前 address):
+1. 對每個 violation 採取 corrective action OR 明確解釋為何不適用
+2. **禁止** silent skip / defer / 「等 user 確認」(M19 違反)
+3. CI(.github/workflows/ci.yml)會 fail push if any threshold breached — 不靠 local discipline
+4. Verify 失敗 → 撤回 prior claim,重做不再 claim done 直到實跑
+
+對齊 M14(自動 integrate)+ M19(trigger phrase auto pipeline)mechanical 落地。
+本 hook 是 last-line warn 防線;CI 是 hard block;兩者 defense-in-depth。")}}
 EOJSON
 
 exit 0
