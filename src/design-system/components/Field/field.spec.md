@@ -1,6 +1,9 @@
 ---
 component: Field
 family: null
+traits:
+  - hasInteractiveStates
+  - isStructural
 variants: {}
 sizes: {}
 ---

@@ -14,7 +14,7 @@ traits:
 
 TimePicker 是**單一時間**(時/分/秒)輸入與顯示元件,對齊 Ant Design `<TimePicker>` API 風格,但視覺與互動走本 DS 設計語言。
 
-**Layout Family**:**Family 4(Field control layout)**,視覺對齊 Family 1(Menu item)。見 `patterns/element-anatomy/element-anatomy.spec.md`「Field control layout」段。
+**Layout Family**:**Family 4(Field control layout)**,視覺對齊 Family 1(Menu item)。見 `patterns/element-anatomy/element-anatomy.spec.md`「Field Composition(不在 family 但相關)」段。
 
 **實作基礎**:
 - **Trigger**:`<button>` + `fieldWrapperStyles`(視覺 = Input wrapper,但 role 是 button 開 popover)
