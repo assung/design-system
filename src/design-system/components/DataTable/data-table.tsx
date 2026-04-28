@@ -231,6 +231,9 @@ function DataTableInner<TData>(
   const { rows } = table.getRowModel()
   const isEmpty = rows.length === 0
   const hasHeightConstraint = height !== 'auto'
+  // Fill-parent mode:height='100%' / '100vh' / 'fill' 等百分比 / 視口語義 → outer flex column + body flex-1 撐滿。
+  // 固定 px/rem 仍維持 maxHeight cap 行為(資料少 = 內容高度,資料多 = 上限後 scroll)— 對齊既有 stories 預期。
+  const isFillHeight = hasHeightConstraint && /^(100%|100vh|fill)$/.test(height)
   const useVirtual = hasHeightConstraint && !isEmpty
   const hasRowActions = !!rowActions
 
@@ -359,12 +362,20 @@ function DataTableInner<TData>(
       const isDisabled = isRowSelectable ? !isRowSelectable(rowOriginal) : false
       const ariaLabel = getRowAriaLabel?.(rowOriginal) ?? 'Select row'
       const checkboxSize = size === 'lg' ? 'lg' : 'md'
+      // Cell 整格可點:click cell padding 也觸發 toggle/select(對齊 Linear / Apple Mail / Material DataGrid)
+      // 內部 checkbox/radio 用 stopPropagation 避免 double-fire
+      const onCellClick = isDisabled ? undefined : (e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (mode === 'single') setSelection([rowId])
+        else toggleRow(rowId, rowOriginal, { shiftKey: e.shiftKey })
+      }
       return (
         <div
           key={cell.id}
           role="cell"
-          className="flex items-center justify-center shrink-0"
+          className={cn('flex items-center justify-center shrink-0', !isDisabled && 'cursor-pointer')}
           style={{ width: cell.column.getSize(), ...cellPadding }}
+          onClick={onCellClick}
         >
           {mode === 'single' ? (
             <RadioGroupItem
@@ -536,17 +547,20 @@ function DataTableInner<TData>(
   const headerCellEl = (header: ReturnType<typeof table.getHeaderGroups>[number]['headers'][number], showDivider: boolean) => {
     // L2 selection:__select__ 欄自訂 render(tri-state header checkbox)
     if (enabled && header.column.id === SELECT_COL_ID) {
+      const isHeaderDisabled = selectableVisibleIds.length === 0 || mode !== 'multi'
       return (
         <div
           key={header.id}
           role="columnheader"
-          className="flex items-center justify-center shrink-0 select-none"
+          className={cn('flex items-center justify-center shrink-0 select-none', !isHeaderDisabled && 'cursor-pointer')}
           style={{ width: header.getSize(), ...cellPadding }}
+          onClick={isHeaderDisabled ? undefined : (e) => { e.stopPropagation(); toggleHeaderCheckbox() }}
         >
           {mode === 'multi' && (
             <Checkbox
               size={size === 'lg' ? 'lg' : 'md'}
               checked={headerCheckedState}
+              onClick={(e) => e.stopPropagation()}
               onCheckedChange={() => toggleHeaderCheckbox()}
               aria-label="Select all visible rows"
               disabled={selectableVisibleIds.length === 0}
@@ -658,7 +672,8 @@ function DataTableInner<TData>(
     <div
       ref={(el) => { tableRef.current = el; if (typeof ref === 'function') ref(el); else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el }}
       data-table-size={size}
-      className={cn(dataTableVariants({ bordered }), className)}
+      className={cn(dataTableVariants({ bordered }), isFillHeight && 'flex flex-col', className)}
+      style={isFillHeight ? { maxHeight: height } : undefined}
       role="table" aria-rowcount={rows.length + 1}
       tabIndex={enabled ? 0 : undefined}
       onKeyDown={enabled ? tableKeyboardHandler : undefined}
@@ -697,8 +712,9 @@ function DataTableInner<TData>(
       {/* ══ BODY(AG Grid 流派:各 region 自己 V scroll + JS 同步)══
            AR44 user-reported UX fix:H scrollbar 現在落在 center-body 的 visible 底部(不是 1800px 內容底部)。
            三個 region(left / center / right)各自 maxHeight + overflowY,JS 同步 scrollTop。
-           Pinned 區 overflow-y:hidden(看不到自己的 V scrollbar),V scroll 真正發生在 center。 */}
-      <div ref={bodyRef} className="flex items-start">
+           Pinned 區 overflow-y:hidden(看不到自己的 V scrollbar),V scroll 真正發生在 center。
+           isFillHeight 時 body div 加 min-h-0 讓它在 outer flex column 內可被 flex shrink — region maxHeight: 100% 才能 bind 到實際分配的高度。 */}
+      <div ref={bodyRef} className={cn('flex items-start', isFillHeight && 'min-h-0')}>
         {hasLeft && (
           <div
             ref={leftBodyRef}

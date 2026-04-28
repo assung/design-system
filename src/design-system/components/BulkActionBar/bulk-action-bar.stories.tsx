@@ -37,7 +37,7 @@ export const Default: Story = {
 
 // Filter 模式:hidden 數量顯示在 count 區 inline
 export const WithFilterHidden: Story = {
-  name: 'Filter 隱藏 selected(inline 進 count 區)',
+  name: '部分項目被篩選隱藏',
   render: () => {
     const [selection, setSelection] = useState<string[]>(['issue-1', 'issue-2', 'issue-3'])
     return (
@@ -59,7 +59,7 @@ export const WithFilterHidden: Story = {
 // Hint banner via Alert primitive(擴 dataset 提示)— 對齊 ref 圖
 // hint banner 唯一 trigger condition:本頁全選 + 還有 dataset 沒選到
 export const WithExtendDatasetHint: Story = {
-  name: '含擴 dataset hint banner(用 Alert)',
+  name: '提示擴選整個資料集',
   render: () => {
     const TOTAL = 5370
     const VISIBLE = 50
@@ -99,18 +99,16 @@ export const WithExtendDatasetHint: Story = {
             )
           }
         />
-        <div className="border-t border-divider">
-          <BulkActionBar
-            selection={selection}
-            onClear={() => { setSelection([]); setAllSelected(false) }}
-            actions={
-              <>
-                <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-                <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
-              </>
-            }
-          />
-        </div>
+        <BulkActionBar
+          selection={selection}
+          onClear={() => { setSelection([]); setAllSelected(false) }}
+          actions={
+            <>
+              <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
+              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+            </>
+          }
+        />
       </div>
     )
   },

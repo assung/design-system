@@ -79,6 +79,8 @@ const BulkActionBar = React.forwardRef<HTMLDivElement, BulkActionBarProps>(
         className={cn(
           'flex items-center gap-2',
           'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
+          // 上分隔線:bottom toolbar canonical(Linear / Apple Mail / Notion 共識)— 視覺從上方內容收尾
+          'border-t border-divider',
           className
         )}
         {...props}

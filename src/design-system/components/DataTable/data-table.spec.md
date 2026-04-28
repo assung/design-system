@@ -74,10 +74,9 @@ DataTable 有三種尺寸（`sm`、`md`、`lg`），透過 `size` prop 控制。
 
 **有高度約束 vs 無高度約束，決定可用的功能組合。**
 
-**有高度約束**（指定高度值，或父容器提供高度限制）
-- 超出就捲動，header 固定在頂部，虛擬捲動啟用
-- 適合大量資料、需要持續操作的場景
-- 高度來源可以是明確的 px 值，也可以是 flex 佈局讓 table 填滿剩餘空間（Linear 做法）——這是使用端的 layout 決策，不是 DataTable 的模式
+**有高度約束**(指定高度值,或父容器提供高度限制)
+- 行為:資料少→outer 內容高度;資料多→撐到上限後內部 scroll(虛擬捲動啟用,header 固定)
+- 高度來源:固定 `height="400px"` 等具體 px/rem,或 `height="100%"` 由父 flex 提供約束(Linear 做法)— 都走相同 cap 行為,無 dead surface
 
 **無高度約束**（auto）
 - 內容決定高度，table 框只包住內容
@@ -355,6 +354,7 @@ preserveSelectionOnFilter?: boolean   // default false
 - click checkbox → toggle 該 row
 - **shift-click checkbox** → 從 anchor row 到當前 row 區間選(內部 track anchor)
 - header checkbox click → toggle 全可見
+- **整 cell 區可點擊**(canonical):cell padding 任何位置(不只視覺 checkbox/radio 本體)點擊都觸發 toggle / select。對齊 Linear / Apple Mail / Material DataGrid — 增 hit target 不要求精準瞄準。Disabled row 不觸發。實作:select cell 容器 div onClick 委派到 toggleRow / setSelection
 
 ### 五、Disabled rows
 

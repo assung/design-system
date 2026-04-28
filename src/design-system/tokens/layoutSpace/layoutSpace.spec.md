@@ -1,126 +1,157 @@
 # LayoutSpace 設計原則
 
-Layout Space 定義頁面與容器的巨觀間距 token，隨 density 自動縮放。
-
-頁面結構間距，隨 `data-density`（或 `data-layout-space`）切換。
+Layout Space 定義頁面與容器的巨觀間距 token,隨 density 自動縮放(透過 `data-density` 或 `data-layout-space`)。
 
 ## Token 表
 
 | Token | md | lg | 語意 |
 |-------|----|----|------|
-| `--layout-space-loose` | 16px | 24px | 主間距:容器水平 padding、元素間 gap、fw 呼吸空間 |
-| `--layout-space-tight` | 12px | 16px | 緊湊間距:header 到非 fw、非 fw 到 fw 轉場 |
+| `--layout-space-loose` | 16px | 24px | 主間距:容器水平 padding、inline 之間 gap、block 呼吸空間 |
+| `--layout-space-tight` | 12px | 16px | 緊湊間距:Header → inline、與 block 相鄰 |
 | `--layout-space-bottom` | 48px | 48px | 結論留白:內容到 action buttons |
 
-### 為什麼 bottom 不隨 density 變
-
-48px 是「結論前的留白」——content 到 action buttons 的視覺暫停。這跟 density 無關(不論 compact 或 comfortable,使用者都需要「表單結束了」的節奏),所以固定。
+**為什麼 bottom 不隨 density 變**:48px 是「結論前的留白」— content 到 action buttons 的視覺暫停。跟 density 無關(不論 compact 或 comfortable,使用者都需要「表單結束了」的節奏)。
 
 ---
 
-## 容器 Layout 規則(6 條)
+## 元件角色:`block` 與 `inline`
 
-### 規則 1:水平 padding = `loose`
+**沒有元件級固定分類** — `block` / `inline` 是元件在「該層 layout」裡扮演的角色,不是元件本質。同一元件放不同層 layout 角色不同。CSS display 跟此分類無關。
 
-所有內容的左右 padding = `--layout-space-loose`。Full-width 元素(table / textarea / editor)的左右 padding **也是 `loose`**,讓內容邊緣跟非 full-width 元素對齊(視覺對稱)。
+### Scope-relative 判斷
+
+每進一層 layout container 重新判斷該層的子元件:
+
+| 情境 | 元件 | 該層角色 | 為什麼 |
+|------|------|---------|------|
+| Page body 直接放 Table | Table | block | 該層 = page-body,Table 占滿是畫布 |
+| Field 內包 Textarea | Field(整體) | inline | 對 form 而言 Field 是 row;Textarea 是 Field 的 internal control,不獨立分類 |
+| Card 內 mini Table | Table | 看 Card 怎 layout | Card chrome 是包裝 |
+| `placement="fixed"` Alert 在 page 底 | Alert | chrome band | 角色 ≈ Toolbar / Footer,非 inline notification |
+
+**判斷 3 題**(對該層該位置回答):
+1. 它在該層占滿容器寬度嗎?
+2. 它在該層的視覺重量是「畫布」還是「控件」?
+3. 跟該層的相鄰元件之間,你期待 loose 還是 tight?(tight = block 角色)
+
+**不要把角色寫進元件 spec**,寫進該層 layout 的 pattern / consumer code。
+
+---
+
+## 6 條 Layout 規則
+
+### 規則 1:水平 padding
+
+任何內容左右 padding = `loose`。**`block` 元件本身的左右 padding 也是 `loose`**(讓內容邊緣跟 inline 元件對齊,視覺對稱)。
+
+```
+✓ <Container px-loose>      ✓ <Table mx-loose>
+  [Inline element]              ╔══════╗
+                                ║ rows ║
+                                ╚══════╝
+```
 
 ### 規則 2:頂部(Header → 第一個元素)
 
-**依第一個元素的類型決定**:
-
-| 第一個元素 | Header → 該元素的距離 | 為什麼 |
+| 第一個元素 | Header → 該元素 | 為什麼 |
 |---|---|---|
-| **Full-width**(table / editor）| `loose` | fw 視覺重、需要呼吸空間 |
-| **非 full-width**(input / button / text / alert）| `tight` | 元素輕、header 邊界已提供分離 |
+| `block`(table / editor) | `loose` | 視覺重、需要呼吸空間 |
+| `inline`(input / button / alert) | `tight` | 元素輕、header 邊界已提供分離 |
 
 ### 規則 3:元素間 gap
 
-| 轉場 | 間距 | 為什麼 |
-|---|---|---|
-| 非 fw → 非 fw | `loose` | 預設 gap,form fields 之間 |
-| 非 fw → fw | `tight` | fw 視覺重、不需額外呼吸;避免「double spacing」感 |
-| fw → fw | `tight` | 同理 |
-| fw → 非 fw | `tight` | 同理(跟 fw 相鄰一律 tight) |
+**核心**:跟 `block` 相鄰一律 `tight`(避免「double spacing」感,因為 block 自帶視覺重量已是分隔)。只有 `inline ↔ inline` 用 `loose`。
 
-**一句話**:跟 full-width 相鄰的 gap 一律 `tight`。只有 non-fw ↔ non-fw 之間用 `loose`。
+| 轉場 | 間距 |
+|---|---|
+| `inline ↔ inline` | `loose` |
+| `inline → block` / `block → inline` | `tight` |
+| `block ↔ block` | `tight` |
 
-#### Caveat:`flex-col gap-*` 單值 form(2026-04-22 校準)
+#### Caveat:`flex-col gap-*` 單值容器
 
-規則 3 是 **per-transition** 設計意圖,但 CSS `flex-col gap-X` 只能套單一值。若 form 用 `flex-col gap-*` 容器統一 gap 處理:
+CSS `gap` 只能套單一值,form 含混合元件時:
 
-| Form 組成 | 統一 gap 選擇 | rationale |
-|----------|-------------|----------|
-| 全是 non-fw(Input / Select / Button) | **`loose`** | 所有 transition 都是 non-fw ↔ non-fw,規則 3 要求 loose |
-| 含 fw + non-fw 混合(Input / Textarea / CheckboxGroup) | **`loose`**(保守選) | 理由:「fw-adjacent 微 tight 的視覺損失」 << 「non-fw-adjacent 用 tight 的視覺擠壓」。非 fw 之間太緊使用者會覺得貼邊(M12 意義上的不合法貼邊);fw-adjacent 從 tight 拉寬到 loose 視覺差異 < 4px(md density)無察覺 |
-| 純 fw(Textarea + Table + Editor) | **`tight`** | 所有 transition 都是 fw-adjacent,規則 3 要求 tight |
+| Form 組成 | 統一 gap | rationale |
+|----------|---------|----------|
+| 全 `inline` | `loose` | 所有 transition 都 inline ↔ inline |
+| 混合 `inline` + `block` | `loose`(保守) | inline ↔ inline 用 tight 太緊(視覺貼邊感)>> block-adjacent 微 loose 視覺差(< 4px md density) |
+| 全 `block` | `tight` | 所有 transition 都 block-adjacent |
 
-**禁止**:單純因為 form 含一個 fw 就把 container 整體設 `tight`(會讓多數的 non-fw ↔ non-fw transition 視覺過緊,歷史 bug:2026-04-22 Sheet form field 全部貼邊假 tight 實際 bug 是 `className` 套錯層,但 spec 選 tight 也是 contributing factor)。
-
-**程式化路徑**(未來):若要完整 per-transition 套不同 gap,需建 `FormLayout` primitive 元件(見下方「程式化建議」),consumer 不用自己算。
+**禁止**:單純因為 form 含一個 `block` 就把 container 整體 `tight`(會讓多數 inline ↔ inline 視覺擠壓)。
 
 ### 規則 4:底部
 
 | 情境 | 間距 |
 |---|---|
-| 最後一個內容 → **action buttons** | `bottom`(48px) |
-| Full-width → **容器底部**（無 buttons）| `loose` |
+| 最後一個內容 → action buttons | `bottom`(48px) |
+| `block` → 容器底 / viewport 底 / 底部 chrome band(無 action buttons) | `loose` |
+| `inline` → 容器底 / viewport 底 | `tight` |
 
-Bottom 48px **只用在 action buttons 之前**。如果容器底部只有 fw content(沒有 Cancel/Save),底部 padding 跟左右一樣用 `loose`。
+**「底部 chrome band」定義**:Alert 提示、BulkActionBar、Status bar、Footer 等附著於容器底部的 chrome elements。它們算「容器底邊」的一部分,table → 它們的距離 = `block → 容器底`。
 
-### 規則 5:Full-width vs 非 Full-width 判斷
+### 規則 5:橫排 Input Gap(固定,不隨 density 變)
 
-| 歸類 | 典型元件 | 判斷 |
-|------|---------|------|
-| Full-width | Table、Textarea、Editor、Code block | 佔滿容器寬度(扣掉 loose padding) |
-| 非 Full-width | Input、Button、Select、Alert、Text、Checkbox、Tabs 內 trigger | 有自己的自然寬度 |
-
-### 規則 6:橫排 Input Gap（固定,不隨 density 變）
-
-橫排並列的 input fields 使用**固定 gap**,不走 layout-space token:
+橫排並列的 input fields **固定 gap,不走 layout-space token**:
 
 | 關聯性 | Gap | 範例 |
 |---|---|---|
-| **緊密相關**（同一組值的起迄） | **8px**（`gap-2`） | Sleep start ↔ Sleep end |
-| **非緊密**（不同組值並列） | **16px**（`gap-4`） | Sleep 時段 ↔ Work 時段 |
+| 緊密相關(同一組值的起迄) | `gap-2`(8px) | Sleep start ↔ Sleep end |
+| 非緊密(不同組值並列) | `gap-4`(16px) | Sleep 時段 ↔ Work 時段 |
 
-為什麼固定:這是 field 層級的 micro-spacing,跟容器層級的 macro-spacing（layout-space）是不同維度。Field gap 由**內容語意**決定（緊密 vs 獨立），不由 density 決定。
+**為什麼固定**:這是 field 級 micro-spacing,跟容器級 macro-spacing 是不同維度。Field gap 由**內容語意**決定(緊密 vs 獨立),不由 density 決定。
+
+### 規則 6:容器 padding 持有方
+
+**容器負責 padding,元件本身不加 margin 推開容器**。同一個元件在不同容器中行為一致,間距控制權在容器端。
 
 ---
 
-## 程式化建議:FormLayout Pattern
+## 典型容器範例
 
-表單容器的 layout 幾乎都是相同格式。可以程式化成一個 `<FormLayout>` pattern:
+### Form 情境(Field stack + footer,FormLayout 適用)
 
-```tsx
-<FormLayout>
-  {/* 自動套用: pt=tight, px=loose, pb=bottom, gap=loose */}
-  <Field><FieldLabel>Name</FieldLabel><Input /></Field>
-  <Field><FieldLabel>Description</FieldLabel><Textarea /></Field>
-  {/* Full-width element: FormLayout 自動偵測,改用 tight gap */}
-  <DataTable ... />
-  {/* Action footer */}
-  <FormLayout.Footer>
-    <Button variant="secondary">Cancel</Button>
-    <Button>Create</Button>
-  </FormLayout.Footer>
-</FormLayout>
+```
+┌────────────────────────────────────┐
+│  Title                        [X]  │
+├────────────────────────────────────┤
+│← tight(12) ──────────────────────→│ ← Header → inline(規則 2)
+│  ← loose → [Name input]   ← loose →│
+│← loose gap ──────────────────────→│ ← inline ↔ inline(規則 3)
+│  ← loose → [Description]  ← loose →│
+│← tight(12) ──────────────────────→│ ← inline → block(規則 3)
+│╔══════════════════════════════════╗│
+│║← loose → DataTable       ← loose →║│ ← block(規則 1 內 px = loose)
+│╚══════════════════════════════════╝│
+│← bottom(48) ────────────────────→│ ← 內容 → action buttons(規則 4)
+│  ← loose → [Cancel] [Save] ← loose →│
+└────────────────────────────────────┘
 ```
 
-**可程式化的部分**:
-- `pt-[var(--layout-space-tight)]` — 頂部 tight(非 fw 首元素)
-- `px-[var(--layout-space-loose)]` — 水平 loose
-- `gap-[var(--layout-space-loose)]` — 預設 gap
-- Footer 前自動加 `pb-[var(--layout-space-bottom)]`
+### Page 情境(全頁 list / dashboard,FormLayout 不適用)
 
-**需要手動處理的部分**:
-- Full-width 偵測(consumer 標記哪些是 fw,或用 className 覆蓋 gap)
-- 橫排 input 的 8px / 16px gap(由 consumer 在 flex row 上設定)
+```
+┌────────────────────────────────────┐
+│ ← loose → [Toolbar items] ← loose →│ ← Toolbar(自帶 py-tight,規則 3 提供 → table 間距)
+│╔══════════════════════════════════╗│
+│║← loose → DataTable       ← loose →║│ ← block(規則 1)
+│╚══════════════════════════════════╝│
+│← loose(16) ──────────────────────→│ ← block → 底部 chrome band / viewport(規則 4)
+│ ← loose → [Alert hint]    ← loose →│ ← 底部 chrome band(扮演 chrome 角色)
+│ ← loose → [BulkActionBar] ← loose →│
+└────────────────────────────────────┘
+```
+
+### 橫排 Input Gap(規則 5)
+
+```
+[*Sleep start][8px][*Sleep end]  [16px]  [*Work start][8px][*Work end]
+ └── 緊密相關 ──┘                └── 非緊密 ──┘ └── 緊密相關 ──┘
+```
 
 ---
 
 ## 模式切換
-
-Layout Space 與 UI Size 統一透過 `data-density` 控制：
 
 ```html
 <html data-density="md">
@@ -130,7 +161,7 @@ Layout Space 與 UI Size 統一透過 `data-density` 控制：
 document.documentElement.setAttribute('data-density', 'lg')
 ```
 
-若需單獨控制版面間距而不影響元件尺寸:
+單獨控制版面間距而不影響元件尺寸:
 
 ```ts
 document.documentElement.setAttribute('data-layout-space', 'lg')
@@ -138,132 +169,15 @@ document.documentElement.setAttribute('data-layout-space', 'lg')
 
 ---
 
-## 容器持有 padding 原則
+## 為什麼不建 FormLayout primitive
 
-元件不貼齊容器邊緣——**容器負責提供內距(padding),元件本身不加外距(margin)來推開容器**。這讓同一個元件在不同容器中都有一致的行為,間距的控制權在容器端。
+之前曾考慮 `<FormLayout>` 自動套規則 1-4。後來確認**不建**:
 
----
+- 規則 1-6 是 universal — Form / Page / Dashboard / Dialog / Card 全部吃同樣,不該為「form」單獨封裝
+- 角色判斷是 scope-relative 業務情境,自動偵測會把固定假設寫死(eg 假設 Textarea 一律 block 是錯的)
+- Consumer 直接套 className 反而透明、易 debug
 
-## 典型容器範例
-
-### 表單 Dialog（非 fw 內容）
-
-```
-┌────────────────────────────────────┐
-│  Title                        [X]  │ ← Dialog header(元件自帶)
-├────────────────────────────────────┤
-│← tight(16) ──────────────────────→│ ← 頂部到第一個非 fw 元素
-│  ← loose → [Name input]  ← loose →│
-│← loose gap(24) ─────────────────→│
-│  ← loose → [Description] ← loose →│
-│← loose gap(24) ─────────────────→│
-│  ← loose → [Color select]← loose →│
-│                                    │
-│← bottom(48) ───────────────────→│
-│  ← loose → [Cancel] [Create] ← loose →│
-└────────────────────────────────────┘
-```
-
-### Full-width Editor Dialog
-
-```
-┌────────────────────────────────────┐
-│  Multi-line text              [X]  │
-├────────────────────────────────────┤
-│← loose(24) ────────────────────→│ ← fw 首元素:用 loose
-│╔══════════════════════════════════╗│
-│║← loose → Editor content ← loose →║│
-│╚══════════════════════════════════╝│
-│← loose(24) ────────────────────→│ ← fw → 底部(無 buttons):loose
-├────────────────────────────────────┤
-│  ← loose → [Cancel] [Save] ← loose →│
-└────────────────────────────────────┘
-```
-
-### Tabs + Alert + Table Dialog
-
-```
-┌────────────────────────────────────┐
-│  Access                       [X]  │
-│  [Members] [Role permission] [Security]│
-├────────────────────────────────────┤
-│← tight(16) ────────────────────→│ ← 非 fw(alert)
-│  ← loose → [ℹ Info alert]← loose →│
-│← tight(16) ────────────────────→│ ← 非 fw → fw 轉場
-│╔══════════════════════════════════╗│
-│║← loose → Table           ← loose →║│
-│╚══════════════════════════════════╝│
-│← loose(24) ────────────────────→│ ← fw → 底部(無 buttons)
-└────────────────────────────────────┘
-```
-
-### Tabs + Table（無 Alert）
-
-```
-┌────────────────────────────────────┐
-│  Access                       [X]  │
-│  [Members] [Role permission] [Security]│
-├────────────────────────────────────┤
-│← loose(24) ────────────────────→│ ← fw 首元素:用 loose
-│╔══════════════════════════════════╗│
-│║← loose → Table           ← loose →║│
-│╚══════════════════════════════════╝│
-│← loose(24) ────────────────────→│
-└────────────────────────────────────┘
-```
-
-### Description + Table + Buttons
-
-```
-┌────────────────────────────────────┐
-│  Map deprecated statuses      [X]  │
-├────────────────────────────────────┤
-│← tight(16) ────────────────────→│ ← 非 fw 首元素
-│  ← loose → [Description text] ← loose →│
-│← tight(16) ────────────────────→│ ← 非 fw → fw 轉場
-│╔══════════════════════════════════╗│
-│║← loose → Table           ← loose →║│
-│╚══════════════════════════════════╝│
-│← loose(24) ────────────────────→│ ← fw → buttons 區
-├────────────────────────────────────┤
-│  ← loose → [Cancel] [Apply] ← loose →│
-└────────────────────────────────────┘
-```
-
-### 橫排 Input Gap
-
-```
-[*Sleep start][8px][*Sleep end]  [16px]  [*Work start][8px][*Work end]
- └── 緊密相關 ──┘              └── 非緊密 ──┘ └── 緊密相關 ──┘
-```
-
----
-
-## 使用方式
-
-```tsx
-// 容器水平 padding
-className="px-[var(--layout-space-loose)]"
-
-// 頂部(非 fw 首元素)
-className="pt-[var(--layout-space-tight)]"
-
-// 頂部(fw 首元素)
-className="pt-[var(--layout-space-loose)]"
-
-// 元素間 gap（非 fw ↔ 非 fw）
-className="gap-[var(--layout-space-loose)]"
-
-// Full-width 轉場 gap
-className="mt-[var(--layout-space-tight)]"
-
-// Bottom（到 action buttons）
-className="pb-[var(--layout-space-bottom)]"
-
-// 橫排 input gap（固定,不走 token）
-className="gap-2"   // 8px 緊密
-className="gap-4"   // 16px 非緊密
-```
+**真正獨特、值得封裝的只有 action-button footer chrome**(border-t + px-loose + py-tight + 內部 button group canonical),已在 `overlay-surface.spec.md`(SurfaceFooter)+ `action-bar.spec.md` 處理。Footer 上方那 48px(`--layout-space-bottom`)是 body 自己的 `pb-bottom`,不屬 footer chrome。一般 layout 直接套規則 1-6 的 className 即可。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

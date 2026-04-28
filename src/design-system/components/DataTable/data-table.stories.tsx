@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, Download } from 'lucide-react'
+import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, Download, Plus } from 'lucide-react'
 import { DataTable } from './data-table'
 import { Button } from '@/design-system/components/Button/button'
 import { Empty } from '@/design-system/components/Empty/empty'
@@ -12,24 +12,38 @@ import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
 
+// ── Person sample data canonical ──
+// 對齊 NameCard.stories「Default」預設呈現:name + subtitle + status + statusMessage + fields
+// avatar.spec.md DS-wide:所有 person avatar hover 必出現 NameCard,展示資訊一致(不可精簡)
+import type { PersonData } from '@/design-system/components/PeoplePicker/person-display'
+
+const SELLERS: PersonData[] = [
+  { name: 'Alice Wonderland Wang', avatarUrl: 'https://i.pravatar.cc/128?u=alice', description: 'Sales｜Tokyo｜EMP-1001', status: 'online', statusMessage: '出差中,週四回。緊急請聯絡 @bob 代理。', fields: [{ label: 'ID', value: 'AWW001' }, { label: '部門', value: 'Sales / APAC' }, { label: '時區', value: 'JST (GMT+9)' }] },
+  { name: 'Bob Christopher Chen', avatarUrl: 'https://i.pravatar.cc/128?u=bob', description: 'Sales｜Taipei｜EMP-1002', status: 'busy', statusMessage: '會議中,訊息我會儘快回。', fields: [{ label: 'ID', value: 'BCC002' }, { label: '部門', value: 'Sales / APAC' }, { label: '時區', value: 'TST (GMT+8)' }] },
+  { name: 'Carol Liu', avatarUrl: 'https://i.pravatar.cc/128?u=carol', description: 'Sales｜Singapore｜EMP-1003', status: 'online', statusMessage: '今日彈性工作。', fields: [{ label: 'ID', value: 'CL003' }, { label: '部門', value: 'Sales / APAC' }, { label: '時區', value: 'SGT (GMT+8)' }] },
+  { name: 'Alexander Hamilton Zhang', avatarUrl: 'https://i.pravatar.cc/128?u=alex', description: 'Sales｜Shanghai｜EMP-1004', status: 'away', statusMessage: '已離開辦公室,週一回。', fields: [{ label: 'ID', value: 'AHZ004' }, { label: '部門', value: 'Sales / APAC' }, { label: '時區', value: 'CST (GMT+8)' }] },
+  { name: 'David Wu', avatarUrl: 'https://i.pravatar.cc/128?u=david', description: 'Sales｜Hong Kong｜EMP-1005', status: 'online', statusMessage: '可線上協助。', fields: [{ label: 'ID', value: 'DW005' }, { label: '部門', value: 'Sales / APAC' }, { label: '時區', value: 'HKT (GMT+8)' }] },
+  { name: 'Elizabeth Montgomery Johnson', avatarUrl: 'https://i.pravatar.cc/128?u=elizabeth', description: 'Sales｜Sydney｜EMP-1006', status: 'offline', statusMessage: '已下線,明早 9:00 上線。', fields: [{ label: 'ID', value: 'EMJ006' }, { label: '部門', value: 'Sales / APAC' }, { label: '時區', value: 'AEST (GMT+10)' }] },
+]
+
 interface Product {
   sku: string
   name: string
   category: string
   stock: string
-  seller: { name: string; avatarUrl: string }
+  seller: PersonData
   updatedAt: string
   price?: number
   note?: string
 }
 
 const sampleData: Product[] = [
-  { sku: 'PRD-001', name: 'Wireless Bluetooth Headphones', category: 'Electronics', stock: 'In stock', seller: { name: 'Alice Wonderland Wang', avatarUrl: 'https://i.pravatar.cc/40?u=alice' }, updatedAt: '2025/03/12', price: 2490 },
-  { sku: 'PRD-002', name: 'Ergonomic Office Chair with Lumbar Support', category: 'Furniture', stock: 'Low stock', seller: { name: 'Bob Christopher Chen', avatarUrl: 'https://i.pravatar.cc/40?u=bob' }, updatedAt: '2025/03/14', price: 8900 },
-  { sku: 'PRD-003', name: 'Organic Green Tea 100 Bags', category: 'Food', stock: 'In stock', seller: { name: 'Carol Liu', avatarUrl: 'https://i.pravatar.cc/40?u=carol' }, updatedAt: '2025/03/15', price: 350 },
-  { sku: 'PRD-004', name: 'USB-C Hub 7-in-1 Adapter', category: 'Electronics', stock: 'Out of stock', seller: { name: 'Alexander Hamilton Zhang', avatarUrl: 'https://i.pravatar.cc/40?u=alex' }, updatedAt: '2025/03/16', price: 1290 },
-  { sku: 'PRD-005', name: 'Stainless Steel Water Bottle 750ml', category: 'Lifestyle', stock: 'In stock', seller: { name: 'David Wu', avatarUrl: 'https://i.pravatar.cc/40?u=david' }, updatedAt: '2025/03/18', price: 680 },
-  { sku: 'PRD-006', name: 'Mechanical Keyboard with Cherry MX Brown Switches and RGB Backlight', category: 'Electronics', stock: 'In stock', seller: { name: 'Elizabeth Montgomery Johnson', avatarUrl: 'https://i.pravatar.cc/40?u=elizabeth' }, updatedAt: '2025/03/20', price: 3200 },
+  { sku: 'PRD-001', name: 'Wireless Bluetooth Headphones', category: 'Electronics', stock: 'In stock', seller: SELLERS[0], updatedAt: '2025/03/12', price: 2490 },
+  { sku: 'PRD-002', name: 'Ergonomic Office Chair with Lumbar Support', category: 'Furniture', stock: 'Low stock', seller: SELLERS[1], updatedAt: '2025/03/14', price: 8900 },
+  { sku: 'PRD-003', name: 'Organic Green Tea 100 Bags', category: 'Food', stock: 'In stock', seller: SELLERS[2], updatedAt: '2025/03/15', price: 350 },
+  { sku: 'PRD-004', name: 'USB-C Hub 7-in-1 Adapter', category: 'Electronics', stock: 'Out of stock', seller: SELLERS[3], updatedAt: '2025/03/16', price: 1290 },
+  { sku: 'PRD-005', name: 'Stainless Steel Water Bottle 750ml', category: 'Lifestyle', stock: 'In stock', seller: SELLERS[4], updatedAt: '2025/03/18', price: 680 },
+  { sku: 'PRD-006', name: 'Mechanical Keyboard with Cherry MX Brown Switches and RGB Backlight', category: 'Electronics', stock: 'In stock', seller: SELLERS[5], updatedAt: '2025/03/20', price: 3200 },
 ]
 
 const dataWithNotes: Product[] = sampleData.map((p, i) => ({
@@ -42,18 +56,12 @@ const dataWithNotes: Product[] = sampleData.map((p, i) => ({
 function generateLargeData(count: number): Product[] {
   const categories = ['Electronics', 'Furniture', 'Food', 'Lifestyle']
   const stocks = ['In stock', 'Low stock', 'Out of stock', 'Pre-order']
-  const sellers = [
-    { name: 'Alice Wang', avatarUrl: 'https://i.pravatar.cc/40?u=alice' },
-    { name: 'Bob Chen', avatarUrl: 'https://i.pravatar.cc/40?u=bob' },
-    { name: 'Carol Liu', avatarUrl: 'https://i.pravatar.cc/40?u=carol' },
-    { name: 'David Wu', avatarUrl: 'https://i.pravatar.cc/40?u=david' },
-  ]
   return Array.from({ length: count }, (_, i) => ({
     sku: `PRD-${String(i + 1).padStart(4, '0')}`,
     name: `Product item ${i + 1} — ${categories[i % 4]}`,
     category: categories[i % 4],
     stock: stocks[i % 4],
-    seller: sellers[i % 4],
+    seller: SELLERS[i % SELLERS.length],
     updatedAt: `2025/03/${String(1 + (i % 28)).padStart(2, '0')}`,
     price: Math.round(100 + Math.random() * 9900),
   }))
@@ -123,7 +131,7 @@ export const ColumnTypes: Story = {
       active: boolean
       status: string
       tags: string[]
-      seller: { name: string; avatarUrl: string }
+      seller: PersonData
       url: string
     }
 
@@ -150,9 +158,9 @@ export const ColumnTypes: Story = {
       typeCol.accessor('url', { header: 'Link', size: 160, meta: { type: 'url' } }),
     ]
     const typeData: TypeDemo[] = [
-      { name: 'Wireless Headphones', quantity: 142, price: 2490, date: '2025-03-12', active: true, status: 'in_stock', tags: ['electronics', 'lifestyle'], seller: { name: 'Alice Wang', avatarUrl: 'https://i.pravatar.cc/40?u=alice' }, url: 'https://example.com/headphones' },
-      { name: 'Office Chair', quantity: 38, price: 8900, date: '2025-03-14', active: false, status: 'low_stock', tags: ['lifestyle'], seller: { name: 'Bob Chen', avatarUrl: 'https://i.pravatar.cc/40?u=bob' }, url: 'https://example.com/chair' },
-      { name: 'Green Tea 100 Bags', quantity: 520, price: 350, date: '2025-03-15', active: true, status: 'in_stock', tags: ['food', 'lifestyle', 'electronics'], seller: { name: 'Carol Liu', avatarUrl: 'https://i.pravatar.cc/40?u=carol' }, url: 'https://example.com/tea' },
+      { name: 'Wireless Headphones', quantity: 142, price: 2490, date: '2025-03-12', active: true, status: 'in_stock', tags: ['electronics', 'lifestyle'], seller: SELLERS[0], url: 'https://example.com/headphones' },
+      { name: 'Office Chair', quantity: 38, price: 8900, date: '2025-03-14', active: false, status: 'low_stock', tags: ['lifestyle'], seller: SELLERS[1], url: 'https://example.com/chair' },
+      { name: 'Green Tea 100 Bags', quantity: 520, price: 350, date: '2025-03-15', active: true, status: 'in_stock', tags: ['food', 'lifestyle', 'electronics'], seller: SELLERS[2], url: 'https://example.com/tea' },
     ]
 
     return (
@@ -391,9 +399,16 @@ export const VirtualScroll: Story = {
 
 /* ── L2 Selection — DataTable + BulkActionBar inline composition(canonical) ──
    保留 toolbar 功能(filter / sort / search 在選取期間仍可用)— 對齊 Linear / Notion /
-   Apple Mail / iOS Files / 你 ref 圖 additive 派 */
+   Apple Mail / iOS Files / ref 圖 additive 派
+
+   排版 canonical(本 showcase):
+   - Toolbar:左 search input / 右 ops 群(Gmail / Linear / Notion idiom)
+   - 各 chrome 元件 self-pad px-loose;table mx-loose 對齊 chrome 內容左右邊界
+   - bordered=true(height="100%" 為垂直滾動 trigger,per spec)
+   - Alert variant="neutral"(資訊性 hint,非 info hue) */
 export const WithBulkActions: Story = {
-  name: 'L2 Selection — 含 BulkActionBar(canonical)',
+  name: '選取 + 批次操作',
+  parameters: { layout: 'fullscreen' },
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     const [allSelected, setAllSelected] = React.useState(false)
@@ -409,11 +424,11 @@ export const WithBulkActions: Story = {
       : true
 
     return (
-      // 父層:純 composition area,填滿 parent 寬高(無 outer chrome)
-      // 各元件獨立並排,各自 own padding canonical 自然對齊
-      <div className="flex flex-col w-full h-[600px]">
-        {/* Toolbar — 獨立元件,自帶 px-loose py-tight */}
-        <div className="flex items-center gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider bg-canvas">
+      // 撐滿 parent(layout=fullscreen);
+      // toolbar 自帶 py = toolbar→table 間距(無父 gap);table→底部 chrome group = loose(footer 呼吸 canonical)
+      <div className="flex flex-col w-full h-screen bg-canvas">
+        {/* Toolbar — 左 search / 右 ops(Gmail / Linear / Notion idiom)*/}
+        <div className="flex items-center justify-between gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
           <div className="flex-1 max-w-sm">
             <Input
               size="sm"
@@ -423,72 +438,77 @@ export const WithBulkActions: Story = {
               startIcon={Search}
             />
           </div>
-          <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" />
-          <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
-          <Button variant="primary" size="sm">+ 新增商品</Button>
-          <Button variant="text" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
+          <div className="flex items-center gap-2">
+            <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" />
+            <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
+            <Button variant="primary" size="sm" startIcon={Plus}>新增商品</Button>
+            <Button variant="text" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
+          </div>
         </div>
 
-        {/* DataTable — 獨立元件,height="100%" + flex-1 撐滿剩餘空間 */}
-        <DataTable
-          columns={baseColumns}
-          data={filteredData}
-          height="100%"
-          bordered={false}
-          selectable
-          selection={selection}
-          onSelectionChange={setSelection}
-          getRowId={(row) => row.sku}
-          className="flex-1 min-h-0"
-        />
-
-        {/* Alert hint banner — 獨立元件,placement=fixed 自帶 loose px(對齊周圍元素)*/}
-        {showHint && (
-          <Alert
-            variant="info"
-            placement="fixed"
-            dismissible={false}
-            title={
-              allSelected ? (
-                <>
-                  已選取全部 {TOTAL} 個項目。{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setSelection([]); setAllSelected(false) }}
-                    className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                  >
-                    清除選取項目
-                  </button>
-                </>
-              ) : (
-                <>
-                  已選取本頁全部 {selection.length} 個。{' '}
-                  <button
-                    type="button"
-                    onClick={() => setAllSelected(true)}
-                    className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                  >
-                    點此選取全部 {TOTAL} 個項目
-                  </button>
-                </>
-              )
-            }
-          />
-        )}
-
-        {/* BulkActionBar — 獨立元件,自帶 px-loose py-tight */}
-        {selection.length > 0 && (
-          <BulkActionBar
-            className="border-t border-divider"
+        {/* DataTable — bordered=true(height 約束 = 垂直滾動 trigger,per spec line 150)
+            mx-loose:水平 padding(規則 1)
+            mb-loose:fw → 容器底 / viewport 底 / 底部 chrome 都是 loose(規則 4)— 永遠保留底部呼吸,不貼邊 */}
+        <div className="flex-1 min-h-0 mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)]">
+          <DataTable
+            columns={baseColumns}
+            data={filteredData}
+            height="100%"
+            selectable
             selection={selection}
-            onClear={() => { setSelection([]); setAllSelected(false) }}
-            actions={
-              <>
-                <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-                <Button variant="tertiary" size="sm" startIcon={Trash2} danger>移除</Button>
-              </>
-            }
+            onSelectionChange={setSelection}
+            getRowId={(row) => row.sku}
           />
+        </div>
+
+        {/* 底部 chrome group:Alert hint(全選提示)+ BulkActionBar — wrapper mb-loose 已提供間距 */}
+        {(showHint || selection.length > 0) && (
+          <div className="flex flex-col">
+            {showHint && (
+              <Alert
+                variant="neutral"
+                placement="fixed"
+                dismissible={false}
+                title={
+                  allSelected ? (
+                    <>
+                      已選取全部 {TOTAL} 個項目。{' '}
+                      <button
+                        type="button"
+                        onClick={() => { setSelection([]); setAllSelected(false) }}
+                        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                      >
+                        清除選取項目
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      已選取本頁全部 {selection.length} 個。{' '}
+                      <button
+                        type="button"
+                        onClick={() => setAllSelected(true)}
+                        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                      >
+                        點此選取全部 {TOTAL} 個項目
+                      </button>
+                    </>
+                  )
+                }
+              />
+            )}
+            {selection.length > 0 && (
+              <BulkActionBar
+                selection={selection}
+                onClear={() => { setSelection([]); setAllSelected(false) }}
+                actions={
+                  <>
+                    <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
+                    <Button variant="tertiary" size="sm" startIcon={Trash2} danger>移除</Button>
+                  </>
+                }
+              />
+            )}
+          </div>
         )}
       </div>
     )
@@ -497,7 +517,7 @@ export const WithBulkActions: Story = {
 
 /* ── L2 Selection — Shift-click + 鍵盤(Cmd+A / Esc)── */
 export const SelectionKeyboardAndShift: Story = {
-  name: 'L2 Selection — Shift-click 區間 + 鍵盤(Cmd+A / Esc)',
+  name: '區間選取與鍵盤操作',
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     const data = generateLargeData(15)
@@ -525,7 +545,7 @@ export const SelectionKeyboardAndShift: Story = {
 
 /* ── L2 Selection — Single mode(每次只選一個)── */
 export const SelectionSingleMode: Story = {
-  name: 'L2 Selection — Single mode',
+  name: '單選模式',
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     return (
@@ -552,7 +572,7 @@ export const SelectionSingleMode: Story = {
 
 /* ── L2 Selection — disabled rows + filter 互動 ── */
 export const SelectionDisabledRows: Story = {
-  name: 'L2 Selection — Disabled rows(只 disable checkbox)',
+  name: '不可選取的列',
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     return (
