@@ -34,7 +34,7 @@ description: Create-phase workflow for building a new design-system component fr
 
 ### Phase 1 — 近親 spec 掃讀(不憑直覺發明)
 
-對齊 CLAUDE.md mindset #2 + `# 遇不確定時的協議` Step 2。
+對齊 CLAUDE.md mindset #2 + `# 遇不確定時的協議` Step 2 + memory `feedback_proactive_5layer_pipeline.md`「5-step pre-check」(寫 tsx 前必含 CLAUDE.md SSOT 清單 + tsx 開頭「── 消費的 SSOT ──」段)。
 
 1. **識別 2-3 個近親元件**(同 family、同 pattern、同職責):
    - 視覺相似?(例:新 `StatusChip` → 近親 `Tag` / `Badge` / `Chip`)
