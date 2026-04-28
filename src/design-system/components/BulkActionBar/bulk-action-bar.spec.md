@@ -5,7 +5,6 @@ variants: {}
 sizes: {}
 traits:
   - hasActions
-  - isOverlay
 ---
 
 # BulkActionBar 設計原則
