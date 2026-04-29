@@ -101,6 +101,29 @@ CSS `gap` 只能套單一值,form 含混合元件時:
 
 **為什麼固定**:這是 field 級 micro-spacing,跟容器級 macro-spacing 是不同維度。Field gap 由**內容語意**決定(緊密 vs 獨立),不由 density 決定。
 
+### 規則 1.1:Chrome inline padding canonical(2026-04-29 codified)
+
+規則 1 specialization。**所有 chrome 表面**(SurfaceHeader / SurfaceFooter / SurfaceBody / Sidebar header / FileViewer toolbar + panel header + body / app top bar / page header)inline padding 統一 `px-[var(--layout-space-loose)]`(md=16 / lg=24,density-aware)。
+
+**為何 loose 而非 tight**:Chrome 是 surface 視覺邊界 + 內容呼吸區;`tight`(12/16)足夠 inline list item,chrome 需更穩定 anchor 讓 title / dismiss / actions 不貼邊。
+
+**M8 8 家世界級對照**(default density 共識 16px):
+
+| DS / Lib | Chrome inline padding |
+|---------|----------------------|
+| Material 3 Top App Bar | 16dp |
+| Carbon UI Shell Header | 16px(`$spacing-05`)|
+| Polaris Page Header | space-400(16px) |
+| Atlassian Page Header | space.200(16px) |
+| Apple HIG macOS Toolbar | 16-20pt |
+| Linear / Notion top bar | 16px(實測)|
+| GitHub Primer PageHeader | 16-24px |
+| Figma toolbar | 16px |
+
+**禁止**:硬寫 `px-4` / 自創值(`px-5`)/ 用 tight 當 chrome inline / 同 surface header/body/footer inline padding 不一致(三層左邊界必對齊)。
+
+**Verify(grep 2026-04-29)**:13+ chrome 處全用 `px-[var(--layout-space-loose)]`,無 drift。
+
 ### 規則 6:容器 padding 持有方
 
 **容器負責 padding,元件本身不加 margin 推開容器**。同一個元件在不同容器中行為一致,間距控制權在容器端。

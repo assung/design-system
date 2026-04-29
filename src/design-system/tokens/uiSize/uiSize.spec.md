@@ -261,34 +261,19 @@ Tailwind：`h-tab-sm` / `h-tab-md` / `h-tab-lg`。
 
 ---
 
-#### 本 DS 當前分類(查核表)
+#### 本 DS 當前分類
 
-| 元件 | Pattern | 位置 / 行號 | 能否 grow? |
-|------|---------|-------------|-----------|
-| Sidebar header/footer | Fixed-h | `sidebar.tsx:L429` | ✗ |
-| FileViewer Toolbar | Fixed-h | `file-viewer.tsx:L321` | ✗ |
-| FileViewer InfoPanel header | Fixed-h | `file-viewer.tsx:L442` | ✗ |
-| App top bar | Fixed-h | 見 sidebar.stories.tsx:L92 | ✗ |
-| Dialog header/footer | Padding-based | SurfaceHeader/Footer 間接 | ✓(有 DialogDescription)|
-| Sheet header/footer | Padding-based | 同上 | ✓(有 SheetDescription)|
-| Popover header/footer | Padding-based | 同上 | ✓(forward-compat)|
-| Coachmark header/footer | Padding-based(via Popover)| 同上 | ✓ |
-| Notice / Alert / Toast | 獨立 banner family(`px-4 py-3` fixed)| `notice.tsx:L50` | N/A(不屬 chrome canonical)|
+- **Fixed-h**:Sidebar header/footer / FileViewer toolbar + InfoPanel header / app top bar(grep verify)
+- **Padding-based**(via SurfaceHeader/Footer):Dialog / Sheet / Popover / Coachmark header + footer
+- **獨立 banner family**(不屬 chrome canonical):Notice / Alert / Toast(`px-4 py-3` fixed)
 
-**一致性原則**:同元件在不同 context 下不切換 pattern。FileViewer toolbar 永遠 fixed,Dialog 永遠 padding-based。
+**一致性原則**:同元件不切換 pattern(FileViewer toolbar 永遠 fixed / Dialog 永遠 padding-based)。
 
 ---
 
-#### Overlay family 的 padding-based 詳細實作
+#### Overlay family 的 padding-based 實作
 
-Padding-based 套用在 overlay family 時,配合 **v5 data-unbounded layout-slot trick**:
-- Button `variant="text"` OR `dismiss` 自動加 `data-unbounded="true"` 屬性
-- SurfaceHeader / SurfaceFooter 的 CSS rule 對 `[data-unbounded]` 套負 my `calc((--field-height-xs - --field-height-sm) / 2)` → md -2px / lg -4px
-- 效果:Button native size + touch target 不變(sm 28/32),layout 佔位縮到 24
-- Header 只有 unbounded control 時高度 = 24 + 2×tight = 48 md / 56 lg = `--chrome-header-height` ✓
-- Header 塞 bounded control(primary / tertiary,無 `data-unbounded`)→ 自然長高(bounded 的視覺邊界讓 padding 比例合理)
-
-**完整細節 + 震盪歷史備忘**:`patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」
+Overlay family 套 v5 `data-unbounded` slot trick(Button unbounded → SurfaceHeader 套負 my calc → 視覺 / a11y / 幾何同時對齊 chrome-header-height)。**完整細節**:`patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」。
 
 ---
 
@@ -312,6 +297,12 @@ Padding-based 套用在 overlay family 時,配合 **v5 data-unbounded layout-slo
 
 **SSOT 入口**(本節即入口):`tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」
 - Density lg 模式下 56px 對齊 Material 桌面 app bar 的舒適呼吸
+
+---
+
+## Chrome 左右 inline padding
+
+→ SSOT `tokens/layoutSpace/layoutSpace.spec.md`「規則 1.1:Chrome inline padding canonical」(統一 `--layout-space-loose`,M8 8 家世界級對照 + 禁止事項)。
 
 ---
 
