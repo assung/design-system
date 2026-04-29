@@ -1,11 +1,16 @@
 import * as React from 'react'
 import { Plus, Trash2, X as XIcon, GripVertical } from 'lucide-react'
 import type { ColumnDef, ColumnFiltersState } from '@tanstack/react-table'
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
 import { Select, type SelectOption } from '@/design-system/components/Select/select'
 import { Input } from '@/design-system/components/Input/input'
 import { SurfaceHeader, SurfaceBody, SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
+import { PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
+import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * DataTableFilterPanel — ClickUp-style 篩選 panel(MVP flat conditions)
@@ -152,63 +157,115 @@ export function DataTableFilterPanel<TData>({
     setConditions([...conditions, { id: firstCol.id, operator: ops[0].value, value: '' }])
   }
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = conditions.findIndex((c) => c.id === active.id)
+    const newIndex = conditions.findIndex((c) => c.id === over.id)
+    if (oldIndex < 0 || newIndex < 0) return
+    const next = [...conditions]
+    const [moved] = next.splice(oldIndex, 1)
+    next.splice(newIndex, 0, moved)
+    setConditions(next)
+  }
+
   return (
     <div className={cn('w-[560px]', className)}>
-      <SurfaceHeader className="justify-between">
-        <div className="text-body font-medium">篩選</div>
-        {onClose && (
-          <Button variant="text" size="sm" iconOnly startIcon={XIcon} aria-label="關閉" onClick={onClose} />
-        )}
+      <SurfaceHeader>
+        <div className="flex items-center gap-1 w-full min-w-0">
+          <PopoverTitle className="flex-1">篩選</PopoverTitle>
+          {onClose && (
+            <PopoverClose asChild>
+              <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" onClick={onClose} />
+            </PopoverClose>
+          )}
+        </div>
       </SurfaceHeader>
 
       <SurfaceBody className="flex flex-col gap-2">
         {conditions.length === 0 ? (
           <div className="text-body text-fg-muted py-2">尚未設定篩選條件</div>
         ) : (
-          conditions.map((condition, index) => {
-            const colInfo = filterableColumns.find((c) => c.id === condition.id)
-            const operatorOptions = getOperatorOptions(colInfo?.type)
-            return (
-              <div key={`${condition.id}-${index}`} className="flex items-center gap-2">
-                <GripVertical size={14} className="text-fg-muted shrink-0" aria-hidden />
-                <div className="w-40 shrink-0">
-                  <Select
-                    size="sm"
-                    options={fieldOptions}
-                    value={condition.id}
-                    onChange={(v) => {
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={conditions.map(c => `${c.id}-${conditions.indexOf(c)}`)} strategy={verticalListSortingStrategy}>
+              {conditions.map((condition, index) => {
+                const colInfo = filterableColumns.find((c) => c.id === condition.id)
+                const operatorOptions = getOperatorOptions(colInfo?.type)
+                return (
+                  <FilterRow
+                    key={`${condition.id}-${index}`}
+                    rowId={`${condition.id}-${index}`}
+                    condition={condition}
+                    fieldOptions={fieldOptions}
+                    operatorOptions={operatorOptions}
+                    onChangeField={(v) => {
                       const newCol = filterableColumns.find((c) => c.id === v)
                       const newOps = getOperatorOptions(newCol?.type)
                       updateAt(index, { id: v, operator: newOps[0].value, value: '' })
                     }}
+                    onChangeOperator={(v) => updateAt(index, { operator: v })}
+                    onChangeValue={(v) => updateAt(index, { value: v })}
+                    onRemove={() => removeAt(index)}
                   />
-                </div>
-                <div className="w-28 shrink-0">
-                  <Select
-                    size="sm"
-                    options={operatorOptions}
-                    value={condition.operator}
-                    onChange={(v) => updateAt(index, { operator: v })}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <Input
-                    size="sm"
-                    value={String(condition.value ?? '')}
-                    onChange={(e) => updateAt(index, { value: e.target.value })}
-                    placeholder="輸入值…"
-                  />
-                </div>
-                <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => removeAt(index)} />
-              </div>
-            )
-          })
+                )
+              })}
+            </SortableContext>
+          </DndContext>
         )}
       </SurfaceBody>
 
       <SurfaceFooter className="justify-start">
-        <Button variant="text" size="sm" startIcon={Plus} onClick={addCondition}>加條件</Button>
+        <Button variant="tertiary" size="sm" startIcon={Plus} onClick={addCondition}>加條件</Button>
       </SurfaceFooter>
+    </div>
+  )
+}
+
+// FilterRow:DnD-enabled row,GripVertical 為 drag handle。
+function FilterRow({
+  rowId, condition, fieldOptions, operatorOptions,
+  onChangeField, onChangeOperator, onChangeValue, onRemove,
+}: {
+  rowId: string
+  condition: FilterCondition
+  fieldOptions: SelectOption[]
+  operatorOptions: SelectOption[]
+  onChangeField: (v: string) => void
+  onChangeOperator: (v: string) => void
+  onChangeValue: (v: string) => void
+  onRemove: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: rowId })
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2">
+      <ItemInlineActionButton
+        icon={GripVertical}
+        size="md"
+        aria-label="拖曳重排"
+        className="cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      />
+      <div className="w-40 shrink-0">
+        <Select size="sm" options={fieldOptions} value={condition.id} onChange={onChangeField} />
+      </div>
+      <div className="w-28 shrink-0">
+        <Select size="sm" options={operatorOptions} value={condition.operator} onChange={onChangeOperator} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <Input
+          size="sm"
+          value={String(condition.value ?? '')}
+          onChange={(e) => onChangeValue(e.target.value)}
+          placeholder="輸入值…"
+        />
+      </div>
+      <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
     </div>
   )
 }

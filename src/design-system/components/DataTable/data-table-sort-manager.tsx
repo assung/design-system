@@ -1,10 +1,16 @@
 import * as React from 'react'
-import { Plus, Trash2, X as XIcon, RotateCcw, GripVertical, ArrowUp, ArrowDown } from 'lucide-react'
+import { Plus, Trash2, X as XIcon, RotateCcw, GripVertical } from 'lucide-react'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
 import { Select, type SelectOption } from '@/design-system/components/Select/select'
 import { SurfaceHeader, SurfaceBody, SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
+import { ButtonDivider } from '@/design-system/components/Button/button-group'
+import { PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
+import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * DataTableSortManager — Notion-style 多欄排序管理 panel
@@ -78,16 +84,15 @@ export function DataTableSortManager<TData>({
   const removeAt = (index: number) => {
     onSortingChange(sorting.filter((_, i) => i !== index))
   }
-  const moveUp = (index: number) => {
-    if (index === 0) return
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = sorting.findIndex((s) => s.id === active.id)
+    const newIndex = sorting.findIndex((s) => s.id === over.id)
+    if (oldIndex < 0 || newIndex < 0) return
     const next = [...sorting]
-    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-    onSortingChange(next)
-  }
-  const moveDown = (index: number) => {
-    if (index === sorting.length - 1) return
-    const next = [...sorting]
-    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
+    const [moved] = next.splice(oldIndex, 1)
+    next.splice(newIndex, 0, moved)
     onSortingChange(next)
   }
   const addSort = () => {
@@ -99,14 +104,19 @@ export function DataTableSortManager<TData>({
 
   return (
     <div className={cn('w-[480px]', className)}>
-      <SurfaceHeader className="justify-between">
-        <div className="text-body font-medium">排序</div>
-        <div className="flex items-center gap-1">
-          {onReset && (
-            <Button variant="text" size="sm" iconOnly startIcon={RotateCcw} aria-label="重置" onClick={onReset} />
+      <SurfaceHeader>
+        <div className="flex items-center gap-1 w-full min-w-0">
+          <PopoverTitle className="flex-1">排序</PopoverTitle>
+          {onReset && sorting.length > 0 && (
+            <>
+              <Button variant="text" size="sm" iconOnly startIcon={RotateCcw} aria-label="重置" onClick={onReset} />
+              <ButtonDivider />
+            </>
           )}
           {onClose && (
-            <Button variant="text" size="sm" iconOnly startIcon={XIcon} aria-label="關閉" onClick={onClose} />
+            <PopoverClose asChild>
+              <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" onClick={onClose} />
+            </PopoverClose>
           )}
         </div>
       </SurfaceHeader>
@@ -115,58 +125,30 @@ export function DataTableSortManager<TData>({
         {sorting.length === 0 ? (
           <div className="text-body text-fg-muted py-2">尚未設定排序條件</div>
         ) : (
-          sorting.map((sort, index) => {
-            const usedByOthers = new Set(sorting.filter((_, i) => i !== index).map((s) => s.id))
-            const optionsForRow = fieldOptions.filter((o) => !usedByOthers.has(o.value))
-            return (
-              <div key={`${sort.id}-${index}`} className="flex items-center gap-2">
-                <div className="flex flex-col">
-                  <button
-                    type="button"
-                    aria-label="向上移動"
-                    onClick={() => moveUp(index)}
-                    disabled={index === 0}
-                    className="text-fg-muted hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <ArrowUp size={12} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="向下移動"
-                    onClick={() => moveDown(index)}
-                    disabled={index === sorting.length - 1}
-                    className="text-fg-muted hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <ArrowDown size={12} />
-                  </button>
-                </div>
-                <GripVertical size={14} className="text-fg-muted shrink-0" aria-hidden />
-                <div className="flex-1 min-w-0">
-                  <Select
-                    size="sm"
-                    options={optionsForRow}
-                    value={sort.id}
-                    onChange={(v) => updateAt(index, { id: v })}
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={sorting.map(s => s.id)} strategy={verticalListSortingStrategy}>
+              {sorting.map((sort, index) => {
+                const usedByOthers = new Set(sorting.filter((_, i) => i !== index).map((s) => s.id))
+                const optionsForRow = fieldOptions.filter((o) => !usedByOthers.has(o.value))
+                return (
+                  <SortRow
+                    key={sort.id}
+                    sort={sort}
+                    optionsForRow={optionsForRow}
+                    onChangeId={(v) => updateAt(index, { id: v })}
+                    onChangeDir={(v) => updateAt(index, { desc: v === 'desc' })}
+                    onRemove={() => removeAt(index)}
                   />
-                </div>
-                <div className="w-32 shrink-0">
-                  <Select
-                    size="sm"
-                    options={DIRECTION_OPTIONS}
-                    value={sort.desc ? 'desc' : 'asc'}
-                    onChange={(v) => updateAt(index, { desc: v === 'desc' })}
-                  />
-                </div>
-                <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => removeAt(index)} />
-              </div>
-            )
-          })
+                )
+              })}
+            </SortableContext>
+          </DndContext>
         )}
       </SurfaceBody>
 
       <SurfaceFooter className="justify-start">
         <Button
-          variant="text"
+          variant="tertiary"
           size="sm"
           startIcon={Plus}
           onClick={addSort}
@@ -180,3 +162,40 @@ export function DataTableSortManager<TData>({
 }
 
 DataTableSortManager.displayName = 'DataTableSortManager'
+
+// SortRow:DnD-enabled row。GripVertical 為 drag listener handle(對齊 Notion / Airtable 拖曳 idiom)。
+function SortRow({
+  sort, optionsForRow, onChangeId, onChangeDir, onRemove,
+}: {
+  sort: { id: string; desc: boolean }
+  optionsForRow: SelectOption[]
+  onChangeId: (v: string) => void
+  onChangeDir: (v: string) => void
+  onRemove: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sort.id })
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2">
+      <ItemInlineActionButton
+        icon={GripVertical}
+        size="md"
+        aria-label="拖曳重排"
+        className="cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      />
+      <div className="flex-1 min-w-0">
+        <Select size="sm" options={optionsForRow} value={sort.id} onChange={onChangeId} />
+      </div>
+      <div className="w-32 shrink-0">
+        <Select size="sm" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} />
+      </div>
+      <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
+    </div>
+  )
+}

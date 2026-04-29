@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, EyeOff, Lock, RotateCcw, Download, Plus, ArrowUpDown, X as XIcon } from 'lucide-react'
+import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, EyeOff, Lock, GripVertical, RotateCcw, Download, Plus, ArrowUpDown, X as XIcon } from 'lucide-react'
 import { DataTable } from './data-table'
 import { DataTableSortManager } from './data-table-sort-manager'
 import { DataTableFilterPanel, dataTableFilterMatch } from './data-table-filter-panel'
@@ -14,8 +14,11 @@ import { Alert } from '@/design-system/components/Alert/alert'
 import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverFooter, PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
 import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 import { ButtonDivider } from '@/design-system/components/Button/button-group'
-import { ItemPrefix, ItemLabel, ROW_PADDING_BY_SIZE } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemPrefix, ItemLabel, ItemInlineActionButton, ROW_PADDING_BY_SIZE } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { cn } from '@/lib/utils'
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -414,6 +417,55 @@ export const VirtualScroll: Story = {
    - 各 chrome 元件 self-pad px-loose;table mx-loose 對齊 chrome 內容左右邊界
    - bordered=true(height="100%" 為垂直滾動 trigger,per spec)
    - Alert variant="neutral"(資訊性 hint,非 info hue) */
+// VisibilityRow:DnD-enabled row(GripVertical 為 drag handle / locked 顯示 Lock)。
+function VisibilityRow({
+  id, label, visible, locked, onToggle,
+}: {
+  id: string
+  label: string
+  visible: boolean
+  locked: boolean
+  onToggle: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: locked })
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'flex items-start gap-2 w-full px-[var(--layout-space-loose)]',
+        ROW_PADDING_BY_SIZE.md,
+      )}
+    >
+      <ItemPrefix>
+        {locked
+          ? <Lock size={14} className="text-fg-muted" aria-hidden />
+          : <ItemInlineActionButton
+              icon={GripVertical}
+              size="md"
+              aria-label="拖曳重排"
+              className="cursor-grab active:cursor-grabbing"
+              {...attributes}
+              {...listeners}
+            />}
+      </ItemPrefix>
+      <ItemLabel className={locked ? 'text-fg-disabled' : undefined}>{label}</ItemLabel>
+      <Button
+        variant="text" size="sm" iconOnly
+        startIcon={visible ? Eye : EyeOff}
+        aria-label={visible ? '隱藏此欄' : '顯示此欄'}
+        disabled={locked}
+        onClick={onToggle}
+      />
+    </div>
+  )
+}
+
 export const WithBulkActions: Story = {
   name: '選取 + 批次操作',
   parameters: { layout: 'fullscreen' },
@@ -423,10 +475,14 @@ export const WithBulkActions: Story = {
     const [search, setSearch] = React.useState('')
     const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
     const [columnSearch, setColumnSearch] = React.useState('')
+    const [columnOrder, setColumnOrder] = React.useState<string[]>(() =>
+      baseColumns.map((c) => (c as any).accessorKey ?? (c as any).id)
+    )
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [filterPrefilledId, setFilterPrefilledId] = React.useState<string | undefined>(undefined)
     const [filterOpen, setFilterOpen] = React.useState(false)
+    const [sortOpen, setSortOpen] = React.useState(false)
     const TOTAL = 5370
     const filteredData = React.useMemo(
       () => search ? sampleData.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase())) : sampleData,
@@ -472,7 +528,7 @@ export const WithBulkActions: Story = {
             </Popover>
             {/* L3 Sort:global panel(Notion-style 多欄條件)
                 pressed prop:套用條件後 trigger 維持 active 視覺 */}
-            <Popover>
+            <Popover open={sortOpen} onOpenChange={setSortOpen}>
               <PopoverTrigger asChild>
                 <Button variant="text" size="sm" iconOnly startIcon={ArrowUpDown} aria-label="排序" pressed={sorting.length > 0} />
               </PopoverTrigger>
@@ -482,6 +538,7 @@ export const WithBulkActions: Story = {
                   sorting={sorting}
                   onSortingChange={setSorting}
                   onReset={() => setSorting([])}
+                  onClose={() => setSortOpen(false)}
                 />
               </PopoverContent>
             </Popover>
@@ -531,48 +588,48 @@ export const WithBulkActions: Story = {
                   />
                 </div>
                 <ScrollArea className="max-h-72">
-                  {/* uniform prefix slot 16px:讓 locked row(有 Lock)跟 unlocked row(空 prefix)
-                      label 起始 x 一致(item-anatomy.tsx ItemPrefix「Uniform prefix slot」)。
-                      Drag handle 在 A.4 phase 接 DnD 時 fill empty slot,屆時 visual 自然 aligned。 */}
+                  {/* DnD column reorder via @dnd-kit + columnOrder state to DataTable。
+                      Drag handle 取代 lock 位置(locked → Lock,unlocked → drag handle)— 對齊 ref 圖。 */}
                   <div className="py-2 flex flex-col" style={{ '--item-prefix-slot': '16px' } as React.CSSProperties}>
-                    {baseColumns
-                      .map((col) => {
-                        const id = (col as any).accessorKey ?? (col as any).id
-                        const headerLabel = typeof (col as any).header === 'string' ? (col as any).header : id
-                        return { id, headerLabel }
-                      })
-                      .filter(({ headerLabel }) =>
-                        columnSearch ? headerLabel.toLowerCase().includes(columnSearch.toLowerCase()) : true
-                      )
-                      .map(({ id, headerLabel }) => {
-                        const visible = columnVisibility[id] !== false
-                        const locked = id === 'sku'
-                        return (
-                          // l3-primitive-allow: panel list row hand-composed via visual primitive
-                          // (item-anatomy ItemPrefix/ItemLabel/ROW_PADDING_BY_SIZE)。
-                          // 不用 MenuItem(menu specialization 不適 panel chrome loose + icon 色限制)。
-                          <div
-                            key={id}
-                            className={cn(
-                              'flex items-start gap-2 w-full px-[var(--layout-space-loose)]',
-                              ROW_PADDING_BY_SIZE.md,
-                              // row 不可 click — 不顯 hover bg(對齊 Notion / ClickUp:Eye 才是 toggle)
-                            )}
-                          >
-                            <ItemPrefix>
-                              {locked && <Lock size={14} className="text-fg-muted" aria-hidden />}
-                            </ItemPrefix>
-                            <ItemLabel className={locked ? 'text-fg-disabled' : undefined}>{headerLabel}</ItemLabel>
-                            <Button
-                              variant="text" size="sm" iconOnly
-                              startIcon={visible ? Eye : EyeOff}
-                              aria-label={visible ? '隱藏此欄' : '顯示此欄'}
-                              disabled={locked}
-                              onClick={() => setColumnVisibility(prev => ({ ...prev, [id]: !visible }))}
-                            />
-                          </div>
-                        )
-                      })}
+                    <DndContext collisionDetection={closestCenter} onDragEnd={(e: DragEndEvent) => {
+                      const { active, over } = e
+                      if (!over || active.id === over.id) return
+                      const oldIdx = columnOrder.indexOf(active.id as string)
+                      const newIdx = columnOrder.indexOf(over.id as string)
+                      if (oldIdx < 0 || newIdx < 0) return
+                      // SKU(locked)鎖在第一位,不允許 reorder 動到
+                      if (columnOrder[0] === 'sku' && (oldIdx === 0 || newIdx === 0)) return
+                      const next = [...columnOrder]
+                      const [m] = next.splice(oldIdx, 1)
+                      next.splice(newIdx, 0, m)
+                      setColumnOrder(next)
+                    }}>
+                      <SortableContext items={columnOrder.filter(id => id !== 'sku')} strategy={verticalListSortingStrategy}>
+                        {columnOrder
+                          .map((id) => {
+                            const col = baseColumns.find(c => ((c as any).accessorKey ?? (c as any).id) === id)
+                            const headerLabel = typeof (col as any)?.header === 'string' ? (col as any).header : id
+                            return { id, headerLabel }
+                          })
+                          .filter(({ headerLabel }) =>
+                            columnSearch ? headerLabel.toLowerCase().includes(columnSearch.toLowerCase()) : true
+                          )
+                          .map(({ id, headerLabel }) => {
+                            const visible = columnVisibility[id] !== false
+                            const locked = id === 'sku'
+                            return (
+                              <VisibilityRow
+                                key={id}
+                                id={id}
+                                label={headerLabel}
+                                visible={visible}
+                                locked={locked}
+                                onToggle={() => setColumnVisibility(prev => ({ ...prev, [id]: !visible }))}
+                              />
+                            )
+                          })}
+                      </SortableContext>
+                    </DndContext>
                   </div>
                 </ScrollArea>
                 <PopoverFooter className="justify-start">
@@ -608,7 +665,10 @@ export const WithBulkActions: Story = {
               setFilterOpen(true)
             }}
             tableOptions={{
-              state: { sorting, columnFilters },
+              state: { sorting, columnFilters, columnOrder },
+              onColumnOrderChange: (updater) => {
+                setColumnOrder(typeof updater === 'function' ? updater(columnOrder) : updater)
+              },
               onSortingChange: (updater) => {
                 setSorting(typeof updater === 'function' ? updater(sorting) : updater)
               },
