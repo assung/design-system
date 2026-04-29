@@ -112,6 +112,11 @@ const buttonVariants = cva(
           'data-[state=on]:hover:bg-neutral-selected-hover',
           'data-[state=on]:active:bg-neutral-selected-active',
           'data-[state=on]:disabled:bg-transparent data-[state=on]:disabled:text-fg-disabled',
+          // aria-pressed fallback:當 Button asChild 包進 Radix overlay trigger,Radix 會 override
+          // data-state 為 'open'/'closed' → data-[state=on] 失效;aria-pressed 不被 override,
+          // 用 aria 變體保證 pressed 視覺在 overlay trigger context 仍生效。
+          'aria-pressed:bg-neutral-selected',
+          'aria-pressed:hover:bg-neutral-selected-hover',
         ],
         link: [
           'bg-transparent text-primary border-transparent',

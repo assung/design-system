@@ -426,33 +426,27 @@ const CHROME_UNBOUNDED_SLOT =
 
 ---
 
-## Consumer rule:必消費 primitive 不自刻 chrome(2026-04-29 codified)
+## Control + List 視覺對稱原則(2026-04-29 codified)
 
-寫 Popover / Dialog / Sheet 內容(含 stories / app code / DataTable 類 panel helper)時,**必消費 SurfaceHeader / SurfaceBody / SurfaceFooter primitive**(或上層 PopoverHeader / DialogHeader 等),**禁止自刻 `<div className="px-loose ... border-(b|t)">` 結構取代**。
+Overlay body「控件(search/select/control row)+ list」混合場景:控件 wrapper `pt-[var(--layout-space-tight)]` **省 pb**,list 沿用 `py-2`,item 沿用 `py-1.5`(SelectionItem 公式)。
 
-**Why**(對齊 mindset #2 不憑直覺發明 / 優先消費既有):
-- Primitive 自帶 padding token 一致(`px-loose py-tight`)
-- PopoverHeader 自動渲染 close X(canonical line 72:「所有 PopoverHeader 一律附右上 X」)
-- PopoverTitle 自帶 typography(`text-body font-medium` non-modal 輕量)
-- autofocus targeting:`data-popover-body` 標記讓 PopoverContent autofocus 落在 body 第一個互動元素
-- 自刻 = drift 起點:padding、border、close X、title 大小四向都可能漂移
+**視覺**:控件上 12md / 下 list-pt 8 + item-py 6 = 14md → **2px 視覺差 ≤ 閾值,視覺對稱**。
 
-**禁止 anti-pattern**:
-```tsx
-// ❌ 自刻 overlay header
-<div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider">
-  <div className="text-body-strong">標題</div>
-</div>
+**Why 不對稱 = 視覺對稱**:list item hover bg + 內 py 視覺重量補償;對稱 `pt-tight pb-tight` 反堆 26px 鬆散。
 
-// ✅ 消費 primitive
-<PopoverHeader>
-  <PopoverTitle>標題</PopoverTitle>
-</PopoverHeader>
-```
+**世界級**:Notion column visibility / Linear filter / Material grid filter / Airtable column toggle / GitHub Primer dropdown — 全派(控件上方 chrome gap、下方緊接 list)。
 
-**Hook 機械化**:`.claude/hooks/check_overlay_handcraft.sh` write-time PostToolUse 攔此 pattern。Escape hatch:加 `// overlay-handcraft-allow: <reason>` 同/前行(罕用,如非 overlay 但借用 layout-space token 的 standalone 卡片 chrome)。
+**禁止**:控件 wrapper pt+pb 對稱 / list wrapper 加 pt-tight 重複 / 用 `<PopoverBody>` 包控件後接 list(PopoverBody pb-tight 雙倍累加)。
 
-**歷史教訓**:2026-04-29 conv DataTable column visibility / SortManager / FilterPanel 三處同時自刻 chrome,user 抓到 4 個 spec 違反(left-align gap / 缺 close X / title typography 偏 / mindset #2)。Codify 本規則後 + hook 攔截杜絕同類。
+---
+
+## Consumer rule:必消費 primitive 不自刻 chrome(2026-04-29)
+
+寫 Popover / Dialog / Sheet 內容必消費 `SurfaceHeader/Body/Footer`(或上層 `PopoverHeader/...`),**禁自刻 `<div className="px-loose ... border-(b|t)">` 取代**。
+
+**Why**:primitive 自帶 padding token + PopoverHeader auto close X(line 72)+ PopoverTitle typography + `data-popover-body` autofocus 標記;自刻 = padding/border/close X/title 大小 4 向 drift 起點(對齊 mindset #2)。
+
+**Hook**:`.claude/hooks/check_overlay_handcraft.sh` 攔此 pattern;escape hatch `// overlay-handcraft-allow: <reason>` 同/前行。
 
 ---
 

@@ -55,11 +55,29 @@ if [ -n "$HITS" ]; then
   done <<< "$HITS"
 
   if [ -n "$FILTERED" ]; then
-    VIOLATIONS="\n⚠️ Hand-crafted overlay chrome detected(自刻 overlay 結構違 mindset #2):\n${FILTERED}\n  → 改用 primitive:\n    Popover content → PopoverHeader / PopoverBody / PopoverFooter / PopoverTitle\n    Dialog content → DialogHeader / DialogBody / DialogFooter / DialogTitle\n    Generic overlay panel → SurfaceHeader / SurfaceBody / SurfaceFooter (overlay-surface)\n  Why:canonical 自帶 padding token + border + close X(Popover)+ autofocus + title typography。\n  自刻 = 違 layoutSpace 規則 1.1 + popover.tsx「所有 PopoverHeader 一律附右上 X」。\n  Escape hatch:加 \`// overlay-handcraft-allow: <reason>\` 在同/前行。"
-
-    ESCAPED=$(printf "%b" "$VIOLATIONS" | jq -Rs .)
-    cat <<EOJSON
-{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Overlay primitive consumption 檢查發現違規:${ESCAPED}"}}
-EOJSON
+    VIOLATIONS="${VIOLATIONS}\n⚠️ Hand-crafted overlay chrome detected(自刻 overlay 結構違 mindset #2):\n${FILTERED}\n  → 改用 primitive:\n    Popover content → PopoverHeader / PopoverBody / PopoverFooter / PopoverTitle\n    Dialog content → DialogHeader / DialogBody / DialogFooter / DialogTitle\n    Generic overlay panel → SurfaceHeader / SurfaceBody / SurfaceFooter (overlay-surface)\n  Why:canonical 自帶 padding token + border + close X(Popover)+ autofocus + title typography。\n  Escape hatch:加 \`// overlay-handcraft-allow: <reason>\` 在同/前行。"
   fi
+fi
+
+# ── Check 2: Raw <Checkbox> count > 1 not in <CheckboxGroup> ──
+# 同 root cause(自刻 SelectionItem 包 Checkbox 而非消費 CheckboxGroup primitive)。
+# 對齊 checkbox.spec.md「群組模式(CheckboxGroup)」canonical line 225:
+#   多選 Checkbox 必包 <CheckboxGroup>(zero-gap canonical + Context 隔離 + a11y group)。
+CB_COUNT=$(grep -c '<Checkbox\b' "$FILE_PATH" 2>/dev/null | head -1 || echo 0)
+CBG_COUNT=$(grep -c '<CheckboxGroup\b' "$FILE_PATH" 2>/dev/null | head -1 || echo 0)
+CB_COUNT=${CB_COUNT:-0}
+CBG_COUNT=${CBG_COUNT:-0}
+if [ "$CB_COUNT" -ge 2 ] && [ "$CBG_COUNT" -eq 0 ]; then
+  CB_HITS=$(grep -nE '<Checkbox\b' "$FILE_PATH" 2>/dev/null | head -3)
+  # allowlist: same-line or prev-line has // checkbox-group-allow:
+  if ! grep -qE 'checkbox-group-allow:' "$FILE_PATH" 2>/dev/null; then
+    VIOLATIONS="${VIOLATIONS}\n⚠️ 多個 raw <Checkbox> 未包 <CheckboxGroup>(${CB_COUNT} hits)— 違反 checkbox.spec.md 群組 canonical:\n${CB_HITS}\n  → 改用 <CheckboxGroup><Checkbox label=\"...\" />...</CheckboxGroup>\n  Why:CheckboxGroup 自帶 zero-gap canonical(SelectionItem py 公式)+ Context 隔離 fieldCtx + a11y group;raw 自刻 wrapper 違 mindset #2。\n  Escape hatch:加 \`// checkbox-group-allow: <reason>\` 在檔頭。"
+  fi
+fi
+
+if [ -n "$VIOLATIONS" ]; then
+  ESCAPED=$(printf "%b" "$VIOLATIONS" | jq -Rs .)
+  cat <<EOJSON
+{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Primitive consumption 檢查發現違規:${ESCAPED}"}}
+EOJSON
 fi

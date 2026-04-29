@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, Download, Plus, ArrowUpDown } from 'lucide-react'
+import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, EyeOff, Lock, GripVertical, RotateCcw, Download, Plus, ArrowUpDown } from 'lucide-react'
 import { DataTable } from './data-table'
 import { DataTableSortManager } from './data-table-sort-manager'
 import { DataTableFilterPanel, dataTableFilterMatch } from './data-table-filter-panel'
@@ -11,8 +11,7 @@ import { Empty } from '@/design-system/components/Empty/empty'
 import { Input } from '@/design-system/components/Input/input'
 import { BulkActionBar } from '@/design-system/components/BulkActionBar/bulk-action-bar'
 import { Alert } from '@/design-system/components/Alert/alert'
-import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverFooter, PopoverTitle } from '@/design-system/components/Popover/popover'
-import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverFooter, PopoverTitle } from '@/design-system/components/Popover/popover'
 import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 import './column-types' // ColumnMeta declaration merging
 
@@ -451,10 +450,11 @@ export const WithBulkActions: Story = {
             />
           </div>
           <div className="flex items-center gap-2">
-            {/* L3 Filter:global panel(ClickUp / Airtable / Notion 派 — flat conditions MVP) */}
+            {/* L3 Filter:global panel(ClickUp / Airtable / Notion 派 — flat conditions MVP)
+                pressed prop:套用條件後 trigger 維持 active 視覺(toggle pressed,Button canonical) */}
             <Popover open={filterOpen} onOpenChange={setFilterOpen}>
               <PopoverTrigger asChild>
-                <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" />
+                <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" pressed={columnFilters.length > 0} />
               </PopoverTrigger>
               <PopoverContent align="end" className="w-auto p-0">
                 <DataTableFilterPanel
@@ -467,10 +467,11 @@ export const WithBulkActions: Story = {
                 />
               </PopoverContent>
             </Popover>
-            {/* L3 Sort:global panel(Notion-style 多欄條件) */}
+            {/* L3 Sort:global panel(Notion-style 多欄條件)
+                pressed prop:套用條件後 trigger 維持 active 視覺 */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="text" size="sm" iconOnly startIcon={ArrowUpDown} aria-label="排序" />
+                <Button variant="text" size="sm" iconOnly startIcon={ArrowUpDown} aria-label="排序" pressed={sorting.length > 0} />
               </PopoverTrigger>
               <PopoverContent align="end" className="w-auto p-0">
                 <DataTableSortManager
@@ -489,13 +490,23 @@ export const WithBulkActions: Story = {
                 <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
               </PopoverTrigger>
               <PopoverContent align="end" className="w-72 p-0">
-                {/* 對齊 overlay-surface canonical:用 PopoverHeader/Body/Footer/Title primitive
-                    PopoverHeader 自帶 close X(canonical 強制);所有 chrome inline padding = loose
-                    讓 title / search input / item content / footer button 全部左右對齊 */}
+                {/* B 派(Notion-style)Eye-toggle column visibility:
+                    Header(title + refresh-when-dirty + auto close X)
+                    Search(per Q2 對稱原則:pt-tight 省 pb,list py-2 自帶下方氣息)
+                    List([⋮⋮ drag] | [⊙ lock or empty] | label | [👁️/〰️ Eye toggle right])
+                    Footer(tertiary sm) */}
                 <PopoverHeader>
                   <PopoverTitle>欄位顯示</PopoverTitle>
+                  {Object.values(columnVisibility).some(v => v === false) && (
+                    <Button
+                      variant="text" size="sm" iconOnly startIcon={RotateCcw}
+                      aria-label="恢復預設"
+                      onClick={() => setColumnVisibility({})}
+                    />
+                  )}
                 </PopoverHeader>
-                <PopoverBody>
+                {/* Q2 對稱:控件 wrapper pt-tight 省 pb,list py-2 + item py-1.5 接管下方 */}
+                <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
                   <Input
                     size="sm"
                     placeholder="搜尋欄位…"
@@ -503,11 +514,9 @@ export const WithBulkActions: Story = {
                     onChange={(e) => setColumnSearch(e.target.value)}
                     startIcon={Search}
                   />
-                </PopoverBody>
-                {/* List section per overlay-surface 規則 3:body py-2 no px + item px-loose rounded-md
-                    → hover bg flush chrome edge,item content align with title at loose from chrome */}
+                </div>
                 <ScrollArea className="max-h-72">
-                  <div className="py-2 flex flex-col gap-0.5">
+                  <div className="py-2 flex flex-col">
                     {baseColumns
                       .map((col) => {
                         const id = (col as any).accessorKey ?? (col as any).id
@@ -518,35 +527,35 @@ export const WithBulkActions: Story = {
                         columnSearch ? headerLabel.toLowerCase().includes(columnSearch.toLowerCase()) : true
                       )
                       .map(({ id, headerLabel }) => {
-                        const checked = columnVisibility[id] !== false
+                        const visible = columnVisibility[id] !== false
+                        const locked = id === 'sku' // demo:SKU 為 primary identifier 鎖定不可隱藏
                         return (
-                          <label
+                          <div
                             key={id}
-                            className="flex items-center gap-2 px-[var(--layout-space-loose)] py-1.5 rounded-md cursor-pointer hover:bg-neutral-hover"
+                            className="flex items-center gap-2 px-[var(--layout-space-loose)] py-1.5 rounded-md hover:bg-neutral-hover"
                           >
-                            <Checkbox
-                              size="md"
-                              checked={checked}
-                              onCheckedChange={(c) => setColumnVisibility(prev => ({ ...prev, [id]: !!c }))}
+                            {/* drag handle slot — A.4 phase 接 DnD,先 placeholder */}
+                            <GripVertical size={14} className="text-fg-muted shrink-0 cursor-grab" aria-hidden />
+                            {/* lock indicator(若 locked) */}
+                            {locked && <Lock size={14} className="text-fg-disabled shrink-0" aria-hidden />}
+                            <span className={`flex-1 text-body ${locked ? 'text-fg-disabled' : ''}`}>{headerLabel}</span>
+                            <Button
+                              variant="text" size="sm" iconOnly
+                              startIcon={visible ? Eye : EyeOff}
+                              aria-label={visible ? '隱藏此欄' : '顯示此欄'}
+                              disabled={locked}
+                              onClick={() => setColumnVisibility(prev => ({ ...prev, [id]: !visible }))}
                             />
-                            <span className={`text-body flex-1 ${!checked ? 'text-fg-muted' : ''}`}>{headerLabel}</span>
-                          </label>
+                          </div>
                         )
                       })}
                   </div>
                 </ScrollArea>
                 <PopoverFooter className="justify-start">
                   <Button
-                    variant="text"
+                    variant="tertiary"
                     size="sm"
-                    onClick={() => {
-                      const next: Record<string, boolean> = {}
-                      baseColumns.forEach((col) => {
-                        const id = (col as any).accessorKey ?? (col as any).id
-                        next[id] = true
-                      })
-                      setColumnVisibility(next)
-                    }}
+                    onClick={() => setColumnVisibility({})}
                   >顯示全部</Button>
                 </PopoverFooter>
               </PopoverContent>
