@@ -795,7 +795,11 @@ function DataTableInner<TData>(
       ref={(el) => { tableRef.current = el; if (typeof ref === 'function') ref(el); else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el }}
       data-table-size={size}
       className={cn(dataTableVariants({ bordered }), isFillHeight && 'flex flex-col', className)}
-      style={isFillHeight ? { maxHeight: height } : undefined}
+      // isFillHeight:用 height(不是 maxHeight)— outer 必須 bind 到 parent 分配的高度,
+      // 否則 outer 收成 children intrinsic 高(header + body content),body 不知要 shrink,
+      // window 縮小時 overflow-hidden 直接切掉內容(scrollbar 出現但無法捲到底,真實 bug)。
+      // 固定 px/rem 仍 maxHeight cap 行為。
+      style={isFillHeight ? { height } : undefined}
       role="table" aria-rowcount={rows.length + 1}
       tabIndex={enabled ? 0 : undefined}
       onKeyDown={enabled ? tableKeyboardHandler : undefined}
@@ -836,7 +840,12 @@ function DataTableInner<TData>(
            三個 region(left / center / right)各自 maxHeight + overflowY,JS 同步 scrollTop。
            Pinned 區 overflow-y:hidden(看不到自己的 V scrollbar),V scroll 真正發生在 center。
            isFillHeight 時 body div 加 min-h-0 讓它在 outer flex column 內可被 flex shrink — region maxHeight: 100% 才能 bind 到實際分配的高度。 */}
-      <div ref={bodyRef} className={cn('flex items-start', isFillHeight && 'min-h-0')}>
+      {/* body 在 isFillHeight 必 flex-1 + min-h-0:flex-1 讓 body 取 outer 剩餘空間
+          (outer 是 flex flex-col,header shrink-0),min-h-0 讓 body 可被 shrink 到比
+          children intrinsic 小(否則 flex 預設 min-height: auto = 不 shrink 反映 children)。
+          兩個合一才能讓 region maxHeight: 100% bind 到 body 實際分配的高度,而非 children
+          intrinsic — 是 window 縮小時 V scroll trigger 的核心。 */}
+      <div ref={bodyRef} className={cn('flex items-start', isFillHeight && 'flex-1 min-h-0 min-w-0')}>
         {hasLeft && (
           <div
             ref={leftBodyRef}
@@ -855,7 +864,9 @@ function DataTableInner<TData>(
           // `scrollbar-gutter: stable` 永遠預留 V scrollbar 寬度(~15-17px),避免 body 出現 V
           // scrollbar 時右端被縮,跟 header 右端產生 gap(Windows/Linux native scrollbar 吃寬)
           data-datatable-hscroll
-          className="flex-1 min-w-0 overflow-x-scroll overflow-y-auto"
+          // overflow-x: auto(不是 scroll)— 沒水平 overflow 就不顯 H bar(避免空 bar 視覺噪訊)。
+          // wrapper 自帶 minWidth = sum(column widths),需要時 H overflow 自動 trigger。
+          className="flex-1 min-w-0 overflow-x-auto overflow-y-auto"
           style={{
             ...(hasHeightConstraint ? { maxHeight: height } : {}),
             scrollbarGutter: 'stable',
