@@ -636,12 +636,33 @@ export const WithBulkActions: Story = {
                     </DndContext>
                   </div>
                 </ScrollArea>
+                {/* 對齊 Linear / Airtable / Material X-Grid:bidirectional toggle —
+                    任何欄位隱藏 → 「顯示全部」;全部可見 → 「全部隱藏」(locked 欄保留)。
+                    Notion 派(disabled when all visible)語義較弱,Linear 派教育性更高。 */}
                 <PopoverFooter className="justify-start">
-                  <Button
-                    variant="tertiary"
-                    size="sm"
-                    onClick={() => setColumnVisibility({})}
-                  >顯示全部</Button>
+                  {(() => {
+                    const togglableIds = baseColumns
+                      .map((c) => ((c as any).accessorKey ?? (c as any).id) as string)
+                      .filter((id) => id !== 'sku')
+                    const allVisible = togglableIds.every((id) => columnVisibility[id] !== false)
+                    return (
+                      <Button
+                        variant="tertiary"
+                        size="sm"
+                        onClick={() => {
+                          if (allVisible) {
+                            const next: Record<string, boolean> = {}
+                            togglableIds.forEach((id) => { next[id] = false })
+                            setColumnVisibility(next)
+                          } else {
+                            setColumnVisibility({})
+                          }
+                        }}
+                      >
+                        {allVisible ? '全部隱藏' : '顯示全部'}
+                      </Button>
+                    )
+                  })()}
                 </PopoverFooter>
               </PopoverContent>
             </Popover>

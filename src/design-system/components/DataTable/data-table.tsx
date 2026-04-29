@@ -248,9 +248,28 @@ function DataTableInner<TData>(
     return list.includes(SELECT_COL_ID) ? list : [SELECT_COL_ID, ...list]
   }, [pinnedLeftColumns, enabled])
 
+  // columnOrder 自動加 __select__ 第一位:consumer 傳的 columnOrder 通常只列 data
+  // columns(忘 __select__),TanStack 會把不在 order 的 column 推到末位 → checkbox
+  // 變右邊。世界級 convention(Notion / Linear / Airtable / Material X-Grid)選取在左。
+  const userColumnOrder = tableOptions?.state?.columnOrder
+  const effectiveColumnOrder = React.useMemo(() => {
+    if (!enabled || !userColumnOrder) return userColumnOrder
+    return userColumnOrder.includes(SELECT_COL_ID) ? userColumnOrder : [SELECT_COL_ID, ...userColumnOrder]
+  }, [userColumnOrder, enabled])
+
+  // 注意:`...tableOptions` 必 spread 在 `state` 前,否則 user 傳的 tableOptions 會
+  // 整個 override 掉我們組的 state(含 __select__ 自動 pinning + columnOrder 注入)。
+  // 之前 bug:checkbox column 跑到右邊 = 此處 spread 順序錯。
   const table = useReactTable({
+    ...tableOptions,
     data, columns: columnsWithSelection,
-    state: { sorting, columnVisibility, columnPinning: { left: effectivePinnedLeft, right: pinnedRightColumns ?? [] }, ...tableOptions?.state },
+    state: {
+      sorting, columnVisibility,
+      ...tableOptions?.state,
+      // columnPinning + columnOrder 在 user state 後 override,確保 __select__ 永遠左
+      columnPinning: { left: effectivePinnedLeft, right: pinnedRightColumns ?? [] },
+      ...(effectiveColumnOrder ? { columnOrder: effectiveColumnOrder } : {}),
+    },
     enableMultiSort,
     onSortingChange: setSorting,
     onColumnVisibilityChange: (updater) => {
@@ -260,7 +279,6 @@ function DataTableInner<TData>(
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getRowId: getRowId,
-    ...tableOptions,
   })
 
   const { rows } = table.getRowModel()
