@@ -13,16 +13,21 @@ import { cn } from '@/lib/utils'
  * slot 失去自然高度,違反 user 意圖)。
  *
  * 對齊 `--chrome-header-height`(48/56)的**條件**:header 只放 unbounded 控件(close X /
- * text variant button,xs 固定 24):header = 24 + 2×tight = 48 md / 56 lg ✓。
+ * text variant button,**native sm + v5 unbounded trick layout 佔位 24**):
+ *   header = 24 + 2×tight = 48 md / 56 lg ✓。
  *
  * 若 header 塞 **bounded 控件**(primary / tertiary with bg/border):header 自然長高
  * (sm 28 + 2×12 = 52 md),因 bounded 按鈕有視覺邊界,padding 不會顯得過大 — 這是預期的。
  *
- * ── Unbounded controls 在 header 必 xs canonical ──
- * Dismiss X(always unbounded)+ text variant header action → size="xs"。Rationale:
- * 沒有視覺邊界的 button,padding 外框顯得過大;xs (24 固定) + tight padding 是精確匹配
- * chrome-header-height 的 layout 佔位。世界級 Linear / Notion / Figma 的 modal close X
- * 皆遵循此幾何。
+ * ── Unbounded controls 在 header canonical(v5 trick,2026-04-22)──
+ * Dismiss X(always unbounded)+ text variant header action → **`size="sm"` native**
+ * + SurfaceHeader CSS 自動套負 my trick(對 `[data-unbounded]`),layout 佔位縮回 24
+ * (xs 等同)。Rationale:button native size 跟 touch target 保留 sm(a11y 最小 24+ hit
+ * target,視覺 render 仍 28/32),layout 佔位精確匹配 chrome-header-height 幾何。詳
+ * `overlay-surface.spec.md`「Chrome dismiss size canonical」。
+ *
+ * **Notification banner family**(Notice / Alert / Toast,fixed `px-4 py-3` chrome,
+ * 無 padding-based header)→ dismiss 用 `size="xs"` explicit(24 固定,無 trick)。
  *
  * ── Token 規則 ──
  * horizontal padding: `px-[var(--layout-space-loose)]`
