@@ -162,35 +162,20 @@ Row action 的 affordance 是「次要功能」,不是 primary CTA。Button chro
 
 ### Same-row consistency rule(防混用)
 
-**同一 action row 所有 icon action 必同一類**(不混 Inline Action + Button)— 消除 box size 不一致造成 gap 斷裂。
+**同一 row 所有 icon action 必同一類**(不混 Inline Action + Button)— 消除 box size 不一致造成 gap 斷裂(InlineAction 16+18 vs Button text sm 28)。
 
-**Alert(notification banner family)corner 範例**:
-
+**範例(panel list row 內 inline action)**:
 ```
-✅ Alert / Toast / Notice(banner family):
-┌─ Alert ────────────── [⟲] [↗] │ [X] ┐   ← chrome corner xs explicit
-│ [icon] Title                        │      ⟲ → Button iconOnly xs variant="text"
-│                   [CTA1] [CTA2]     │      X → Button iconOnly xs dismiss
-└─────────────────────────────────────┘   ← body action row(Button sm,有 variant chrome)
+✅ DataTable column visibility row(panel list):
+[⋮⋮ drag] [label] [👁️ toggle]   ← 全 ItemInlineActionButton size=md(16+18 hover bg)
+
+❌ 混用 anti-pattern:
+[⋮⋮ ItemInlineActionButton] [label] [Button text sm Eye 28x28]  ← box size 不一致 gap 斷裂
 ```
 
-**Banner family corner**:`size="xs"` explicit(24,直接固定)— 對齊 banner 緊湊 chrome。
-
-**Overlay header(Dialog / Popover / Sheet)corner**(2026-04-29 對齊 overlay-surface 主 canonical):
-- 用 `size="sm"` native + v5 unbounded trick(layout 佔位 24,渲染 28/32)
-- SurfaceHeader auto 套負 my(對 `data-unbounded` button)讓 chrome-header-height 公式成立
-- SSOT:`patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」
-
-**Corner 視覺規則**:
-- Corner 所有 action **同 size**(banner xs / overlay sm + trick,各自統一)
-- Corner 所有 action 一律 `variant="text"`(輕量 chrome,避免填色搶 CTA 焦點)
-- Close X 走 `dismiss` prop 套 fg-muted 弱化(不靠改 size)
-- 分群用 `<ButtonDivider />`(自帶 mx-1 = 與相鄰 Button 形成 8px gap + 4px 自身 = 12px 視覺距離),不用 `<Separator orientation="vertical" className="h-5 mx-1" />`(後者是 inline-action era leftover)
-
-❌ 禁止:
-│ Title     [CTA1] [CTA2] [X] │   ← 同 row 混 CTA + dismiss(違反 same-row;
-                                   dismiss X 應搬到 chrome corner action group)
-```
+**chrome corner action group(Alert / Toast / Dialog / Popover header corner)** 屬 **Button family**(action group region,不是 inline action)。Canonical 不在本 spec — 詳:
+- 尺寸:`patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」(overlay sm + v5 trick / banner xs explicit)
+- variant / divider:`patterns/action-bar/action-bar.spec.md`(corner action group)
 
 ### Inline action 共用元件(`ItemInlineAction` / `ItemSuffix`)
 
