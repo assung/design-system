@@ -13,7 +13,7 @@ import { NameCard, NameCardDefaultActions } from '@/design-system/components/Nam
 import { ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
- * 通知設定 — variant="list" 中 item(title + desc + right-side Switch)
+ * 通知設定 — flush 中 item(title + desc + right-side Switch)
  * in-modal 直接設定 pattern(對齊 Gmail 通知設定 / macOS Sys Prefs / Notion prefs)
  *
  * **Item-anatomy Family 2 reading mode 套用(2026-04-22 v3 修正,user 指出 Switch 是 suffix)**:
@@ -45,12 +45,12 @@ function NotificationSettings() {
         <DialogHeader>
           <DialogTitle>通知設定</DialogTitle>
         </DialogHeader>
-        <DialogBody variant="list">
+        <DialogBody flush>
           <div className="flex flex-col">
             {items.map((n) => (
               // item-anatomy Family 2:[content: title + desc(--item-gap-label-desc-scanning gap)] [ItemSuffix: Switch]
               // items-start(let content flow);suffix h-[1lh] 對齊 title 第一行(24px 閾值 canonical)
-              // px-loose:content 對齊 header/footer 的 loose padding(body variant="list" 無水平 padding)
+              // px-loose:content 對齊 header/footer 的 loose padding(body flush 無水平 padding)
               <div
                 key={n.key}
                 className="flex items-start gap-3 py-2 px-[var(--layout-space-loose)]"
@@ -197,10 +197,10 @@ export const LongContent = {
           <DialogHeader>
             <DialogTitle>成員列表</DialogTitle>
           </DialogHeader>
-          {/* Body 放 list → variant="list":body px-loose + py-2,item 自己 px=0(hover bg flush body padded edge)
+          {/* Body 放 list → flush:body px-loose + py-2,item 自己 px=0(hover bg flush body padded edge)
               item 用 Family 2 reading mode(prefix Avatar 40 + content title+description)
               對應 user Image #16 期望 + overlay-surface.spec.md 規則 3.1 hover bg context 判斷 */}
-          <DialogBody variant="list">
+          <DialogBody flush>
             <div role="list" className="flex flex-col">
               {members.map((m, i) => (
                 // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(--item-gap-label-desc-scanning gap)]
@@ -293,7 +293,7 @@ export const Destructive = {
  * - GitHub Primer ActionList in Dialog:body 0 vertical padding
  *
  * **共識**:overlay body 裝 list 時,**body 不加 vertical padding**;list item 自己的
- * py 是節奏源。我方採同 pattern,用 `<DialogBody variant="list">` 一鍵切換。
+ * py 是節奏源。我方採同 pattern,用 `<DialogBody flush>` 一鍵切換。
  *
  * 以下三個 item-size 範例對應不同 list-item tier(item-anatomy Family 1 reading mode):
  */
@@ -310,7 +310,7 @@ export const ListBody = {
           <DialogHeader>
             <DialogTitle>成員列表</DialogTitle>
           </DialogHeader>
-          <DialogBody variant="list">
+          <DialogBody flush>
             <div role="list" className="flex flex-col">
               {[
                 { name: 'Alan Chen', role: 'Design', empId: 'D-0042', empNum: 'EMP-1001' },
@@ -320,7 +320,7 @@ export const ListBody = {
                 { name: 'Ethan Park', role: 'Engineering', empId: 'E-0210', empNum: 'EMP-1005' },
                 { name: 'Fiona Lin', role: 'Design', empId: 'D-0098', empNum: 'EMP-1006' },
               ].map((m, i) => (
-                // variant="list" canonical v3:item `px-2 rounded-md` → content 在 hover bg 內有 breathing
+                // flush canonical v3:item `px-2 rounded-md` → content 在 hover bg 內有 breathing
                 <div
                   key={m.empNum}
                   role="listitem"
@@ -381,13 +381,13 @@ export const ListBody = {
           <DialogHeader>
             <DialogTitle>選擇標籤</DialogTitle>
           </DialogHeader>
-          <DialogBody variant="list">
+          <DialogBody flush>
             <div role="list" className="flex flex-col">
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
                 // 小 item 純文字 label → 用 **MenuItem** primitive(世界級 Linear Cmd+K / Polaris OptionList
                 // / Atlassian Modal+Menu 共通 pattern:menu-like 內容在 dialog 內用 menu primitive)
                 // className 覆蓋 px-3 為 px-loose → 對齊 dialog header/footer(tailwind-merge 吃掉預設 px-3)
-                // dialog body variant="list" 已 py-2 = menu no-group wrap 的 8px breathing,MenuItem 不需再外包 py-2
+                // dialog body flush 已 py-2 = menu no-group wrap 的 8px breathing,MenuItem 不需再外包 py-2
                 <MenuItem key={t} className="px-[var(--layout-space-loose)]">
                   {t}
                 </MenuItem>

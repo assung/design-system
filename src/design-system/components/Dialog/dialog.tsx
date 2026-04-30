@@ -156,50 +156,34 @@ DialogHeader.displayName = "DialogHeader"
 // padding 搬進 viewport inner div:px-loose / pt-tight / pb-bottom(Dialog 「大容器」底部多一拍呼吸)。
 // data-dialog-body:讓 DialogContent onOpenAutoFocus 找得到 body 第一個有意義互動元素(避免 focus 到 close X)
 //
-// **`variant="list"`**(2026-04-22 canonical,對齊 Material / Polaris / Linear list-in-dialog):
-// body 只放 list 時 **移除 vertical padding** 但**保留 horizontal padding**(list item 左右
-// 邊距仍對齊 header title 與 footer button 的 left),list item 自己的 py 是節奏來源。
-// 這樣 list item content 跟 header title 垂直對齊 — 世界級 Material M3 / Polaris
-// ResourceList / Atlassian OptionList 都是這個 pattern(body horizontal gutter 保留,vertical 移除)。
+// **`flush`**(2026-05-01 rename,前 `variant="list"` 對齊 Polaris flush API):
+// body 為單一 unbounded list-as-region 場景 — body **`py-2`** 無 horizontal padding,
+// list item 自己 **`px-[var(--layout-space-loose)] rounded-md`** → hover bg flush chrome 邊
+// (Linear / Cmd+K idiom)+ content 對齊 header title 位置。
+// 對齊 layoutSpace v6「unbounded list-as-region」概念 + Polaris `flush` API canonical。
 interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollArea> {
   /**
-   * Body 佈局模式。
-   * - `default`(預設):body 有 px-loose / pt-tight / pb-bottom,適合 form 或一般內容
-   * - `list`:body **`py-2`**(無 horizontal padding),item 自己 **`px-[var(--layout-space-loose)] rounded-md`**
-   *   → hover bg 外邊 **flush chrome 邊**(貼齊 dialog 外殼內邊)、**content(avatar / text)在 hover bg
-   *   內有 loose breathing**(對齊 header title 位置)
+   * `flush=true`:body 為**單一 unbounded list-as-region**(menu / nav / settings list)
+   * - body `py-2`,無 horizontal padding,item 自帶 `px-loose rounded-md`
+   * - hover bg flush chrome 內邊(Linear idiom)
+   * - **限制**:single unbounded list-only,multi-row(search + list / 多 control)走 default + consumer compose(規則 3 補充 inline → block 累加)
    *
-   * ── 兩個 invariant(2026-04-22 v4 user Image #26 校準)──
-   * 1. **Content 對齊 header/footer**:content left = body px (0) + item px (loose) = **loose** from chrome
-   *    → 跟 `SurfaceHeader` 的 `px-loose` 同位,視覺一致
-   * 2. **Content 在 hover bg 內有 breathing**:item px-loose 讓 content 離 hover bg 邊 loose,不觸邊
+   * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),適合 form / 一般 / 混合內容
    *
-   * ── Hover bg 邊位置 = 設計選擇(不是 invariant)──
-   * 本 DS 當前選 **flush chrome**(Linear / Cmd+K idiom)— body 無水平 padding,hover bg 貼 chrome 內邊。
-   * 另一個合法選擇是 **inset with chrome gutter**(Material M3 / Polaris idiom)— body 有 px,
-   * hover bg 離 chrome 邊若干 px;兩者皆世界級,擇一即可。**不是 violation 判斷點**。
-   *
-   * List item 本身應遵循 **item-anatomy** 原則:
-   * - 純文字 / 簡單 list → MenuItem(Family 1 scanning)或 Family 2 手刻(reading)
-   * - key-value pair → DescriptionList(horizontal / vertical 模式)
-   * 見 `patterns/element-anatomy/item-anatomy.spec.md`「Row primitives 共用結構規格」。
+   * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 4 + Notes 「Body variant catalog」
    */
-  variant?: "default" | "list"
+  flush?: boolean
 }
 // `className` forward 到 **inner content div**(非外層 ScrollArea wrapper)——
 // consumer `<DialogBody className="flex flex-col gap-X">` 期望作用於 children 排列;
 // 套在 ScrollArea 上會 0 效果(children 住 inner div),曾造成 modal form field 完全貼邊。
 const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
-  ({ className, children, variant = "default", ...props }, ref) => (
+  ({ className, children, flush = false, ...props }, ref) => (
     <ScrollArea ref={ref} data-dialog-body className="flex-1 min-h-0" {...props}>
       <div
         className={cn(
-          variant === "list"
-            ? // list mode 2026-04-22 v4(user Image #26 校準,flush chrome canonical):
-              // - body 無水平 padding → hover bg flush chrome 邊(Linear idiom)
-              // - py-2:menu group 節奏
-              // - item 負責 px-loose rounded-md → content 對齊 header title + content 在 hover bg 內有 loose breathing
-              "py-2"
+          flush
+            ? "py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
           className,
         )}

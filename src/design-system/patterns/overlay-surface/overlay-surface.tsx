@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils'
  *
  * ── Body ──
  * Body 仍 padding-based(content area),`px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`,
- * Dialog / Sheet body 有 variant="list" 時 py 由 consumer override(見 dialog.tsx)。
+ * Dialog / Sheet body 有 flush 時 py 由 consumer override(見 dialog.tsx)。
  */
 
 // Chrome-slot layout trick(2026-04-22 v5,user intent 精確實作):

@@ -289,7 +289,7 @@ document.documentElement.setAttribute('data-layout-space', 'lg')
 ## Notes
 
 - **不抽 universal LayoutBody / FormLayout primitive**:world-class(Material / Polaris / Atlassian / Carbon / Mantine)都「每元件 own variant + 共享 token」;規則 1-6 universal,角色 scope-relative 易誤封裝。獨特 chrome 已在 `overlay-surface.spec.md` + `action-bar.spec.md`
-- **Body variant catalog**:overlay-class 元件 `variant="default" \| "list"` — default = 概念 A(commitment 前留白 `pb-bottom 48`)/ list = unbounded list-as-region 概念 B(`py-2` 0 outer 讓 list 自撐)。已實作:Dialog / Sheet / Popover
+- **Body `flush` API catalog**(2026-05-01 rename 前 `variant="list"`,對齊 Polaris flush):overlay-class 元件 `flush?: boolean` — flush=false 預設(chrome padded,概念 A)/ flush=true(unbounded list-as-region,`py-2` 0 outer,概念 B)。已實作:Dialog / Sheet / Popover
 - **v1 → v6**(2026-04-30):block-adjacent 機械 → 親疏判 + bundled-family 分權 + region 二分(bounded/unbounded)+ 多 region 限制。詳 git + memory `feedback_layout_v6_canonical.md`
 
 ---
