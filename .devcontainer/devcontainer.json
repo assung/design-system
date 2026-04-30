@@ -1,0 +1,19 @@
+{
+  "name": "ui-playground",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [6006, 5173],
+  "portsAttributes": {
+    "6006": { "label": "Storybook", "onAutoForward": "openPreview" },
+    "5173": { "label": "Vite Dev", "onAutoForward": "notify" }
+  },
+  "postCreateCommand": "npm ci && cp -rn .claude/memory/* ~/.claude/projects/$(pwd | shasum | cut -c1-40)/memory/ 2>/dev/null || true",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  },
+  "remoteUser": "node"
+}

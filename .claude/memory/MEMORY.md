@@ -1,0 +1,18 @@
+# Memory Index
+
+- [feedback_no_binary_evaluation.md](feedback_no_binary_evaluation.md) — When user proposes solution, generate 3rd alternative via world-class benchmark; never binary-execute user's suggestion without evaluation
+- [feedback_concrete_not_vague.md](feedback_concrete_not_vague.md) — P2 / finding 必具體:file:line + 片段 + 具體問題;禁 topic-level generic 描述
+- [feedback_skill_trigger_precision.md](feedback_skill_trigger_precision.md) — Skill trigger 必精確 user vocabulary;loose 語句(「怎麼做世界級」)不 auto-invoke,clarify-first
+- [feedback_proactive_5layer_pipeline.md](feedback_proactive_5layer_pipeline.md) — 對話結論立刻自動 5-layer 落地(spec/hook/grep);user 不該需要兩次提醒同件事
+- [feedback_overlay_primitive_consumption.md](feedback_overlay_primitive_consumption.md) — 寫 Popover/Dialog/Sheet 內容前必 grep primitive exports + read overlay-surface.spec.md;禁自刻 px-loose border-(b/t) chrome
+- [feedback_inline_action_sizing.md](feedback_inline_action_sizing.md) — Panel list row icon action 必統一 ItemInlineActionButton(16+18);禁混 Button iconOnly 違 same-row consistency
+- [feedback_overlay_chrome_token_semantic.md](feedback_overlay_chrome_token_semantic.md) — Overlay chrome bg = bg-surface-raised(不是 canvas / surface);dark mode --surface 半透明洗白,canvas 是 page-level 語意錯
+- [feedback_layout_v6_canonical.md](feedback_layout_v6_canonical.md) — layoutSpace v6:region/element + bounded/unbounded + 親疏三級(同範疇 out/相關 tight/不相關 loose)+ Dialog-class 元件 spec own 分權
+- [user_role.md](user_role.md) — Design-oriented frontend engineer with high standards for design correctness
+- [project_goal.md](project_goal.md) — The ultimate goal: world-class design system where CLAUDE.md + specs ensure AI faithfully executes design principles every time
+- [project_audit_progress.md](project_audit_progress.md) — Full design system audit progress: Button/Menu/Field done, tokens done, patterns done, stale refs cleaned
+- [project_form_controls_refactor.md](project_form_controls_refactor.md) — REJECTED 2026-04-18: 3-layer refactor is over-abstraction; current Input-with-mode matches Chakra/Ant/shadcn
+- [project_ds_devmode_addon_2026_04_24.md](project_ds_devmode_addon_2026_04_24.md) — DS Devmode Addon 規格索引 → 完整 spec 在 `.claude/planning/ds-devmode.md`(on-disk 冗餘)
+- [project_story_auto_compile_2026_04_24.md](project_story_auto_compile_2026_04_24.md) — Story auto-compile 系統索引(C)→ 完整 4-phase plan 在 `.claude/planning/story-auto-compile.md`
+- [project_audit_history_2026_04.md](project_audit_history_2026_04.md) — 2026-04-21~24 audit sessions 合輯(取代 8 個 per-session memories)— detail 見 commits
+- [project_story_canonical_2026_04_26.md](project_story_canonical_2026_04_26.md) — Storybook 三層(展示 trait v2 + anatomy + principles)5-layer pipeline 全落地索引(合併 typology + principles)
