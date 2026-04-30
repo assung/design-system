@@ -163,14 +163,26 @@ DialogHeader.displayName = "DialogHeader"
 // 對齊 layoutSpace v6「unbounded list-as-region」概念 + Polaris `flush` API canonical。
 interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollArea> {
   /**
-   * `flush=true`:body 為**單一 unbounded list-as-region**(menu / nav / settings list)
-   * - body `py-2`,無 horizontal padding,item 自帶 `px-loose rounded-md`
+   * `flush=true`:body 為 unbounded list-as-region 場景
+   * - body `py-2`,**無 horizontal padding**(讓 list 自帶 py 撐 + items 自帶 px-loose 對齊 chrome)
    * - hover bg flush chrome 內邊(Linear idiom)
-   * - **限制**:single unbounded list-only,multi-row(search + list / 多 control)走 default + consumer compose(規則 3 補充 inline → block 累加)
+   * - **支援 search-above-list 等 multi-row**:consumer 把 search/control 包 div 自帶
+   *   `px-loose pt-tight`(省 pb,規則 3 補充 inline → block 累加)
    *
-   * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),適合 form / 一般 / 混合內容
+   * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),
+   * 適合 form / 一般 / 混合內容
    *
-   * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 4 + Notes 「Body variant catalog」
+   * Pattern(search + list):
+   * ```tsx
+   * <DialogBody flush>
+   *   <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
+   *     <Input search />  // search wrapper:省 pb 讓 list py-2 累加生 tight 視覺
+   *   </div>
+   *   {items.map(item => <MenuItem className="px-[var(--layout-space-loose)] rounded-md" />)}
+   * </DialogBody>
+   * ```
+   *
+   * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 3 補充 + 規則 4 + Notes flush catalog
    */
   flush?: boolean
 }
