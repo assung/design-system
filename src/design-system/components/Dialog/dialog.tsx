@@ -175,12 +175,14 @@ interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollAr
    * Pattern(search + list):
    * ```tsx
    * <DialogBody flush>
-   *   <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
-   *     <Input search />  // search wrapper:省 pb 讓 list py-2 累加生 tight 視覺
+   *   <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-2">
+   *     <Input search />  // wrapper 4 邊明寫 padding;pb-2(8)+ item 自帶 py-1(4)= tight 12
    *   </div>
    *   {items.map(item => <MenuItem className="px-[var(--layout-space-loose)] rounded-md" />)}
    * </DialogBody>
    * ```
+   * **Note**:body py-2 是 body 邊界 padding(body 上邊到第一 child / 最後 child 到 body 下邊),
+   * **不是 sibling 之間 gap**。search → first item gap 由 search wrapper pb + item 自帶 py 累加決定,consumer 須明寫。
    *
    * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 3 補充 + 規則 4 + Notes flush catalog
    */
