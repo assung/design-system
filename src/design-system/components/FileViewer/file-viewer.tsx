@@ -922,13 +922,23 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                 onMouseMove={handleViewportMouseMove}
                 onMouseLeave={handleViewportMouseLeave}
                 // Backdrop click-to-close(對齊 Google Drive / Dropbox lightbox / Apple Photos canonical):
-                // 點擊 image 周圍的暗色 backdrop 區關閉。檢查 closest('img,button,[role="button"]')
-                // — 命中 = 點到 image 本身 / 互動元素(side arrows / chrome controls 等)→ 不關。
-                // 未命中 = 點到 viewport 內 image 周圍空白(由 image-renderer TransformComponent
-                // 透出 bg-canvas)→ close。
+                // 點擊 image 周圍的暗色 backdrop 區關閉,跟 modal mask 同 idiom。
+                //
+                // 為何 geometric check 而非 closest('img')?
+                // react-zoom-pan-pinch 的 TransformComponent 是 wrapper div 蓋在 image 之上(absorb
+                // pan/zoom events),click target 是該 wrapper div 不是 <img>。closest('img') 檢查
+                // ancestor 永遠 false。改 geometric check:看 click 座標是否落在 <img> 視覺 rect 內。
                 onClick={(e) => {
                   const t = e.target as HTMLElement
-                  if (t.closest('img, button, [role="button"], [role="dialog"] [role="button"]')) return
+                  // 互動元素(side arrows / chrome buttons 透過冒泡)→ 不關
+                  if (t.closest('button, [role="button"]')) return
+                  // 點到 image 視覺範圍 → 不關(image 本體 click ≠ close)
+                  const img = e.currentTarget.querySelector('img')
+                  if (img) {
+                    const r = img.getBoundingClientRect()
+                    if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) return
+                  }
+                  // 否則 = 點到 backdrop(image-renderer TransformComponent 透出的 bg-canvas)→ close
                   onOpenChange?.(false)
                 }}
               >
