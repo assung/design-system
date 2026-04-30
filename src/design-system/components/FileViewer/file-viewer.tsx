@@ -868,8 +868,13 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
   return (
     <DialogPrimitive.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        {/* Overlay — FileViewer 固定深色氛圍,與 Dialog 共用 bg-overlay */}
+        {/* Overlay — FileViewer 固定深色氛圍,與 Dialog 共用 bg-overlay。
+            **data-theme="dark"**(2026-04-30):Overlay 在 Portal 內、是 Content 的 sibling,
+            不繼承 Content 內層的 dark 主題 → `--overlay` 默認 resolve 成 light theme α45 黑。
+            FileViewer 永遠 dark(line 899 outer),mask 也須 dark token = α65 黑(更深)
+            才語意一致。同 DropdownMenuContent Portal 處理(line 245)。 */}
         <DialogPrimitive.Overlay
+          data-theme="dark"
           className={cn(
             'fixed inset-0 z-50 bg-overlay',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
