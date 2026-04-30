@@ -161,7 +161,7 @@ const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
       <div
         className={cn(
           flush
-            ? "py-2"
+            ? "" // 裸 body,無 padding — list py 屬 list outer wrapper 而非 body(同 DialogBody flush)
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
           className,
         )}

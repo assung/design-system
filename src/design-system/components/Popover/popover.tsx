@@ -115,7 +115,7 @@ const PopoverBody = React.forwardRef<HTMLDivElement, PopoverBodyProps>(
       <div
         ref={ref}
         data-popover-body
-        className={cn("py-2", className)}
+        className={className}  // 裸 body,無 padding — list py 屬 list outer wrapper
         {...props}
       >
         {children}

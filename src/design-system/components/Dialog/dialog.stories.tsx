@@ -46,7 +46,7 @@ function NotificationSettings() {
           <DialogTitle>通知設定</DialogTitle>
         </DialogHeader>
         <DialogBody flush>
-          <div className="flex flex-col">
+          <div className="flex flex-col py-2">
             {items.map((n) => (
               // item-anatomy Family 2:[content: title + desc(--item-gap-label-desc-scanning gap)] [ItemSuffix: Switch]
               // items-start(let content flow);suffix h-[1lh] 對齊 title 第一行(24px 閾值 canonical)
@@ -201,7 +201,7 @@ export const LongContent = {
               item 用 Family 2 reading mode(prefix Avatar 40 + content title+description)
               對應 user Image #16 期望 + overlay-surface.spec.md 規則 3.1 hover bg context 判斷 */}
           <DialogBody flush>
-            <div role="list" className="flex flex-col">
+            <div role="list" className="flex flex-col py-2">
               {members.map((m, i) => (
                 // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(--item-gap-label-desc-scanning gap)]
                 // `px-2 rounded-md` → content(avatar / text)在 hover bg 內有 8px breathing
@@ -311,7 +311,7 @@ export const ListBody = {
             <DialogTitle>成員列表</DialogTitle>
           </DialogHeader>
           <DialogBody flush>
-            <div role="list" className="flex flex-col">
+            <div role="list" className="flex flex-col py-2">
               {[
                 { name: 'Alan Chen', role: 'Design', empId: 'D-0042', empNum: 'EMP-1001' },
                 { name: 'Betty Wu', role: 'Engineering', empId: 'E-0183', empNum: 'EMP-1002' },
@@ -382,7 +382,7 @@ export const ListBody = {
             <DialogTitle>選擇標籤</DialogTitle>
           </DialogHeader>
           <DialogBody flush>
-            <div role="list" className="flex flex-col">
+            <div role="list" className="flex flex-col py-2">
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
                 // 小 item 純文字 label → 用 **MenuItem** primitive(世界級 Linear Cmd+K / Polaris OptionList
                 // / Atlassian Modal+Menu 共通 pattern:menu-like 內容在 dialog 內用 menu primitive)

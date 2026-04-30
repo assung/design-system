@@ -163,11 +163,10 @@ DialogHeader.displayName = "DialogHeader"
 // 對齊 layoutSpace v6「unbounded list-as-region」概念 + Polaris `flush` API canonical。
 interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollArea> {
   /**
-   * `flush=true`:body 為 unbounded list-as-region 場景
-   * - body `py-2`,**無 horizontal padding**(讓 list 自帶 py 撐 + items 自帶 px-loose 對齊 chrome)
-   * - hover bg flush chrome 內邊(Linear idiom)
-   * - **支援 search-above-list 等 multi-row**:consumer 把 search/control 包 div 自帶
-   *   `px-loose pt-tight`(省 pb,規則 3 補充 inline → block 累加)
+   * `flush=true`:body 變**裸**(無 padding)— 為 unbounded list-as-region 場景。
+   * - body 不套 chrome padding 也**不套 py-2**(2026-05-01 修正)
+   * - **list 自帶 py-2 outer wrapper**(consumer 包 `<div py-2>` 包 items)
+   * - items 自帶 `px-loose rounded-md`(對齊 chrome 邊 + hover bg flush)
    *
    * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),
    * 適合 form / 一般 / 混合內容
@@ -186,8 +185,7 @@ interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollAr
    * search → first item 視覺距離 = 0(wrapper pb 省)+ 8(list pt-2)+ 4(item pt)
    * = **12 ≈ tight ✓**(規則 3 補充 line 85 公式)
    *
-   * **Note**:flush body 自己 py-2 是 body 邊界 padding,跟 list 自帶 py-2 outer
-   * 是兩個不同 wrapper 各司其職。list canonical 結構必有自己 outer py-2(menu group / list-as-region 通用)。
+   * **設計原則**:flush body 是**裸容器**(無 padding),padding 屬內部 wrapper(list 自帶 py-2 outer + search wrapper 各自 own)。原本 body py-2 設計 intent 就是「list 上下 padding」,但實作層面屬 list outer 而非 body — 此 thread (2026-05-01) 修正混淆。
    *
    * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 3 補充 + 規則 4 + Notes flush catalog
    */
@@ -202,7 +200,7 @@ const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
       <div
         className={cn(
           flush
-            ? "py-2"
+            ? "" // 裸 body,**無 padding** — list py 屬 list outer wrapper(consumer 包 `<div py-2>`)而非 body
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
           className,
         )}
