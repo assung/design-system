@@ -293,36 +293,12 @@ const CHROME_UNBOUNDED_SLOT =
 - **Bounded** 有視覺邊界:button 本身 bg/border 佔視覺重量,padding 自然包住 button,header 長到 52+ 不顯得空。這也跟 footer 保持一致 — footer 通常放 primary/tertiary,自然高度。
 - **幾何閉合**:只有 header 全是 unbounded(Dialog 只有 title + close X 典型場景)時,header = chrome-header-height canonical,跟 Sidebar / page header / top bar 完美對齊。
 
-**Code canonical**:
-
-```tsx
-// Overlay family:Dialog / Sheet / Popover / Coachmark / FileViewer chrome
-// Dismiss X 永遠 unbounded → 永遠 xs
-<Button iconOnly dismiss size="xs" startIcon={X} aria-label="關閉" />
-
-// 其他 header unbounded action(text variant)→ xs
-<Button iconOnly variant="text" size="xs" startIcon={Share2} aria-label="分享" />
-
-// Header bounded action(primary / tertiary)→ sm 或 natural
-<Button variant="primary" size="sm">套用</Button>
-
-// Notification banner family:Notice / Alert / Toast
-// dismiss 永遠 unbounded + notification px-4 py-3 固定 → 永遠 xs
-<Button iconOnly dismiss size="xs" startIcon={X} aria-label="關閉通知" />
-```
-
 **SurfaceHeader / SurfaceFooter 實作**(padding-based,非 fixed-height):
 ```tsx
 // 保持 py-tight,不用 min-h / fixed h
 'flex items-center gap-2 shrink-0 border-b border-divider',
 'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
 ```
-
-**Consumer 實際高度範例**:
-- Dialog header 只有 title + close X(xs): 24 + 2×12 = **48 md** / 24 + 2×16 = **56 lg**(= chrome-header-height ✓)
-- Dialog header 有 refresh/share/close 全 xs: 同上
-- Dialog footer 有 Cancel(tertiary sm) + OK(primary sm): 28 + 2×12 = 52 md(自然長)
-- Popover header 同 Dialog pattern:48 md / 56 lg
 
 **共通 rationale**(全 overlay + banner 家族):corner close X 屬 **action group region**,必用 `<Button>` primitive(不自刻 `<button><X /></button>` 繞 DS token / a11y,不用 `ItemInlineActionButton`)。
 
@@ -336,14 +312,14 @@ const CHROME_UNBOUNDED_SLOT =
 **SSOT 關聯**:
 - `tokens/uiSize/uiSize.spec.md`「--chrome-header-height」+ `globals.css` 聲明(md=3rem / lg=3.5rem)
 - `tokens/layoutSpace/layoutSpace.spec.md` tight = 12 md / 16 lg
-- `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical」
+- `patterns/element-anatomy/inline-action.spec.md`「Dismiss canonical — X close only」
 - `components/Button/button.spec.md`「Dismiss 視覺類」+ unbounded / bounded 判斷
 
 ---
 
 ## Control + List 視覺對稱原則 → SSOT 規則 3 補充
 
-→ `tokens/layoutSpace/layoutSpace.spec.md`「規則 3 補充:List 場景的 inline → block 累加」(本原則本質是 inline → block 對稱在 list 場景的特殊化,SSOT 移上游避免重複 — Rule-of-3)。
+→ `tokens/layoutSpace/layoutSpace.spec.md`「規則 3:元素間 gap」+ `## Notes` 節「List-as-region in overlay body」(本原則本質是 inline → block 對稱在 list 場景的特殊化,SSOT 移上游避免重複 — Rule-of-3)。
 
 ---
 

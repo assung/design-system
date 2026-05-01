@@ -73,7 +73,7 @@ Sheet 的 `SheetHeader` / `SheetBody` / `SheetFooter` 對應 `SurfaceHeader` / `
 
 永遠存在於 SheetHeader 右側(對齊 DialogHeader canonical)。使用 `<Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />`,不可移除——使用者永遠需要明確的關閉手段。
 
-**Canonical 來源**:Sheet 是 overlay chrome,corner close X 屬 action group region,必用 Button(非 Inline Action / 非自刻 button)。詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical」+ `patterns/overlay-surface/overlay-surface.spec.md`「Close X canonical」。
+**Canonical 來源**:Sheet 是 overlay chrome,corner close X 屬 action group region,必用 Button(非 Inline Action / 非自刻 button)。詳見 `patterns/element-anatomy/inline-action.spec.md`「Dismiss canonical — X close only」+ `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」。
 
 ---
 
