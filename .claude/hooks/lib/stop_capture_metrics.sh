@@ -33,7 +33,8 @@ mkdir -p "$(dirname "$SNAPSHOT_FILE")"
 if [ -f "$SNAPSHOT_FILE" ]; then
   LAST_TS=$(tail -1 "$SNAPSHOT_FILE" 2>/dev/null | jq -r '.ts // empty' 2>/dev/null || echo "")
   if [ -n "$LAST_TS" ]; then
-    LAST_EPOCH=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_TS" +%s 2>/dev/null || echo 0)
+    # Cross-platform date parse(Linux GNU date -d / macOS BSD date -j -f)
+    LAST_EPOCH=$(date -u -d "$LAST_TS" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_TS" +%s 2>/dev/null || echo 0)
     NOW_EPOCH=$(date -u +%s)
     DIFF=$(( NOW_EPOCH - LAST_EPOCH ))
     if [ "$DIFF" -lt 86400 ]; then

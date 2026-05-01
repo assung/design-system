@@ -28,6 +28,7 @@ setup_proj() {
   git init --quiet
   git config user.email "test@test"
   git config user.name "Test"
+  git config commit.gpgsign false
   echo "x" > a.txt
   git add a.txt
   git commit -q -m "init"

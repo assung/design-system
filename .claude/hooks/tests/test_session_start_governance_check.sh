@@ -25,7 +25,7 @@ setup_proj() {
   # 5-line healthy CLAUDE.md
   printf '%s\n' a b c d e > "$TMP_PROJ/CLAUDE.md"
   # init git for last-prune check (no commits → -1)
-  ( cd "$TMP_PROJ" && git init -q && git commit --allow-empty -m "init" -q ) 2>/dev/null
+  ( cd "$TMP_PROJ" && git init -q && git -c commit.gpgsign=false -c user.name=test -c user.email=t@t.com commit --allow-empty -m "init" -q ) 2>/dev/null
 }
 
 teardown_proj() { rm -rf "$TMP_PROJ"; }
