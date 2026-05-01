@@ -10,7 +10,7 @@
 # 2. "canonical" / "Canonical" — spec-internal terminology
 # 3. "(spec...)" / "(canonical)" trailing tags
 
-source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 

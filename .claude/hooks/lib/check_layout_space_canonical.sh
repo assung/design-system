@@ -11,7 +11,7 @@
 # WARN-style (not BLOCK): emit additionalContext so AI reads and can fix.
 
 # Per-hook fire logging
-source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 

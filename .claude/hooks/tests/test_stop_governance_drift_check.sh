@@ -10,7 +10,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../stop_governance_drift_check.sh"
+HOOK="$SCRIPT_DIR/../lib/stop_governance_drift_check.sh"
 
 if [ ! -x "$HOOK" ]; then
   echo "FATAL: hook not executable: $HOOK"

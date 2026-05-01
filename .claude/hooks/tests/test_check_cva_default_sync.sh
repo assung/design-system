@@ -1,7 +1,7 @@
 #!/bin/bash
 # Smoke test for check_cva_default_sync.sh
 set -u
-HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../check_cva_default_sync.sh"
+HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/check_cva_default_sync.sh"
 [ -x "$HOOK" ] || { echo "FATAL: hook not exec"; exit 1; }
 PASS=0; FAIL=0
 run_hook() {

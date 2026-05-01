@@ -1,7 +1,7 @@
 #!/bin/bash
 # Smoke test for check_story_compile_drift.sh
 set -u
-HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../check_story_compile_drift.sh"
+HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/check_story_compile_drift.sh"
 [ -x "$HOOK" ] || { echo "FATAL: hook not exec"; exit 1; }
 PASS=0; FAIL=0
 run_hook() {

@@ -24,15 +24,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_anatomy.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_anatomy.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_slot_split.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_slot_split.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_category.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_category.sh\""
           },
           {
             "type": "command",
@@ -60,31 +60,31 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_token_hygiene.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_token_hygiene.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_hardcoded_strings.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_hardcoded_strings.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_code_quality.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_code_quality.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_layout_space_canonical.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_layout_space_canonical.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_name_jargon.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_name_jargon.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_person_data_richness.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_person_data_richness.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_overlay_handcraft.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_overlay_handcraft.sh\""
           }
         ]
       },
@@ -93,7 +93,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_cva_default_sync.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_cva_default_sync.sh\""
           }
         ]
       },
@@ -102,7 +102,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_compile_drift.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_compile_drift.sh\""
           }
         ]
       },
@@ -130,11 +130,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_tsc_sanity.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_tsc_sanity.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_governance_drift_check.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_governance_drift_check.sh\""
           },
           {
             "type": "command",
@@ -154,11 +154,11 @@
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_harvest_corrections.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_harvest_corrections.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_capture_metrics.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_capture_metrics.sh\""
           }
         ]
       }

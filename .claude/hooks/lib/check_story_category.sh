@@ -22,7 +22,7 @@
 # (M19 trigger,2026-04-26)。Pre-write 是 mechanical 防線,Audit Dim 29 是 periodic 補位。
 
 # Per-hook fire logging
-source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 
 set -u
 

@@ -2,7 +2,7 @@
 # Tests for check_story_name_jargon.sh
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../check_story_name_jargon.sh"
+HOOK="$SCRIPT_DIR/../lib/check_story_name_jargon.sh"
 [ -x "$HOOK" ] || { echo "FATAL: hook not executable"; exit 1; }
 PASS=0; FAIL=0
 

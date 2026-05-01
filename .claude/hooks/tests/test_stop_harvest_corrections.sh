@@ -1,7 +1,7 @@
 #!/bin/bash
 # Smoke test for stop_harvest_corrections.sh
 set -u
-HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../stop_harvest_corrections.sh"
+HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/stop_harvest_corrections.sh"
 [ -x "$HOOK" ] || { echo "FATAL"; exit 1; }
 echo "Test 1: minimal payload → no crash"
 STDOUT=$(echo '{}' | bash "$HOOK" 2>&1); EXIT=$?

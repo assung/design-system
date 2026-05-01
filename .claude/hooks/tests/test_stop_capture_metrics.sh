@@ -9,7 +9,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../stop_capture_metrics.sh"
+HOOK="$SCRIPT_DIR/../lib/stop_capture_metrics.sh"
 [ -x "$HOOK" ] || { echo "FATAL: hook not executable"; exit 1; }
 
 PASS=0; FAIL=0; FAILED=""

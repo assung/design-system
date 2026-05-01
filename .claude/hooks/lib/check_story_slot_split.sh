@@ -10,7 +10,7 @@
 # 只擋顯著反 pattern。Allowlist 為 // @story-split-rationale: <reason> 在檔首。
 
 # Per-hook fire logging
-source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 
 set -euo pipefail
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Smoke test for check_token_hygiene.sh
 set -u
-HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../check_token_hygiene.sh"
+HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/check_token_hygiene.sh"
 [ -x "$HOOK" ] || { echo "FATAL"; exit 1; }
 PASS=0; FAIL=0
 run_hook() {

@@ -19,7 +19,7 @@
 # WARN-style (additionalContext) — AI reads + fixes next iteration.
 
 # Per-hook fire logging
-source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 

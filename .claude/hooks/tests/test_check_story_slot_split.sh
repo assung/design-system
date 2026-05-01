@@ -9,7 +9,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../check_story_slot_split.sh"
+HOOK="$SCRIPT_DIR/../lib/check_story_slot_split.sh"
 
 if [ ! -x "$HOOK" ]; then
   echo "FATAL: hook not executable: $HOOK"
