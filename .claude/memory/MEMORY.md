@@ -16,3 +16,4 @@
 - [project_story_auto_compile_2026_04_24.md](project_story_auto_compile_2026_04_24.md) — Story auto-compile 系統索引(C)→ 完整 4-phase plan 在 `.claude/planning/story-auto-compile.md`
 - [project_audit_history_2026_04.md](project_audit_history_2026_04.md) — 2026-04-21~24 audit sessions 合輯(取代 8 個 per-session memories)— detail 見 commits
 - [project_story_canonical_2026_04_26.md](project_story_canonical_2026_04_26.md) — Storybook 三層(展示 trait v2 + anatomy + principles)5-layer pipeline 全落地索引(合併 typology + principles)
+- [project_datatable_l1_l7_roadmap.md](project_datatable_l1_l7_roadmap.md) — DataTable L1-L7 階段 roadmap(target = agGrid 級):L1 ✓ / L2 L5 設計已定實作待做 / L3 L4 L6 L7 待定。下次接續從 L2 實作或 L3/L4 設計起跳
