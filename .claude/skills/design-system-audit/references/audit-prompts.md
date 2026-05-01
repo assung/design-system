@@ -409,19 +409,18 @@ Additional `export const` 7+ allowed (component-specific, no rationale required)
 Replacing 6-canonical with different identifier → VIOLATION regardless of rationale.
 Missing 6-canonical → requires rationale paragraph in .spec.md OR `// @anatomy-rationale:` 檔頭註解列出 N/A sections + 一行原因(legitimate 偏離)。
 
-**Layer 2 — Mandatory `name:` 中文覆寫(含編號前綴,一字不差)**:
-1. `Overview`     → `name: '1. 元件總覽'`
-2. `Inspector`    → `name: '2. 元件檢閱器'`
-3. `ColorMatrix`  → `name: '3. 色彩對照表'`
-4. `SizeMatrix`   → `name: '4. 尺寸對照表'`
-5. `StateBehavior`→ `name: '5. 狀態行為'`
-6. `Accessibility`→ `name: '6. 無障礙與鍵盤'`
-7+ (extras)      → `name: '7. {中文描述}'` / `'8. {中文描述}'` (編號連續,中文命名)
+**Layer 2 — Mandatory `name:` 中文覆寫(素顏型,**一律不加序號**)**:
+1. `Overview`     → `name: '元件總覽'`
+2. `Inspector`    → `name: '元件檢閱器'`
+3. `ColorMatrix`  → `name: '色彩對照表'`
+4. `SizeMatrix`   → `name: '尺寸對照表'`
+5. `StateBehavior`→ `name: '狀態行為'`
+6. `Accessibility`→ `name: '無障礙與鍵盤'`
+7+ (extras)      → `name: '{中文描述}'`(中文命名,**禁止編號前綴**)
 
 依賴 `export const` identifier 讓 Storybook sidebar 顯示英文 = VIOLATION(sidebar 中英混雜)。
-素顏型 `name: '元件總覽'`(無編號) = VIOLATION(Storybook sidebar 字母序亂)。
-帶括號 context `name: '6. Orientation(horizontal / vertical)'` = VIOLATION(canonical 命名不應混英文 context)。
-編號不連續(跳 5 直接到 7) = VIOLATION。
+帶編號前綴 `name: '1. 元件總覽'` = VIOLATION(2026-05-01 canonical flip:sidebar 順序由 `export const` 順序決定,序號重複 = 視覺噪音)。
+帶括號英文 context `name: 'Orientation(horizontal / vertical)'` = VIOLATION(canonical 命名不應混英文 context)。
 
 **Layer 3 — Content hygiene** (only if Layer 1+2 pass):
 - Density dual values (`md density / lg density` columns) — CLAUDE.md forbids
