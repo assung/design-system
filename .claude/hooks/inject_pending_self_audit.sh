@@ -24,13 +24,36 @@ cd "$PROJECT_DIR" || exit 0
 
 LAST_TS_FILE=".claude/logs/last-inject-ts.txt"
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-# Default LAST_TS: 24 小時前(若無 state file,只看最近 24h 避免初次/重置爆量)
-DEFAULT_AGO=$(date -u -v-24H +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+# Default LAST_TS: 30 分鐘前(防呆 — session cutoff,老 warning 自動 expire 避免 echo)
+# 之前 24h 太寬,session 跨 hour 仍 inject 老 warning。30m sliding window 讓 fresh
+# warning 進 inject,old warning 自動老化。Cross-platform GNU + BSD date。
+DEFAULT_AGO=$(date -u -d '30 minutes ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || \
+              date -u -v-30M +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || \
+              date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || \
+              echo "1970-01-01T00:00:00Z")
 LAST_TS="$DEFAULT_AGO"
 if [ -f "$LAST_TS_FILE" ]; then
   STORED=$(cat "$LAST_TS_FILE" 2>/dev/null)
-  # 用 stored OR 24h-ago 較新者(避免被重置成 1970)
+  # 用 stored OR 30m-ago 較新者(避免被重置成 1970)
   [ -n "$STORED" ] && [[ "$STORED" > "$LAST_TS" ]] && LAST_TS="$STORED"
+fi
+
+# ── Acknowledge detection(防呆)──────────────────────────────────────────
+# 若 last user msg(transcript)含 acknowledge keyword,stop inject 該類 warning
+# 這 turn — 表示 user 已 see + 接受該 warning,持續 inject 是 spam。
+ACK_DETECTED=0
+TRANSCRIPT_PATH=$(echo "${1:-}" | jq -r '.transcript_path // ""' 2>/dev/null || echo "")
+if [ -z "$TRANSCRIPT_PATH" ]; then
+  # UserPromptSubmit hook 從 stdin JSON 讀 transcript_path
+  TRANSCRIPT_PATH=$(cat 2>/dev/null | jq -r '.transcript_path // ""' 2>/dev/null || echo "")
+fi
+if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
+  LAST_USER=$(tail -50 "$TRANSCRIPT_PATH" 2>/dev/null | \
+    jq -r 'select(.message.role=="user") | .message.content // empty | if type=="string" then . else (.[]? | .text // empty) end' 2>/dev/null | tail -3)
+  ACK_RE='(收到|知道了|了解|acknowledged|ok 撤回|不用再 inject|停止 inject|skip warning|不要再警告)'
+  if echo "$LAST_USER" | grep -qiE "$ACK_RE"; then
+    ACK_DETECTED=1
+  fi
 fi
 
 # ── Aggregate warnings 去重 + 計數(extract_warnings_dedup helper)─────────
@@ -110,6 +133,11 @@ echo "$NOW" > "$LAST_TS_FILE"
 
 # Silent exit if nothing accumulated
 if [ -z "$WARNINGS_BEHAVIORAL" ] && [ -z "$WARNINGS_SCORE" ]; then
+  exit 0
+fi
+
+# 防呆 layer 2:user 已 acknowledge → silent skip inject 本 turn
+if [ "$ACK_DETECTED" = "1" ]; then
   exit 0
 fi
 

@@ -101,8 +101,9 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   TRIGGER_COUNT=$(echo "$USER_MSGS" | grep -ciE "$TRIGGER_RE" 2>/dev/null)
   TRIGGER_COUNT=${TRIGGER_COUNT:-0}
 
-  # Threshold 3 → 8(降 false positive,每 turn 自然會講「ensure / 確保」)
-  if [ "$TRIGGER_COUNT" -ge 8 ]; then
+  # Threshold 5(偏敏感,catch 真 trigger pattern) — user 「ensure / 確保」
+  # 重複 ≥ 5 次 = 強 signal 該 invoke /ensure-canonical pipeline
+  if [ "$TRIGGER_COUNT" -ge 5 ]; then
     WARNINGS="${WARNINGS}\n  • User trigger-phrase 累計 ${TRIGGER_COUNT} 次(M19 strong signal)。確認 /ensure-canonical 5-layer 全做完;若有任一 layer skip = 違反 M19。"
   fi
 
@@ -112,8 +113,8 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     sort | uniq -c | sort -rn | head -3)
   TOP_COUNT=$(echo "$TOPIC_KEYWORDS" | head -1 | awk '{print $1}')
 
-  # Threshold 5 → 15(governance topic 一次 session 自然會多次提)
-  if [ -n "$TOP_COUNT" ] && [ "$TOP_COUNT" -gt 15 ]; then
+  # Threshold 8(偏敏感 — topic 重複 ≥ 8x = 真未落地 signal)
+  if [ -n "$TOP_COUNT" ] && [ "$TOP_COUNT" -gt 8 ]; then
     TOP_TOPIC=$(echo "$TOPIC_KEYWORDS" | head -1 | awk '{print $2}')
     WARNINGS="${WARNINGS}\n  • Topic「${TOP_TOPIC}」repeated ${TOP_COUNT}x — likely user 第 N 次提示同主題,可能 prior turns 落地不徹底。"
   fi
