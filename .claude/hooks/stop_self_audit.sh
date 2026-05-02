@@ -49,7 +49,10 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   # NOTE(2026-05-01): 縮窄 CLAIM_RE — 移除「完成 / 沒問題 / 全部 done / 全綠 / 永遠合規」
   # over-broad conversational 字眼(每 turn 結尾「commit 完成 push」/「沒問題」自然出現,
   # false positive 率高)。保留 strong verification claim(verified / 0 errors / tsc 0 等)。
-  CLAIM_RE='(verified|all green|all pass|0 errors|tsc 0|done\.|complete\.|✅)'
+  # NOTE(2026-05-01): 移除「✅」— 我用 ✅ 在 markdown table 列 status(「✅ 同樣 / ✅ 已 done」)
+  # 不是 claim verified done。CLAIM_RE match ✅ 在 table context = false positive。
+  # 仍保留 strong verbal claim:verified / 0 errors / done\.(literal period)/ tsc 0
+  CLAIM_RE='(verified|all green|all pass|0 errors|tsc 0|done\.|complete\.)'
   # 撤回 escape:assistant 已明確撤回 / 認錯 / 預先聲明否定 / 已 inline 跑 verify → 不 trigger gap
   # 包含 claim-denial patterns(「不 claim」「沒 claim」「明確不」)避免 false positive。
   # 加 verify-result patterns(2026-05-01):AI inline 跑 tsc / build 顯示 result 字眼,
