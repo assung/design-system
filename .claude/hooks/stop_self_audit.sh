@@ -28,21 +28,19 @@ WARNINGS=""
 
 # ── Mechanism 1: Claim-verification gap ─────────────────────────────────────
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
-  # NOTE(2026-05-01): scope 改 this-turn-only — 之前 tail -50 cross-turn
-  # capture 我前 turn 的「verified」字眼 → trigger false positive on
-  # housekeeping turn(本 turn 沒 claim 卻 fire)。
-  # Now: find last user msg line in transcript,只取之後的 assistant text。
-  LAST_USER_LINE=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | \
-    awk '/"role":"user"/ {n=NR} END {print n+0}')
+  # NOTE(2026-05-01 v3): Claude transcript 把 tool_result 也標 role="user"。
+  # 之前 awk 抓到 tool_result line 當「真 user prompt」→ scope window 算錯
+  # → fire false positive。
+  # 修:grep filter 真 user prompt(role=user 且 content 不是 tool_result),
+  # 整 transcript scan(不 tail 500 windowed,避免 edge case)。
+  LAST_USER_LINE=$(grep -n '"role":"user"' "$TRANSCRIPT_PATH" 2>/dev/null | \
+    grep -v '"type":"tool_result"' | tail -1 | cut -d: -f1)
   LAST_USER_LINE=${LAST_USER_LINE:-0}
   if [ "$LAST_USER_LINE" -gt 0 ]; then
-    LAST_ASSISTANT=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | \
-      tail -n +$((LAST_USER_LINE+1)) | \
+    LAST_ASSISTANT=$(tail -n +$((LAST_USER_LINE+1)) "$TRANSCRIPT_PATH" 2>/dev/null | \
       jq -r 'select(.message.role=="assistant") | .message.content[]?.text // empty' 2>/dev/null)
   else
-    LAST_ASSISTANT=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | \
-      jq -r 'select(.message.role=="assistant") | .message.content[]?.text // empty' 2>/dev/null | \
-      tail -50)
+    LAST_ASSISTANT=""
   fi
 
   # Detect claim keywords
@@ -62,9 +60,9 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     # Check if any verify-class tool_use happened in THIS turn(after last user msg)
     VERIFY_RE='(npx tsc|bash .claude/hooks/tests|compile-stories|npm run build|npm run test|design-system-audit|visual-audit)'
     if [ "$LAST_USER_LINE" -gt 0 ]; then
-      THIS_TURN_TOOLS=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | tail -n +$((LAST_USER_LINE+1)))
+      THIS_TURN_TOOLS=$(tail -n +$((LAST_USER_LINE+1)) "$TRANSCRIPT_PATH" 2>/dev/null)
     else
-      THIS_TURN_TOOLS=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null)
+      THIS_TURN_TOOLS=""
     fi
     if ! echo "$THIS_TURN_TOOLS" | grep -qE "$VERIFY_RE"; then
       WARNINGS="${WARNINGS}\n  • Claim-verify gap:你說 verified / done / 完成 等,但本 turn 無 tsc / test / audit 真執行。下輪實跑驗證或撤回 claim。"
