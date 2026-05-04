@@ -130,17 +130,30 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 **Disabled border integrity canonical(K12,2026-05-04)**:全域 disabled = `border-transparent`(讓 standalone field 視覺輕量),但**FCG context 下,disabled child 強制 `border-input`** — 確保:(a) FCG 整體外圈 border 健在,(b) inner divider 健在(不會因兩相鄰 disabled cells 都 transparent 而消失)。bg-disabled 仍區分狀態,border 維護群組視覺整合性。對齊 Bootstrap input-group / Ant Space.Compact disabled idiom。
 
-實作(v4 — Ant Space.Compact 對齊):
+實作(v5 — 派 B,inspired by Material OutlinedInput):
+
 ```tsx
-[&>*[data-field-mode="disabled"]]:border-border  // disabled cell 強制 same border-color as edit
+// FCG outer 自帶 frame(border + rounded + overflow-hidden)
+'border border-border rounded-md overflow-hidden bg-surface'
+'hover:border-border-hover'
+'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-focus-ring has-[:focus-visible]:border-border-hover'
+// Cells 內部 flat(strip own border + rounded,保留 own bg)
+'[&>*]:!border-0 [&>*]:!rounded-none'
+// Internal divider via ::before pseudo on cells[2..]
+"[&>*+*]:relative [&>*+*]:before:absolute [&>*+*]:before:left-0 [&>*+*]:before:top-0 [&>*+*]:before:bottom-0 [&>*+*]:before:w-px [&>*+*]:before:bg-border [&>*+*]:before:content-['']"
+// Cell error state via box-shadow inset(避免跟 outer frame 衝突)
+'[&>*[data-error]]:shadow-[inset_0_0_0_1px_var(--error)]'
 ```
-保留 global `bg-disabled`(neutral-2 灰底)— disabled state 視覺主要由 bg 承載。
 
-**為什麼不 override bg**:user 明確要求 disabled cells 有底色(辨識 state)。bg 灰底是 disabled state 的主要視覺載體,FCG context 不應抹除。
+**為什麼派 B(2026-05-04 重構)**:派 A `-ml-px` overlap 模式下,disabled cell 灰底跟 edit cell 白底會在 boundary 產生「bg 色差視覺分隔線」,加上 cell 自帶 border 會雙重壓深感。派 B 由 outer frame 主導 group integrity,cells 沒有彼此 border overlap,divider 改 ::before pseudo 1px line(均勻無壓深)。
+- ✓ Outer frame:border + rounded(group-level signal)
+- ✓ Cells 保留 own bg:edit white / disabled gray / Button primary 等都自然 work
+- ✓ Hover/focus 改 group-level signal(整 group highlight)— 對齊 Material OutlinedInput idiom
+- ✓ Error state 仍 cell-level(box-shadow inset)— 單 cell error 也能精確標示
 
-**為什麼用同 `border-border`**:跨 cells 統一 border-color → group divider 整體一致,沒有「邊強邊弱」割裂。
-
-**「border on gray bg 視覺略深於 border on white bg」是物理對比結果**:世界級 Ant Space.Compact / Bootstrap input-group 共識認可此視覺,不嘗試補償(補償會引入更大 trade-off)。alternative「外層 container 派」(Material/Polaris/Carbon)需 architectural refactor — 動 FCG hover/focus/error state 全部走 box-shadow inset,cost > value。
+**Source(world-class precedent)**:
+- Material OutlinedInput NotchedOutlineRoot — `github.com/mui/material-ui/blob/v6.0.0/packages/mui-material/src/OutlinedInput/OutlinedInput.js`(absolute-positioned outer frame overlay)
+- Pattern adapted to multi-field compose;direct copy 不 applicable(Material 用於 single-field-with-adornments),但 architecture inspired by
 | error(子)| 該 child border-error | 3(error 視覺在最上)|
 
 **整 row error**:目前 v1 不支援 row-level error(走 cell-level)。未來若需可走 outer border-error wrapper,但 v1 follow Ant 不做。
