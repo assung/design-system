@@ -8,7 +8,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
 import { Select, type SelectOption } from '@/design-system/components/Select/select'
-import { SurfaceHeader, SurfaceBody, LIGHTWEIGHT_CHROME_HEADER } from '@/design-system/patterns/overlay-surface/overlay-surface'
+import { SurfaceHeader, SurfaceBody } from '@/design-system/patterns/overlay-surface/overlay-surface'
 import { ButtonDivider } from '@/design-system/components/Button/button-group'
 import { PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -104,7 +104,8 @@ export function DataTableSortManager<TData>({
 
   return (
     <div className={cn('w-[480px]', className)}>
-      <SurfaceHeader className={LIGHTWEIGHT_CHROME_HEADER}>
+      {/* Popover 派輕量 chrome — slot 縮 20 匹配 PopoverTitle text-body line-height,header 自然 ~45px */}
+      <SurfaceHeader className="[--chrome-slot-h:1.25rem]">
         <PopoverTitle className="flex-1">排序</PopoverTitle>
         {onReset && sorting.length > 0 && (
           <>

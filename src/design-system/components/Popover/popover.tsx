@@ -4,7 +4,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { X as XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { SurfaceHeader, SurfaceBody, SurfaceFooter, LIGHTWEIGHT_CHROME_HEADER } from "@/design-system/patterns/overlay-surface/overlay-surface"
+import { SurfaceHeader, SurfaceBody, SurfaceFooter } from "@/design-system/patterns/overlay-surface/overlay-surface"
 import { Button } from "@/design-system/components/Button/button"
 import { OVERLAY_SIDE_OFFSET, OVERLAY_COLLISION_PADDING } from "@/design-system/tokens/elevation/overlay-geometry"
 
@@ -83,14 +83,15 @@ interface PopoverHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const PopoverHeader = React.forwardRef<HTMLDivElement, PopoverHeaderProps>(
   ({ className, children, hideClose = false, ...props }, ref) => (
-    // Popover lightweight chrome canonical(2026-05-04 重思 Q10):
-    //   min-h-10 (40px) + !py-2 (8×2=16) → inner content area = 24 (匹配 unbounded slot trick)
-    //   比 Dialog/Sheet (48 px) 輕一級,對齊 Linear/Notion/Figma popover header idiom
-    //   Title text-body 14 (line-height 20) 在 24 slot 內垂直置中
-    //   `!py-2` override SurfaceHeader 的 `py-[var(--layout-space-tight)]`(12)
+    // Popover lightweight chrome canonical(2026-05-04 重思 v2):
+    //   覆寫 `--chrome-slot-h: 1.25rem` (20px) → unbounded button 佔位縮成 20,**匹配 PopoverTitle
+    //   text-body line-height (14×1.5≈21,floor 20)**。Header 維持 padding-based 自然撐開:
+    //   max(21 title, 20 slot) + py-tight(12*2) = 45 → 自然比 Dialog/Sheet 48 輕一級。
+    //   Q10 穩定:title-only / title+close 都 = title + py 主導,slot 不 dominate。
+    //   無 min-h / 無 py override — 修正前一版過度設計。
     <SurfaceHeader
       ref={ref}
-      className={cn("justify-between", LIGHTWEIGHT_CHROME_HEADER, className)}
+      className={cn("justify-between [--chrome-slot-h:1.25rem]", className)}
       {...props}
     >
       <div className="flex-1 min-w-0">{children}</div>
