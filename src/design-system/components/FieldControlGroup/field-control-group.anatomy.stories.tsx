@@ -26,12 +26,13 @@ export const Overview: Story = {
   render: () => (
     <div className="flex flex-col gap-6 w-[520px]">
       <section>
-        <h3 className="text-body font-bold mb-2">機制(Ant compact-item.ts source verified)</h3>
+        <h3 className="text-body font-bold mb-2">機制(派 B,2026-05-04 — Material OutlinedInput inspired)</h3>
         <ul className="text-body text-fg-secondary list-disc pl-5 space-y-1">
-          <li>子 controls 保留自身 border + radius(不 strip)</li>
-          <li>鄰接子用 <code>margin-left: -1px</code> 重疊 border → 視覺 1 條線</li>
-          <li>z-index:default 2 / hover/focus 3 / disabled 0</li>
-          <li>first child 右 radii=0;middle 全 radii=0;last child 左 radii=0</li>
+          <li>FCG outer 自帶 frame:<code>border + rounded-md + overflow-hidden + bg-surface</code></li>
+          <li>子 cells 內部 flat:<code>!border-0 !rounded-none</code>(保留 own bg)</li>
+          <li>內部 divider:<code>::before</code> pseudo absolute 1px line(均勻無壓深)</li>
+          <li>State signal:hover / focus-within 套 outer border-hover + ring(group-level)</li>
+          <li>Cell error:<code>shadow-[inset_0_0_0_1px_var(--error)]</code>(cell-level 精確標示)</li>
         </ul>
       </section>
       <section>
