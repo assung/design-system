@@ -112,6 +112,12 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 - ❌ 一個 child 設 disabled / 一個設 readonly 等不同 mode(語意一體應一致)
 - ❌ 開 Cell wrapper(違 Ant idiom;子 className 控 width 即可)
 - ❌ Vertical 堆疊用 FieldControlGroup(用 FieldGroup;本元件僅 horizontal)
+- ❌ **包 `<div>` / `<span>` wrapper 在 FieldControlGroup direct children 外**(2026-05-04 #2 真實 bug):
+  CSS `[&>*]` 直接子選擇器命中 wrapper(無 border/radius)→ inner Field control 保留 left/right radii → **圓角破圖**。
+  修法:Field control 必為 direct child;若需 className 給 inner Field control,透過 component prop forward
+  (e.g. FilterValuePicker 的 `className` prop 直接 forward 給 inner Input/Select),不另開 wrapper div。
+- ❌ Field controls trigger 內部 `w-full` 無法被外加 `className="w-[Xpx]"` override(同 cn() 後 specificity 順序)
+  →  必用 `!w-[Xpx]` (Tailwind important) OR 外加 `flex-shrink-0` + 設容器 grid-cols。
 
 ## States
 

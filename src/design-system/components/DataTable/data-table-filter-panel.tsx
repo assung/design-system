@@ -144,6 +144,9 @@ interface FilterValuePickerProps {
   disabled?: boolean
   /** 用 column.label 組「{label} 篩選值」(panel 每 row 不顯式 label,a11y 必填) */
   ariaLabel?: string
+  /** Forward 給內部 Field control 的 className(2026-05-04 #2 fix)
+   *  避免外層包 wrapper div 破壞 FieldControlGroup CSS variants(rounded radii / margin overlap) */
+  className?: string
 }
 
 function FilterValuePicker({
@@ -153,9 +156,10 @@ function FilterValuePicker({
   colInfo,
   disabled,
   ariaLabel,
+  className,
 }: FilterValuePickerProps) {
   if (!shape || disabled) {
-    return <Input size="md" value="" onChange={() => {}} placeholder="輸入值…" disabled aria-label={ariaLabel} />
+    return <Input size="md" value="" onChange={() => {}} placeholder="輸入值…" disabled aria-label={ariaLabel} className={className} />
   }
 
   switch (shape) {
@@ -170,6 +174,7 @@ function FilterValuePicker({
           onChange={(e) => onChange(e.target.value)}
           placeholder="輸入值…"
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -181,6 +186,7 @@ function FilterValuePicker({
           onChange={(v) => onChange(v ?? '')}
           placeholder="輸入數字…"
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -191,6 +197,7 @@ function FilterValuePicker({
           value={typeof value === 'string' ? value : null}
           onChange={(v) => onChange(v ?? '')}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -203,6 +210,7 @@ function FilterValuePicker({
             : null}
           onChange={(v) => onChange(v)}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -222,6 +230,7 @@ function FilterValuePicker({
           onChange={(v) => onChange(v)}
           placeholder="選擇相對日期"
           aria-label={ariaLabel}
+          className={className}
         />
       )
     }
@@ -239,6 +248,7 @@ function FilterValuePicker({
           onChange={(v) => onChange(v)}
           placeholder="選擇值"
           aria-label={ariaLabel}
+          className={className}
         />
       )
     }
@@ -257,6 +267,7 @@ function FilterValuePicker({
           onChange={(v) => onChange(v)}
           placeholder="選擇值…"
           aria-label={ariaLabel}
+          className={className}
         />
       )
     }
@@ -269,6 +280,7 @@ function FilterValuePicker({
           value={typeof value === 'string' ? value : null}
           onChange={(v) => onChange(v ?? '')}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -282,6 +294,7 @@ function FilterValuePicker({
             : null}
           onChange={(v) => onChange(v)}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -296,6 +309,7 @@ function FilterValuePicker({
           onChange={(e) => onChange(e.target.value)}
           placeholder="(person picker 預留)"
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -458,7 +472,17 @@ function DataTableFilterPanelInner<TData>({
   return (
     // 寬度策略:desktop 680px;mobile 縮到 viewport 內留 32px 邊(避溢出 popover 切右半)。
     // 對齊 Notion / Airtable 的 advanced filter 在 mobile 走 full-width 邊處理。
-    <div ref={ref} className={cn('w-[min(680px,calc(100vw-2rem))]', className)}>
+    // **#8 fix(2026-05-04)**:popover width by mode(由 cell min-w 與 group nested chrome 反推)
+    //   flat:cell ConjunctionLabel(80) + gap-2(8) + FCG(field-min 160 + op-min 120 + value 200) +
+    //         gap-2(8) + trash(28) + 2×loose padding(32) = ~636 → 640px
+    //   nested:再加 group p-2 (16) + outer ConjunctionLabel (80) + outer gap (8) → ~740 → 760px
+    //   對齊 Airtable / Notion / Linear filter row 視覺密度 @benchmark-unverified(non-OSS)
+    <div ref={ref} className={cn(
+      mode === 'nested'
+        ? 'w-[min(760px,calc(100vw-2rem))]'
+        : 'w-[min(640px,calc(100vw-2rem))]',
+      className,
+    )}>
       {/* Popover 派輕量 chrome — slot 縮 20 匹配 PopoverTitle text-body line-height,header 自然 ~45px */}
       <SurfaceHeader className="[--chrome-slot-h:1.25rem]">
         <PopoverTitle className="flex-1">篩選</PopoverTitle>
@@ -607,16 +631,21 @@ function FilterRow({
     ? getValueShape(opSpec, colInfo.type, colInfo.includeTime)
     : null
 
-  // FieldControlGroup 接合 field + op + value 視覺(2026-05-04 E refactor):
-  //   border collapse 取代 3 顆獨立 Select 並排,對齊 Airtable / Linear / Notion filter row idiom
-  //   ConjunctionLabel + Trash 在 group 外層(meta actions,不屬 control 一體)
-  // gap = layout-space-tight(A3,DS density-aware token,從 hardcode gap-2 升級)
+  // FieldControlGroup 接合 field + op + value 視覺(2026-05-04 E refactor + 多輪 fix):
+  //   - border collapse 取代 3 顆獨立 Select 並排,對齊 Airtable / Linear / Notion filter row idiom
+  //   - ConjunctionLabel + Trash 在 group 外層(meta actions,不屬 control 一體)
+  //   - **#5 fix**:row 內水平 gap = `gap-2` (8px),layoutSpace 規則 5 緊密相關
+  //   - **#9 fix**:cell 用 `min-w-[]`(field 160 / op 120),value flex-1 min-w-0,讓 long label 可撐寬
+  //   - **#2 fix**:FilterValuePicker 直接是 FieldControlGroup direct child(無 wrapper div),CSS variants 命中正確
   return (
-    <div className="flex items-center gap-[var(--layout-space-tight)]">
+    <div className="flex items-center gap-2">
       <ConjunctionLabel index={index} conjunction={conjunction} onChange={onChangeConjunction} />
+      {/* **#9 fix(2026-05-04 v4)**:Field controls trigger `w-full` override 外 className,改用 Tailwind `!`
+          important 強制 override(`!w-[160px]` / `!w-[120px]`),value 用 `!flex-1 !min-w-0`。
+          Select 元件本身沒 destructure `style` prop 所以 inline style flex-basis 行不通,只能用 className。 */}
       <FieldControlGroup block className="flex-1 min-w-0">
         <Select
-          className="w-40"
+          className="!w-[160px] flex-shrink-0"
           size="md"
           options={fieldOptions}
           value={condition.field}
@@ -625,7 +654,7 @@ function FilterRow({
           aria-label="篩選欄位"
         />
         <Select
-          className="w-32"
+          className="!w-[120px] flex-shrink-0"
           size="md"
           options={operatorOptions}
           value={condition.op}
@@ -633,18 +662,17 @@ function FilterRow({
           disabled={!hasField}
           aria-label="篩選運算子"
         />
-        <div className="flex-1 min-w-0">
-          <FilterValuePicker
-            shape={valueShape}
-            value={condition.value}
-            onChange={onChangeValue}
-            colInfo={colInfo}
-            disabled={!hasField}
-            ariaLabel={colInfo ? `${colInfo.label} 篩選值` : '篩選值'}
-          />
-        </div>
+        <FilterValuePicker
+          shape={valueShape}
+          value={condition.value}
+          onChange={onChangeValue}
+          colInfo={colInfo}
+          disabled={!hasField}
+          ariaLabel={colInfo ? `${colInfo.label} 篩選值` : '篩選值'}
+          className="!flex-1 !min-w-0"
+        />
       </FieldControlGroup>
-      {/* Trash 用 text Button(Q4)— filter row 是 form-control row,Field 同高對齊(28 md) */}
+      {/* Trash 用 text Button — filter row 是 form-control row,Field 同高對齊(28 md) */}
       <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
     </div>
   )

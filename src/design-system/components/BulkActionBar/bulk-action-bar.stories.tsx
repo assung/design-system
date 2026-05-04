@@ -67,8 +67,11 @@ export const WithExtendDatasetHint: Story = {
       Array.from({ length: VISIBLE }, (_, i) => `file-${i}`)
     )
     const [allSelected, setAllSelected] = useState(false)
+    // **NEW fix(2026-05-04)**:Alert 必跟著 selection.length 一起 hide,否則「清除選取項目」
+    // 後 selection=0 但 Alert 仍 render → 怪 state「已選取本頁全部 0 個」
     return (
       <div className="flex flex-col">
+        {selection.length > 0 && (
         <Alert
           variant="info"
           placement="fixed"
@@ -99,6 +102,7 @@ export const WithExtendDatasetHint: Story = {
             )
           }
         />
+        )}
         <BulkActionBar
           selection={selection}
           onClear={() => { setSelection([]); setAllSelected(false) }}

@@ -45,6 +45,9 @@ function useOverflowCount(
       const ofEl = overflowEl.current
       if (ofEl) ofEl.hidden = false
       const overflowW = ofEl?.offsetWidth || 60
+      // **#3 fix(2026-05-04)**:width-check 先於 count++,並處理 i=0 邊界(1 tag 自身就太寬 → 全 hidden 顯 +N)
+      // 之前 bug:greedy `count++` 永遠至少 = 1,1-tag-too-wide case 視覺呈半個 tag clipped + +N(錯)
+      // 修後:1 tag 太寬時 count = 0,全 N tags 走 +N 顯 indicator
       let used = 0, count = 0
       for (let i = 0; i < totalCount; i++) {
         const el = tagEls.current[i]
@@ -52,8 +55,9 @@ function useOverflowCount(
         const w = el.offsetWidth
         const next = used + (count > 0 ? GAP : 0) + w
         const remaining = totalCount - count - 1
-        if (remaining > 0 && next + GAP + overflowW > available && count > 0) break
-        if (remaining === 0 && next > available && count > 0) break
+        // width check FIRST(無 `count > 0` 短路):任何超寬都 break,包含 i=0 case
+        if (remaining > 0 && next + GAP + overflowW > available) break
+        if (remaining === 0 && next > available) break
         used = next; count++
       }
       for (let i = 0; i < tagEls.current.length; i++) { const el = tagEls.current[i]; if (el) el.hidden = i >= count }

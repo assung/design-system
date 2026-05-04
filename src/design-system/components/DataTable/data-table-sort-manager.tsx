@@ -179,8 +179,10 @@ function SortRow({
     transition,
     opacity: isDragging ? 0.5 : 1,
   }
+  // **#5 fix(2026-05-04)**:row 內水平 gap = gap-2 (8px),layoutSpace 規則 5 緊密相關
+  // SurfaceBody row↔row vertical 仍 tight(12)— 不同 row 不緊密
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-[var(--layout-space-tight)]">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2">
       <ItemInlineActionButton
         icon={GripVertical}
         size="md"

@@ -272,10 +272,16 @@ function DataTableInner<TData>(
       ...(effectiveColumnOrder ? { columnOrder: effectiveColumnOrder } : {}),
     },
     enableMultiSort,
-    onSortingChange: setSorting,
+    // **#1 fix(2026-05-04)**:chain user `tableOptions.onSortingChange`(spread 在前被 override = 之前 bug)
+    // 同 onColumnVisibilityChange:both internal setState + forward 給 user external state
+    onSortingChange: (updater) => {
+      setSorting(updater)
+      tableOptions?.onSortingChange?.(updater)
+    },
     onColumnVisibilityChange: (updater) => {
       const next = typeof updater === 'function' ? updater(columnVisibility) : updater
       setColumnVisibility(next)
+      tableOptions?.onColumnVisibilityChange?.(updater)
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

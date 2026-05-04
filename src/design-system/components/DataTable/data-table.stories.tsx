@@ -494,9 +494,13 @@ export const WithBulkActions: Story = {
       [search]
     )
     const VISIBLE = filteredData.length
-    const showHint = !allSelected
-      ? selection.length === VISIBLE && VISIBLE > 0 && TOTAL > VISIBLE
-      : true
+    // **NEW fix(2026-05-04)**:showHint 必含 selection.length > 0 前提,否則「清除選取」後 allSelected
+    // 還是 true 邏輯走「: true」branch → Alert 仍 render「已選取全部 N 個」 → 怪 state
+    const showHint = selection.length > 0 && (
+      !allSelected
+        ? selection.length === VISIBLE && VISIBLE > 0 && TOTAL > VISIBLE
+        : true
+    )
 
     return (
       // 撐滿 parent(layout=fullscreen);

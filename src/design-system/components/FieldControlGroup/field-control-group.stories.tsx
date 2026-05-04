@@ -50,16 +50,17 @@ export const Phone_NumberInput: Story = {
       <div className="w-[360px]">
         <Field>
           <FieldLabel>聯絡電話</FieldLabel>
+          {/* `!w-[]` important override Select 內 trigger w-full;w-120px 容「+886」+ phone icon + chevron */}
           <FieldControlGroup block>
             <Select
-              className="w-[88px]"
+              className="!w-[120px] flex-shrink-0"
               options={COUNTRY_CODES}
               value={code}
               onChange={setCode}
               startIcon={Phone}
             />
             <Input
-              className="flex-1"
+              className="!flex-1 !min-w-0"
               value={num}
               onChange={(e) => setNum(e.target.value)}
               placeholder="912 345 678"
@@ -84,13 +85,13 @@ export const Currency_Amount: Story = {
           <FieldLabel>採購金額</FieldLabel>
           <FieldControlGroup block>
             <Select
-              className="w-[80px]"
+              className="!w-[88px] flex-shrink-0"
               options={CURRENCIES}
               value={currency}
               onChange={setCurrency}
             />
             <NumberInput
-              className="flex-1"
+              className="!flex-1 !min-w-0"
               value={amount}
               onChange={setAmount}
               placeholder="0"
@@ -111,7 +112,7 @@ export const Search_Submit: Story = {
       <div className="w-[440px]">
         <FieldControlGroup block>
           <Input
-            className="flex-1"
+            className="!flex-1 !min-w-0"
             startIcon={Search}
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -147,9 +148,9 @@ export const FilterRow_RealUsage: Story = {
       <div className="w-[640px]">
         <p className="text-caption text-fg-muted mb-3">DataTable 進階篩選 row 是 FieldControlGroup 的典型 consumer。</p>
         <FieldControlGroup block>
-          <Select className="w-[140px]" options={FILTER_FIELDS} value={field} onChange={setField} />
-          <Select className="w-[120px]" options={STRING_OPS} value={op} onChange={setOp} />
-          <Input className="flex-1" value={value} onChange={(e) => setValue(e.target.value)} placeholder="輸入值..." />
+          <Select className="!w-[160px] flex-shrink-0" options={FILTER_FIELDS} value={field} onChange={setField} />
+          <Select className="!w-[120px] flex-shrink-0" options={STRING_OPS} value={op} onChange={setOp} />
+          <Input className="!flex-1 !min-w-0" value={value} onChange={(e) => setValue(e.target.value)} placeholder="輸入值..." />
         </FieldControlGroup>
       </div>
     )
@@ -165,8 +166,8 @@ export const AllSizes: Story = {
         <div key={size}>
           <p className="text-caption text-fg-muted mb-2">size="{size}"</p>
           <FieldControlGroup block>
-            <Select size={size} className="w-[100px]" options={CURRENCIES} value="TWD" onChange={() => {}} />
-            <Input size={size} className="flex-1" defaultValue="1,200" />
+            <Select size={size} className="!w-[100px] flex-shrink-0" options={CURRENCIES} value="TWD" onChange={() => {}} />
+            <Input size={size} className="!flex-1 !min-w-0" defaultValue="1,200" />
           </FieldControlGroup>
         </div>
       ))}
