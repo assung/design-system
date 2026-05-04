@@ -13,6 +13,7 @@ import { DatePicker, DatePickerRange } from '@/design-system/components/DatePick
 import { SurfaceHeader, SurfaceBody } from '@/design-system/patterns/overlay-surface/overlay-surface'
 import { PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
 import { ButtonDivider } from '@/design-system/components/Button/button-group'
+import { FieldControlGroup } from '@/design-system/components/FieldControlGroup/field-control-group'
 import type { ColumnType } from './column-types'
 import { getColumnId, getColumnLabel, getColumnMeta } from './lib/column-meta'
 import {
@@ -483,7 +484,7 @@ function DataTableFilterPanelInner<TData>({
       {/* Body — flat / nested 條件;空條件 → 直接顯 + 加篩選 CTA(對齊 Notion / Airtable / Linear inline 派,
           無條件時不需要 Empty 元件大區塊,單顆 CTA 引導即可。SurfaceFooter 整層拔除,
           + Add filter / + 加篩選器 inline 緊貼最後一條 row,讓 user 感受到「條件」與「加入」屬同一語境)*/}
-      <SurfaceBody className="flex flex-col gap-2">
+      <SurfaceBody className="flex flex-col gap-[var(--layout-space-tight)]">
         {flatTree && flatTree.children.map((cond, idx) => (
           <FilterRow
             key={cond.id}
@@ -520,12 +521,12 @@ function DataTableFilterPanelInner<TData>({
           />
         ))}
 
-        {/* Inline CTA — text variant 輕量視覺(對齊 Q9 + 世界級 5/6 派 inline 共識)
-            不放 SurfaceFooter:條件與「加入」屬同一語義群,中間插 footer 切斷敘事。
-            Trigger row 外層 self-align-start 不撐滿 panel 寬。*/}
+        {/* Inline CTA(2026-05-04 A1)— root-level「加篩選」用 tertiary(視覺輕量但有邊界,
+            符合 root-CTA 視覺重量);nested 內「加入巢狀篩選」走 text variant(更輕,在 group 內 inline)
+            不放 SurfaceFooter:條件與「加入」屬同一語義群,中間插 footer 切斷敘事 */}
         <div>
           <Button
-            variant="text" size="sm" startIcon={Plus}
+            variant="tertiary" size="sm" startIcon={Plus}
             onClick={mode === 'flat' ? addFlatCondition : addGroup}
           >
             {mode === 'nested' ? '加入篩選器' : '加篩選'}
@@ -553,14 +554,21 @@ const CONJ_OPTIONS: SelectOption[] = [
 function ConjunctionLabel({
   index, conjunction, onChange,
 }: { index: number; conjunction: Conjunction; onChange: (c: Conjunction) => void }) {
+  // index === 0:首 row 顯示靜態「Where」label
+  // index === 1:**唯一可改**的 AND/OR Select(連動整 group conjunction)
+  // index ≥ 2:被連動的 row,read-only 顯示當前 conjunction 文字(同 Where 視覺,A6 canonical)
+  //   對齊 Airtable / Notion / Linear 共識 @benchmark-unverified(non-OSS)
+  //   px-3 對齊 Field 內部 padding 12px(Q13)
   if (index === 0) {
-    // 「Where」靜態 label;w-20 對齊 row 2+ 的 Select 寬度
-    // px-3 對齊 Field 內部 padding(field-wrapper.tsx px-3 = 12px),Where 文字起點與下方 row Select value 起點對齊(Q13)
     return <div className="w-20 shrink-0 text-body text-fg-muted px-3 self-center">Where</div>
   }
+  if (index >= 2) {
+    const label = conjunction === 'and' ? 'And' : 'Or'
+    return <div className="w-20 shrink-0 text-body text-fg-muted px-3 self-center">{label}</div>
+  }
+  // index === 1:可切換的 AND/OR Select
+  // minRows={2} — And/Or 2 選項,顯式縮 menu 高度避免 reserve 3 row 空白(Q5)
   return (
-    // w-20(80px)— 容納「And ⌄」/「Or ⌄」label + chevron 不被截斷
-    // minRows={2} — And/Or 只有 2 選項,顯式縮 menu 高度避免 reserve 3 row 空白(Q5)
     <div className="w-20 shrink-0">
       <Select
         size="md"
@@ -599,11 +607,16 @@ function FilterRow({
     ? getValueShape(opSpec, colInfo.type, colInfo.includeTime)
     : null
 
+  // FieldControlGroup 接合 field + op + value 視覺(2026-05-04 E refactor):
+  //   border collapse 取代 3 顆獨立 Select 並排,對齊 Airtable / Linear / Notion filter row idiom
+  //   ConjunctionLabel + Trash 在 group 外層(meta actions,不屬 control 一體)
+  // gap = layout-space-tight(A3,DS density-aware token,從 hardcode gap-2 升級)
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-[var(--layout-space-tight)]">
       <ConjunctionLabel index={index} conjunction={conjunction} onChange={onChangeConjunction} />
-      <div className="w-40 shrink-0">
+      <FieldControlGroup block className="flex-1 min-w-0">
         <Select
+          className="w-40"
           size="md"
           options={fieldOptions}
           value={condition.field}
@@ -611,9 +624,8 @@ function FilterRow({
           placeholder="選擇欄位"
           aria-label="篩選欄位"
         />
-      </div>
-      <div className="w-32 shrink-0">
         <Select
+          className="w-32"
           size="md"
           options={operatorOptions}
           value={condition.op}
@@ -621,19 +633,18 @@ function FilterRow({
           disabled={!hasField}
           aria-label="篩選運算子"
         />
-      </div>
-      <div className="flex-1 min-w-0">
-        <FilterValuePicker
-          shape={valueShape}
-          value={condition.value}
-          onChange={onChangeValue}
-          colInfo={colInfo}
-          disabled={!hasField}
-          ariaLabel={colInfo ? `${colInfo.label} 篩選值` : '篩選值'}
-        />
-      </div>
-      {/* Trash 用 text Button(Q4)— filter row 是 form-control row,Field 同高對齊(28 md)。
-          Inline Action(16+18 hover bg)只用於 scanning/reading list row,本場景違反 item-anatomy canonical。 */}
+        <div className="flex-1 min-w-0">
+          <FilterValuePicker
+            shape={valueShape}
+            value={condition.value}
+            onChange={onChangeValue}
+            colInfo={colInfo}
+            disabled={!hasField}
+            ariaLabel={colInfo ? `${colInfo.label} 篩選值` : '篩選值'}
+          />
+        </div>
+      </FieldControlGroup>
+      {/* Trash 用 text Button(Q4)— filter row 是 form-control row,Field 同高對齊(28 md) */}
       <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
     </div>
   )

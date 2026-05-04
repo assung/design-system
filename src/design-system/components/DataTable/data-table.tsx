@@ -195,7 +195,7 @@ function DataTableInner<TData>(
   {
     columns, data, size = 'md', autoRowHeight = false, height = '400px',
     overscan = 5, emptyState, enableHover = true, bordered,
-    estimateRowHeight = 36, tableOptions, rowActions,
+    estimateRowHeight, tableOptions, rowActions,
     pinnedLeftColumns, pinnedRightColumns, inlineEdit = false,
     selection: selectionProp, defaultSelection, onSelectionChange,
     selectable = false, isRowSelectable, getRowId, getRowAriaLabel,
@@ -301,36 +301,39 @@ function DataTableInner<TData>(
   const [leftWidth, setLeftWidth] = React.useState(0)
   const [rightWidth, setRightWidth] = React.useState(0)
 
+  // estimate 預設 size-aware 對齊 token(--table-row-{sm,md,lg} = 32/40/48 md density)
+  // Q7 fix(2026-05-04):前用 hardcode 36 跟真高 40 差 4px,N rows 累積誤差呈現「table 慢慢長高」假象。
+  // ResizeObserver+measureElement 的修正過程被 user 看見 = mount-time growth bug 的真因。
+  const ESTIMATE_BY_SIZE: Record<string, number> = { sm: 32, md: 40, lg: 48 }
+  const resolvedEstimate = estimateRowHeight ?? ESTIMATE_BY_SIZE[size] ?? 40
   const virtualizer = useVirtualizer({
     count: useVirtual ? rows.length : 0,
     // V scroll 現在在 centerBodyRef(不是外層 bodyRef)
     getScrollElement: () => centerBodyRef.current,
-    estimateSize: () => estimateRowHeight,
+    estimateSize: () => resolvedEstimate,
     overscan, enabled: useVirtual,
   })
 
-  // ── isFillHeight body maxHeight JS 計算(2026-04-30,Q7 mount-flicker fix 2026-05-04)──
+  // ── isFillHeight body maxHeight JS 計算(2026-04-30)──
   // CSS `%` height 在 flex column min-h-0 + auto basis 場景下,Chromium 不可靠 shrink
   // (實測:outer maxHeight 100% bind parent,但 body 不 shrink 反映 outer 約束 → outer
   // overflow-hidden 切掉 content,V scroll 不 trigger)。
   // 改用 ResizeObserver 算 body avail = outer rect - header rect → set centerBody
   // maxHeight = pixel value(不是 %)。content 大 → V scroll;content 小 → centerBody
   // = content,outer = intrinsic,沒留白。
-  // **Q7 mount flicker(2026-05-04 user report)**:bodyMaxHeight=null → 第一 render 時
-  // virtualizer scroll element 還沒測 → 0 visible rows → 第二 pass measure 後 → rows 漸進出現
-  // → 用戶看到「rows 一個個冒出來」展開動畫感。fix: `tableReady` flag,measurement 完成前
-  // table outer `visibility: hidden`(保留 layout 但不繪)→ 第一個可見 frame = 完整 table。
+  // **Q7 mount-time growth fix(2026-05-04 v3 真因)**:不是 visibility race,是 estimateRowHeight
+  // 預設 36 ≠ 真實 row height(token md=40 / sm=32 / lg=48),virtualizer initial total = 6×36 = 216,
+  // 後續 measureElement 修正到 6×40 = 240,差 24px 視覺看起來像「table 慢慢長高」。fix = estimate
+  // 預設 size-aware 對齊 token(見下方 estimateRowHeight default 計算)。
   const [bodyMaxHeight, setBodyMaxHeight] = React.useState<number | null>(null)
-  const [tableReady, setTableReady] = React.useState(!isFillHeight)
   React.useLayoutEffect(() => {
-    if (!isFillHeight) { setBodyMaxHeight(null); setTableReady(true); return }
+    if (!isFillHeight) { setBodyMaxHeight(null); return }
     const compute = () => {
       if (!tableRef.current) return
       const outerH = tableRef.current.getBoundingClientRect().height
       const headerEl = tableRef.current.firstElementChild as HTMLElement | null
       const headerH = headerEl?.getBoundingClientRect().height ?? 0
       setBodyMaxHeight(Math.max(0, outerH - headerH))
-      setTableReady(true)
     }
     compute()
     const obs = new ResizeObserver(compute)
@@ -835,11 +838,7 @@ function DataTableInner<TData>(
       // (hug rows);content 大或 window 縮 < content → outer cap 到 100% of parent。
       // 行為:**永遠 hug rows**,只在被約束時才 cap + body shrink + V scroll。
       // 簡單需求:有約束 → rows 沒超就 hug;超就 cap+scroll;RWD 同理。
-      // tableReady=false 時 visibility:hidden(保留 layout 不繪)→ 消除 mount-flicker(Q7)
-      style={{
-        ...(isFillHeight ? { maxHeight: height } : undefined),
-        visibility: tableReady ? undefined : 'hidden',
-      }}
+      style={isFillHeight ? { maxHeight: height } : undefined}
       role="table" aria-rowcount={rows.length + 1}
       tabIndex={enabled ? 0 : undefined}
       onKeyDown={enabled ? tableKeyboardHandler : undefined}

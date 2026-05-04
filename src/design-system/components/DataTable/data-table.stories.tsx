@@ -501,8 +501,7 @@ export const WithBulkActions: Story = {
     return (
       // 撐滿 parent(layout=fullscreen);
       // toolbar 自帶 py = toolbar→table 間距(無父 gap);table→底部 chrome group = loose(footer 呼吸 canonical)
-      // relative — chrome group(absolute bottom)的 positioning context(Q7 fix)
-      <div className="relative flex flex-col w-full h-screen bg-canvas">
+      <div className="flex flex-col w-full h-screen bg-canvas">
         {/* Toolbar — 左 search / 右 ops(Gmail / Linear / Notion idiom)*/}
         <div className="flex items-center justify-between gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
           <div className="flex-1 max-w-sm">
@@ -707,17 +706,15 @@ export const WithBulkActions: Story = {
           />
         </div>
 
-        {/* 底部 chrome group(Q7 fix 2026-05-04):從 flex-flow 抽出改 absolute bottom overlay,
-            避免 mount/unmount 時推擠 table 區域,虛擬列重新計算引起的「展開動畫」感受。
-            對齊 Linear / Asana / Gmail 浮動 BulkActionBar canonical(不佔 flex 流) */}
+        {/* 底部 chrome group(撤回前一版 absolute overlay,2026-05-04 user 抓 BulkActionBar 沒底色 + 蓋表底列 regression):
+            回 flex flow 自然推 table。Q7 mount-time growth 真因 = virtualizer estimateRowHeight ≠ token,已在 DataTable 內修(estimate size-aware) */}
         {(showHint || selection.length > 0) && (
-          <div className="absolute left-0 right-0 bottom-0 flex flex-col pointer-events-none">
+          <div className="flex flex-col">
             {showHint && (
               <Alert
                 variant="neutral"
                 placement="fixed"
                 dismissible={false}
-                className="pointer-events-auto"
                 title={
                   allSelected ? (
                     <>
@@ -749,7 +746,6 @@ export const WithBulkActions: Story = {
               <BulkActionBar
                 selection={selection}
                 onClear={() => { setSelection([]); setAllSelected(false) }}
-                className="pointer-events-auto"
                 actions={
                   <>
                     <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
@@ -1002,6 +998,46 @@ export const FilterPanelModified: Story = {
           defaultValue={initial}
           onChange={setValue}
 
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 長 tag 溢出測試(A5 reproduce)── */
+export const FilterPanelLongTagOverflow: Story = {
+  name: '進階篩選 — 長 tag 溢出',
+  render: () => {
+    // 故意用 select_multi op + 多個長 label values,測試 Combobox tag overflow + +N indicator
+    const longLabelColumns = [
+      col.accessor('category', {
+        header: '類別',
+        meta: { type: 'select', filterable: true, options: [
+          { value: 'Heavy Industrial Manufacturing Equipment', label: 'Heavy Industrial Manufacturing Equipment' },
+          { value: 'Premium Consumer Electronics & Accessories', label: 'Premium Consumer Electronics & Accessories' },
+          { value: 'Sustainable Organic Food & Beverage Products', label: 'Sustainable Organic Food & Beverage Products' },
+          { value: 'Lifestyle Home & Garden Decoration', label: 'Lifestyle Home & Garden Decoration' },
+        ] },
+      }),
+    ]
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'flat', conjunction: 'and',
+      children: [
+        { kind: 'cond', id: 'c1', field: 'category', op: 'is', value: [
+          'Heavy Industrial Manufacturing Equipment',
+          'Premium Consumer Electronics & Accessories',
+          'Sustainable Organic Food & Beverage Products',
+        ]},
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <p className="text-caption text-fg-muted mb-3">A5 reproduce — 多個超長 label values 是否觸發 Combobox `+N` overflow indicator?</p>
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...longLabelColumns]}
+          value={value}
+          onChange={setValue}
         />
       </div>
     )

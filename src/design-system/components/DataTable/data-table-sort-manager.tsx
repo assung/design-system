@@ -122,7 +122,7 @@ export function DataTableSortManager<TData>({
 
       {/* Body — 條件 list + inline 加排序 CTA(對齊 filter panel canonical Q3+Q6,2026-05-04)
           無條件時 CTA 直接顯示,不需要 Empty 大區塊 */}
-      <SurfaceBody className="flex flex-col gap-2">
+      <SurfaceBody className="flex flex-col gap-[var(--layout-space-tight)]">
         {sorting.length > 0 && (
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={sorting.map(s => s.id)} strategy={verticalListSortingStrategy}>
@@ -144,9 +144,10 @@ export function DataTableSortManager<TData>({
           </DndContext>
         )}
 
+        {/* B1 加排序 → tertiary,parallel filter「加篩選」(root-level CTA 對等視覺重量) */}
         <div>
           <Button
-            variant="text"
+            variant="tertiary"
             size="sm"
             startIcon={Plus}
             onClick={addSort}
@@ -179,7 +180,7 @@ function SortRow({
     opacity: isDragging ? 0.5 : 1,
   }
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-2">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-[var(--layout-space-tight)]">
       <ItemInlineActionButton
         icon={GripVertical}
         size="md"

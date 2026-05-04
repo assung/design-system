@@ -226,13 +226,16 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
       <RowSizeProvider value={size}>
       <PopoverContent
         id={contentId}
+        // w-auto override PopoverContent default w-72(rich-popover canonical)— SelectMenu 走「跟 trigger 同寬」
+        // canonical(spec L72)。minWidth = max(trigger-width, 240px sensible-min)— 對齊 shadcn / Material / Ant
+        // select dropdown 共識(2026-05-04 D1 verify SelectMenu spec implementation)。
         className={cn(
-          'p-0 rounded-lg border border-border bg-surface-raised overflow-hidden',
+          'p-0 w-auto rounded-lg border border-border bg-surface-raised overflow-hidden',
           className
         )}
         style={{
           boxShadow: 'var(--elevation-200)',
-          minWidth: minWidth ?? 'var(--radix-popover-trigger-width)',
+          minWidth: minWidth ?? 'max(var(--radix-popover-trigger-width), 15rem)',
         }}
         align={align}
         sideOffset={OVERLAY_SIDE_OFFSET}
