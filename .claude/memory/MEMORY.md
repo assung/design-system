@@ -1,5 +1,6 @@
 # Memory Index
 
+- [feedback_solo_dev_workflow.md](feedback_solo_dev_workflow.md) — Solo dev workflow:push direct to main,no branch / no PR / no fix-forward PR / no split PR;Netlify auto-preview = review 介面;同 chat 連續不分 session
 - [feedback_no_binary_evaluation.md](feedback_no_binary_evaluation.md) — When user proposes solution, generate 3rd alternative via world-class benchmark; never binary-execute user's suggestion without evaluation
 - [feedback_concrete_not_vague.md](feedback_concrete_not_vague.md) — P2 / finding 必具體:file:line + 片段 + 具體問題;禁 topic-level generic 描述
 - [feedback_skill_trigger_precision.md](feedback_skill_trigger_precision.md) — Skill trigger 必精確 user vocabulary;loose 語句(「怎麼做世界級」)不 auto-invoke,clarify-first
