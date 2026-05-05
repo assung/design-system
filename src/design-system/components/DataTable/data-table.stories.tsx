@@ -1228,12 +1228,14 @@ export const FilterPanelLongTagOverflow: Story = {
 }
 
 /* ── 列拖曳重排(Jira-style + 3-panel pinned columns)──────────────────────
-   enableRowDrag + onRowReorder 整合範例(v2):
-   - hover row → 最左 GripVertical 浮現(opacity 0 → 100)
+   enableRowDrag + onRowReorder 整合範例(v3 Jira canonical):
+   - handle absolute 浮在 row 左 border(Button tertiary iconOnly xs = elevated chip)
+   - 不佔 column 空間 — table 看起來乾淨,沒有預留拖曳欄位
+   - hover row → handle 浮現(opacity 0 → 100)
    - 拖曳 row → @dnd-kit/sortable 重排;放下 → onRowReorder(sourceId, targetId, 'before' | 'after')
    - consumer 自管 data array mutation(同 Notion / Airtable / Linear pattern)
    - sort 啟用時 drag handle 自動 disabled + Tooltip 解釋
-   - v2:pinned-left + pinned-right 同時存在 → mirror regions 跟動 transform(per-region useSortable
+   - pinned-left + pinned-right 同時存在 → mirror regions 跟動 transform(per-region useSortable
      共享同 SortableContext state) */
 export const RowDragInteractive: Story = {
   name: '列拖曳重排（含釘選欄）',
@@ -1256,8 +1258,9 @@ export const RowDragInteractive: Story = {
     return (
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
-          v2:pinned-left（SKU）+ pinned-right（Updated）+ center 中段欄。拖曳任一列時,三個 region 的 row
-          會同步跟動 transform（per-region <code>useSortable</code> 共享同 SortableContext state)。
+          handle 浮在 row 左緣（不佔 column 空間，Jira canonical）。pinned-left（SKU）+ pinned-right（Updated）+
+          center 中段欄。拖曳任一列時，三個 region 的 row 會同步跟動 transform（per-region
+          <code>useSortable</code> 共享同 SortableContext state）。
         </p>
         <DataTable
           columns={columnsWithPrice}
@@ -1275,9 +1278,15 @@ export const RowDragInteractive: Story = {
 }
 
 /* ── 列拖曳 × 虛擬捲動（200 列）────────────────────────────────────────────
-   v2 fix #1:被拖 row 略過 virtualizer.measureElement(transform 干擾測量會在 > 50 列時累積錯位)。
+   v3 fix(2026-05-05)— scroll bug 修法:
+   1. enableRowDrag 時 overscan 自動拉到 ≥ 10(避免 row unmount 時 useSortable subscription 跟著
+      消失導致 dnd-kit stale lookup → 拖到該 id 視覺錯位)
+   2. drag 進行中(activeDragId != null)整個略過 measureElement(任一 row 重新量測會跟 dnd-kit
+      transform 競爭,長 list 累積錯位)
+   3. DndContext modifier 鎖 Y 軸(restrictToVerticalAxis inline 實作)— row drag 是垂直語義,
+      X 抖動會觸發水平 transform → 進而 measureElement loop
    - 200 列 + 固定高度 → virtualizer 啟用
-   - 拖曳長距離 → 視覺位置仍對齊,放下後 onRowReorder 收到正確 sourceId / targetId */
+   - 拖曳長距離 + 持續往下捲 → 視覺位置仍對齊,放下後 onRowReorder 收到正確 sourceId / targetId */
 export const RowDragWithVirtualization: Story = {
   name: '列拖曳 × 虛擬捲動',
   render: () => {
@@ -1298,8 +1307,8 @@ export const RowDragWithVirtualization: Story = {
     return (
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
-          200 列 + 虛擬捲動。v2 修正:被拖 row 在拖曳期間略過 measureElement,避免 transform 干擾長 list
-          量測累積錯位。
+          200 列 + 虛擬捲動。v3 修正:enableRowDrag 自動拉高 overscan ≥ 10、drag 期間 freeze
+          measureElement、modifier 鎖 Y 軸 — 拖曳 + 持續往下捲不再錯位。
         </p>
         <DataTable
           columns={baseColumns}
