@@ -1,12 +1,15 @@
 #!/bin/bash
-# Tests for check_field_state_token_consume.sh
+# Tests for check_field_state_token_consume.sh(2026-05-05 v9 升級規則)
+#
+# v9 rule:naked **完全繼承 Field default state machine**(border-based)— 禁所有自寫
+# outline-{border|primary} state ring + 禁 box-shadow inset。
 #
 # 7 scenarios:
-#   1. SSOT host(field-wrapper.tsx)→ skip(pass even with raw outline)
+#   1. SSOT host(field-wrapper.tsx)→ skip
 #   2. SSOT host(textarea.tsx)→ skip
 #   3. Story file → skip
-#   4. naked outline state ring + SSOT const import → pass
-#   5. naked outline state ring + NO SSOT import → block(Match B)
+#   4. 自寫 outline-border / outline-primary state ring → block(任何 .tsx 都不該寫)
+#   5. 用 Field default border-based state(border-border-hover / border-primary)→ pass
 #   6. box-shadow inset 舊寫法 → block(Match A)
 #   7. allowlist comment → pass
 
@@ -82,22 +85,21 @@ const x = "hover:outline-border"
 '
 expect_pass "3. Story file → skip"
 
-# 4. naked outline + SSOT import → pass
-run_hook "/repo/src/design-system/components/Combobox/combobox.tsx" '
-import { nakedCellHoverRing, nakedCellFocusRing } from "@/design-system/components/Field/field-wrapper"
-function Foo() {
-  return <div className={cn("hover:outline-border focus-within:outline-primary", nakedCellHoverRing, nakedCellFocusRing)} />
-}
-'
-expect_pass "4. naked outline + SSOT import → pass"
-
-# 5. naked outline + NO SSOT import → block
+# 4. 自寫 outline-border state ring → block(v9 任何 .tsx 都禁)
 run_hook "/repo/src/design-system/components/Bad/bad.tsx" '
 function Foo() {
   return <div className="hover:outline-border focus-within:outline-primary" />
 }
 '
-expect_block "5. naked outline no SSOT → block" "M19 BLOCKER"
+expect_block "4. self-coded outline state ring → block" "M19 BLOCKER"
+
+# 5. Field default border-based state → pass(v9 期望走 Field native)
+run_hook "/repo/src/design-system/components/Good/good.tsx" '
+function Foo() {
+  return <div className="border border-border hover:border-border-hover focus-within:border-primary" />
+}
+'
+expect_pass "5. Field default border state machine → pass"
 
 # 6. box-shadow inset 舊寫法 → block
 run_hook "/repo/src/design-system/components/Old/old.tsx" '

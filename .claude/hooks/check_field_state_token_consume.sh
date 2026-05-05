@@ -1,20 +1,21 @@
 #!/bin/bash
 set -uo pipefail
-# M19 PreToolUse hook(2026-05-05 v4):Field naked variant state ring token SSOT enforcement。
+# M19 PreToolUse hook(2026-05-05 v9):Field naked variant state ring SSOT enforcement。
 #
-# Rule(`field-wrapper.tsx` `nakedCellHoverRing` / `nakedCellFocusRing` / `nakedCellOpenRing` SSOT):
-#   cell-as-input naked variant state ring **必走 outline + token SSOT**(同 Field default + bare 共用
-#   `--border` / `--primary` token)。禁止 hardcode `box-shadow inset` / 禁止寫死 token alias
-#   (例 `border-border-hover` 在 naked context — 應該用 SSOT const,改 token 同步動)。
+# Rule(2026-05-05 v9 architectural rewrite):naked variant **完全繼承 Field default state
+# machine**(border-based)— 禁止寫平行 outline state ring(`outline-{border|primary}` /
+# `box-shadow inset` 等)。對齊 user spec:「原 Field 互動樣式都保留,唯一差別 fill cell + 無圓角」。
 #
-# 偵測:Edit/Write 動 components/*.tsx,added line 含 naked variant + state ring class:
-#   match A:`focus-within:shadow-\[inset` / `hover:shadow-\[inset`(舊 box-shadow inset 寫法)
-#   match B:`(hover|focus|focus-within|focus-visible|data-\[state=open\]):outline-(border|primary)` 但
-#           檔案**未** import `nakedCellHoverRing|FocusRing|OpenRing` SSOT const → 自寫 token,違反
-#           「token-level SSOT」原則(改 const → 全變體跟動)。
+# 偵測:Edit/Write 動 components/*.tsx,added line 含:
+#   match A:`(hover|focus-within|focus-visible|data-\[state=open\]):shadow-\[inset` 舊 box-shadow inset
+#   match B:`(hover|focus-within|focus-visible|data-\[state=open\]):outline-(border|primary)` 自寫 outline state ring
+#   → BLOCKER(用 Field default state machine 繼承,不寫平行 outline)
+#
+# 唯一允許:`nakedCellEditableDisplayHover` 是 cell wrapper editable display hover 信號(對齊
+# Notion / Airtable),已在 field-wrapper.tsx export — DataTable cell wrapper 直接 import 即可。
 #
 # Allowlist:行尾 `// @field-state-ring-allow: <reason>`。
-# Skip:`field-wrapper.tsx`(SSOT host)+ `textarea.tsx`(SSOT host 同層)+ stories / tests。
+# Skip:SSOT host(field-wrapper.tsx / textarea.tsx)+ stories / tests。
 
 source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
 
@@ -53,53 +54,45 @@ if echo "$NEW_STRING" | grep -q '@field-state-ring-allow'; then
   exit 0
 fi
 
-# Match A: 舊 box-shadow inset 寫法(naked state ring)
+# Match A: 舊 box-shadow inset 寫法
 if echo "$NEW_STRING" | grep -E "(hover|focus-within|data-\[state=open\]):shadow-\[inset" >/dev/null; then
   cat >&2 <<'EOF'
 
 ┄┄┄ check_field_state_token_consume — M19 BLOCKER ┄┄┄
 
-[P0] 偵測到 cell-as-input naked variant state ring 用 `box-shadow inset` 寫法。
+[P0] 偵測到 naked variant state ring 用 `box-shadow inset` 寫法。
 
-⚠️  M19 canonical(2026-05-05 v4):state ring 必用 `outline-2 outline-offset-[-1px]`
-    straddle cell edge,不用 inset shadow(只畫內側,不蓋 adjacent grid)。
+⚠️  M19 canonical(2026-05-05 v9 architectural rewrite):naked **完全繼承 Field default
+    state machine**(border-based)— hover:border-border-hover / focus-within:border-primary
+    / data-[state=open]:border-border-hover。**不寫平行 outline / shadow ring**。
 
-修法:import + apply SSOT const(field-wrapper.tsx):
-  - `nakedCellHoverRing` / `nakedCellFocusRing` / `nakedCellOpenRing`
-  輸出 `outline-2 outline-offset-[-1px] outline-{border|primary}` 格式,
-  改 `--border` / `--primary` token → Field default + bare + naked **三變體全動**。
+修法:讓 Field default state machine 自動繼承(naked compoundVariant 已正確設定);
+若是 cell wrapper editable display hover affordance,用 `nakedCellEditableDisplayHover`
+const(field-wrapper.tsx export)。
 
 允: 行尾 `// @field-state-ring-allow: <reason>` 豁免。
 EOF
   exit 2
 fi
 
-# Match B: outline state ring 但無 SSOT import
-HAS_NAKED_OUTLINE=$(echo "$NEW_STRING" | grep -E "(hover|focus-within|focus-visible|data-\[state=open\]):outline-(border|primary)" || true)
-if [ -n "$HAS_NAKED_OUTLINE" ]; then
-  FILE_CONTENT=""
-  if [ -f "$FILE_PATH" ]; then FILE_CONTENT=$(cat "$FILE_PATH"); fi
-  MERGED="${FILE_CONTENT}
-${NEW_STRING}"
-  if ! echo "$MERGED" | grep -qE "nakedCell(Hover|Focus|Open)Ring"; then
-    cat >&2 <<'EOF'
+# Match B: 自寫 outline state ring(naked context)
+if echo "$NEW_STRING" | grep -E "(hover|focus-within|focus-visible|data-\[state=open\]):outline-(border|primary)" >/dev/null; then
+  cat >&2 <<'EOF'
 
 ┄┄┄ check_field_state_token_consume — M19 BLOCKER ┄┄┄
 
-[P0] 偵測到 outline state ring(`hover:outline-border` / `focus:outline-primary` 等)
-但檔案**未** import `nakedCellHoverRing` / `nakedCellFocusRing` / `nakedCellOpenRing` SSOT const。
+[P0] 偵測到自寫 outline state ring(`hover:outline-border` / `focus-within:outline-primary` 等)。
 
-⚠️  M19 canonical:state ring 必走 SSOT const(`field-wrapper.tsx` export),
-    不可在元件內自寫 outline class — 否則改 token / 改 outline 規則時不同步。
+⚠️  M19 canonical(2026-05-05 v9):naked variant **不寫 outline state ring**,完全繼承
+    Field default state machine(border-based)。前 v4-v8 outline-2 平行系統已 retire。
 
 修法:
-  import { nakedCellHoverRing, nakedCellFocusRing, nakedCellOpenRing } from '@/design-system/components/Field/field-wrapper'
-  className={cn(..., nakedCellHoverRing, nakedCellFocusRing)}
+  - Field naked variant 內 state(edit/hover/focus/open)→ 走 Field default(border-*)
+  - Cell wrapper editable display hover 信號 → import `nakedCellEditableDisplayHover` const
 
 允: 行尾 `// @field-state-ring-allow: <reason>` 豁免。
 EOF
-    exit 2
-  fi
+  exit 2
 fi
 
 exit 0

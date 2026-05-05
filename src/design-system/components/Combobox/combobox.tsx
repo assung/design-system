@@ -137,8 +137,12 @@ function ComboboxTagStack({
   )
 
   if (externalRef) return content
+  // 2026-05-05 v9 fix(Bug 4):display path 內 wrapper 必須 `flex-1 min-w-0`,否則在 cell flex
+  // parent 下不認領完整可用寬度 → OverflowTagList 量得寬度小於 edit path → 顯 `+N` 多於 edit。
+  // edit path tagAreaRef wrapper 已是 `flex-1 min-w-0`(NativeCombobox/CustomCombobox line 258 / 354),
+  // display 必對稱才 SSOT。
   return (
-    <div ref={ownRef} className={cn('flex items-center min-w-0', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+    <div ref={ownRef} className={cn('flex-1 min-w-0 flex items-center', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
       {content}
     </div>
   )

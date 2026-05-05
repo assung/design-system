@@ -113,36 +113,47 @@ export const fieldWrapperStyles = cva(
         className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled',
       },
       // naked variant — cell-as-input substrate(Notion / Airtable / Excel canonical)
-      //   - `!h-full`: Field 框框 = host cell box(frame 填 cell)
-      //   - **state ring 用 outline + offset:[-1px] straddle**(2026-05-05 v4 user canonical):
-      //     不用 `border` — border 吃 2px 高度 + corner gap。
-      //     不用 `box-shadow inset` — 只畫內側,不蓋 adjacent grid 外側 borders(user 實測雙線重疊)。
-      //     **`outline-2 outline-offset-[-1px]`** = 1px 內 + 1px 外,straddle cell edge,完全蓋過
-      //     this row border-b(內 1px)+ adjacent cell border-r(外 1px)+ previous row border-b(外 1px)。
-      //   - **token SSOT**:hover/open 用 `--border`(同 Field bare 共用,transparent → 浮現語意);
-      //     focus-within 用 `--primary`(同 Field default + bare 共用,主強調)。**user 改任一 token
-      //     value → Field default + bare + naked 三家全動**(token-level SSOT,無新 alias)。
-      //   - **edit mode 反向接管 cell padding**(`!py-[var(--table-cell-py)] !px-[var(--table-cell-px)]`):
-      //     host cell editing 時 padding=0,Field 內部加回 padding → 切 mode 文字 0 px shift。
-      //   - display / readonly / disabled `!px-0 !py-0`:host cell 仍有 padding,Field 不重複加。
-      //   - **內 alignment 從 host cell 取**(`nakedCellRowModeAlign` SSOT,M19 propagate)
+      //
+      // ── 2026-05-05 v9 architectural rewrite ──
+      // 前 v4-v8 用 `outline-2 outline-offset-[-1px]` 平行 state machine 跟 Field default
+      // border state 對抗 → user 報 6 bug(thickness 加粗 / hover 蓋 focus / open 藍框 vs
+      // Field default open hover-color 不同)。本 v9 砍掉 outline ring,**naked 完全繼承
+      // Field default state machine**(同 border-based 同 token 同 hover/focus/open precedence),
+      // 只改物理尺寸(rounded-none / h-full / cell padding tokens)。
+      //
+      // user 原話:「原本 field 的互動樣式都能保留,唯一差別就是 field 會填滿 cell,然後沒有圓角而已」
+      //
+      //   - `!h-full`:Field 框框 = host cell box(frame 填 cell)
+      //   - `!rounded-none`:cell 無 corner gap
+      //   - `!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]`(edit 用)
+      //     / `!px-0 !py-0`(display/readonly/disabled 用):host cell padding ↔ Field padding
+      //     反向接管,切 mode 文字 0px shift
+      //   - state machine **完全繼承 Field default**(`border-border` 1px gray rest;hover
+      //     `border-border-hover`;focus-within `border-primary` + `focus-within:hover:border-primary`
+      //     處理 AND case;open `border-border-hover` 對齊 Field default 不是藍框)
+      //   - display/readonly/disabled **`border-transparent`** 預留 1px 空間防 hover 切 layout
+      //     shift,視覺無 border(host cell 仍有 cellPadding + border-r divider 構成 grid 線)
+      //   - `group-data-[row-mode=auto]/cell:!items-start`:host cell `data-row-mode=auto` 自動
+      //     propagate alignment
       {
         mode: 'edit',
         variant: 'naked',
         className: [
-          'bg-transparent !border-0 !rounded-none !gap-0 !h-full',
+          'bg-transparent !rounded-none !gap-0 !h-full',
           '!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]',
+          'border border-border',
+          'hover:border-border-hover',
+          'focus-within:border-primary focus-within:hover:border-primary',
+          'data-[state=open]:border-border-hover',
           'group-data-[row-mode=auto]/cell:!items-start',
-          'hover:outline hover:outline-2 hover:outline-offset-[-1px] hover:outline-border',
-          'focus-within:outline focus-within:outline-2 focus-within:outline-offset-[-1px] focus-within:outline-primary',
-          'data-[state=open]:outline data-[state=open]:outline-2 data-[state=open]:outline-offset-[-1px] data-[state=open]:outline-primary',
         ],
       },
       {
         mode: 'display',
         variant: 'naked',
         className: [
-          'bg-transparent !border-0 !rounded-none !px-0 !py-0 !gap-0 !h-full',
+          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full',
+          'border border-transparent',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -150,7 +161,8 @@ export const fieldWrapperStyles = cva(
         mode: 'readonly',
         variant: 'naked',
         className: [
-          'bg-transparent !border-0 !rounded-none !px-0 !py-0 !gap-0 !h-full',
+          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full',
+          'border border-transparent',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -158,7 +170,8 @@ export const fieldWrapperStyles = cva(
         mode: 'disabled',
         variant: 'naked',
         className: [
-          'bg-transparent !border-0 !rounded-none cursor-not-allowed opacity-disabled !px-0 !py-0 !gap-0 !h-full',
+          'bg-transparent !rounded-none cursor-not-allowed opacity-disabled !px-0 !py-0 !gap-0 !h-full',
+          'border border-transparent',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -209,17 +222,17 @@ export const bareInputStyles = [
 // Audit:design-system-audit Group N M27(periodic batch verify)
 export const nakedCellRowModeAlign = 'group-data-[row-mode=auto]/cell:items-start'
 
-// ── Cell-as-input State Ring SSOT(M19 / 2026-05-05 v4 token-level)──────────
-// 三個 ring class 給 cell wrapper(editable display hover)+ Field naked(edit state)+
-// 任何 cell-as-input substrate 共用。**SSOT 在 token 層**:hover 走 `--border`(同 Field
-// bare hover token,transparent → 浮現語意),focus-within / open 走 `--primary`。
-// User 改 `--border` 或 `--primary` 值 → Field default + bare + naked **三變體全跟動**。
-// `outline-2 outline-offset-[-1px]` straddle cell edge:1px 內 + 1px 外,完整蓋過 4 邊
-// adjacent grid divider(this row border-b 內 1px / previous row border-b + adjacent
-// border-r 外 1px),**不留漏邊雙線**。
-export const nakedCellHoverRing = 'hover:outline hover:outline-2 hover:outline-offset-[-1px] hover:outline-border'
-export const nakedCellFocusRing = 'focus-within:outline focus-within:outline-2 focus-within:outline-offset-[-1px] focus-within:outline-primary'
-export const nakedCellOpenRing = 'data-[state=open]:outline data-[state=open]:outline-2 data-[state=open]:outline-offset-[-1px] data-[state=open]:outline-primary'
+// ── Cell-as-input Display Hover Ring(2026-05-05 v9 — sole remaining ring const)─
+// 唯一保留的 ring const:editable cell **display mode hover 提示**(「這 cell 可編,點 → 進
+// edit」affordance 信號)。對齊 Notion / Airtable hover-cell-shows-border canonical。
+//
+// 為何只剩這一個:Field naked **edit/focus/open state ring 已下沉到 Field default state
+// machine**(border-based,2026-05-05 v9 architectural rewrite),不需 outline 平行系統;
+// 但 display mode 沒 Field state(display = 純展示無互動),hover 提示需 cell wrapper 自加。
+//
+// 1px outline straddle cell edge:offset:[-1px] 起點,outline-1 1px 厚 → 完全 inside element
+// edge,不破 row layout。Color `--border-hover` 對齊 Field default hover state token。
+export const nakedCellEditableDisplayHover = 'hover:outline hover:outline-1 hover:outline-offset-[-1px] hover:outline-[var(--border-hover)]'
 
 // ── Cell-as-input Edge Slot SSOT(2026-05-05 v8 — retire 平行 SSOT,改 L1 消費)───
 //

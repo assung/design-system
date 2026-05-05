@@ -23,10 +23,10 @@ import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
-import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemInlineActionButton, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { columnTypeDefaults, type ColumnType } from './column-types'
 import { resolveCellComponent } from './cell-registry'
-import { nakedCellHoverRing } from '@/design-system/components/Field/field-wrapper'
+import { nakedCellEditableDisplayHover } from '@/design-system/components/Field/field-wrapper'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
@@ -796,16 +796,24 @@ function DataTableInner<TData>(
   //   只在 cellEditable=true 才 render(由 caller `cellEl` gating);non-editable cell 無 indicator。
   //   editing 時 hide(避免跟 Field control 自帶 trigger icon 衝突 → 雙 icon)。
   //   對齊 Airtable / Notion editable cell hint canonical — 永遠顯示維持互動可發現性。
+  // Display-mode editable cell indicator(對齊 Notion / Airtable / Linear common idiom):
+  //   editable cell display 永遠顯示「點擊觸發浮層」icon(chevron / calendar / clock),用戶
+  //   一眼識別「這 cell 可編」。**包 `<ItemSuffix>` 消費 row-layout L1 SSOT**(永遠 h-[1lh],
+  //   單行視覺 = items-center,autoRow 多行 pin first-line) — 解 v8 前 chevron 齊頂 bug。
+  //   URL column 屬 hover-pencil 例外(URL 本身 click=導航,需保留;edit 走 hover affordance)。
   const getEditIndicator = (colType?: ColumnType) => {
     if (!inlineEdit) return null
-    const cls = 'shrink-0 text-fg-muted'
-    if (colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson')
-      return <ChevronDown size={iconSize} className={cls} aria-hidden />
-    if (colType === 'date')
-      return <Calendar size={iconSize} className={cls} aria-hidden />
-    if (colType === 'time')
-      return <Clock size={iconSize} className={cls} aria-hidden />
-    return null
+    const Icon =
+      (colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson') ? ChevronDown
+      : colType === 'date' ? Calendar
+      : colType === 'time' ? Clock
+      : null
+    if (!Icon) return null
+    return (
+      <ItemSuffix className="text-fg-muted">
+        <Icon size={iconSize} aria-hidden />
+      </ItemSuffix>
+    )
   }
 
   // L4 row drag:sort active 時 drag handle disabled(對齊 Notion / Airtable 共識)
@@ -951,7 +959,7 @@ function DataTableInner<TData>(
           align === 'center' && 'justify-center text-center',
           inlineEdit && !isLastInRow && !isEditingThisCell && 'border-r border-divider',
           indicator && 'gap-2',
-          onEditableCellClick && ['cursor-pointer', nakedCellHoverRing],  // editable display:hover ring SSOT(同 Field naked editing focus 同 token / 同 outline straddle)
+          onEditableCellClick && ['cursor-pointer', nakedCellEditableDisplayHover],  // editable cell display hover affordance(對齊 Notion / Airtable hover-cell-shows-border canonical)
           isEditingThisCell && 'z-10',
         )}
         style={{
