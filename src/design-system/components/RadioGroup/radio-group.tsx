@@ -47,20 +47,30 @@ const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   RadioGroupProps
 >(({ className, mode, chrome: _chrome, value, defaultValue, ...props }, ref) => {
-  // mode='display' — 不渲染 Radix Root,改透過 context 讓 child item 自決。
-  // 容器 wrapper 用 grid 維持與 edit mode 同 layout(item gap / a11y group semantics 由 SelectionItem 提供)。
+  // mode='display' — 純展示 selected option 的 label,不渲染任何 radio control 視覺。
+  // 對齊 Carbon read-only single-select(只顯示 selected 內容)+ Airtable / Notion read-only。
+  // 實作:walk children 找 control.value === selectedValue 的 SelectionItem,render label plain text。
+  // (不用 context dispatch 給 RadioGroupItem — SelectionItem layout wrapper 仍會渲染所有 item label)
   if (mode === 'display') {
     const selectedValue = (value ?? defaultValue) as string | undefined
-    const hasSelection = selectedValue != null && selectedValue !== ''
+    if (!selectedValue) {
+      return <div role="group" className={cn('grid', className)}><span className="text-fg-muted">{EMPTY_DISPLAY}</span></div>
+    }
+    let selectedLabel: React.ReactNode = null
+    React.Children.forEach(props.children, (child) => {
+      if (!React.isValidElement(child)) return
+      const cProps = child.props as { control?: unknown; label?: React.ReactNode }
+      const control = cProps.control
+      if (React.isValidElement(control)) {
+        const controlValue = (control.props as { value?: unknown }).value
+        if (controlValue === selectedValue) {
+          selectedLabel = cProps.label ?? selectedValue
+        }
+      }
+    })
     return (
       <div role="group" className={cn('grid', className)}>
-        {hasSelection
-          ? (
-            <RadioGroupDisplayContext.Provider value={{ displayMode: true, selectedValue }}>
-              {props.children}
-            </RadioGroupDisplayContext.Provider>
-          )
-          : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>}
+        <span className="text-foreground">{selectedLabel ?? selectedValue}</span>
       </div>
     )
   }
