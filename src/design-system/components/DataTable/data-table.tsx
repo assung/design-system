@@ -24,14 +24,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { columnTypeDefaults, type ColumnType } from './column-types'
-import { InputDisplay, Input } from '@/design-system/components/Input/input'
-import { NumberInputDisplay, NumberInput } from '@/design-system/components/NumberInput/number-input'
-import { BooleanDisplay } from '@/design-system/components/Checkbox/boolean-display'
-import { SelectDisplay, Select } from '@/design-system/components/Select/select'
-import { ComboboxDisplay, Combobox } from '@/design-system/components/Combobox/combobox'
-import { DatePickerDisplay, DatePicker } from '@/design-system/components/DatePicker/date-picker'
+import { Input } from '@/design-system/components/Input/input'
+import { NumberInput } from '@/design-system/components/NumberInput/number-input'
+import { Select } from '@/design-system/components/Select/select'
+import { Combobox } from '@/design-system/components/Combobox/combobox'
+import { DatePicker } from '@/design-system/components/DatePicker/date-picker'
 import { PersonDisplay, MultiPersonDisplay, type PersonValue } from '@/design-system/components/PeoplePicker/person-display'
-import { LinkInputDisplay } from '@/design-system/components/LinkInput/link-input'
+import { LinkInput } from '@/design-system/components/LinkInput/link-input'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Button } from '@/design-system/components/Button/button'
 import { RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
@@ -153,15 +152,15 @@ function renderTypedValue(value: unknown, meta?: Record<string, any>, autoRowHei
   const wrap = autoRowHeight && meta?.wrap === true
   switch (type) {
     case 'number': case 'currency':
-      return <NumberInputDisplay value={value as number | null} prefix={type === 'currency' ? (meta?.prefix ?? '$') : meta?.prefix} suffix={meta?.suffix} precision={meta?.precision} locale={meta?.locale} />
-    case 'date': return <DatePickerDisplay value={value as string | number | Date | null} formatOptions={meta?.formatOptions} locale={meta?.locale} />
-    case 'boolean': return <BooleanDisplay value={value as boolean | null} />
-    case 'select': return <SelectDisplay value={value as string | null} options={meta?.options} size={tableSize} />
-    case 'multiSelect': return <ComboboxDisplay value={value as string[] | null} options={meta?.options} wrap={wrap} />
+      return <NumberInput mode="display" value={value as number | null} prefix={type === "currency" ? (meta?.prefix ?? "$") : meta?.prefix} suffix={meta?.suffix} precision={meta?.precision} locale={meta?.locale} />
+    case 'date': return <DatePicker mode="display" value={value as string | null} formatOptions={meta?.formatOptions} locale={meta?.locale} />
+    case 'boolean': return <Checkbox mode="display" checked={value === true} />
+    case 'select': return <Select mode="display" value={value as string | null} options={meta?.options ?? []} size={tableSize} display="tag" />
+    case 'multiSelect': return <Combobox mode="display" value={(value as string[] | null) ?? []} options={meta?.options ?? []} wrap={wrap} size={tableSize} />
     case 'person': return <PersonDisplay value={value as PersonValue | null} size={tableSize} />
     case 'multiPerson': return <MultiPersonDisplay value={value as PersonValue[] | null} size={tableSize} />
-    case 'url': return <LinkInputDisplay value={value as string | null} label={meta?.linkLabel} />
-    default: return <InputDisplay value={value != null ? String(value) : null} />
+    case 'url': return <LinkInput mode="display" value={value as string | null} label={meta?.linkLabel} />
+    default: return <Input mode="display" value={value != null ? String(value) : ""} />
   }
 }
 
@@ -217,7 +216,7 @@ function EditableCellContent({
 
   // URL 特例:讀模式永遠 link(edit 觸發走外部 Pencil button)
   if (type === 'url' && !isEditing) {
-    return <LinkInputDisplay value={value as string | null} label={meta?.linkLabel} />
+    return <LinkInput mode="display" value={value as string | null} label={meta?.linkLabel} />
   }
 
   // Edit mode renderers(per type)

@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { LinkInput, LinkInputDisplay } from './link-input'
+import { LinkInput } from './link-input'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta<typeof LinkInput> = {
@@ -118,9 +118,9 @@ export const Display: Story = {
   name: 'Display',
   render: () => (
     <div className="flex flex-col gap-3">
-      <LinkInputDisplay value="https://www.example.com/path/to/page" />
-      <LinkInputDisplay value="https://github.com/user/repo" label="GitHub Repo" />
-      <LinkInputDisplay value={null} />
+      <LinkInput mode="display" value="https://www.example.com/path/to/page" />
+      <LinkInput mode="display" value="https://github.com/user/repo" label="GitHub Repo" />
+      <LinkInput mode="display" value={null} />
     </div>
   ),
 }

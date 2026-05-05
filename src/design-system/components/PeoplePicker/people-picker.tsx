@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { PersonDisplay, MultiPersonDisplay, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 
@@ -31,7 +32,24 @@ function personToMenuOption(person: PersonValue): SelectMenuOption {
 
 export interface PeoplePickerProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /**
+   * Field mode(2026-05-05 Phase B3 align):
+   *   edit     — Popover + Command 搜尋(預設)
+   *   display  — **純展示**:單選 → PersonDisplay(Avatar + NameCard hoverCard);
+   *              多選 → MultiPersonDisplay(Avatar stack + OverflowIndicator)。無 input chrome、無互動 Popover。
+   *              對齊 Carbon read-only / DataTable person cell read mode。
+   *   readonly — input chrome + 鎖互動,Avatar 視覺保留(留 a11y signal「這是 input 但鎖了」)
+   *   disabled — input chrome + disabled 降色
+   */
   mode?: FieldMode
+  /**
+   * Visual chrome(2026-05-05 Phase B3)。對齊 FieldContext.chrome 透傳。
+   * - `'default'` — 完整 Field wrapper chrome(form / Field 內嵌)
+   * - `'bare'` — 透明 chrome,hover/focus 才現 border(DataTable cell-as-input)
+   *
+   * mode='display' 時 chrome 無視覺意義(display 完全無 wrapper);chrome 僅作用於 edit / readonly / disabled。
+   */
+  chrome?: FieldChrome
   size?: 'sm' | 'md' | 'lg'
   /** 當前已選的人（單選 PersonValue，多選 PersonValue[]） */
   value?: PersonValue | PersonValue[] | null
@@ -48,7 +66,8 @@ export interface PeoplePickerProps
 }
 
 const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(function PeoplePicker({
-  mode = 'edit',
+  mode: modeProp,
+  chrome: chromeProp,
   size = 'md',
   value,
   onChange,
@@ -59,18 +78,33 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   disabled,
   ...props
 }, ref) {
-  const resolvedMode = disabled ? 'disabled' : mode
+  const fieldCtx = useFieldContext()
+  const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'
+  const resolvedMode: FieldMode = disabled ? 'disabled' : mode
+  // chrome resolution:per-prop > context > 'default'
+  const resolvedChrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
   const isEditable = resolvedMode === 'edit'
   const iconSize = size === 'lg' ? 20 : 16
   const isMulti = Array.isArray(value)
   const isEmpty = !value || (isMulti && value.length === 0)
+
+  // ── mode='display' ──────────────────────────────────────────────────────
+  // 純展示:無 fieldWrapperStyles 容器、無 chevron affordance。
+  // 直接 reuse 既有 PersonDisplay / MultiPersonDisplay primitive(該 primitive 同時供 NameCard /
+  // DataTable / 其他 cross-component 場景使用,不在本 phase retire — 保留 standalone export)。
+  if (resolvedMode === 'display') {
+    if (isEmpty) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+    return isMulti
+      ? <MultiPersonDisplay value={value as PersonValue[]} size={size} />
+      : <PersonDisplay value={value as PersonValue} size={size} />
+  }
 
   // ── Readonly / disabled ──
   if (!isEditable) {
     return (
       <div
         ref={ref}
-        className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+        className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedChrome, size }), className)}
         data-field-mode={resolvedMode}
         {...props}
       >
@@ -123,7 +157,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
       aria-haspopup="listbox"
       tabIndex={0}
       className={cn(
-        fieldWrapperStyles({ mode: 'edit', size }),
+        fieldWrapperStyles({ mode: 'edit', variant: resolvedChrome, size }),
         // Radix Popover 在 trigger 上寫 data-state="open",用它顯示 focus border
         'cursor-pointer data-[state=open]:border-primary',
         className,
