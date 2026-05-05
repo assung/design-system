@@ -5,147 +5,157 @@ const URL = 'http://localhost:6007/iframe.html?id=design-system-components-datat
 const out = (msg) => console.log(`[verify] ${msg}`);
 
 const browser = await chromium.launch({ headless: true });
-const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 });
 const page = await ctx.newPage();
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
-page.on('console', (m) => {
-  if (m.type() === 'error') console.log('[console.error]', m.text());
-});
 
 await page.goto(URL, { waitUntil: 'networkidle' });
-// Wait for table rows
-await page.waitForSelector('[role="row"], tr', { timeout: 15000 }).catch(() => {});
-await page.waitForTimeout(800);
+await page.waitForSelector('#storybook-root', { timeout: 15000 });
+// Wait for actual SKU content
+await page.waitForFunction(() => document.querySelector('#storybook-root')?.textContent?.includes('SKU-'), null, { timeout: 15000 }).catch(() => out('SKU not found in time'));
+await page.waitForTimeout(500);
 
-// Capture row order initially
-const initialRowTexts = await page.$$eval('tr, [role="row"]', (rows) =>
-  rows.map((r) => r.textContent?.trim().slice(0, 40)).filter(Boolean),
-);
-out(`Initial rows count: ${initialRowTexts.length}`);
-out(`Initial first 5 rows: ${JSON.stringify(initialRowTexts.slice(0, 5))}`);
+const root = page.locator('#storybook-root');
 
-// Screenshot 1 — initial (no hover)
-await page.screenshot({ path: '/tmp/f3-row-drag-verify-1.png', fullPage: false });
-out('shot1 saved');
+// Identify rows inside story root containing a SKU code
+const dataRowSkus = await root.evaluate((el) => {
+  const rows = Array.from(el.querySelectorAll('[role="row"], tr'));
+  return rows
+    .map((r) => {
+      const t = r.textContent || '';
+      const m = t.match(/SKU-\d+/);
+      return m ? { sku: m[0], rect: r.getBoundingClientRect().toJSON() } : null;
+    })
+    .filter(Boolean);
+});
+out(`Initial SKU rows: ${dataRowSkus.length}`);
+out(`Initial SKU order: ${JSON.stringify(dataRowSkus.map((r) => r.sku))}`);
 
-// Find drag handles. The story says GripVertical reveals on hover.
-// Look for an element rendered as drag handle — likely button with grip icon.
-const handleSelectors = [
-  '[data-row-drag-handle]',
-  '[aria-label*="drag"]',
-  '[aria-label*="Drag"]',
-  'button:has(svg.lucide-grip-vertical)',
-  '[data-testid*="drag"]',
-  'svg.lucide-grip-vertical',
-];
+// Take a clipped screenshot of just storybook-root for clarity
+const rootBox = await root.boundingBox();
+out(`Root box: ${JSON.stringify(rootBox)}`);
 
-let handleSel = null;
-for (const sel of handleSelectors) {
-  const c = await page.locator(sel).count();
-  if (c > 0) {
-    handleSel = sel;
-    out(`Found handle via selector: ${sel} (count=${c})`);
-    break;
-  }
-}
+await page.screenshot({
+  path: '/tmp/f3-row-drag-verify-1.png',
+  clip: rootBox ? { x: rootBox.x, y: rootBox.y, width: Math.min(rootBox.width, 1280), height: Math.min(rootBox.height, 900) } : undefined,
+});
+out('shot1 saved (initial, no hover)');
 
-if (!handleSel) {
-  // Dump first row HTML for debug
-  const firstRowHtml = await page.locator('tr, [role="row"]').nth(1).innerHTML().catch(() => '(none)');
-  out('No drag handle selector matched. First row HTML excerpt:');
-  console.log(firstRowHtml.slice(0, 2000));
-}
+// Find drag handles inside storybook root only
+const handleCount = await root.locator('svg.lucide-grip-vertical').count();
+out(`GripVertical icons inside root: ${handleCount}`);
 
-// First data row (skip header)
-const firstDataRow = page.locator('tbody tr, [role="rowgroup"] [role="row"]').first();
-const rowBox = await firstDataRow.boundingBox();
-out(`First data row box: ${JSON.stringify(rowBox)}`);
-
-// Hover at far-left of first row to trigger handle reveal
-if (rowBox) {
-  await page.mouse.move(rowBox.x + 8, rowBox.y + rowBox.height / 2);
-  await page.waitForTimeout(300);
-}
-
-// Check handle visibility (opacity)
-let handleOpacityBefore = null, handleOpacityAfter = null;
-if (handleSel) {
-  const handleHandle = page.locator(handleSel).first();
-  // Note: the prior screenshot1 was taken before hover; we read opacity now post-hover
-  handleOpacityAfter = await handleHandle.evaluate((el) => {
-    const target = el.closest('button') || el;
-    return getComputedStyle(target).opacity;
-  }).catch(() => 'err');
-  out(`Handle opacity AFTER hover: ${handleOpacityAfter}`);
-}
-
-await page.screenshot({ path: '/tmp/f3-row-drag-verify-2.png', fullPage: false });
-out('shot2 saved (hover state)');
-
-// Read opacity for unhovered (last row) handle for comparison
-if (handleSel) {
-  const allHandles = await page.locator(handleSel).count();
-  if (allHandles > 1) {
-    handleOpacityBefore = await page.locator(handleSel).last().evaluate((el) => {
-      const target = el.closest('button') || el;
-      return getComputedStyle(target).opacity;
-    }).catch(() => 'err');
-    out(`Handle opacity (unhovered last-row): ${handleOpacityBefore}`);
-  }
-}
-
-// Attempt programmatic drag from row1 handle to row3 area
-let dragOk = false;
-let finalRowTexts = initialRowTexts;
-if (handleSel && rowBox) {
-  try {
-    const handleEl = page.locator(handleSel).first();
-    const hb = await handleEl.boundingBox();
-    out(`Handle box: ${JSON.stringify(hb)}`);
-    const row3 = page.locator('tbody tr, [role="rowgroup"] [role="row"]').nth(2);
-    const r3b = await row3.boundingBox();
-    out(`Row3 box: ${JSON.stringify(r3b)}`);
-    if (hb && r3b) {
-      // dnd-kit uses pointer events; emulate
-      await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2);
-      await page.mouse.down();
-      // gradual movement to trigger activation distance
-      const steps = 12;
-      const dx = (r3b.x + r3b.width / 2) - (hb.x + hb.width / 2);
-      const dy = (r3b.y + r3b.height / 2 + 4) - (hb.y + hb.height / 2);
-      for (let i = 1; i <= steps; i++) {
-        await page.mouse.move(hb.x + hb.width / 2 + (dx * i) / steps, hb.y + hb.height / 2 + (dy * i) / steps, { steps: 2 });
-        await page.waitForTimeout(20);
-      }
-      await page.waitForTimeout(150);
-      await page.mouse.up();
-      await page.waitForTimeout(400);
-      dragOk = true;
+// Read opacity of handle BEFORE any hover (use 2nd row's handle so we don't move mouse over it)
+const handleOpacityInitial = await root
+  .locator('svg.lucide-grip-vertical')
+  .first()
+  .evaluate((el) => {
+    // walk up to nearest element with explicit opacity controlled by group hover
+    let node = el;
+    const chain = [];
+    while (node && node !== document.body) {
+      const cs = getComputedStyle(node);
+      chain.push({ tag: node.tagName, cls: node.className?.toString().slice(0, 80), opacity: cs.opacity });
+      node = node.parentElement;
     }
+    return chain.slice(0, 6);
+  })
+  .catch((e) => 'err: ' + e.message);
+out(`Handle ancestor opacity chain (initial, no hover): ${JSON.stringify(handleOpacityInitial)}`);
+
+// Hover the first SKU row at a non-handle area to trigger group-hover reveal
+if (dataRowSkus.length > 0) {
+  const r0 = dataRowSkus[0].rect;
+  // Move to middle of row (away from handle column to avoid grabbing it)
+  await page.mouse.move(r0.x + r0.width / 2, r0.y + r0.height / 2);
+  await page.waitForTimeout(400);
+}
+
+const handleOpacityHover = await root
+  .locator('svg.lucide-grip-vertical')
+  .first()
+  .evaluate((el) => {
+    let node = el;
+    const chain = [];
+    while (node && node !== document.body) {
+      const cs = getComputedStyle(node);
+      chain.push({ tag: node.tagName, cls: node.className?.toString().slice(0, 80), opacity: cs.opacity });
+      node = node.parentElement;
+    }
+    return chain.slice(0, 6);
+  })
+  .catch((e) => 'err: ' + e.message);
+out(`Handle ancestor opacity chain (after hover row 0): ${JSON.stringify(handleOpacityHover)}`);
+
+await page.screenshot({
+  path: '/tmp/f3-row-drag-verify-2.png',
+  clip: rootBox ? { x: rootBox.x, y: rootBox.y, width: Math.min(rootBox.width, 1280), height: Math.min(rootBox.height, 900) } : undefined,
+});
+out('shot2 saved (hover row 0)');
+
+// Programmatic drag: row 0 handle -> row 2 (drop after row 2)
+let dragErr = null;
+if (dataRowSkus.length >= 3) {
+  try {
+    // Locate the actual handle button bounding box
+    const handleBox = await root.locator('svg.lucide-grip-vertical').first().evaluate((el) => {
+      const btn = el.closest('button') || el.closest('[role="button"]') || el.parentElement;
+      return btn.getBoundingClientRect().toJSON();
+    });
+    const r2 = dataRowSkus[2].rect;
+    out(`handle box: ${JSON.stringify(handleBox)}`);
+    out(`row2 box: ${JSON.stringify(r2)}`);
+
+    const startX = handleBox.x + handleBox.width / 2;
+    const startY = handleBox.y + handleBox.height / 2;
+    const endX = r2.x + r2.width / 2;
+    const endY = r2.y + r2.height - 4; // bottom of row 2 → drop after
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    // dnd-kit PointerSensor default activation distance = 8px; do gradual move
+    for (let i = 1; i <= 20; i++) {
+      const x = startX + ((endX - startX) * i) / 20;
+      const y = startY + ((endY - startY) * i) / 20;
+      await page.mouse.move(x, y, { steps: 2 });
+      await page.waitForTimeout(25);
+    }
+    await page.waitForTimeout(200);
+    await page.mouse.up();
+    await page.waitForTimeout(500);
   } catch (e) {
-    out('drag err: ' + e.message);
+    dragErr = e.message;
+    out('drag error: ' + dragErr);
   }
 }
 
-finalRowTexts = await page.$$eval('tr, [role="row"]', (rows) =>
-  rows.map((r) => r.textContent?.trim().slice(0, 40)).filter(Boolean),
-);
-out(`Final first 5 rows: ${JSON.stringify(finalRowTexts.slice(0, 5))}`);
+// Re-read SKU order
+const finalSkus = await root.evaluate((el) => {
+  const rows = Array.from(el.querySelectorAll('[role="row"], tr'));
+  return rows
+    .map((r) => (r.textContent || '').match(/SKU-\d+/)?.[0])
+    .filter(Boolean);
+});
+out(`Final SKU order: ${JSON.stringify(finalSkus)}`);
 
-await page.screenshot({ path: '/tmp/f3-row-drag-verify-3.png', fullPage: false });
+await page.screenshot({
+  path: '/tmp/f3-row-drag-verify-3.png',
+  clip: rootBox ? { x: rootBox.x, y: rootBox.y, width: Math.min(rootBox.width, 1280), height: Math.min(rootBox.height, 900) } : undefined,
+});
 out('shot3 saved (post-drag)');
 
-const reordered = JSON.stringify(initialRowTexts) !== JSON.stringify(finalRowTexts);
-out(`Order changed: ${reordered}`);
+const initialOrder = dataRowSkus.map((r) => r.sku);
+const reordered = JSON.stringify(initialOrder) !== JSON.stringify(finalSkus);
 
 await browser.close();
 
+console.log('\n=== RESULT ===');
 console.log(JSON.stringify({
-  handleSelector: handleSel,
-  handleOpacityHovered: handleOpacityAfter,
-  handleOpacityUnhovered: handleOpacityBefore,
-  initialFirstRows: initialRowTexts.slice(0, 5),
-  finalFirstRows: finalRowTexts.slice(0, 5),
+  handleCount,
+  initialSkuOrder: initialOrder,
+  finalSkuOrder: finalSkus,
   reordered,
-  dragAttempted: dragOk,
+  dragErr,
+  hoverOpacityChain: handleOpacityHover,
+  initialOpacityChain: handleOpacityInitial,
 }, null, 2));

@@ -1488,29 +1488,79 @@ function DataTableInner<TData>(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
-  const topLevelRowIds = React.useMemo(
-    () => rows.filter(r => (r.depth ?? 0) === 0).map(r => r.id),
-    [rows]
-  )
+
+  // v2 fix #3:custom collisionDetection — 過濾出與 active 同 parent 的 sortable items。
+  // 跨 parent 的 candidate 全部排除 → over 為 null → DragHandleCell 切 cursor-not-allowed。
+  // closestCenter 仍是 base alg(對齊既有行為);只是 droppable 集合先過濾。
+  const sameParentCollisionDetection: CollisionDetection = React.useCallback((args) => {
+    const activeId = args.active?.id != null ? String(args.active.id) : null
+    if (!activeId) return closestCenter(args)
+    const activeParent = parentMap.get(activeId)
+    // 過濾 droppable container collection — 只保留 same parent siblings(且不含 active 本身)
+    const filtered = args.droppableContainers.filter(c => {
+      const cid = String(c.id)
+      if (cid === activeId) return false
+      const cParent = parentMap.get(cid)
+      if (cParent === undefined) return false // 非 row droppable
+      return cParent === activeParent
+    })
+    return closestCenter({ ...args, droppableContainers: filtered })
+  }, [parentMap])
+
+  const handleDragStart = React.useCallback((e: { active: { id: string | number } }) => {
+    setActiveDragId(String(e.active.id))
+    setInvalidDropActive(false)
+  }, [])
+
+  const handleDragOver = React.useCallback((e: { active: { id: string | number }; over: { id: string | number } | null }) => {
+    const { active, over } = e
+    if (!active) return
+    if (!over) {
+      // 無 valid same-parent over → invalid drop signal(配合 v2 cross-parent visual)
+      if (!invalidRef.current) setInvalidDropActive(true)
+      return
+    }
+    if (invalidRef.current) setInvalidDropActive(false)
+  }, [])
+
+  const handleDragCancel = React.useCallback(() => {
+    setActiveDragId(null)
+    setInvalidDropActive(false)
+  }, [])
+
   const handleDragEnd = React.useCallback((e: DragEndEvent) => {
     const { active, over } = e
+    setActiveDragId(null)
+    setInvalidDropActive(false)
     if (!over || active.id === over.id) return
     const sourceId = String(active.id)
     const targetId = String(over.id)
-    // position: active 原本 index < over index → drop after over;反之 → drop before
-    // (對齊 @dnd-kit/sortable arrayMove 慣例:active 從上往下拖到 over 下方 = after)
-    const oldIdx = topLevelRowIds.indexOf(sourceId)
-    const newIdx = topLevelRowIds.indexOf(targetId)
+    // v2:cross-parent 已被 collisionDetection 過濾,但 defensive check
+    if (parentMap.get(sourceId) !== parentMap.get(targetId)) return
+
+    // position 計算需用「same parent siblings」list(對 sub-rows 也適用)
+    const parentId = parentMap.get(sourceId)
+    const siblings = allRowIds.filter(id => parentMap.get(id) === parentId)
+    const oldIdx = siblings.indexOf(sourceId)
+    const newIdx = siblings.indexOf(targetId)
     if (oldIdx === -1 || newIdx === -1) return
+    // 對齊 @dnd-kit/sortable arrayMove 慣例:active 從上往下拖到 over 下方 = after
     const position: 'before' | 'after' = oldIdx < newIdx ? 'after' : 'before'
     onRowReorder?.(sourceId, targetId, position)
-  }, [topLevelRowIds, onRowReorder])
+  }, [allRowIds, parentMap, onRowReorder])
 
   const wrapWithDnd = (node: React.ReactNode): React.ReactNode => {
     if (!enableRowDrag) return node
     return (
-      <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={topLevelRowIds} strategy={verticalListSortingStrategy}>
+      <DndContext
+        sensors={dndSensors}
+        collisionDetection={sameParentCollisionDetection}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragCancel={handleDragCancel}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={allRowIds} strategy={verticalListSortingStrategy}>
           {node}
         </SortableContext>
       </DndContext>
