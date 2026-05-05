@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Pencil } from 'lucide-react'
 import type { VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -52,13 +52,13 @@ export interface LinkInputProps
     Omit<VariantProps<typeof fieldWrapperStyles>, 'mode' | 'variant'> {
   mode?: FieldMode
   /**
-   * Visual chrome(2026-05-05 Phase B3)。對齊 FieldContext.chrome 透傳。
+   * Visual chrome(2026-05-05 Phase B3)。對齊 FieldContext.variant 透傳。
    * - `'default'`(預設)— Field wrapper 完整 chrome(form / Field 內嵌)。
-   * - `'bare'` — 透明 chrome,hover/focus 才現 border(Toolbar inline edit / DataTable cell-as-input)。
+   * - `'bare'` — 透明 variant,hover/focus 才現 border(Toolbar inline edit / DataTable cell-as-input)。
    *
    * mode='display' 時 chrome 無視覺意義(display 完全無 wrapper);chrome 僅作用於 edit / readonly / disabled。
    */
-  chrome?: FieldChrome
+  variant?: FieldVariant
   error?: boolean
   value?: string | null
   onChange?: (value: string) => void
@@ -74,7 +74,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
   (
     {
       mode: modeProp,
-      chrome: chromeProp,
+      variant: variantProp,
       error: errorProp = false,
       size: sizeProp = 'md',
       value,
@@ -98,7 +98,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     const resolvedMode: FieldMode = disabled ? 'disabled' : mode
     const isEditable = resolvedMode === 'edit'
     // chrome resolution:per-prop > context > 'default'
-    const resolvedChrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+    const resolvedVariant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
 
     // ── mode='display' ─────────────────────────────────────────────────────
     // 純展示:無 input chrome / 無 hover affordance / 無 Pencil edit 入口。
@@ -173,7 +173,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
       const displayText = value ? (label || formatHostname(value)) : null
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedChrome, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedVariant, size }), className)}
           data-field-mode={resolvedMode}
         >
           <span className="flex-1 min-w-0 truncate">
@@ -194,7 +194,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     if (showLink) {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: 'edit', variant: resolvedChrome, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: 'edit', variant: resolvedVariant, size }), className)}
           data-field-mode="edit"
         >
           <span className="flex-1 min-w-0">
@@ -212,7 +212,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     return (
       <div
         className={cn(
-          fieldWrapperStyles({ mode: 'edit', variant: resolvedChrome, size }),
+          fieldWrapperStyles({ mode: 'edit', variant: resolvedVariant, size }),
           error && [
             'border-error hover:border-error-hover',
             'focus-within:border-error focus-within:hover:border-error',

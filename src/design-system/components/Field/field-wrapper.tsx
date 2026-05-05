@@ -37,11 +37,11 @@ export const fieldWrapperStyles = cva(
       variant: {
         // default — 完整 Field wrapper chrome(bg-surface、明顯 border、hover/focus 回饋)
         default: '',
-        // bare — 透明 chrome,hover / focus 才出現 border。適用 Toolbar inline editing
+        // bare — 透明 variant,hover / focus 才出現 border。適用 Toolbar inline editing
         // (FileViewer zoom input / chart config / rich text toolbar number input 等)。
         // 世界級對照:VS Code settings / Figma toolbar number / Notion prop input。
         bare: '',
-        // naked — 完全無 chrome,hover/focus 也不出 border。適用 cell-as-input
+        // naked — 完全無 variant,hover/focus 也不出 border。適用 cell-as-input
         // (host cell 自管 border + focus visual,內部 input 純文字承載)。
         // 世界級對照:Airtable / Notion / Excel / Google Sheets cell editing。
         naked: '',
@@ -72,7 +72,7 @@ export const fieldWrapperStyles = cva(
       {
         mode: 'display',
         variant: 'default',
-        // 純展示:無 input chrome,無 hover/focus affordance(語意 = 純內容展示)
+        // 純展示:無 input variant,無 hover/focus affordance(語意 = 純內容展示)
         className: 'bg-transparent border border-transparent',
       },
       {
@@ -99,7 +99,7 @@ export const fieldWrapperStyles = cva(
       {
         mode: 'display',
         variant: 'bare',
-        // bare + display:cell-as-input default state(無 chrome,完全融入 cell;hover/focus 才有 affordance 等 user 點下去切 edit mode)
+        // bare + display:cell-as-input default state(無 variant,完全融入 cell;hover/focus 才有 affordance 等 user 點下去切 edit mode)
         className: 'bg-transparent border border-transparent',
       },
       {

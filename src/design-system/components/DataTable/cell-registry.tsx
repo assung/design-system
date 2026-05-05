@@ -7,7 +7,7 @@
 //
 // 設計原則:
 //   - 每個 cell component 接同一組 props(`CellComponentProps`)
-//   - 用 `chrome="naked"` — DataTable cell-as-input substrate(對齊 Field B1 chrome=bare)
+//   - 用 `variant="naked"` — DataTable cell-as-input substrate(對齊 Field B1 chrome=bare)
 //   - 消費 full Field 家族 primitive(無 stub)
 //   - 不再用 `meta._editable` 私有 flag — `isEditable` 直接顯式入參(消除 M1 hack)
 //
@@ -77,11 +77,11 @@ const sizeForInput = (size: CellSize): CellSize => size
 // ── Cell Components ──────────────────────────────────────────────────────────
 
 function StringCell({ value, mode, size, onCommit, onCancel }: CellComponentProps) {
-  if (mode === 'display') return <Input chrome="naked" mode="display" value={value != null ? String(value) : ''} />
+  if (mode === 'display') return <Input variant="naked" mode="display" value={value != null ? String(value) : ''} />
   return (
     <Input
       autoFocus
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       defaultValue={value != null ? String(value) : ''}
       onBlur={(e) => onCommit?.(e.target.value)}
@@ -97,7 +97,7 @@ function NumberCell({ value, meta, mode, size, onCommit, onCancel }: CellCompone
   if (mode === 'display') {
     return (
       <NumberInput
-        chrome="naked"
+        variant="naked"
         mode="display"
         value={value as number | null}
         prefix={prefix}
@@ -114,7 +114,7 @@ function NumberCell({ value, meta, mode, size, onCommit, onCancel }: CellCompone
   return (
     <NumberInput
       autoFocus
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       defaultValue={typeof value === 'number' ? value : undefined}
       prefix={prefix}
@@ -130,7 +130,7 @@ function DateCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
   if (mode === 'display') {
     return (
       <DatePicker
-        chrome="naked"
+        variant="naked"
         mode="display"
         value={value as string | null}
         formatOptions={meta?.formatOptions}
@@ -141,7 +141,7 @@ function DateCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
   return (
     <DatePicker
       autoFocus
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       value={typeof value === 'string' ? value : null}
       showTime={meta?.includeTime === true}
@@ -154,7 +154,7 @@ function TimeCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
   if (mode === 'display') {
     return (
       <TimePicker
-        chrome="naked"
+        variant="naked"
         mode="display"
         value={value as string | null}
         formatOptions={meta?.formatOptions}
@@ -164,7 +164,7 @@ function TimeCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
   }
   return (
     <TimePicker
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       value={typeof value === 'string' ? value : null}
       showSeconds={meta?.showSeconds === true}
@@ -176,14 +176,14 @@ function TimeCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
 }
 
 function SelectCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
-  // Display canonical(2026-05-05):cell IS chrome,default plain text(no Tag pill 疊在 cell border 內)。
+  // Display canonical(2026-05-05):cell IS variant,default plain text(no Tag pill 疊在 cell border 內)。
   // Consumer 可在 column meta.display='tag' opt-in 內容導向的 Tag 視覺(category 含色彩標籤等)。
   // 對齊 JTable / AG Grid「renderer/editor 視覺一致」canonical。
   const displayMode = (meta?.display as 'plain' | 'tag' | undefined) ?? 'plain'
   if (mode === 'display') {
     return (
       <Select
-        chrome="naked"
+        variant="naked"
         mode="display"
         value={value as string | null}
         options={meta?.options ?? []}
@@ -195,7 +195,7 @@ function SelectCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
   return (
     <Select
       autoFocus
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       options={meta?.options ?? []}
       value={value as string | null | undefined}
@@ -213,7 +213,7 @@ function MultiSelectCell({ value, meta, mode, size, autoRowHeight, onCommit }: C
   if (mode === 'display') {
     return (
       <Combobox
-        chrome="naked"
+        variant="naked"
         mode="display"
         value={(value as string[] | null) ?? []}
         options={meta?.options ?? []}
@@ -224,7 +224,7 @@ function MultiSelectCell({ value, meta, mode, size, autoRowHeight, onCommit }: C
   }
   return (
     <Combobox
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       options={meta?.options ?? []}
       value={Array.isArray(value) ? (value as string[]) : []}
@@ -236,11 +236,11 @@ function MultiSelectCell({ value, meta, mode, size, autoRowHeight, onCommit }: C
 function PersonCell({ value, mode, size, onCommit, meta }: CellComponentProps) {
   if (mode === 'display') {
     // PeoplePicker mode='display' 自動依 value 是否為 array 切 PersonDisplay vs MultiPersonDisplay
-    return <PeoplePicker chrome="naked" mode="display" value={value as PersonValue | null} size={size} />
+    return <PeoplePicker variant="naked" mode="display" value={value as PersonValue | null} size={size} />
   }
   return (
     <PeoplePicker
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       value={value as PersonValue | null}
       people={meta?.people ?? []}
@@ -252,11 +252,11 @@ function PersonCell({ value, mode, size, onCommit, meta }: CellComponentProps) {
 
 function MultiPersonCell({ value, mode, size, onCommit, meta }: CellComponentProps) {
   if (mode === 'display') {
-    return <PeoplePicker chrome="naked" mode="display" value={(value as PersonValue[]) ?? []} size={size} />
+    return <PeoplePicker variant="naked" mode="display" value={(value as PersonValue[]) ?? []} size={size} />
   }
   return (
     <PeoplePicker
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       value={Array.isArray(value) ? (value as PersonValue[]) : []}
       people={meta?.people ?? []}
@@ -268,7 +268,7 @@ function MultiPersonCell({ value, mode, size, onCommit, meta }: CellComponentPro
 function BooleanCell({ value, mode, meta, size, isEditable, onCommit }: CellComponentProps) {
   // boolean 不分 read/edit mode — display 渲 mode='display' 純展示;editable 時直接 toggle Checkbox
   if (mode === 'display' && !isEditable) {
-    return <Checkbox chrome="naked" mode="display" checked={value === true} />
+    return <Checkbox variant="naked" mode="display" checked={value === true} />
   }
   return (
     <Checkbox
@@ -290,7 +290,7 @@ function BooleanCell({ value, mode, meta, size, isEditable, onCommit }: CellComp
 function UrlCell({ value, meta, mode, size, isEditable, onRequestEdit, onCommit, onCancel }: CellComponentProps) {
   if (mode === 'display') {
     const display = (
-      <LinkInput chrome="naked" mode="display" value={value as string | null} label={meta?.linkLabel} />
+      <LinkInput variant="naked" mode="display" value={value as string | null} label={meta?.linkLabel} />
     )
     if (!isEditable) return display
     // editable read mode:hover Pencil 鈕(對齊 spec 第十二段「url:read = 連結 + Pencil」)
@@ -316,7 +316,7 @@ function UrlCell({ value, meta, mode, size, isEditable, onRequestEdit, onCommit,
   return (
     <LinkInput
       autoFocus
-      chrome="naked"
+      variant="naked"
       size={sizeForInput(size)}
       defaultValue={value != null ? String(value) : ''}
       label={meta?.linkLabel}

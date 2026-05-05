@@ -87,7 +87,7 @@ const BulkActionBar = React.forwardRef<HTMLDivElement, BulkActionBarProps>(
         )}
         {...props}
       >
-        {/* X close — md dismiss(2026-05-04 spec update:default placement = footer chrome,
+        {/* X close — md dismiss(2026-05-04 spec update:default placement = footer variant,
             visual weight 對齊 Dialog footer commitment buttons md;same-row consistency 維持)
             未來若有 top-toolbar variant(覆蓋 sm-density toolbar)→ 該 variant override sm */}
         {onClear && (

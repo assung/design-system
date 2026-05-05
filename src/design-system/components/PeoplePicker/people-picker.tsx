@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { PersonDisplay, MultiPersonDisplay, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
@@ -43,13 +43,13 @@ export interface PeoplePickerProps
    */
   mode?: FieldMode
   /**
-   * Visual chrome(2026-05-05 Phase B3)。對齊 FieldContext.chrome 透傳。
+   * Visual chrome(2026-05-05 Phase B3)。對齊 FieldContext.variant 透傳。
    * - `'default'` — 完整 Field wrapper chrome(form / Field 內嵌)
-   * - `'bare'` — 透明 chrome,hover/focus 才現 border(DataTable cell-as-input)
+   * - `'bare'` — 透明 variant,hover/focus 才現 border(DataTable cell-as-input)
    *
    * mode='display' 時 chrome 無視覺意義(display 完全無 wrapper);chrome 僅作用於 edit / readonly / disabled。
    */
-  chrome?: FieldChrome
+  variant?: FieldVariant
   size?: 'sm' | 'md' | 'lg'
   /** 當前已選的人（單選 PersonValue，多選 PersonValue[]） */
   value?: PersonValue | PersonValue[] | null
@@ -67,7 +67,7 @@ export interface PeoplePickerProps
 
 const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(function PeoplePicker({
   mode: modeProp,
-  chrome: chromeProp,
+  variant: variantProp,
   size = 'md',
   value,
   onChange,
@@ -82,7 +82,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'
   const resolvedMode: FieldMode = disabled ? 'disabled' : mode
   // chrome resolution:per-prop > context > 'default'
-  const resolvedChrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+  const resolvedVariant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
   const isEditable = resolvedMode === 'edit'
   const iconSize = size === 'lg' ? 20 : 16
   const isMulti = Array.isArray(value)
@@ -104,7 +104,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
     return (
       <div
         ref={ref}
-        className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedChrome, size }), className)}
+        className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedVariant, size }), className)}
         data-field-mode={resolvedMode}
         {...props}
       >
@@ -157,7 +157,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
       aria-haspopup="listbox"
       tabIndex={0}
       className={cn(
-        fieldWrapperStyles({ mode: 'edit', variant: resolvedChrome, size }),
+        fieldWrapperStyles({ mode: 'edit', variant: resolvedVariant, size }),
         // Radix Popover 在 trigger 上寫 data-state="open",用它顯示 focus border
         'cursor-pointer data-[state=open]:border-primary',
         className,

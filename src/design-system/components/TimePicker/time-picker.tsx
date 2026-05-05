@@ -2,7 +2,7 @@ import * as React from 'react'
 import { X, Clock } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import {
   fieldWrapperStyles,
   bareInputStyles,
@@ -92,8 +92,8 @@ export interface TimePickerProps
       'onChange' | 'placeholder'
     > {
   mode?: FieldMode
-  /** Field chrome variant. Default = context.chrome ?? 'default'. Per-prop override. */
-  chrome?: FieldChrome
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   /** ISO time string("HH:mm" 或 "HH:mm:ss") */
@@ -124,7 +124,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
   (
     {
       mode = 'edit',
-      chrome: chromeProp,
+      variant: variantProp,
       error: errorProp = false,
       size = 'md',
       value,
@@ -151,7 +151,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
-    const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
     const StartIconCmp: LucideIcon | null =
@@ -216,7 +216,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
     if (!isEditable) {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: chrome, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
@@ -272,7 +272,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
             data-field-mode="edit"
             data-error={error ? '' : undefined}
             className={cn(
-              fieldWrapperStyles({ mode: 'edit', variant: chrome, size }),
+              fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
               'text-left cursor-pointer',
               'focus-visible:outline-none',
               error && [

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { X, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverAnchor, PopoverContent } from '@/design-system/components/Popover/popover'
@@ -223,8 +223,8 @@ export interface DatePickerProps
       'value' | 'onChange' | 'placeholder' | 'defaultValue'
     > {
   mode?: FieldMode
-  /** Field chrome variant. Default = context.chrome ?? 'default'. Per-prop override. */
-  chrome?: FieldChrome
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   /** ISO date(YYYY-MM-DD)或 ISO datetime(YYYY-MM-DDTHH:MM:SS,當 showTime=true) */
@@ -258,7 +258,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   (
     {
       mode = 'edit',
-      chrome: chromeProp,
+      variant: variantProp,
       error: errorProp = false,
       size = 'md',
       value,
@@ -287,7 +287,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
-    const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
     const needConfirm = needConfirmProp ?? showTime  // datetime 預設需確認
@@ -328,7 +328,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     if (!isEditable) {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: chrome, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
@@ -377,7 +377,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
             data-field-mode="edit"
             data-error={error ? '' : undefined}
             className={cn(
-              fieldWrapperStyles({ mode: 'edit', variant: chrome, size }),
+              fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
               'text-left cursor-pointer',
               'focus-visible:outline-none',
               error && [
@@ -496,8 +496,8 @@ export interface DatePickerRangeProps
       'value' | 'onChange' | 'placeholder' | 'defaultValue'
     > {
   mode?: FieldMode
-  /** Field chrome variant. Default = context.chrome ?? 'default'. Per-prop override. */
-  chrome?: FieldChrome
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   /** 區間值:[start ISO, end ISO]。任一 null 代表尚未選。 */
@@ -521,7 +521,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
   (
     {
       mode = 'edit',
-      chrome: chromeProp,
+      variant: variantProp,
       error: errorProp = false,
       size = 'md',
       value,
@@ -548,7 +548,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
-    const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
     const needConfirm = needConfirmProp ?? showTime
@@ -689,7 +689,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
       return (
         <div
           ref={ref}
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: chrome, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
           {...props}
         >

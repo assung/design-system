@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils'
  * target,視覺 render 仍 28/32),layout 佔位精確匹配 chrome-header-height 幾何。詳
  * `overlay-surface.spec.md`「Chrome dismiss size canonical」。
  *
- * **Notification banner family**(Notice / Alert / Toast,fixed `px-4 py-3` chrome,
+ * **Notification banner family**(Notice / Alert / Toast,fixed `px-4 py-3` variant,
  * 無 padding-based header)→ dismiss 用 `size="xs"` explicit(24 固定,無 trick)。
  *
  * ── Token 規則 ──

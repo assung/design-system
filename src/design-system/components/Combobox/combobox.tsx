@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { Tag } from '@/design-system/components/Tag/tag'
@@ -148,8 +148,8 @@ function ComboboxTagStack({
 
 export interface ComboboxProps {
   mode?: FieldMode
-  /** Field chrome variant. Default = context.chrome ?? 'default'. Per-prop override. */
-  chrome?: FieldChrome
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   options: SelectOption[]
@@ -179,10 +179,10 @@ const getIconSize = (size: string) => size === 'lg' ? 20 : 16
 // ── Shared readonly/disabled/display render ─────────────────────────────────
 
 function ReadonlyMultiSelect({
-  mode, chrome, size, options, value, wrap, className,
-}: Pick<ComboboxProps, 'mode' | 'chrome' | 'size' | 'options' | 'value' | 'wrap' | 'className'>) {
+  mode, variant: variantProp, size, options, value, wrap, className,
+}: Pick<ComboboxProps, 'mode' | 'variant' | 'size' | 'options' | 'value' | 'wrap' | 'className'>) {
   const resolvedMode = mode ?? 'readonly'
-  const variant = chrome ?? 'default'
+  const variant = variantProp ?? 'default'
   const sz = size ?? 'md'
   const containerRef = React.useRef<HTMLDivElement>(null)
   const hasTags = (value?.length ?? 0) > 0
@@ -214,11 +214,11 @@ function ReadonlyMultiSelect({
 // ── Native Combobox (mobile) ────────────────────────────────────────
 
 function NativeCombobox({
-  mode = 'edit', chrome: chromeProp, error = false, size = 'md', options, value = [], onChange, placeholder,
+  mode = 'edit', variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
   className, disabled, wrap = false, clearable = false,
 }: ComboboxProps) {
   const fieldCtx = useFieldContext()
-  const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
   const resolvedMode = disabled ? 'disabled' : mode
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
@@ -227,7 +227,7 @@ function NativeCombobox({
   const handleAdd = (v: string) => { if (!value.includes(v)) onChange?.([...value, v]) }
 
   if (resolvedMode !== 'edit') {
-    return <ReadonlyMultiSelect mode={resolvedMode} chrome={chrome} size={size} options={options} value={value} wrap={wrap} className={className} />
+    return <ReadonlyMultiSelect mode={resolvedMode} variant={variant} size={size} options={options} value={value} wrap={wrap} className={className} />
   }
 
   const items = value.map(v => ({ value: v, label: options.find(o => o.value === v)?.label ?? v }))
@@ -246,7 +246,7 @@ function NativeCombobox({
   ) : null
 
   return (
-    <div className={cn(fieldWrapperStyles({ mode: 'edit', variant: chrome, size }), value.length > 0 && tagPadding[size], 'relative',
+    <div className={cn(fieldWrapperStyles({ mode: 'edit', variant: variant, size }), value.length > 0 && tagPadding[size], 'relative',
       wrap && 'items-start py-1', error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode="edit" data-error={error ? '' : undefined}
       onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
@@ -278,7 +278,7 @@ function NativeCombobox({
 // ── Custom Combobox (desktop — consumes SelectMenu) ───────────────────
 
 function CustomCombobox({
-  mode = 'edit', chrome: chromeProp, error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
+  mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
   className, disabled: disabledProp, wrap = false, clearable = false, searchable = false, searchIn = 'menu',
   searchPlaceholder = '搜尋…', // i18n-allow: DS default
   searchAriaLabel = '搜尋選項', // i18n-allow: DS default
@@ -289,7 +289,7 @@ function CustomCombobox({
   const error = errorProp || (fieldCtx?.invalid ?? false)
   const disabled = disabledProp ?? fieldCtx?.disabled
   const resolvedMode = disabled ? 'disabled' : mode
-  const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
   const [open, setOpen] = React.useState(false)
@@ -301,7 +301,7 @@ function CustomCombobox({
   React.useEffect(() => { if (!open) setSearch('') }, [open])
 
   if (resolvedMode !== 'edit') {
-    return <ReadonlyMultiSelect mode={resolvedMode} chrome={chrome} size={size} options={options} value={value} wrap={wrap} className={className} />
+    return <ReadonlyMultiSelect mode={resolvedMode} variant={variant} size={size} options={options} value={value} wrap={wrap} className={className} />
   }
 
   const items = React.useMemo(
@@ -338,7 +338,7 @@ function CustomCombobox({
       aria-required={fieldCtx?.required || undefined}
       aria-describedby={fieldCtx?.descriptionId}
       aria-errormessage={error ? fieldCtx?.errorId : undefined}
-      className={cn(fieldWrapperStyles({ mode: 'edit', variant: chrome, size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
+      className={cn(fieldWrapperStyles({ mode: 'edit', variant: variant, size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
         wrap && 'items-start py-1',
         open && !error && 'border-primary',
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}

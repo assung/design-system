@@ -51,7 +51,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/design-system/compone
 // Context 定義在 field-context.ts(打斷 circular import)。
 // field.tsx 只 import 不 re-export——consumer 直接從 field-context.ts import useFieldContext。
 
-import type { FieldMode, FieldChrome, FieldOrientation, FieldSize, FieldControlLayout, FieldContextValue } from './field-context'
+import type { FieldMode, FieldVariant, FieldOrientation, FieldSize, FieldControlLayout, FieldContextValue } from './field-context'
 import { FieldContext, useFieldContext } from './field-context'
 
 // ── Internal helpers ────────────────────────────────────────────────────────
@@ -110,11 +110,11 @@ export interface FieldProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   /**
    * 視覺外殼(2026-05-05)。
    * - `default`(預設)— 含 border + bg(一般 form input)
-   * - `bare` — 透明 chrome,hover/focus reveal(cell-as-input substrate;VS Code/Figma toolbar idiom)
+   * - `bare` — 透明 variant,hover/focus reveal(cell-as-input substrate;VS Code/Figma toolbar idiom)
    *
    * 透傳機制:Field 一次宣告,所有 child Field control 自動繼承(per-control prop override 可覆寫)。
    */
-  chrome?: FieldChrome
+  variant?: FieldVariant
   orientation?: FieldOrientation
   size?: FieldSize
   required?: boolean
@@ -152,7 +152,7 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
     {
       id: idProp,
       mode = 'edit',
-      chrome = 'default',
+      variant = 'default',
       orientation = 'vertical',
       size = 'md',
       required = false,
@@ -205,7 +205,7 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
         descriptionId,
         errorId,
         mode,
-        chrome,
+        variant,
         disabled,
         required,
         invalid,
@@ -214,7 +214,7 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
         controlLayout,
         hasFieldWrapper: true,
       }),
-      [id, labelId, descriptionId, errorId, mode, chrome, disabled, required, invalid, size, orientation, controlLayout]
+      [id, labelId, descriptionId, errorId, mode, variant, disabled, required, invalid, size, orientation, controlLayout]
     )
 
     // Control area：兩種佈局模型,「第一行內容中線」都錨在 field-height/2,

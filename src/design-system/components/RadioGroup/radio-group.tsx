@@ -4,7 +4,7 @@ import { Circle } from "lucide-react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
-import type { FieldMode, FieldChrome } from "@/design-system/components/Field/field-types"
+import type { FieldMode, FieldVariant } from "@/design-system/components/Field/field-types"
 import { useFieldContext } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
 import { EMPTY_DISPLAY } from "@/design-system/components/Field/field-wrapper"
@@ -37,16 +37,16 @@ export interface RadioGroupProps
    */
   mode?: FieldMode
   /**
-   * Visual chrome — RadioGroup 本體無 input wrapper chrome,本 prop 對主體無視覺影響;
+   * Visual chrome — RadioGroup 本體無 input wrapper variant,本 prop 對主體無視覺影響;
    * 為對齊 Field 4-mode + chrome 透傳契約而保留(M19 一致性)。
    */
-  chrome?: FieldChrome
+  variant?: FieldVariant
 }
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   RadioGroupProps
->(({ className, mode, chrome: _chrome, value, defaultValue, ...props }, ref) => {
+>(({ className, mode, variant: _chrome, value, defaultValue, ...props }, ref) => {
   // mode='display' — 純展示 selected option 的 label,不渲染任何 radio control 視覺。
   // 對齊 Carbon read-only single-select(只顯示 selected 內容)+ Airtable / Notion read-only。
   // 實作:walk children 找 control.value === selectedValue 的 SelectionItem,render label plain text。

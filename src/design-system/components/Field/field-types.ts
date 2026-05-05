@@ -1,7 +1,7 @@
 // ── Field Mode ───────────────────────────────────────────────────────────────
 //
 // 4 模式 canonical(2026-05-05 expand to 4):
-//   edit     — 一般可編輯 input(預設 chrome:border + bg)
+//   edit     — 一般可編輯 input(預設 variant:border + bg)
 //   display  — **純展示**(無 input chrome / 無互動 affordance);語意「這是 read-only 內容,展示給人看」
 //              對齊 Carbon read-only / PatternFly inline-edit hidden-input / Cloudscape display-mode
 //   readonly — input chrome + non-editable(保留 underline / border subtle 給 a11y signal「這是 input 但鎖了」)
@@ -18,17 +18,21 @@
 //   Cloudscape: https://cloudscape.design/patterns/general/disabled-and-read-only-states/
 export type FieldMode = 'edit' | 'display' | 'readonly' | 'disabled'
 
-// ── Field Chrome ─────────────────────────────────────────────────────────────
+// ── Field Variant ────────────────────────────────────────────────────────────
 //
-// 視覺外殼(2026-05-05):
-//   default — 含 border + bg(一般 form input)
-//   bare    — 透明 chrome,hover/focus 才 reveal inner border(VS Code/Figma toolbar inline editing idiom)
+// 視覺外殼(對齊主流 DS canonical M22 verified 2026-05-05):
+//   - Ant Design `Input variant`: 'outlined' | 'borderless' | 'filled' | 'underlined'
+//   - MUI `TextField variant`: 'outlined' | 'standard' | 'filled'
+//
+//   default — 含 border + bg(一般 form input,= Ant outlined / MUI outlined)
+//   bare    — 透明 variant,hover/focus 才 reveal inner border(VS Code/Figma toolbar inline editing idiom,
+//             ≈ Ant borderless,但保留 hover/focus reveal)
 //   naked   — 完全無 chrome / 無 focus ring on wrapper(cell-as-input — host cell 提供 border + focus visual)
 //             對齊 Airtable / Notion / Excel cell editing — cell 本身扮演 input frame,內無 wrapper
 //
-// 透傳機制:Field 透過 FieldContext.chrome 一次宣告,所有 child Field control 自動繼承。
+// 透傳機制:Field 透過 FieldContext.variant 一次宣告,所有 child Field control 自動繼承。
 // per-control prop override 可覆寫 context。
-export type FieldChrome = 'default' | 'bare' | 'naked'
+export type FieldVariant = 'default' | 'bare' | 'naked'
 
 // ── Menu List Min Height ─────────────────────────────────────────────────────
 // SelectMenu / Select / Combobox 共用的 CommandList minHeight 計算。

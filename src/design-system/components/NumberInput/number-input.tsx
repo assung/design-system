@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import type { InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
@@ -46,11 +46,11 @@ export interface NumberInputProps
   /**
    * Visual chrome(正交於 mode);Phase B1(2026-05-05)新增。
    * - `'default'`(預設)— 完整 Field wrapper chrome。
-   * - `'bare'` — 透明 chrome,hover/focus 才 reveal(Toolbar inline / DataTable cell)。
+   * - `'bare'` — 透明 variant,hover/focus 才 reveal(Toolbar inline / DataTable cell)。
    *
-   * 透傳:在 `<Field chrome="bare">` 內自動繼承 context.chrome;per-prop override context。
+   * 透傳:在 `<Field variant="bare">` 內自動繼承 context.variant;per-prop override context。
    */
-  chrome?: FieldChrome
+  variant?: FieldVariant
   /** Error 狀態（正交於 mode）。 */
   error?: boolean
   /** 數值 */
@@ -74,7 +74,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   (
     {
       mode: modeProp,
-      chrome: chromeProp,
+      variant: variantProp,
       error: errorProp = false,
       size: sizeProp,
       value,
@@ -100,7 +100,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const size = sizeProp ?? fieldCtx?.size ?? 'md'
     const disabled = disabledProp ?? fieldCtx?.disabled
     // chrome 透傳:per-prop override context;context 沒值則 'default'
-    const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback
     const resolvedMode: FieldMode = modeProp
       ?? fieldCtx?.mode
@@ -110,7 +110,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     if (resolvedMode !== 'edit') {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: chrome, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
         >
           <span
@@ -143,7 +143,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     return (
       <div
         className={cn(
-          fieldWrapperStyles({ mode: 'edit', variant: chrome, size }),
+          fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
           error && [
             'border-error hover:border-error-hover',
             'focus-within:border-error focus-within:hover:border-error',

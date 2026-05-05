@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 
@@ -133,11 +133,11 @@ export interface TextareaProps
   /** Field display mode */
   mode?: FieldMode
   /**
-   * Visual chrome(正交於 mode);Phase B1(2026-05-05)新增。透傳自 FieldContext.chrome,per-prop override。
+   * Visual chrome(正交於 mode);Phase B1(2026-05-05)新增。透傳自 FieldContext.variant,per-prop override。
    * - `'default'` — 完整 chrome(form 場景)
-   * - `'bare'` — 透明 chrome,hover/focus reveal(toolbar / cell-as-input)
+   * - `'bare'` — 透明 variant,hover/focus reveal(toolbar / cell-as-input)
    */
-  chrome?: FieldChrome
+  variant?: FieldVariant
   /** Error 狀態（正交於 mode）。border-error + aria-invalid。 */
   error?: boolean
 }
@@ -146,7 +146,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {
       mode: modeProp,
-      chrome: chromeProp,
+      variant: variantProp,
       error: errorProp = false,
       size: sizeProp,
       className,
@@ -164,7 +164,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     // Field context 整合：disabled / mode / chrome / invalid / size / id 都能從 context 繼承
     const fieldCtx = useFieldContext()
     // chrome 透傳:per-prop override context
-    const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const size = sizeProp ?? fieldCtx?.size ?? 'md'
     // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback > 'edit'
@@ -187,7 +187,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           data-field-mode="display"
           aria-describedby={ariaDescribedBy}
           className={cn(
-            textareaVariants({ mode: 'display', variant: chrome, size }),
+            textareaVariants({ mode: 'display', variant: variant, size }),
             'whitespace-pre-wrap break-words',
             displayValue == null && 'text-fg-muted',
             className,
@@ -213,7 +213,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         data-field-mode={resolvedMode}
         data-error={isEditable && error ? '' : undefined}
         className={cn(
-          textareaVariants({ mode: resolvedMode, variant: chrome, size }),
+          textareaVariants({ mode: resolvedMode, variant: variant, size }),
           isEditable && error && [
             'border-error hover:border-error-hover',
             'focus-visible:border-error focus-visible:hover:border-error',

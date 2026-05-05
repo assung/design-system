@@ -4,7 +4,7 @@ import * as SwitchPrimitives from '@radix-ui/react-switch'
 import { Check } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 
 /**
@@ -112,10 +112,10 @@ export interface SwitchProps
    */
   mode?: FieldMode
   /**
-   * Visual chrome — Switch 本體無 input wrapper chrome,本 prop 對 Switch 主體無視覺影響;
+   * Visual chrome — Switch 本體無 input wrapper variant,本 prop 對 Switch 主體無視覺影響;
    * 為對齊 Field 4-mode + chrome 透傳契約而保留(M19 一致性)。
    */
-  chrome?: FieldChrome
+  variant?: FieldVariant
 }
 
 const Switch = React.forwardRef<
@@ -132,7 +132,7 @@ const Switch = React.forwardRef<
       disabled,
       mode,
       // chrome 對 Switch 主體無視覺影響(無 input wrapper)— 接收純為 prop 一致性;destructure 防 leak 到 DOM。
-      chrome: _chrome,
+      variant: _chrome,
       id: idProp,
       ...props
     },
@@ -142,7 +142,7 @@ const Switch = React.forwardRef<
     const spec = SPECS[sizeKey]
 
     // ── mode='display' ─────────────────────────────────────────────────────
-    // 純展示模式:無互動 toggle、無 input chrome,渲染 ✓ / —。
+    // 純展示模式:無互動 toggle、無 input variant,渲染 ✓ / —。
     // 與 Checkbox display 對齊(同為 boolean primitive)— DataTable boolean cell 場景共用。
     // 與 readonly 差異:readonly 保留 toggle 視覺 + 鎖互動;display 完全無 toggle 形體。
     if (mode === 'display') {
