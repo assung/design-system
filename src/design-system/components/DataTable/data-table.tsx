@@ -15,7 +15,10 @@ import {
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { ChevronDown, Calendar, ArrowUp, ArrowDown, Filter as FilterIcon, EyeOff, X as XIcon, Pencil } from 'lucide-react'
+import { ChevronDown, Calendar, ArrowUp, ArrowDown, Filter as FilterIcon, EyeOff, X as XIcon, Pencil, GripVertical } from 'lucide-react'
+import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, useSortable, verticalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
+import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
@@ -307,6 +310,8 @@ function EditableCellContent({
 const CELL_PX = '0.75rem'
 // L2 selection 內部 column id(避免 magic string 重複)
 const SELECT_COL_ID = '__select__'
+// L4 row drag 內部 column id(GripVertical handle 容器,永遠最左,在 __select__ 之前)
+const DRAG_COL_ID = '__drag__'
 const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)', paddingInline: CELL_PX }
 const HEADER_BG = 'bg-muted'
 
@@ -353,6 +358,61 @@ function TruncateCell({ children, className }: { children: React.ReactNode; clas
   const span = <span ref={ref} className={cn('truncate min-w-0', className)}>{children}</span>
   if (!isTruncated) return span
   return <Tooltip><TooltipTrigger asChild>{span}</TooltipTrigger><TooltipContent>{children}</TooltipContent></Tooltip>
+}
+
+// ── L4 Row Drag: SortableRowContext ──────────────────────────────────────────
+// 跨 3-region(left/center/right)同 row id 共享單一 useSortable() instance。
+// 一個 row 的 left/center/right 是 3 個獨立 DOM,但邏輯上是一個 sortable item;
+// useSortable 只能 mount 在「一個」DOM ref(setNodeRef),這裡選 left region(若有)
+// 否則 center region。其他 region 的 row 透過 context 拿到 transform CSS 同步動。
+// 同 listeners — drag handle render 在 left region(__drag__ column),其他 region 不需。
+interface SortableRowCtxValue {
+  setNodeRef: (el: HTMLElement | null) => void
+  /** 主 region(掛 setNodeRef 的)→ 'primary';其他 region(只跟動畫)→ 'mirror' */
+  role: 'primary' | 'mirror'
+  style: React.CSSProperties
+  attributes: Record<string, unknown>
+  listeners: Record<string, unknown> | undefined
+  isDragging: boolean
+  /** drag handle 走 listeners — render 在 __drag__ column body cell */
+  handleListeners: Record<string, unknown> | undefined
+  handleAttributes: Record<string, unknown>
+}
+const SortableRowCtx = React.createContext<SortableRowCtxValue | null>(null)
+
+/** Per-row sortable wrapper: 為每 row 唯一一次呼叫 useSortable,把 ref/transform 透過
+ *  React Context 散發給 3 region 對應的 row DOM。primary region 掛 setNodeRef,
+ *  mirror regions 只套用 transform CSS。 */
+function SortableRowProvider({
+  id,
+  disabled,
+  children,
+}: {
+  id: string
+  disabled?: boolean
+  children: (ctx: SortableRowCtxValue) => React.ReactNode
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
+  const style: React.CSSProperties = {
+    transform: DndCSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+    zIndex: isDragging ? 1 : undefined,
+    position: 'relative',
+  }
+  // primary region 拿 setNodeRef + listener-free attributes(listeners 走 handle);
+  // 提供 handleListeners + handleAttributes 給 __drag__ cell 上的 GripVertical
+  const ctxValue: SortableRowCtxValue = {
+    setNodeRef,
+    role: 'primary',
+    style,
+    attributes,
+    listeners: undefined,
+    isDragging,
+    handleListeners: listeners as Record<string, unknown> | undefined,
+    handleAttributes: attributes as Record<string, unknown>,
+  }
+  return <SortableRowCtx.Provider value={ctxValue}>{children(ctxValue)}</SortableRowCtx.Provider>
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

@@ -70,6 +70,119 @@ export interface SelectProps
 // ── Icon / size helpers ─────────────────────────────────────────────────────
 const getIconSize = (size: string) => size === 'lg' ? 20 : 16
 
+// ── Shared sub-components ───────────────────────────────────────────────────
+
+/**
+ * Inline clear button for Select trigger.
+ * 共用 SSOT — Native + Custom 兩變體統一消費。差別僅 onClick 內是否 stopPropagation
+ * (Custom trigger 是 combobox `<div>`,點 clear 不可冒泡到打開 menu;Native `<select>` 自有原生
+ * 行為,不需 stopPropagation)。
+ *
+ * 消費的 SSOT:
+ * - patterns/element-anatomy/item-anatomy.spec.md → ItemInlineAction(canonical row inline action)
+ */
+function SelectClearButton({
+  size,
+  onClear,
+  stopPropagation = false,
+}: {
+  size: 'sm' | 'md' | 'lg'
+  onClear: () => void
+  stopPropagation?: boolean
+}) {
+  return (
+    <span className="relative z-10">
+      <ItemInlineAction
+        size={size}
+        action={{
+          icon: X,
+          label: '清除選取', // i18n-allow: DS default inline-action label
+          onClick: stopPropagation ? (e) => { e?.stopPropagation(); onClear() } : () => onClear(),
+        }}
+      />
+    </span>
+  )
+}
+SelectClearButton.displayName = 'SelectClearButton'
+
+/**
+ * Trigger content for CustomSelect — 三種顯示模式分支(searchable+open / text / tag)
+ * 抽出降低 `CustomSelect` forwardRef body 長度;邏輯本質是純展示分流,無 hook / ref。
+ */
+function CustomSelectTriggerContent({
+  searchable,
+  open,
+  isTextDisplay,
+  size,
+  value,
+  selectedLabel,
+  selectedOpt,
+  SelectedIcon,
+  StartIcon,
+  iconSize,
+  placeholder,
+  search,
+  setSearch,
+  inputRef,
+}: {
+  searchable: boolean
+  open: boolean
+  isTextDisplay: boolean
+  size: 'sm' | 'md' | 'lg'
+  value?: string | null
+  selectedLabel: string
+  selectedOpt?: SelectOption
+  SelectedIcon?: LucideIcon
+  StartIcon?: LucideIcon
+  iconSize: number
+  placeholder?: string
+  search: string
+  setSearch: (v: string) => void
+  inputRef: React.RefObject<HTMLInputElement | null>
+}) {
+  // Searchable + open: 顯示搜尋 input
+  if (searchable && open) {
+    return (
+      <>
+        {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
+        <input
+          ref={inputRef}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={selectedLabel || placeholder || '搜尋…'}
+          className={cn(bareInputStyles, 'cursor-text')}
+          autoFocus
+        />
+      </>
+    )
+  }
+  // Text display: 純文字 + optional value icon
+  if (isTextDisplay) {
+    return (
+      <>
+        {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
+        {!StartIcon && SelectedIcon && value && <SelectedIcon size={iconSize} className="shrink-0 pointer-events-none" aria-hidden />}
+        <span className={cn('flex-1 min-w-0 truncate', !value && 'text-fg-muted')}>
+          {value ? selectedLabel : (placeholder ?? '選擇…')}
+        </span>
+      </>
+    )
+  }
+  // Tag display: 用 option 的 tagVariant
+  return (
+    <>
+      {value && selectedOpt?.tagVariant
+        ? <Tag size={size} variant={selectedOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
+        : value
+          ? <Tag size={size} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
+          : <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
+      }
+      <span className="flex-1" />
+    </>
+  )
+}
+CustomSelectTriggerContent.displayName = 'CustomSelectTriggerContent'
+
 // ── Shared readonly/disabled render ─────────────────────────────────────────
 function ReadonlyDisplay({
   mode, size, options, value, display, startIcon: StartIcon, className, placeholder,
@@ -149,12 +262,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
     )
 
     const clearEl = showClear ? (
-      <span className="relative z-10">
-        <ItemInlineAction
-          size={size ?? 'md'}
-          action={{ icon: X, label: '清除選取', onClick: () => onChange?.('') }} // i18n-allow: DS default inline-action label; consumer override by passing own `clearable` / wrapping logic
-        />
-      </span>
+      <SelectClearButton size={size ?? 'md'} onClear={() => onChange?.('')} />
     ) : null
 
     const chevronEl = <ChevronDown size={iconSize} className="shrink-0 text-fg-muted pointer-events-none relative z-10" aria-hidden />
@@ -261,54 +369,28 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     }
 
     const clearEl = showClear ? (
-      <span className="relative z-10">
-        <ItemInlineAction
-          size={size ?? 'md'}
-          action={{
-            icon: X,
-            label: '清除選取', // i18n-allow: DS default inline-action label
-            onClick: (e) => { e?.stopPropagation(); onChange?.('') },
-          }}
-        />
-      </span>
+      <SelectClearButton size={size ?? 'md'} onClear={() => onChange?.('')} stopPropagation />
     ) : null
 
     const chevronEl = <ChevronDown size={iconSize} className={cn('shrink-0 text-fg-muted transition-transform', open && 'rotate-180')} aria-hidden />
 
-    // ── Trigger content ──
-    const triggerContent = searchable && open ? (
-      // Searchable + open: 顯示搜尋 input
-      <>
-        {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
-        <input
-          ref={inputRef}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={selectedLabel || placeholder || '搜尋…'}
-          className={cn(bareInputStyles, 'cursor-text')}
-          autoFocus
-        />
-      </>
-    ) : isTextDisplay ? (
-      // Text display: 純文字 + optional value icon
-      <>
-        {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
-        {!StartIcon && SelectedIcon && value && <SelectedIcon size={iconSize} className="shrink-0 pointer-events-none" aria-hidden />}
-        <span className={cn('flex-1 min-w-0 truncate', !value && 'text-fg-muted')}>
-          {value ? selectedLabel : (placeholder ?? '選擇…')}
-        </span>
-      </>
-    ) : (
-      // Tag display: 用 option 的 tagVariant
-      <>
-        {value && selectedOpt?.tagVariant
-          ? <Tag size={size} variant={selectedOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
-          : value
-            ? <Tag size={size} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
-            : <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
-        }
-        <span className="flex-1" />
-      </>
+    const triggerContent = (
+      <CustomSelectTriggerContent
+        searchable={searchable}
+        open={open}
+        isTextDisplay={isTextDisplay}
+        size={size}
+        value={value}
+        selectedLabel={selectedLabel}
+        selectedOpt={selectedOpt}
+        SelectedIcon={SelectedIcon}
+        StartIcon={StartIcon}
+        iconSize={iconSize}
+        placeholder={placeholder}
+        search={search}
+        setSearch={setSearch}
+        inputRef={inputRef}
+      />
     )
 
     // hooks(filteredOptions / menuOptions / renderLabel / handleValueChange)已全 hoist(React #310 fix v2)
