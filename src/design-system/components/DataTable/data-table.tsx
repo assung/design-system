@@ -730,13 +730,14 @@ function DataTableInner<TData>(
 
   const iconSize = size === 'lg' ? 20 : 16
 
-  // Inline edit 指示器 — hover-reveal canonical(2026-05-05,對齊 Airtable / Notion):
-  //   editable cell default 不顯示 indicator,cursor hover row → indicator 浮現提示「可編輯」。
-  //   減視覺噪音(reduce 表格 default 視覺密度),user explicit feedback「chevron 應 hover 才出現」。
-  //   實作:opacity-0 → group-hover/row:opacity-100;positioning 還是固定佔位避免 hover 時 layout shift。
+  // Inline edit 指示器 — 永遠顯示 canonical(2026-05-05 user explicit:不要 hover-reveal):
+  //   editable cell 永遠顯示對應 type 的指示型 icon(chevron / Calendar / Clock),提示「可編輯」。
+  //   只在 cellEditable=true 才 render(由 caller `cellEl` gating);non-editable cell 無 indicator。
+  //   editing 時 hide(避免跟 Field control 自帶 trigger icon 衝突 → 雙 icon)。
+  //   對齊 Airtable / Notion editable cell hint canonical — 永遠顯示維持互動可發現性。
   const getEditIndicator = (colType?: ColumnType) => {
     if (!inlineEdit) return null
-    const cls = 'shrink-0 text-fg-muted opacity-0 group-hover/row:opacity-100 transition-opacity'
+    const cls = 'shrink-0 text-fg-muted'
     if (colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson')
       return <ChevronDown size={iconSize} className={cls} aria-hidden />
     if (colType === 'date')
@@ -838,10 +839,12 @@ function DataTableInner<TData>(
     const cellColId = cell.column.id
     const cellEditable = isCellEditable(meta, cell.row.original)
     const isEditingThisCell = editingCellId === cellEditId(cellRowId, cellColId)
-    // edit mode 時 indicator 由 inner Field control(SelectMenu trigger / DatePicker trigger)
-    // 自帶 chevron / Calendar — cell-level indicator 重複會 double。對齊 Airtable / Notion canonical:
-    // edit mode = cell content IS the input,no extra indicator overlay。
-    const indicator = isEditingThisCell ? null : getEditIndicator(colType)
+    // Indicator canonical(2026-05-05):
+    //   - 永遠顯示(user explicit:不要 hover-reveal)— 對齊 Airtable / Notion editable cell 永遠 hint 可編輯性
+    //   - 只在 cellEditable 才顯示(non-editable cell 無 indicator)— user explicit
+    //   - editing 時 hide(避免跟 Field control 自帶 trigger icon 衝突 → 雙 icon)
+    //   - SSOT 在 DataTable cellEl,Field component 不渲染 indicator(不重複定義)
+    const indicator = (cellEditable && !isEditingThisCell) ? getEditIndicator(colType) : null
     // Cell click → 進 edit mode(boolean 不需 — 自己 toggle;url 不需 — 走內部 Pencil button,Phase C 由 UrlCell 內處理)
     const onEditableCellClick = cellEditable && colType !== 'boolean' && colType !== 'url' && !isEditingThisCell
       ? () => setEditingCellId(cellEditId(cellRowId, cellColId))
@@ -862,7 +865,10 @@ function DataTableInner<TData>(
         key={cell.id}
         role="cell"
         className={cn(
-          'flex text-foreground text-body font-normal shrink-0 overflow-hidden relative',
+          // self-stretch:cell box 永遠填 row 高(autoRowHeight 模式下 row items-start 不 stretch,
+          // cell content 短時 cell box 仍要全高,確保 border-r divider 全高銜接 row border-b
+          // 不留 vertical gap)。對齊「table grid line 連續」world-class canonical(Airtable / Notion / Excel)。
+          'flex text-foreground text-body font-normal shrink-0 overflow-hidden relative self-stretch',
           autoRowHeight ? 'items-start' : 'items-center',
           align === 'right' && 'justify-end text-right',
           align === 'center' && 'justify-center text-center',
