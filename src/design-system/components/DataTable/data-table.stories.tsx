@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { dragSourceStyle } from '@/design-system/lib/drag-visual'
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -84,34 +85,32 @@ function generateLargeData(count: number): Product[] {
 
 const col = createColumnHelper<Product>()
 
+// 2026-05-06 v14.3 DS canonical:column 寬度走 `meta.width` / `meta.minWidth`
+// (避開 `size: 'sm'|'md'|'lg'` density 命名衝突)。內部 pre-process copy 到 TanStack root size。
 const baseColumns = [
-  col.accessor('sku', { header: 'SKU', size: 100, minSize: 80, meta: { type: 'string' } }),
-  col.accessor('name', { header: 'Product', size: 280, minSize: 120, meta: { type: 'string' } }),
-  col.accessor('category', { header: 'Category', size: 120, meta: { type: 'select' } }),
-  col.accessor('stock', { header: 'Stock', size: 110, meta: { type: 'select' } }),
-  col.accessor('seller', { header: 'Seller', size: 150, meta: { type: 'person' } }),
-  col.accessor('updatedAt', { header: 'Updated', size: 120, meta: { type: 'date' } }),
+  col.accessor('sku', { header: 'SKU', meta: { type: 'string', width: 100, minWidth: 80 } }),
+  col.accessor('name', { header: 'Product', meta: { type: 'string', width: 280, minWidth: 120 } }),
+  col.accessor('category', { header: 'Category', meta: { type: 'select', width: 120 } }),
+  col.accessor('stock', { header: 'Stock', meta: { type: 'select', width: 110 } }),
+  col.accessor('seller', { header: 'Seller', meta: { type: 'person', width: 150 } }),
+  col.accessor('updatedAt', { header: 'Updated', meta: { type: 'date', width: 120 } }),
 ]
 
 const columnsWithPrice = [
   ...baseColumns,
   col.accessor('price', {
     header: 'Price',
-    size: 120,
-    meta: { type: 'currency', prefix: '$' },
+    meta: { type: 'currency', prefix: '$', width: 120 },
   }),
 ]
 
 const columnsWithNote = [
-  col.accessor('sku', { header: 'SKU', size: 100, meta: { type: 'string' } }),
-  col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
+  col.accessor('sku', { header: 'SKU', meta: { type: 'string', width: 100 } }),
+  col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 } }),
   col.accessor('note', {
-    header: 'Note',
-    size: 300,
-    meta: { type: 'string', wrap: true },
-  }),
-  col.accessor('category', { header: 'Category', size: 120, meta: { type: 'select' } }),
-  col.accessor('seller', { header: 'Seller', size: 150, meta: { type: 'person' } }),
+    header: 'Note', meta: { type: 'string', wrap: true, width: 300 } }),
+  col.accessor('category', { header: 'Category', meta: { type: 'select', width: 120 } }),
+  col.accessor('seller', { header: 'Seller', meta: { type: 'person', width: 150 } }),
 ]
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -160,15 +159,15 @@ export const ColumnTypes: Story = {
       { value: 'food', label: 'Food' },
     ]
     const typeCols = [
-      typeCol.accessor('name', { header: 'Text', size: 160, meta: { type: 'string' } }),
-      typeCol.accessor('quantity', { header: 'Number', size: 90, meta: { type: 'number' } }),
-      typeCol.accessor('price', { header: 'Currency', size: 100, meta: { type: 'currency', prefix: '$' } }),
-      typeCol.accessor('date', { header: 'Date', size: 110, meta: { type: 'date' } }),
-      typeCol.accessor('active', { header: 'Boolean', size: 80, meta: { type: 'boolean' } }),
-      typeCol.accessor('status', { header: 'Select', size: 110, meta: { type: 'select', options: statusOptions } }),
-      typeCol.accessor('tags', { header: 'MultiSelect', size: 180, meta: { type: 'multiSelect', options: tagOptions } }),
-      typeCol.accessor('seller', { header: 'Person', size: 140, meta: { type: 'person' } }),
-      typeCol.accessor('url', { header: 'Link', size: 160, meta: { type: 'url' } }),
+      typeCol.accessor('name', { header: 'Text', meta: { type: 'string', width: 160 } }),
+      typeCol.accessor('quantity', { header: 'Number', meta: { type: 'number', width: 90 } }),
+      typeCol.accessor('price', { header: 'Currency', meta: { type: 'currency', prefix: '$', width: 100 } }),
+      typeCol.accessor('date', { header: 'Date', meta: { type: 'date', width: 110 } }),
+      typeCol.accessor('active', { header: 'Boolean', meta: { type: 'boolean', width: 80 } }),
+      typeCol.accessor('status', { header: 'Select', meta: { type: 'select', options: statusOptions, width: 110 } }),
+      typeCol.accessor('tags', { header: 'MultiSelect', meta: { type: 'multiSelect', options: tagOptions, width: 180 } }),
+      typeCol.accessor('seller', { header: 'Person', meta: { type: 'person', width: 140 } }),
+      typeCol.accessor('url', { header: 'Link', meta: { type: 'url', width: 160 } }),
     ]
     const typeData: TypeDemo[] = [
       { name: 'Wireless Headphones', quantity: 142, price: 2490, date: '2025-03-12', active: true, status: 'in_stock', tags: ['electronics', 'lifestyle'], seller: SELLERS[0], url: 'https://example.com/headphones' },
@@ -220,7 +219,7 @@ export const ColumnResize: Story = {
           <br />
           - Hover handle:分隔線從 divider(淡灰)變 border-hover(深灰),cursor: col-resize
           <br />
-          - 拖動中:分隔線變 primary(藍)
+          - 拖動中:column 即時跟動 cursor(<code>columnResizeMode: 'onChange'</code>),分隔線變 primary(藍)
           <br />
           - more 選單「自動調整寬度」:scan column 內容 max scrollWidth + buffer 自動 fit
           <br />
@@ -240,22 +239,74 @@ export const ColumnResize: Story = {
   },
 }
 
+/* ── 欄拖曳重排 — enableColumnReorder + columnDef.meta.locked ──
+   對齊 Notion / Linear / Airtable canonical:header 任一 reorderable cell 可拖,
+   drop indicator 在 target column 邊緣。SKU 標 `meta.locked=true` 鎖定不可拖,亦不可
+   接受 drop(Notion 「primary column」pattern)。System column(__select__)永遠鎖。
+   Pinned column 仍可 reorder 但只在自己 region 內(left/center/right 不跨 region)。 */
+export const ColumnReorder: Story = {
+  name: '欄位拖曳重排',
+  render: () => {
+    const initialOrder = ['sku', 'name', 'category', 'price', 'stock', 'updatedAt']
+    const [columnOrder, setColumnOrder] = React.useState<string[]>(initialOrder)
+    const lockedCols = columnsWithPrice.map((c) => {
+      const ak = (c as { accessorKey?: string }).accessorKey
+      return ak === 'sku' ? { ...c, meta: { ...(c.meta ?? {}), locked: true } } : c
+    }) as ColumnDef<Product>[]
+    const handleColumnReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {
+      setColumnOrder((prev) => {
+        const next = prev.filter((id) => id !== sourceId)
+        const targetIdx = next.indexOf(targetId)
+        if (targetIdx === -1) return prev
+        const insertAt = position === 'before' ? targetIdx : targetIdx + 1
+        next.splice(insertAt, 0, sourceId)
+        return next
+      })
+    }
+    return (
+      <div className="flex flex-col gap-3 max-w-5xl">
+        <p className="text-caption text-fg-muted">
+          enableColumnReorder=true:hover header → grab cursor;拖曳期間 DragOverlay portal 顯示 ghost,
+          target column 邊緣顯 drop indicator(before/after 由 cursor 位置判定)。
+          <br />
+          - <strong>SKU 鎖定</strong>(<code>meta.locked=true</code>):無 grab cursor、被拖過不顯 drop
+          indicator(Notion primary column pattern)
+          <br />
+          - System columns(__select__)永遠鎖
+          <br />
+          目前 order:{columnOrder.join(' → ')}
+        </p>
+        <DataTable
+          columns={lockedCols}
+          data={sampleData}
+          height="auto"
+          tableOptions={{ state: { columnOrder } }}
+          enableColumnReorder
+          onColumnReorder={handleColumnReorder}
+        />
+      </div>
+    )
+  },
+}
+
 /* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
 export const RowAutoHeightInlineEdit: Story = {
   name: '自動行高 × 內聯編輯(verify display↔edit position)',
   render: () => {
     const [list, setList] = React.useState<Product[]>(generateLargeData(4))
     const cols: ColumnDef<Product & { note: string }>[] = [
-      { accessorKey: 'sku', header: 'SKU', size: 100, meta: { type: 'string' } },
-      { accessorKey: 'name', header: 'Product', size: 240, meta: { type: 'string', editable: true } },
-      { accessorKey: 'category', header: 'Category', size: 160, meta: { type: 'select', editable: true, options: [
+      // 2026-05-06 v14.3 DS canonical: column 寬度走 `meta.width`(避開 `size: 'sm'|'md'|'lg'`
+      // density 命名衝突)。內部 pre-process copy 到 TanStack root size,resize feature 仍正常。
+      { accessorKey: 'sku', header: 'SKU', meta: { type: 'string', width: 100 } },
+      { accessorKey: 'name', header: 'Product', meta: { type: 'string', editable: true, width: 240 } },
+      { accessorKey: 'category', header: 'Category', meta: { type: 'select', editable: true, width: 160, options: [
         { value: 'Electronics', label: 'Electronics' },
         { value: 'Furniture', label: 'Furniture' },
         { value: 'Food', label: 'Food' },
         { value: 'Lifestyle', label: 'Lifestyle' },
       ] } },
-      { accessorKey: 'note', header: 'Note (wrap text)', size: 360, meta: { type: 'string', editable: true } },
-      { accessorKey: 'price', header: 'Price', size: 100, meta: { type: 'currency', editable: true } },
+      { accessorKey: 'note', header: 'Note (wrap text)', meta: { type: 'string', editable: true, width: 360 } },
+      { accessorKey: 'price', header: 'Price', meta: { type: 'currency', editable: true, width: 100 } },
     ]
     const dataWithNotes = list.map((r, i) => ({
       ...r,
@@ -466,26 +517,52 @@ const TAG_OPTIONS = [
 // SAMPLE_PEOPLE 完整 PersonData(2026-05-06 v11):每筆都有 default field values(email/phone/
 // department/location)+ status + statusMessage,讓 NameCard hoverCard 永遠完整顯示一致。
 // 對齊 NameCard always-render canonical(NAMECARD_DEFAULT_FIELD_KEYS SSOT)。
+// **2026-05-07 v15.7**:NameCard default fields 改 ['id', 'employeeNumber'] only。
+// Email / Phone / Department / Location 透過 `fields` array opt-in。
 const SAMPLE_PEOPLE: PersonData[] = [
   {
     name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/48?u=alice', description: 'Design',
-    email: 'alice.chen@example.com', phone: '+886-2-2700-0001', department: 'Design / APAC', location: 'Taipei',
+    id: 'AC001', employeeNumber: 'EMP-1001',
     status: 'online', statusMessage: '本週設計評審,週四前 standup 移到 4pm',
+    fields: [
+      { label: 'Email', value: 'alice.chen@example.com' },
+      { label: 'Phone', value: '+886-2-2700-0001' },
+      { label: 'Department', value: 'Design / APAC' },
+      { label: 'Location', value: 'Taipei' },
+    ],
   },
   {
     name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/48?u=bob', description: 'Engineering',
-    email: 'bob.lin@example.com', phone: '+886-2-2700-0002', department: 'Engineering / Platform', location: 'Taipei',
+    id: 'BL002', employeeNumber: 'EMP-1002',
     status: 'busy', statusMessage: 'Code review 中,訊息我會晚點回',
+    fields: [
+      { label: 'Email', value: 'bob.lin@example.com' },
+      { label: 'Phone', value: '+886-2-2700-0002' },
+      { label: 'Department', value: 'Engineering / Platform' },
+      { label: 'Location', value: 'Taipei' },
+    ],
   },
   {
     name: 'Charlie Wu', avatarUrl: 'https://i.pravatar.cc/48?u=charlie', description: 'Product',
-    email: 'charlie.wu@example.com', phone: '+852-2700-0003', department: 'Product / Growth', location: 'Hong Kong',
+    id: 'CWU003', employeeNumber: 'EMP-1003',
     status: 'online', statusMessage: '今日 OKR 規劃日,可線上協助',
+    fields: [
+      { label: 'Email', value: 'charlie.wu@example.com' },
+      { label: 'Phone', value: '+852-2700-0003' },
+      { label: 'Department', value: 'Product / Growth' },
+      { label: 'Location', value: 'Hong Kong' },
+    ],
   },
   {
     name: 'Diana Huang', avatarUrl: 'https://i.pravatar.cc/48?u=diana', description: 'Marketing',
-    email: 'diana.huang@example.com', phone: '+65-6700-0004', department: 'Marketing / Brand', location: 'Singapore',
+    id: 'DH004', employeeNumber: 'EMP-1004',
     status: 'away', statusMessage: '客戶會議中,週四上午回辦公室',
+    fields: [
+      { label: 'Email', value: 'diana.huang@example.com' },
+      { label: 'Phone', value: '+65-6700-0004' },
+      { label: 'Department', value: 'Marketing / Brand' },
+      { label: 'Location', value: 'Singapore' },
+    ],
   },
 ]
 interface EditableProduct {
@@ -526,19 +603,19 @@ export const InlineEdit: Story = {
     const editCol = createColumnHelper<EditableProduct>()
     const editableColumns = React.useMemo(
       () => [
-        editCol.accessor('sku', { header: 'SKU', size: 100, meta: { type: 'string' } }),  // 唯讀
-        editCol.accessor('name', { header: 'Product (string)', size: 200, meta: { type: 'string', editable: true } }),
-        editCol.accessor('qty', { header: 'Qty (number)', size: 110, meta: { type: 'number', editable: true } }),
-        editCol.accessor('category', { header: 'Category (select)', size: 150, meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true } }),
-        editCol.accessor('stock', { header: 'Stock (select)', size: 140, meta: { type: 'select', options: STOCK_OPTIONS, editable: true } }),
-        editCol.accessor('tags', { header: 'Tags (multiSelect)', size: 180, meta: { type: 'multiSelect', options: TAG_OPTIONS, editable: true } }),
-        editCol.accessor('owner', { header: 'Owner (person)', size: 160, meta: { type: 'person', people: SAMPLE_PEOPLE, editable: true } }),
-        editCol.accessor('reviewers', { header: 'Reviewers (multiPerson)', size: 180, meta: { type: 'multiPerson', people: SAMPLE_PEOPLE, editable: true } }),
-        editCol.accessor('inStock', { header: 'In (boolean)', size: 90, meta: { type: 'boolean', editable: true } }),
-        editCol.accessor('url', { header: 'URL', size: 180, meta: { type: 'url', editable: true } }),
-        editCol.accessor('price', { header: 'Price (currency)', size: 130, meta: { type: 'currency', prefix: '$', editable: true } }),
-        editCol.accessor('releaseDate', { header: 'Release (date)', size: 140, meta: { type: 'date', editable: true } }),
-        editCol.accessor('reminderTime', { header: 'Reminder (time)', size: 130, meta: { type: 'time', editable: true } }),
+        editCol.accessor('sku', { header: 'SKU', meta: { type: 'string', width: 100 } }),  // 唯讀
+        editCol.accessor('name', { header: 'Product (string)', meta: { type: 'string', editable: true, width: 200 } }),
+        editCol.accessor('qty', { header: 'Qty (number)', meta: { type: 'number', editable: true, width: 110 } }),
+        editCol.accessor('category', { header: 'Category (select)', meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true, width: 150 } }),
+        editCol.accessor('stock', { header: 'Stock (select)', meta: { type: 'select', options: STOCK_OPTIONS, editable: true, width: 140 } }),
+        editCol.accessor('tags', { header: 'Tags (multiSelect)', meta: { type: 'multiSelect', options: TAG_OPTIONS, editable: true, width: 180 } }),
+        editCol.accessor('owner', { header: 'Owner (person)', meta: { type: 'person', people: SAMPLE_PEOPLE, editable: true, width: 160 } }),
+        editCol.accessor('reviewers', { header: 'Reviewers (multiPerson)', meta: { type: 'multiPerson', people: SAMPLE_PEOPLE, editable: true, width: 180 } }),
+        editCol.accessor('inStock', { header: 'In (boolean)', meta: { type: 'boolean', editable: true, width: 90 } }),
+        editCol.accessor('url', { header: 'URL', meta: { type: 'url', editable: true, width: 180 } }),
+        editCol.accessor('price', { header: 'Price (currency)', meta: { type: 'currency', prefix: '$', editable: true, width: 130 } }),
+        editCol.accessor('releaseDate', { header: 'Release (date)', meta: { type: 'date', editable: true, width: 140 } }),
+        editCol.accessor('reminderTime', { header: 'Reminder (time)', meta: { type: 'time', editable: true, width: 130 } }),
       ],
       []
     )
@@ -619,9 +696,9 @@ export const NestedRows: Story = {
     const taskCol = createColumnHelper<TaskRow>()
     const taskColumns = React.useMemo(
       () => [
-        taskCol.accessor('task', { header: '任務', size: 360, meta: { type: 'string' } }),
-        taskCol.accessor('owner', { header: '負責人', size: 160, meta: { type: 'string' } }),
-        taskCol.accessor('status', { header: '狀態', size: 140, meta: { type: 'select', options: STATUS_OPTIONS } }),
+        taskCol.accessor('task', { header: '任務', meta: { type: 'string', width: 360 } }),
+        taskCol.accessor('owner', { header: '負責人', meta: { type: 'string', width: 160 } }),
+        taskCol.accessor('status', { header: '狀態', meta: { type: 'select', options: STATUS_OPTIONS, width: 140 } }),
       ],
       []
     )
@@ -636,6 +713,72 @@ export const NestedRows: Story = {
           height="auto"
           getRowId={(row) => row.id}
           selectable
+          tableOptions={{
+            getSubRows: (row: TaskRow) => row.children,
+            getRowCanExpand: (row) => Boolean(row.original.children?.length),
+            state: { expanded },
+            onExpandedChange: setExpanded as any,
+          }}
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 巢狀 row × 拖曳重排(tree-table drag)──
+   Tree drag canonical(2026-05-06 v14.7,對齊 spec.md「Cross-parent drop 禁止」)
+   - **Top-level rows**:有 drag handle(absolute pinned to row left edge),可拖重排
+   - **Sub-rows**(`row.depth > 0`):**無 handle**,不可拖(設計保守對齊 Notion)
+   - **Cross-parent drop**:過濾,顯 invalid signal(handle cursor `not-allowed`)
+   - **Drop indicator**:水平 2px primary line(top/bottom)— SSOT 對齊 TreeView */
+export const NestedRowsWithDrag: Story = {
+  name: '巢狀 row × 拖曳重排',
+  render: () => {
+    const [expanded, setExpanded] = React.useState<Record<string, boolean>>({ 'task-1': true })
+    const [list, setList] = React.useState<TaskRow[]>(NESTED_DATA)
+    const STATUS_OPTIONS = [
+      { value: 'Not started', label: 'Not started' },
+      { value: 'In progress', label: 'In progress' },
+      { value: 'Blocked', label: 'Blocked' },
+      { value: 'Done', label: 'Done' },
+    ]
+    const taskCol = createColumnHelper<TaskRow>()
+    const taskColumns = React.useMemo(
+      () => [
+        taskCol.accessor('task', { header: '任務', meta: { type: 'string', width: 360 } }),
+        taskCol.accessor('owner', { header: '負責人', meta: { type: 'string', width: 160 } }),
+        taskCol.accessor('status', { header: '狀態', meta: { type: 'select', options: STATUS_OPTIONS, width: 140 } }),
+      ],
+      []
+    )
+    const handleReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {
+      setList((prev) => {
+        // top-level reorder only(sub-rows 不可拖)
+        const sourceIdx = prev.findIndex((r) => r.id === sourceId)
+        const targetIdx = prev.findIndex((r) => r.id === targetId)
+        if (sourceIdx === -1 || targetIdx === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(sourceIdx, 1)
+        const adjustedTarget = next.findIndex((r) => r.id === targetId)
+        const insertAt = position === 'before' ? adjustedTarget : adjustedTarget + 1
+        next.splice(insertAt, 0, moved)
+        return next
+      })
+    }
+    return (
+      <div className="flex flex-col gap-3 max-w-3xl">
+        <p className="text-caption text-fg-muted">
+          Tree-table drag canonical:**top-level rows 可拖**(handle 浮在 row 左緣),
+          **sub-rows 無 handle 不可拖**(對齊 Notion 保守)。Cross-parent drop 過濾,
+          顯 invalid signal。Drop indicator 水平 2px primary line — SSOT 對齊 TreeView。
+        </p>
+        <DataTable
+          columns={taskColumns}
+          data={list}
+          height="auto"
+          getRowId={(row) => row.id}
+          enableRowDrag
+          onRowReorder={handleReorder}
           tableOptions={{
             getSubRows: (row: TaskRow) => row.children,
             getRowCanExpand: (row) => Boolean(row.original.children?.length),
@@ -684,10 +827,11 @@ function VisibilityRow({
   onToggle: () => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: locked })
+  // 對齊 lib/drag-visual.ts SSOT(--opacity-disabled token)
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    ...dragSourceStyle(isDragging),
   }
   return (
     <div
@@ -1123,6 +1267,9 @@ const FILTER_COLUMNS = [
       { value: 'Out of stock', label: 'Out of stock' },
     ],
   }}),
+  // 2026-05-07 v15.3:加 seller(person column)demo,讓 user 在 FilterPanel demo 中
+  // 看見 PeoplePicker filter UI 真實渲染(否則 picker render 但 people pool=undefined → 選項空)。
+  col.accessor('seller',    { header: '負責人',   meta: { type: 'person', filterable: true, people: SELLERS } }),
   col.accessor('updatedAt', { header: '更新時間', meta: { type: 'date', filterable: true, includeTime: true } }),
 ] as const
 

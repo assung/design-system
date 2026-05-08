@@ -90,14 +90,15 @@ const STATUS_LABEL: Record<StatusType, string> = {
  * Hide → consumer 不知道少傳 → 視覺漂移;Placeholder → 永遠看到「該欄該有」+ dev-warn 提示
  * consumer 補資料,自動防漂移(M19 ensure-canonical 對齊)。
  */
-export const NAMECARD_DEFAULT_FIELD_KEYS = ['email', 'phone', 'department', 'location'] as const
+// **2026-05-07 v15.7 user directive**:default render 只 `id` + `employeeNumber` 兩個。
+// Email / Phone / Department / Location 等其他 description 一律 opt-in by consumer 透過
+// `fields` array prop。對齊 user 明確「應該確保所有都只有這兩個,因為我並沒有要求你要選其他的」。
+export const NAMECARD_DEFAULT_FIELD_KEYS = ['id', 'employeeNumber'] as const
 export type NameCardDefaultFieldKey = typeof NAMECARD_DEFAULT_FIELD_KEYS[number]
 
 const DEFAULT_FIELD_LABEL: Record<NameCardDefaultFieldKey, string> = {
-  email: 'Email',
-  phone: 'Phone',
-  department: 'Department',
-  location: 'Location',
+  id: 'ID',
+  employeeNumber: 'Employee number',
 }
 
 const FIELD_PLACEHOLDER = '—'
@@ -146,20 +147,46 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
     // v11 always-render canonical:default fields 永遠 render(缺資料顯 placeholder),
     // consumer 自訂 fields 在 default 之後 append。Status section 也永遠 render(無 status
     // 顯「Status not set」placeholder),統一視覺結構。
+    //
+    // **Dedup canonical(2026-05-07 v15.8 fix Bug E)**:consumer 的 `fields` array 若含
+    // label 撞 default(eg. 「ID」「Employee number」),consumer 值 win — defaults 那一行
+    // 跳過(否則 same label 連 render 兩次,如 default placeholder `—` + consumer 真值)。
+    // 這是遷移期 forgiving 行為:DEV warn 提示應改用 `defaultFieldValues`,但 production
+    // 不破壞既有 consumer。對齊 React `key` 唯一性 + Linear / Slack profile card 一 label
+    // 一 row idiom。
     const allFields = React.useMemo(() => {
-      const defaults = NAMECARD_DEFAULT_FIELD_KEYS.map((key) => ({
-        label: DEFAULT_FIELD_LABEL[key],
-        value: defaultFieldValues?.[key] ?? FIELD_PLACEHOLDER,
-      }))
+      const consumerLabels = new Set((fields ?? []).map((f) => f.label))
+      const defaults = NAMECARD_DEFAULT_FIELD_KEYS
+        .map((key) => ({
+          label: DEFAULT_FIELD_LABEL[key],
+          value: defaultFieldValues?.[key] ?? FIELD_PLACEHOLDER,
+        }))
+        .filter((d) => !consumerLabels.has(d.label))
       return fields && fields.length > 0 ? [...defaults, ...fields] : defaults
     }, [defaultFieldValues, fields])
+
+    // Dev warn:consumer 透過 `fields` 傳 default key label(legacy pattern)→ 應改 `defaultFieldValues`
+    if (process.env.NODE_ENV !== 'production' && fields) {
+      const legacyEntry = fields.find((f) =>
+        Object.values(DEFAULT_FIELD_LABEL).includes(f.label as string),
+      )
+      if (legacyEntry) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[NameCard] "${name}":legacy pattern — fields[].label="${legacyEntry.label}" ` +
+          `is a default field. Migrate to defaultFieldValues={{ id, employeeNumber }} prop ` +
+          `to align with NAMECARD_DEFAULT_FIELD_KEYS canonical.`,
+        )
+      }
+    }
 
     // Dev mode warn:consumer 沒傳 default field 任何 key → 提示補完(避免漂移成 placeholder-only)
     if (process.env.NODE_ENV !== 'production' && !defaultFieldValues) {
       // eslint-disable-next-line no-console
       console.warn(
         `[NameCard] "${name}":no defaultFieldValues passed — sections will render placeholders. ` +
-        `Pass at least { email, phone, department, location } via PersonData or defaultFieldValues prop.`,
+        `Pass at least { id, employeeNumber } via defaultFieldValues prop. ` +
+        `For other description items (email/phone/department/location etc),use \`fields\` prop array.`,
       )
     }
 

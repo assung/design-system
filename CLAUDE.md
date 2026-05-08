@@ -7,7 +7,7 @@
 3. **改一處必看三處**——code / spec / story 三方聯動。改 cva `defaultVariants` / variant / token 前先 grep 該元件所有檔案,一次改完。
 4. **範例必真實業務場景**——Jira / Stripe / Notion / Figma 可辨識情境;禁 `Option A/B/C`、「按鈕一」、極端不現實、ASCII art。
 5. **猶豫就問**——無前例的決策:grep 既有 → 讀近親 spec → 仍不確定停下問。**禁止憑直覺造新 pattern**。
-6. **大原則吸收瑣碎**——同類 bug 反覆糾正 = meta 層沒抓住。見 `.claude/rules/meta-patterns.md` 26 條大原則(M1-M26)。**AI 不需 user 提醒才找 root invariant**——rule 震盪 → AI 自跑 M12 benchmark + invariant test。User 第 2 次問 → 必截圖 verify(M13)。對話結論 → AUTO 5-layer pipeline(M14)。Visual / behavior decision 前必先 WebFetch ≥ 3 source(M26)。使用者 tell me once 不該要 tell me twice。
+6. **大原則吸收瑣碎**——同類 bug 反覆糾正 = meta 層沒抓住。見 `.claude/rules/meta-patterns.md` 27 條大原則(M1-M27)。**AI 不需 user 提醒才找 root invariant**——rule 震盪 → AI 自跑 M12 benchmark + invariant test。User 第 2 次問 → 必截圖 verify(M13)。對話結論 → AUTO 5-layer pipeline(M14)。Visual / behavior decision 前必先 WebFetch ≥ 3 source(M26)。使用者 tell me once 不該要 tell me twice。
 
 完整 M-rules 詳 `.claude/rules/meta-patterns.md`(always loads)。
 
@@ -26,8 +26,9 @@
 | 6 | Memory(`~/.claude/.../memory/` SSOT + repo `.claude/memory/` mirror)| 跨 session 狀態。本機編完跑 `npm run sync-memory` 推回 repo(讓 cloud sandbox 看得到) |
 | 7 | Hook(`.claude/hooks/`) | 機械化 pre/post tool 檢查 |
 | 8 | Slash Command(`.claude/commands/`) | 一次性單步 action |
+| 9 | Plan doc(`.claude/planning/`)| 完整 plan / RFC / spec 草稿 SSOT;memory file 是短 index pointer 指向 plan doc(對齊 ds-devmode / story-auto-compile pattern) |
 
-**Q1 設計規則 → Level 1-4 / Q2 invoke 情境 → Skill or Command / Q3 隨時間變化 → Memory / Q4 機械化 → Hook**。完整 flowchart → `.claude/skills/design-system-audit/references/rule-placement.md`。
+**Q1 設計規則 → Level 1-4 / Q2 invoke 情境 → Skill or Command / Q3 隨時間變化 → Memory(short index)+ Plan doc(完整 spec)/ Q4 機械化 → Hook**。完整 flowchart → `.claude/skills/design-system-audit/references/rule-placement.md`。
 
 ## 行數預算(Anthropic 對齊)
 
@@ -101,6 +102,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | **Tailwind 出怪事** | `.claude/rules/ui-development.md`「Tailwind 5 條核心」+ `# 失敗記憶索引` |
 | **Stakeholder 產出 / 稽核** | `# 稽核 canonical` |
 | **User 糾正後** | `# 治理 canonical`(home 判斷) |
+| **跟 codex 討論 / 多輪震盪 / 任何 codex 輸出** | `.claude/skills/codex-collab/SKILL.md`。**3-step discipline 鐵律(動 code 前必過)**:(1) Step 4.5 verify codex claim 真不真;(2) Step 4.6 regression / 連動 scan 自己 fix(grep callers / type contract / edge / cross-component / 跑 tsc + invariants);(3) Step 5 比稿 my own-version vs codex 取優棄劣。**禁** pass-through / 直覺 ship / 短 format。Queue SSOT → `.claude/memory/codex-brief-queue.jsonl`(每 session start 必讀,3 min 間隔 / 1 in-flight serial / 10 min auto-followup) |
 
 **找不到** → 進 `# 遇不確定時的協議`,不自決定。
 
@@ -135,7 +137,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 # 失敗記憶索引(技術沉默陷阱 only)
 
-設計判斷類已被 M1-M26 吸收(見 `.claude/rules/meta-patterns.md`);具體歷史詳 `.claude/skills/design-system-audit/references/historical-bugs.md`。
+設計判斷類已被 M1-M27 吸收(見 `.claude/rules/meta-patterns.md`);具體歷史詳 `.claude/skills/design-system-audit/references/historical-bugs.md`。
 
 | 技術陷阱 | 一行 anchor |
 |--------|-----------|
@@ -157,7 +159,7 @@ Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design 
 
 僅在相關檔案打開時載入,降低本檔 token 成本:
 
-- `.claude/rules/meta-patterns.md` — 26 M-rules(always loads,fundamental)
+- `.claude/rules/meta-patterns.md` — 27 M-rules(always loads,fundamental)
 - `.claude/rules/spec-rules.md` — paths: `**/*.spec.md` + `src/design-system/**`
 - `.claude/rules/ui-development.md` — paths: `**/*.tsx` + `**/*.ts`(含 Tailwind / Token / Props 命名 / shadcn)
 - `.claude/rules/story-rules.md` — paths: `**/*.stories.tsx`(三層定位 + Title + 範例最高準則)

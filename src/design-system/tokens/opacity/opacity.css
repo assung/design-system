@@ -2,8 +2,14 @@
    Opacity Tokens
    ═══════════════════════════════════════════════════════════════════════
 
-   系統內唯一的 opacity token（disabled 狀態）。其他所有透明度需求
-   應透過 alpha 色階（--white-aN / --black-aN）解決，不另開 opacity token。
+   系統內唯一的 opacity token(disabled 狀態)。其他所有透明度需求
+   應透過 alpha 色階(--white-aN / --black-aN)解決,不另開 opacity token。
+
+   **Drag-and-drop reuse(2026-05-06 v14.5.2 對齊 Atlassian Pragmatic)**:
+   - Drag source 半透殘影 → reuse `opacity-disabled`(0.45)。Atlassian Pragmatic
+     guidelines 也是 reuse `opacity.disabled`(他們值 0.40,我們 0.45,role 一致)。
+   - DragOverlay ghost 不另 dim,用 `opacity:1` + `shadow-[var(--elevation-200)]`
+     表達 "lifted preview"(對齊 dnd-kit / Material / Atlassian canonical)。
    ═══════════════════════════════════════════════════════════════════════ */
 
 @theme inline {

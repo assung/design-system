@@ -17,16 +17,17 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { ChevronDown, Calendar, Clock, ArrowUp, ArrowDown, ArrowUpDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
-import { DndContext, DragOverlay, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
-import { SortableContext, useSortable, verticalListSortingStrategy, horizontalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
-import { CSS as DndCSS } from '@dnd-kit/utilities'
+// **v15.0 Path B**(對齊 user 「source 留原位 / indicator 為 drop preview / 不 auto-shift」directive):
+// 砍 useSortable + SortableContext 用 useDraggable + useDroppable 分離 hooks(對齊 DS 內 TreeView SSOT)。
+import { DndContext, DragOverlay, useDraggable, useDroppable, useDndContext, pointerWithin, rectIntersection, useSensor, useSensors, PointerSensor, KeyboardSensor, MeasuringStrategy, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
+import { dragSourceStyle, dropIndicatorRow, dropIndicatorColumn, dragActiveCursor, isReorderNoop, reconstructFullRowGhost, snapToCursorModifier } from '@/design-system/lib/drag-visual'
+import { nakedCellEditableDisplayHover } from '@/design-system/components/Field/field-wrapper'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
 import { ItemInlineActionButton, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { columnTypeDefaults, type ColumnType } from './column-types'
 import { resolveCellComponent } from './cell-registry'
-import { nakedCellEditableDisplayHover } from '@/design-system/components/Field/field-wrapper'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
@@ -219,7 +220,13 @@ function columnSizeStyle(
   opts: { resize: boolean; isSystemCol: boolean },
 ): React.CSSProperties {
   const baseSize = col.getSize()
-  const minSize = col.columnDef.minSize ?? MIN_COLUMN_WIDTH
+  // **Regression fix(2026-05-06 v14.1)**:default fallback 從 `MIN_COLUMN_WIDTH (80)` 改回
+  // `baseSize`(等於 v9 行為)。前 v11 column resize commit 改 fallback 為 80 後,enableColumnResize=false
+  // 的 default flex case 全 column 可 shrink 到 80 → flex 均分忽視 `size` prop → Note 360 被擠到 204
+  // → text wrap 行數爆增 → autoRow cell 變高 → edit textarea rows=3 估算更不準 → shrink 看起來壞掉。
+  // v9 直覺:沒明示 minSize 預設不 shrink 低於 size。enableColumnResize=true 仍 honour `MIN_COLUMN_WIDTH`
+  // (因 user 主動拖拉時要能縮)。
+  const minSize = col.columnDef.minSize ?? (opts.resize ? MIN_COLUMN_WIDTH : baseSize)
   const maxSize = col.columnDef.maxSize
   // System columns 永遠 fixed(checkbox / drag handle 等內建欄位,不在 resize 集合)
   if (opts.isSystemCol) {
@@ -229,8 +236,22 @@ function columnSizeStyle(
   if (opts.resize) {
     return { width: baseSize, minWidth: minSize, maxWidth: maxSize }
   }
-  // Data columns:enableColumnResize=false → flex 均分(default)
-  return { flex: '1 1 0%', minWidth: minSize, maxWidth: maxSize }
+  // Data columns:enableColumnResize=false → flex grow but NOT shrink below `size` prop。
+  // 對齊 v9 行為:column 沒明示 minSize 時固定 ≥ baseSize(尊重 user `size` 設定),table 寬不夠
+  // 觸發 H scroll(預期)。前 v11 換 MIN_COLUMN_WIDTH=80 fallback 讓 columns 全擠等寬,違 user
+  // 預期。
+  // **Tanstack default 干擾**:tanstack v8 `defaultColumn.minSize=20` 會 merge 進 column.columnDef
+  // → `col.columnDef.minSize` 永遠不 undefined → `?? baseSize` 不 fall back。
+  // 解法:直接用 baseSize(若 user 要明示 shrink-below-size,改 `enableColumnResize=true` 或別自設
+  // `minSize` < size)。
+  //
+  // **flex-basis: baseSize(2026-05-06 v14.2)**:把 baseSize 當 explicit basis(不是 `0%`)。
+  // 為什麼:flex item base = basis + padding(box-sizing: border-box content-box 行為)。前 `0%`
+  // basis → cell padding 變 base 一部分。display(padding 12)vs edit(padding 0,Field 接管)
+  // 兩態 base 不同 → flex 重分配 → user 報「Price cell 進 edit 寬度縮 12px」(verify by
+  // debug-v14-1-display-edit-rect-match.mjs:Price display 130.5 → edit 118.5 = -12px)。
+  // explicit basis = baseSize 讓 padding 不參與 base 計算 → display↔edit 寬度穩定。
+  return { flex: `1 1 ${baseSize}px`, minWidth: baseSize, maxWidth: maxSize }
 }
 
 const SYSTEM_COL_IDS = new Set([SELECT_COL_ID, '__drag__', '__actions__'])
@@ -293,7 +314,18 @@ interface SortableRowCtxValue {
   style: React.CSSProperties
   attributes: Record<string, unknown>
   isDragging: boolean
-  /** 只 primary 提供 listeners — render 在 __drag__ column body cell */
+  /** **v15.6 button-only drag**(對齊 Notion / Linear / Jira canonical):
+   *  整列拖 + ghost 跟 cursor 在 multi-instance same-id pinned column 場景互相矛盾——
+   *  唯一 single-source-of-activation = visible RowDragHandle Button。
+   *  Source DOM = primary row(`setNodeRef`),activator = button(`handleSetActivatorNodeRef`),
+   *  listeners = button(`handleListeners`)。User 從哪個 region 都看見 portal'd button → 點下啟動。
+   *  Row click 不觸發 drag(允許 row click → select / open detail 等別的 UX)。
+   *  保留 `rowListeners`/`rowAttributes` field 但 button-only mode 為 undefined。 */
+  rowListeners: Record<string, unknown> | undefined
+  rowAttributes: Record<string, unknown>
+  /** RowDragHandle Button 用:接 setActivatorNodeRef → button rect 當 activator;
+   *  primary 才提供(mirror 不需要,RowDragHandle 只在 primary region 渲染) */
+  handleSetActivatorNodeRef: ((el: HTMLElement | null) => void) | undefined
   handleListeners: Record<string, unknown> | undefined
   handleAttributes: Record<string, unknown>
   /** drag 進行中且當前 over target 與 active 不同 parent → invalid signal */
@@ -305,7 +337,24 @@ const SortableRowCtx = React.createContext<SortableRowCtxValue | null>(null)
  *  同 row.id 在 left/center/right 三 region 各 mount 一次 — useSortable 共享同 SortableContext
  *  state,各 instance 取得相同 transform → mirror 自動跟動。
  *  primary instance 額外提供 listeners 給 DragHandleCell;mirror 不提供避免雙觸發。 */
-function SortableRowProvider({
+function SortableRowProvider(props: {
+  id: string
+  disabled?: boolean
+  role: 'primary' | 'mirror'
+  invalidDrop: boolean
+  children: (ctx: SortableRowCtxValue) => React.ReactNode
+}) {
+  // **v15.4 final architectural split**:multi-instance same-id 是 dnd-kit anti-pattern。
+  // 必須完全分離 component 讓 hook mount tree 不衝突:
+  //   - primary 走 SourceRowProvider(useDraggable + useDroppable)— 唯一 source
+  //   - mirror 走 MirrorRowProvider(useDroppable only)— 接受 drop target 但不參與 drag source
+  // 之前 v15.2/15.3 同 component 内 conditional setNodeRef/disabled 仍讓 mirror instance 進入
+  // dnd-kit context store,導致 last-mount-wins 把 activator 取成 mirror region row → ghost
+  // 起點偏離 cursor。Split 後 dnd-kit 只看到 primary instance,問題消滅。
+  return props.role === 'primary' ? <SourceRowProvider {...props} /> : <MirrorRowProvider {...props} />
+}
+
+function SourceRowProvider({
   id,
   disabled,
   role,
@@ -318,43 +367,162 @@ function SortableRowProvider({
   invalidDrop: boolean
   children: (ctx: SortableRowCtxValue) => React.ReactNode
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
-  // 2026-05-06 v10 DragOverlay portal:source row drag 中 invisible(opacity:0)— 視覺 by DragOverlay
-  // (前 v9 用 0.5 半透明殘影,跟 overlay 重疊 = 雙重影)。對齊 dnd-kit canonical for virtualized lists。
-  const style: React.CSSProperties = {
-    transform: DndCSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0 : undefined,
-    zIndex: isDragging ? 1 : undefined,
-    position: 'relative',
-  }
+  const draggable = useDraggable({ id, disabled, data: { type: 'row' } })
+  const droppable = useDroppable({ id, disabled, data: { type: 'row' } })
+  // **v15.6 button-only drag**:setActivatorNodeRef 不接 row,改由 RowDragHandle Button 接(via ctx)。
+  // setNodeRef = primary row(source DOM,ghost 抓這個);droppable.setNodeRef = same row(droppable target)。
+  const setRefs = React.useCallback((el: HTMLElement | null) => {
+    draggable.setNodeRef(el)
+    droppable.setNodeRef(el)
+  }, [draggable.setNodeRef, droppable.setNodeRef])
+  const isDragging = draggable.isDragging
+  const style: React.CSSProperties = { ...dragSourceStyle(isDragging) }
+  // a11y(2026-05-07 v15.10 codex P1 fix):button-only drag mode 下,row 本身不該成為
+  // keyboard tab stop。dnd-kit `useDraggable.attributes` 含 `role="button" tabIndex=0
+  // aria-roledescription="..."` 全給 activator 用,套到 row div 會讓每筆 row tabbable
+  // (large table 累積上百 inert focus stops,grid navigation 體驗壞)。
+  // **拆分**:rowAttributes 留空(row 是 passive container)/ handleAttributes 全給
+  // RowDragHandle Button(它是真 activator,Button 自帶 role/tabIndex 完全相容)。
+  const handleAttrs = draggable.attributes as unknown as Record<string, unknown>
   const ctxValue: SortableRowCtxValue = {
-    setNodeRef,
+    setNodeRef: setRefs,
     role,
     style,
-    attributes: attributes as unknown as Record<string, unknown>,
+    attributes: {},
     isDragging,
-    handleListeners: role === 'primary' ? (listeners as unknown as Record<string, unknown> | undefined) : undefined,
-    handleAttributes: attributes as unknown as Record<string, unknown>,
+    // row 不接 listeners(button-only),baseRowDiv `{...(extra?.listeners ?? {})}` 自動 noop
+    rowListeners: undefined,
+    rowAttributes: {},
+    // Button activator + listener:portal'd RowDragHandle Button 走這條 ctx,
+    // user 從任何 region 看見 button → 點下啟動 drag,activator rect = button DOM(24×24),
+    // ghost 起點 = button 位置(table outer 左 12px),cursor 在 ghost 左前段(自然視覺)。
+    handleSetActivatorNodeRef: draggable.setActivatorNodeRef,
+    handleListeners: draggable.listeners as unknown as Record<string, unknown> | undefined,
+    handleAttributes: handleAttrs,
     invalidDrop,
   }
   return <SortableRowCtx.Provider value={ctxValue}>{children(ctxValue)}</SortableRowCtx.Provider>
 }
 
+function MirrorRowProvider({
+  id,
+  disabled,
+  role,
+  invalidDrop,
+  children,
+}: {
+  id: string
+  disabled?: boolean
+  role: 'primary' | 'mirror'
+  invalidDrop: boolean
+  children: (ctx: SortableRowCtxValue) => React.ReactNode
+}) {
+  // Mirror region(left / right pinned)只 mount useDroppable — 接受 drop target,
+  // 但不參與 drag source(避免 multi-instance same-id 衝突)。
+  // RowDragHandle Button 只在 primary region 渲染(per `showDragHandle = ... && isPrimaryRegion`),
+  // mirror ctx 不需要 handle listeners / activator,相關 field 為 undefined。
+  // **v15.8 Bug 3 fix**(對齊 user 「source 沒一整條都有 disabled opacity」):
+  //   mirror region drag 期間需跟 primary 同步顯 opacity-disabled,讓 source row 跨三 region
+  //   視覺一致(SKU 釘選欄 + center + Updated 釘選欄整列半透明)。透過 useDndContext active
+  //   判斷:any drag activated with active.id === own row id → mirror 也 isDragging。
+  const droppable = useDroppable({ id, disabled, data: { type: 'row' } })
+  const dndCtx = useDndContext()
+  const isDragging = dndCtx.active?.id === id
+  const ctxValue: SortableRowCtxValue = {
+    setNodeRef: droppable.setNodeRef,
+    role,
+    style: { ...dragSourceStyle(isDragging) },
+    attributes: {},
+    isDragging,
+    rowListeners: undefined,
+    rowAttributes: {},
+    handleSetActivatorNodeRef: undefined,
+    handleListeners: undefined,
+    handleAttributes: {},
+    invalidDrop,
+  }
+  return <SortableRowCtx.Provider value={ctxValue}>{children(ctxValue)}</SortableRowCtx.Provider>
+}
+
+/** DraggableHeaderCell — wrap header cell 跟 dnd-kit useSortable 接軌(2026-05-06 v14.2)。
+ *
+ *  Why wrap-not-rewrite:`headerCellEl` 既有邏輯複雜(sort / resize / select column / right region 等),
+ *  改 inline useSortable 入侵性高。本 wrapper cloneElement 注入 ref / style / listeners → 既有 render
+ *  保持 untouched,單一職責 = 加 drag affordance。
+ *
+ *  Behavior:
+ *    - useSortable 永遠 call(Rules of Hooks)— `disabled=true` 時不啟動 listeners
+ *    - `data: { type: 'column', columnId }` 餵 dnd-kit handleDragStart / handleDragEnd 區分 row/column drag
+ *    - 注入 ref(setNodeRef)+ transform style + transition + opacity(drag 時 source invisible,DragOverlay 顯 ghost)
+ *    - draggable 時注入 attributes + listeners + cursor:grab / `data-column-id` (DragOverlay snapshot 用)
+ *    - locked column / system column → disabled,無 grab cursor / 不啟動 drag
+ *
+ *  對齊 TanStack Column DnD canonical(<https://tanstack.com/table/latest/docs/framework/react/examples/column-dnd>)
+ *  + Notion / Airtable header drag UX。 */
+function DraggableHeaderCell({
+  id,
+  disabled,
+  isLocked,
+  dropIndicatorSide,
+  children,
+}: {
+  id: string
+  disabled: boolean
+  isLocked: boolean
+  /** Notion blue line drop indicator(2026-05-06 v14.4):'before' = 左邊緣藍線 / 'after' = 右邊緣藍線 / null = 無 */
+  dropIndicatorSide: 'before' | 'after' | null
+  children: React.ReactElement
+}) {
+  // **v15.0 Path B refactor**(對齊 TreeView SSOT):分離 useDraggable + useDroppable,不 auto-shift
+  const draggable = useDraggable({ id, disabled, data: { type: 'column', columnId: id } })
+  const droppable = useDroppable({ id, disabled, data: { type: 'column', columnId: id } })
+  const setRefs = React.useCallback((el: HTMLElement | null) => {
+    draggable.setNodeRef(el)
+    droppable.setNodeRef(el)
+  }, [draggable.setNodeRef, droppable.setNodeRef])
+  const isDragging = draggable.isDragging
+  const dragStyle: React.CSSProperties = {
+    ...dragSourceStyle(isDragging),
+  }
+  // cloneElement 注入 — 不額外加 wrapper div(避免破壞 flex / column width 計算)
+  const childProps = (children as React.ReactElement<{ style?: React.CSSProperties; className?: string; role?: string }>).props
+  // useDraggable.attributes 含 `role="button"` + `tabIndex` 等 — 全部 spread 會蓋掉 header 原 `role="columnheader"`
+  // (a11y 必保 columnheader 語意)。strip role + 保留 aria-* / tabIndex / aria-roledescription:
+  const { role: _draggableRole, ...draggableAttrs } = draggable.attributes as unknown as Record<string, unknown>
+  // Drop indicator(SSOT 對齊 TreeView):2px primary line via pseudo-element
+  const indicatorClass = dropIndicatorSide === 'before'
+    ? dropIndicatorColumn.pseudoBefore
+    : dropIndicatorSide === 'after'
+    ? dropIndicatorColumn.pseudoAfter
+    : ''
+  return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+    ref: setRefs,
+    style: { ...(childProps.style ?? {}), ...dragStyle },
+    'data-column-id': id,
+    'data-column-locked': isLocked || undefined,
+    ...(disabled ? {} : { ...draggableAttrs, ...(draggable.listeners as unknown as Record<string, unknown>) }),
+    // 2026-05-06 v14.9 cursor canonical(對齊 Notion / Jira):
+    // **idle hover NOT 顯 cursor-grab** — header click 觸發 sort,grab cursor 會誤導 user 以為「點 = 拖」;
+    // **drag activation 後**(isDragging=true,過 8px activationConstraint)才顯 cursor-grabbing。
+    // user 點 = sort / 長壓 = drag,兩語意分開不互踩。
+    className: cn(childProps.className, isDragging && dragActiveCursor, indicatorClass),
+  })
+}
+
 /** Row drag handle — Portal-rendered, position:fixed 真正水平置中於 table outer border line(Jira canonical)。
+ *
+ *  v15.2 重構:**Button 純視覺 affordance**,不再 spread drag listeners — 改由 row div 整列接 listeners
+ *  (TreeView SSOT)。Button 只負責顯示「此 row 可拖」的視覺暗示。
  *
  *  Why Portal + position:fixed(2026-05-05 v4):
  *    DataTable 結構含三層 overflow-hidden(outer wrapper / leftBody / row),用 absolute + translate-x:-50%
  *    凸出 row 左 border 會被三層任一裁切。position:fixed escape 所有 ancestor overflow constraint。
- *    座標來自 row.getBoundingClientRect() + table outer.getBoundingClientRect(),scroll/resize 同步。
  *
  *  - 不佔 column 空間;hover-revealed 透過 row.dataset.hovered MutationObserver 觸發
- *  - Button variant="tertiary" iconOnly size="xs"(24px chip)→ bg-surface + border + foreground icon
- *  - 透過 SortableRowCtx 拿 listeners(nested rows 子層 ctx=null → 不 render)
- *  - sort active 時 disabled(visual + listeners 移除 + Tooltip 解釋)
- *  - invalidDrop(cross-parent over)→ cursor-not-allowed + text-error 警示
- *  - drag 進行中(ctx.isDragging)強制可見(即使 cursor 移開 row)*/
-function RowDragHandle({ disabled }: { disabled: boolean }) {
+ *  - Button variant="tertiary" iconOnly size="xs"(24px chip)
+ *  - 任何 row drag 進行時(activeDragId != null)整體隱藏 — 對齊 user directive:
+ *    drag 期間「INDICATOR + GHOST」就夠了,所有 row 不顯 hover bg / drag button */
+function RowDragHandle({ disabled, anyDragActive }: { disabled: boolean; anyDragActive: boolean }) {
   const ctx = React.useContext(SortableRowCtx)
   const [rowEl, setRowEl] = React.useState<HTMLDivElement | null>(null)
   const [portalTarget, setPortalTarget] = React.useState<HTMLElement | null>(null)
@@ -381,7 +549,9 @@ function RowDragHandle({ disabled }: { disabled: boolean }) {
       if (!tableEl) return
       const rRect = rowEl.getBoundingClientRect()
       const tRect = tableEl.getBoundingClientRect()
-      const rowHovered = rowEl.hasAttribute('data-hovered') || !!ctx.isDragging
+      // v15.1:drag 期間 source button hide(visible 邏輯已 guard isDragging),
+      // 此處只報「真實 hover」狀態,不疊 isDragging mask。
+      const rowHovered = rowEl.hasAttribute('data-hovered')
       setPos({
         top: rRect.top + rRect.height / 2,
         left: tRect.left, // table outer 左 border line position(viewport coords)
@@ -424,12 +594,20 @@ function RowDragHandle({ disabled }: { disabled: boolean }) {
 
   const canDrag = !disabled
   const showInvalid = !!ctx.invalidDrop && !!ctx.isDragging
-  // Visibility = rowHovered || buttonHovered || isDragging — button-level hover 補上 portal 逃逸後
-  // 「cursor 移到 button → row mouseleave」造成的閃爍。對齊 React Portal hover canonical(Radix HoverCard)。
-  const visible = pos.rowHovered || buttonHovered || !!ctx.isDragging
+  // Visibility canonical v15.3(對齊 Linear / Jira 世界級 + user directive
+  // 「source 的 drag button 反倒是可以留在原本的位置維持被壓住的狀態」):
+  //   - idle:rowHovered || buttonHovered → 顯示
+  //   - drag 進行中:**source row 強制顯示 + active 視覺**(讓 user 知道哪個被壓住)
+  //                  其他 row 的 button 隱藏(由 anyDragActive guard)
+  const visible = ctx.isDragging || (!anyDragActive && (pos.rowHovered || buttonHovered))
 
   const handle = (
     <Button
+      // **v15.6 button-only drag activator**:
+      //   ref → setActivatorNodeRef(button DOM = 24×24 portal'd)
+      //   listeners + attributes → spread(button 是 drag activator)
+      //   pointer-events: visible=auto → 接 pointer events 觸發 drag
+      ref={canDrag ? ctx.handleSetActivatorNodeRef : undefined}
       variant="tertiary"
       iconOnly
       size="xs"
@@ -446,13 +624,17 @@ function RowDragHandle({ disabled }: { disabled: boolean }) {
         left: pos.left,
         transform: 'translate(-50%, -50%)',
         zIndex: 50,
-        // hover-reveal:opacity 切換取代 visibility(動畫平順)
         opacity: visible ? 1 : 0,
+        // visible=true → auto(接 pointer events 觸發 drag activator);invisible → none(避免 click 落空)
         pointerEvents: visible ? 'auto' : 'none',
         transition: 'opacity 150ms ease',
       }}
       className={cn(
-        canDrag && !showInvalid && 'cursor-grab active:cursor-grabbing',
+        // **v15.7 cursor canonical**(對齊 user directive「拖動時 cursor 不要變 grabbing」):
+        // 只 hover 時 cursor-grab 提示「可拖」,drag 期間維持 cursor-grab 不變 grabbing
+        // (對齊 Material / Carbon / Polaris canonical:drag affordance 由 visible button 提供,
+        // cursor 變化反而干擾 indicator+ghost 視覺焦點)。
+        canDrag && !showInvalid && 'cursor-grab',
         canDrag && showInvalid && 'cursor-not-allowed !text-error !border-error',
       )}
       {...(canDrag ? ctx.handleListeners ?? {} : {})}
@@ -562,8 +744,27 @@ function DataTableInner<TData>(
   // **Column resizable canonical**(2026-05-05 user E rule):per-column `enableResizing` flag
   //   決定 width 行為(getCanResize=true → fixed / false → flex 1 1 0%)。**無 auto-default**
   //   "last column !resizable" — consumer 顯式設(對齊 user 拒絕「autoFillLastColumn」決策)。
+  //
+  // **2026-05-06 v14.3 DS canonical width API**:consumer 寫 `meta.width` / `meta.minWidth` /
+  //   `meta.maxWidth`(DS-internal naming,避開跟 `size: 'sm'|'md'|'lg'` density 命名衝突)。
+  //   此 pre-process 把 meta 值 copy 到 root size/minSize/maxSize,確保 TanStack column
+  //   resize state 正常運作。**Back-compat**:consumer 寫 root `size` 仍 work(meta.width 沒設則
+  //   不覆蓋 root)。新 code 一律用 meta.width。
+  const dsProcessedColumns = React.useMemo<ColumnDef<TData>[]>(() => {
+    return columns.map((c) => {
+      const meta = c.meta as { width?: number; minWidth?: number; maxWidth?: number } | undefined
+      if (!meta) return c
+      const cAny = c as { size?: number; minSize?: number; maxSize?: number }
+      const updates: { size?: number; minSize?: number; maxSize?: number } = {}
+      if (meta.width !== undefined && cAny.size === undefined) updates.size = meta.width
+      if (meta.minWidth !== undefined && cAny.minSize === undefined) updates.minSize = meta.minWidth
+      if (meta.maxWidth !== undefined && cAny.maxSize === undefined) updates.maxSize = meta.maxWidth
+      return Object.keys(updates).length > 0 ? ({ ...c, ...updates } as ColumnDef<TData>) : c
+    })
+  }, [columns])
+
   const columnsWithSelection = React.useMemo(() => {
-    if (!enabled) return columns
+    if (!enabled) return dsProcessedColumns
     const selectCol: ColumnDef<TData, any> = {
       id: SELECT_COL_ID,
       size: 40,
@@ -573,8 +774,8 @@ function DataTableInner<TData>(
       header: 'Select',  // header cell 由下方自訂 render 取代
       cell: () => null,  // body cell 由下方自訂 render 取代
     }
-    return [selectCol, ...columns]
-  }, [columns, enabled])
+    return [selectCol, ...dsProcessedColumns]
+  }, [dsProcessedColumns, enabled])
 
   // pinned-left 自動加 __select__(__select__ 永遠最左)
   const effectivePinnedLeft = React.useMemo(() => {
@@ -625,14 +826,16 @@ function DataTableInner<TData>(
     // L4 nested rows:啟用 expanded row model(consumer 透過 tableOptions.getSubRows + state.expanded forward)
     getExpandedRowModel: getExpandedRowModel(),
     getRowId: getRowId,
-    // 2026-05-06 v13.2 column resize:tanstack 內部管 columnSizing state(uncontrolled),`onEnd` mode
-    // → user 拖完才 commit 一次。`columnSizingState` 變動透過 useEffect 觀測 + 呼 callback。
+    // 2026-05-06 v14 column resize:`onChange` mode → drag 中 column 即時跟動 cursor(world-class
+    // canonical:TanStack docs / AG Grid / Excel / Google Sheets 全部 live resize)。前 v13.2
+    // 用 `onEnd` 拖完才 jump,user 報「感覺超頓像 bug」。tanstack 內部管 columnSizing state
+    // (uncontrolled);`columnSizingState` 變動透過 useEffect 觀測 + 呼 callback。
     //
     // 前 v11 用 `onColumnSizingChange` 接管 updater 但忘了 setColumnSizing,導致 state 永遠不變動 →
     // column.getSize() 永遠回初始值 → drag visual 完全沒效果(user 報 "drag 沒反應")。本 v13.2 改回
     // tanstack uncontrolled state(預設行為)+ useEffect 觀測 columnSizing 變動 fire callback。
     enableColumnResizing: enableColumnResize,
-    columnResizeMode: 'onEnd',
+    columnResizeMode: 'onChange',
   })
 
   // v13.2:onColumnResize callback 透過 useEffect 觀測 columnSizing state 變動 fire(uncontrolled state pattern)
@@ -655,7 +858,14 @@ function DataTableInner<TData>(
   // Fill-parent mode:height='100%' / '100vh' / 'fill' 等百分比 / 視口語義 → outer flex column + body flex-1 撐滿。
   // 固定 px/rem 仍維持 maxHeight cap 行為(資料少 = 內容高度,資料多 = 上限後 scroll)— 對齊既有 stories 預期。
   const isFillHeight = hasHeightConstraint && /^(100%|100vh|fill)$/.test(height)
-  const useVirtual = hasHeightConstraint && !isEmpty
+  // **Virtualization threshold(2026-05-07 v15.9 Bug G fix)**:小資料集 skip 虛擬化。
+  // Root cause:虛擬化器(TanStack Virtual)`getVirtualItems()` 在 scrollElement
+  // 還沒 mount(first render,centerBodyRef = null)時會返回空陣列 →「0 row → N row」
+  // 跨 frame transition,user 看到「table 從矮長高 + 資料慢慢露出」。≤ 30 rows
+  // direct render 完全 bypass 此 race,且小資料下虛擬化沒效益(浪費 reflow)。
+  // 對齊 AG Grid `suppressVirtualization` / TanStack Table virtualization-when-needed idiom。
+  const VIRTUAL_THRESHOLD = 30
+  const useVirtual = hasHeightConstraint && !isEmpty && rows.length > VIRTUAL_THRESHOLD
   const hasRowActions = !!rowActions
 
   // Refs
@@ -773,6 +983,14 @@ function DataTableInner<TData>(
     }
     return {
       onMouseOver: (e: React.MouseEvent) => {
+        // v15.3:drag 進行中只允許 source row 自己被標 hover(維持 active 視覺
+        // 對齊 Linear / Jira「source 維持 pressed 狀態」canonical)。其他 row 抑制。
+        if (activeDragIdRef.current != null) {
+          const target = e.target instanceof HTMLElement ? e.target : null
+          const rowEl = target?.closest<HTMLElement>('[data-sortable-row-id]')
+          const isSource = rowEl?.dataset.sortableRowId === activeDragIdRef.current
+          if (!isSource) return
+        }
         const idx = findRowIndex(e.target)
         if (idx == null) return
         tableRef.current?.querySelectorAll(`[data-row-index="${idx}"]`).forEach((el) => ((el as HTMLElement).dataset.hovered = ''))
@@ -819,6 +1037,7 @@ function DataTableInner<TData>(
           autoRowHeight={autoRowHeight}
           isEditable={editable}
           onCommit={(next) => commitCell(rowId, colId, next)}
+          onCommitLive={(next) => onCellCommit?.(rowId, colId, next)}
           onCancel={exitEdit}
           onRequestEdit={() => setEditingCellId(cellEditId(rowId, colId))}
         />
@@ -1005,17 +1224,13 @@ function DataTableInner<TData>(
           //     「框框跟 cell 一樣大並取代 cell 的框且與 table 隔線無縫接軌」(2026-05-05)。
           //   - **沒有** cell 自己 box-shadow ring — focus / hover / open ring 由 Field naked 自帶
           //     state machine 提供(對齊 user「狀態樣式取決於原輸入框」reminder)
-          'group/cell flex text-foreground text-body font-normal shrink-0 relative self-stretch',
-          // 2026-05-06 v12:editing cell 必 `overflow-visible` 才允許 Field naked absolute 1px 外溢繪
-          // (-top-px / -left-px → border-t/-l overlap prev row.border-b / prev cell.border-r)。
-          // 非 editing cell 維持 `overflow-hidden` 防 content 外溢。
-          isEditingThisCell ? 'overflow-visible' : 'overflow-hidden',
+          'group/cell flex text-foreground text-body font-normal shrink-0 relative self-stretch overflow-hidden',
           autoRowHeight ? 'items-start' : 'items-center',
           align === 'right' && 'justify-end text-right',
           align === 'center' && 'justify-center text-center',
-          // 2026-05-06 v12:retire `!isEditingThisCell` 條件 — Field naked v12 right edge 在
-          // [cell.right-1, cell.right] 跟 cell.border-r 同位置完全 overlap(child paint 後贏),
-          // 視覺仍 1px,不再需要 editing-time remove cell.border-r workaround。4 邊統一處理。
+          // 2026-05-06 v14:revert v12 absolute(autoRowHeight 不相容)→ Field 留 layout flow,
+          // 視覺接受 cell border-r grid + Field border 2px 雙線。永遠 keep border-r divider
+          // (user 確認 cell 右邊 border 不必移除)。
           inlineEdit && !isLastInRow && 'border-r border-divider',
           indicator && 'gap-2',
           onEditableCellClick && ['cursor-pointer', nakedCellEditableDisplayHover],  // editable cell display hover affordance(對齊 Notion / Airtable hover-cell-shows-border canonical)
@@ -1383,6 +1598,12 @@ function DataTableInner<TData>(
     return row.getVisibleCells().filter(c => ids.has(c.column.id))
   }
 
+  // 2026-05-06 v14.4 Notion blue line drop indicator(column reorder visual canonical)
+  // 必須宣告在 renderHeaderRow 之前(closure 引用,避 minified bundler TDZ false-positive)
+  const [dropIndicator, setDropIndicator] = React.useState<{ id: string; side: 'before' | 'after'; type: 'row' | 'column' } | null>(null)
+  // ref for stable lookup in handleDragOver(避免 closure 抓舊值)
+  const reorderableColumnIdsRef = React.useRef<string[]>([])
+
   // ── Render header row for a region ──
   const renderHeaderRow = (cols: Column<TData, unknown>[], isRight: boolean) => {
     const headers = getRegionHeaders(cols)
@@ -1394,7 +1615,29 @@ function DataTableInner<TData>(
     const rowRole = hasVisibleChildren ? 'row' : undefined
     return (
       <RowTag role={rowRole} className={cn('flex items-center border-b border-divider', rowHeight, HEADER_BG)}>
-        {headers.map((h, i) => headerCellEl(h, i < headers.length - 1 && !(isRight && i === headers.length - 1)))}
+        {headers.map((h, i) => {
+          const showDivider = i < headers.length - 1 && !(isRight && i === headers.length - 1)
+          const colId = h.column.id
+          const meta = h.column.columnDef.meta as { locked?: boolean } | undefined
+          const isLocked = meta?.locked === true
+          const isSystem = isSystemColumn(colId)
+          // useSortable per header(Rules of Hooks compliant — same hook count per render
+          // as long as headers count consistent;column reorder/hide 整 row reflow 自然觸發 React reconcile)。
+          // disabled=true 時仍 call hook 不啟動 listeners。
+          const isDraggable = enableColumnReorder && !isLocked && !isSystem
+          const indicatorSide = dropIndicator?.type === 'column' && dropIndicator.id === colId ? dropIndicator.side : null
+          return (
+            <DraggableHeaderCell
+              key={h.id}
+              id={colId}
+              disabled={!isDraggable}
+              isLocked={isLocked}
+              dropIndicatorSide={indicatorSide}
+            >
+              {headerCellEl(h, showDivider)}
+            </DraggableHeaderCell>
+          )
+        })}
         {isRight && hasRowActions && (
           <div className="flex items-center justify-end shrink-0 gap-2 invisible" aria-hidden="true" style={cellPadding}>
             {/* 渲染一個假 row 的 actions 來佔位,確保 header 和 body 同寬(aria-hidden 避免 screen reader 讀出 invisible 內容)*/}
@@ -1414,10 +1657,16 @@ function DataTableInner<TData>(
     }
     if (isEmpty) return null
 
-    // L4 row drag v2:per-region per-row useSortable instances 共享同一 SortableContext。
-    // primary = left region(若有)否則 center;listeners 只在 primary。
-    // mirror regions(其他)同呼叫 useSortable → 取得相同 transform → 自然跟動(v2 fix #2)。
-    const isPrimaryRegion = hasLeft ? cols === leftCols : isCenter
+    // **v15.4 architectural decision** — primary 永遠 = center region(不論是否 pinnedLeft)。
+    // 之前 `primary = left if hasLeft else center` 有兩問題:
+    //   1. multi-instance same-id 是 dnd-kit anti-pattern,setActivatorNodeRef 救不了
+    //      (last-mount-wins,用 last region 的 rect 當 activator → ghost 起點偏離 cursor)
+    //   2. user 從 center 主視覺 grab 才直觀;pinned-left(SKU)/ pinned-right(Updated)
+    //      是「鎖定欄」語意,不是 drag handle。Linear / Notion / Jira 的 pinned column
+    //      都不接 drag listeners,純視覺鎖。
+    // 改 center-only listeners → ghost activator = center row → cursor 跟 ghost 維持初始
+    // 相對位置(SSOT 對齊 user directive)。
+    const isPrimaryRegion = isCenter
     const regionRole: 'primary' | 'mirror' = isPrimaryRegion ? 'primary' : 'mirror'
 
     const rowEl = (row: typeof rows[number], idx: number, opts?: { virtual?: boolean; start?: number; isLast?: boolean }) => {
@@ -1431,13 +1680,29 @@ function DataTableInner<TData>(
       // 只在 primary region(left 若有,否則 center)+ depth===0 render — RowDragHandle
       // 內部再用 ctx.role === 'primary' 守門避免 mirror region 重複 render。
       const showDragHandle = enableRowDrag && (row.depth ?? 0) === 0 && isPrimaryRegion
-      const baseRowDiv = (extra?: { ref?: (el: HTMLElement | null) => void; style?: React.CSSProperties; isDragging?: boolean }) => (
+      // v15.2 SSOT 對齊 TreeView:drag 期間 suppress 全表 hover state
+      // (user directive「drag 時 row 不應 hover / drag button 不應出現」)
+      const anyDragActive = activeDragId != null
+      const baseRowDiv = (extra?: { ref?: (el: HTMLElement | null) => void; style?: React.CSSProperties; isDragging?: boolean; listeners?: Record<string, unknown>; attributes?: Record<string, unknown> }) => (
         <div
           key={row.id}
           ref={(el) => {
             // v2 fix #1:被拖 row 略過 measureElement(transform 干擾測量,長 list 累積誤差)
-            // v2 fix #4(virtual freeze):drag 進行中(activeDragId != null)整個略過 measureElement —
-            // 任一 row 重新量測都可能觸發 row position recompute → 跟 dnd-kit transform 競爭。
+            // v2 fix #4(virtual freeze):drag 進行中(activeDragId != null)整個略過 measureElement
+            // **2026-05-07 v15.17 A 路徑 — revert autoRowHeight guard**:
+            //   v15.8 加 `&& autoRowHeight` guard 為了解 R4 mount-time row growth animation
+            //   (假設 measureElement 在 fixed mode 觸發 getTotalSize 重算 → React re-render →
+            //   mount 時看起來 row height 在變)。但 codex P2 audit (`6d5188e` line 1699)指出
+            //   此 guard 副作用:consumer 傳 custom `estimateRowHeight` 或 CSS theme override
+            //   row height 時,fixed mode 不再 reconcile estimate vs reality → getTotalSize 錯
+            //   → scroll 範圍截斷或末端留白。
+            //
+            //   Codex deep R4 eval (`4399272774` follow-up reply) 認為 R4 真因更可能是
+            //   「首幀樣式未齊 / 字型 async load / paint stagger」,不是 measureElement。
+            //   故先 revert guard 觀察 R4 是否真回歸:
+            //   - R4 不重現(我 + codex 推論對)→ guard mis-fix,永久撤,P2 自動解
+            //   - R4 重現(measureElement 真因)→ 補 dampening (差異 <1px 不 setState /
+            //     一幀只 update 一次)+ low-freq sampling per codex 雙模式方案
             if (isCenter && opts?.virtual && el && !isThisRowDragging && activeDragId == null) {
               virtualizer.measureElement(el)
             }
@@ -1446,6 +1711,9 @@ function DataTableInner<TData>(
           data-index={isCenter && opts?.virtual ? idx : undefined}
           data-row-index={idx}
           data-sortable-row-id={enableRowDrag ? row.id : undefined}
+          // v15.4:primary region(center)= drag source row — ghost reconstruction 用此 marker
+          // 找 source row(避免 multi-region 場景挑錯 region 的 row 當 ghost)
+          data-row-drag-source={enableRowDrag && isPrimaryRegion ? 'true' : undefined}
           role="row"
           aria-rowindex={idx + 2}
           className={cn(
@@ -1455,21 +1723,36 @@ function DataTableInner<TData>(
             !autoRowHeight && 'overflow-hidden',
             opts?.virtual && 'absolute w-full',
             showBorder && 'border-b border-divider',
+            // v15.3 hover bg canonical:hover class 永遠生效,但 onMouseOver delegate
+            // 在 drag 期間只允許 source row 寫 data-hovered → 其他 row 自然不顯 bg。
+            // (對齊 Linear / Jira:source 維持 active 視覺,其他 row 完全靜止)
             'transition-colors data-[hovered]:bg-neutral-hover',
             extra?.isDragging && 'bg-neutral-hover',
+            // **v15.3.1**:不變 cursor(對齊 Material / Carbon / Polaris / Notion canonical)。
+            // 整列可拖的 affordance 由可見的 RowDragHandle Button 提供,不靠 cursor 暗示。
+            // 之前 cursor-grab → drag 中 user 看到 cursor 變化反而干擾 indicator+ghost 的視覺焦點。
           )}
           style={{
             ...(opts?.virtual ? { transform: `translateY(${opts.start}px)` } : {}),
             ...(extra?.style ?? {}),
           }}
           {...hoverProps(idx)}
+          {...(extra?.attributes ?? {})}
+          {...(extra?.listeners ?? {})}
         >
-          {showDragHandle && <RowDragHandle disabled={dragDisabled} />}
+          {showDragHandle && <RowDragHandle disabled={dragDisabled} anyDragActive={anyDragActive} />}
+          {/* 2026-05-06 v14.6 row drop indicator(SSOT 對齊 TreeView):水平 2px primary line at top/bottom edge */}
+          {dropIndicator?.type === 'row' && dropIndicator.id === row.id && dropIndicator.side === 'before' && (
+            <div className={dropIndicatorRow.before} aria-hidden />
+          )}
           {getRegionCells(row, cols).map((cell, ci, arr) => cellEl(cell, ci === arr.length - 1 && !(isRight && hasRowActions)))}
           {isRight && hasRowActions && (
             <div role="cell" className="flex items-center justify-end shrink-0 gap-2 flex-1" style={cellPadding}>
               {rowActions!(row.original)}
             </div>
+          )}
+          {dropIndicator?.type === 'row' && dropIndicator.id === row.id && dropIndicator.side === 'after' && (
+            <div className={dropIndicatorRow.after} aria-hidden />
           )}
         </div>
       )
@@ -1485,6 +1768,10 @@ function DataTableInner<TData>(
               ref: ctx.setNodeRef,
               style: ctx.style,
               isDragging: ctx.isDragging,
+              // v15.2 整列可拖:listeners + attributes spread 在 row div 上(只 primary,
+              // mirror region 沒 listeners 避免 a11y 重複 announce / pointer 雙觸發)
+              listeners: ctx.rowListeners,
+              attributes: ctx.rowAttributes,
             })}
           </SortableRowProvider>
         )
@@ -1642,17 +1929,43 @@ function DataTableInner<TData>(
   // 同 parent level 限制由「sub-rows 不在 items 內」自然成立。
   // DragEnd:active.id / over.id → 算 position(active vs over 視覺位置),呼叫 onRowReorder。
   // hooks 必呼叫(rules-of-hooks)— 即使 enableRowDrag=false 也走 useSensors;wrap 才條件化。
+  // **codex P1 fix(2026-05-07 v15.13)**:KeyboardSensor 不傳 `coordinateGetter`,用
+  // dnd-kit 預設 25px 箭頭 stepping。`sortableKeyboardCoordinates` 是 `@dnd-kit/sortable`
+  // preset,需 `<SortableContext>` 才正確 resolve 下一個 sortable target — 但 v15.0
+  // path B 已 explicit 砍 SortableContext 改用 useDraggable+useDroppable(line 21),
+  // 此 getter 在無 context 下 keyboard nav 無法 reliable resolve target → keyboard
+  // drag/reorder regression。Default getter(arrow-key Δ25px)在 useDraggable 場景是
+  // dnd-kit canonical(`@dnd-kit/core/src/sensors/keyboard/defaults.ts` 預設行為)。
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor),
   )
 
-  // v2 fix #3:custom collisionDetection — 過濾出與 active 同 parent 的 sortable items。
-  // 跨 parent 的 candidate 全部排除 → over 為 null → DragHandleCell 切 cursor-not-allowed。
-  // closestCenter 仍是 base alg(對齊既有行為);只是 droppable 集合先過濾。
+  // **2026-05-06 v14.8 collision detection canonical(對齊 dnd-kit official best practice)**:
+  // 從 closestCenter 換 `pointerWithin + rectIntersection` composite。
+  // **Why**:closestCenter 永遠返回最近 droppable → over 永遠非 null → 釋放任何位置都觸發
+  // onRowReorder 強制 reorder(user 報「拉動就強制 reorder 不能 snap back」)。
+  // pointerWithin 要求 pointer 真在 droppable rect 內才返回 → release 在 gap 自然 over=null →
+  // 不觸發 reorder → snap back 自然成立(對齊 Notion / TreeView 行為)。
+  // rectIntersection fallback 給 keyboard sensor(無 pointer)。
+  // 詳 .claude/references/drag-canonical.md。
   const sameParentCollisionDetection: CollisionDetection = React.useCallback((args) => {
     const activeId = args.active?.id != null ? String(args.active.id) : null
-    if (!activeId) return closestCenter(args)
+    if (!activeId) {
+      const pointer = pointerWithin(args)
+      return pointer.length > 0 ? pointer : rectIntersection(args)
+    }
+    // **v15.8 Bug 2 fix**(對齊 user「PRD-004 拉起儘管同位置放開後一定 reorder」):
+    // 預設 dnd-kit `pointerWithin` 排除 active 自身,fallback `rectIntersection` 找最近
+    // next row → cursor 仍在 source row 內 但 over=next row → reorder 觸發。
+    // Fix:cursor 仍在 source row vertical range 內 → return [](no over → no indicator
+    // → onDragEnd over=null → noop)。User 必須 cursor 真正離開 source row vertical 範圍
+    // 才視為「想 reorder」,對齊 user 的「沒動就不該 reorder」直覺。
+    const activeRect = args.active?.rect.current.initial
+    const cursor = args.pointerCoordinates
+    if (cursor && activeRect && cursor.y >= activeRect.top && cursor.y <= activeRect.bottom) {
+      return []
+    }
     const activeParent = parentMap.get(activeId)
     // 過濾 droppable container collection — 只保留 same parent siblings(且不含 active 本身)
     const filtered = args.droppableContainers.filter(c => {
@@ -1662,7 +1975,41 @@ function DataTableInner<TData>(
       if (cParent === undefined) return false // 非 row droppable
       return cParent === activeParent
     })
-    return closestCenter({ ...args, droppableContainers: filtered })
+    const filteredArgs = { ...args, droppableContainers: filtered }
+    const pointer = pointerWithin(filteredArgs)
+    if (pointer.length > 0) return pointer
+    // **v15.8 fix**(virtualized list dnd-kit droppableRects stale issue):
+    // virtualized rows position 由 virtualizer transform:translateY 動態套,但 dnd-kit
+    // measure droppable 在 mount 瞬間(rows 還沒 transform → 全 rect at top=100)+ 不
+    // re-measure(MeasuringStrategy.Always 沒效)→ stale rects → rectIntersection 永遠
+    // 0 over。Fix:fallback 用 cursor.y 對 DOM querySelector 找 row whose live
+    // boundingClientRect 包含 cursor.y(同 parent siblings,排除 active)。
+    if (cursor) {
+      // **codex P2 fix(2026-05-07)**:scope 到 active table root + 同時驗 X 邊界。
+      // 之前 document-wide query + cursor.y-only match → 多 DataTable 同頁(side-by-side
+      // panels with overlapping Y ranges)會把 cursor 不在當前 table 卻 Y 帶相同的 row
+      // 認成 over,觸發錯誤 reorder indicator/commit。Fix:limit 到 tableRef.current 的
+      // sortable rows + 同時驗 cursor 在 row's X bounds 內。
+      const tableScope = tableRef.current ?? document
+      const liveRows = Array.from(tableScope.querySelectorAll<HTMLElement>('[role="row"][data-sortable-row-id]'))
+        .filter(el => el.dataset.sortableRowId !== activeId)
+        .filter(el => {
+          const cParent = parentMap.get(el.dataset.sortableRowId ?? '')
+          return cParent === activeParent
+        })
+      for (const el of liveRows) {
+        const r = el.getBoundingClientRect()
+        if (
+          cursor.y >= r.top && cursor.y <= r.bottom &&
+          cursor.x >= r.left && cursor.x <= r.right
+        ) {
+          const rowId = el.dataset.sortableRowId
+          const cont = filtered.find(c => String(c.id) === rowId)
+          if (cont) return [{ id: cont.id, data: { droppableContainer: cont, value: 0 } }]
+        }
+      }
+    }
+    return rectIntersection(filteredArgs)
   }, [parentMap])
 
   // 2026-05-06 v10 DragOverlay canonical:drag start 時 snapshot source row outerHTML(strip
@@ -1675,13 +2022,23 @@ function DataTableInner<TData>(
   const [dragOverlayHtml, setDragOverlayHtml] = React.useState<string | null>(null)
   const [dragOverlayWidth, setDragOverlayWidth] = React.useState<number | null>(null)
   // 2026-05-06 v11:column reorder 共用 drag overlay state — `dragType` 區分 row vs column
-  const [dragType, setDragType] = React.useState<'row' | 'column' | null>(null)
+  // **v15.9 移除 dragType state**:之前用來條件套 row drag modifier,現在三 scenario
+  // 都無 modifier(SSOT 一致),drag type 只在 handler 內部用 active.data.current.type 取即可。
   const [, setActiveDragColId] = React.useState<string | null>(null)
   const handleDragStart = React.useCallback((e: { active: { id: string | number; data: { current?: { type?: 'row' | 'column'; columnId?: string } } } }) => {
     const id = String(e.active.id)
     const type = e.active.data?.current?.type ?? 'row'
-    setDragType(type)
     setInvalidDropActive(false)
+    // v15.3:drag 啟動清掉非 source row 的 data-hovered(避免其他 row 殘留 hover bg + drag button)。
+    // **保留 source row 的 hover** — 對齊 Linear / Jira「source 維持 active 視覺」world-class canonical。
+    if (type === 'row') {
+      tableRef.current?.querySelectorAll<HTMLElement>('[data-hovered]').forEach((el) => {
+        const rowId = el.dataset.sortableRowId
+        if (rowId !== id) delete el.dataset.hovered
+      })
+    } else {
+      tableRef.current?.querySelectorAll<HTMLElement>('[data-hovered]').forEach((el) => delete el.dataset.hovered)
+    }
     if (type === 'column') {
       // Column drag:snapshot header cell visual,strip transform/inline-styles
       const colId = e.active.data?.current?.columnId ?? id
@@ -1702,65 +2059,90 @@ function DataTableInner<TData>(
       }
     } else {
       setActiveDragId(id)
-      const rowEl = document.querySelector<HTMLElement>(`[role="row"][data-row-index] [data-sortable-row-id="${id}"]`)
-        ?? document.querySelector<HTMLElement>(`[role="row"][data-sortable-row-id="${id}"]`)
-      if (rowEl) {
-        const clone = rowEl.cloneNode(true) as HTMLElement
-        clone.style.position = 'static'
-        clone.style.transform = 'none'
-        clone.style.transition = 'none'
-        clone.style.opacity = '1'
-        clone.style.zIndex = ''
-        clone.style.width = `${rowEl.offsetWidth}px`
-        clone.removeAttribute('data-row-index')
-        clone.removeAttribute('aria-rowindex')
-        clone.querySelectorAll('[data-drag-handle-portal]').forEach(n => n.remove())
-        setDragOverlayHtml(clone.outerHTML)
-        setDragOverlayWidth(rowEl.offsetWidth)
+      // **v15.4 SSOT**:reconstructFullRowGhost 跨 pinned 區域(left/center/right)
+      // 重組完整 row ghost,確保 cursor 在 ghost 內部維持與 mousedown 時相對位置一致
+      // (對齊 user directive「ghost 跟 cursor 維持固定相對位置」+ Linear / Notion / Jira)
+      const ghost = reconstructFullRowGhost(id, tableRef.current)
+      if (ghost) {
+        setDragOverlayHtml(ghost.html)
+        setDragOverlayWidth(ghost.width)
       }
     }
   }, [])
 
-  const handleDragOver = React.useCallback((e: { active: { id: string | number }; over: { id: string | number } | null }) => {
+  // SSOT helpers `isReorderNoop` + `reconstructFullRowGhost` 已搬到 `lib/drag-visual.ts`
+  // —— TreeView / DataTable row / DataTable column drag 三處 consumer 共享同一 invariant。
+
+  const handleDragOver = React.useCallback((e: { active: { id: string | number; data?: { current?: { type?: 'row' | 'column' } } }; over: { id: string | number } | null }) => {
     const { active, over } = e
     if (!active) return
     if (!over) {
       // 無 valid same-parent over → invalid drop signal(配合 v2 cross-parent visual)
       if (!invalidRef.current) setInvalidDropActive(true)
+      setDropIndicator(null)
       return
     }
     if (invalidRef.current) setInvalidDropActive(false)
-  }, [])
+    if (active.id === over.id) { setDropIndicator(null); return }
+    // Drop indicator(2026-05-06 v14.6 row + column 統一 SSOT pattern):
+    // 用 active vs over 在 sortable items 的相對位置判 before/after。
+    // (Notion canonical:source 在 target 之前 → drop after / source 在 target 之後 → drop before)
+    const dragType = active.data?.current?.type ?? 'row'
+    if (dragType === 'column') {
+      const activeIdx = reorderableColumnIdsRef.current.indexOf(String(active.id))
+      const overIdx = reorderableColumnIdsRef.current.indexOf(String(over.id))
+      if (activeIdx === -1 || overIdx === -1) { setDropIndicator(null); return }
+      const side: 'before' | 'after' = activeIdx < overIdx ? 'after' : 'before'
+      // **v15.3 noop suppress**:drop position 等同原位 → 不顯 indicator(對齊 handleDragEnd noop guard)
+      if (isReorderNoop(activeIdx, overIdx, side)) { setDropIndicator(null); return }
+      setDropIndicator({ id: String(over.id), side, type: 'column' })
+    } else {
+      // Row drag — 用 allRowIds 算位置(只 same-parent siblings,跨 parent collisionDetection 已過濾)
+      const activeIdx = allRowIds.indexOf(String(active.id))
+      const overIdx = allRowIds.indexOf(String(over.id))
+      if (activeIdx === -1 || overIdx === -1) { setDropIndicator(null); return }
+      const side: 'before' | 'after' = activeIdx < overIdx ? 'after' : 'before'
+      if (isReorderNoop(activeIdx, overIdx, side)) { setDropIndicator(null); return }
+      setDropIndicator({ id: String(over.id), side, type: 'row' })
+    }
+  }, [allRowIds, isReorderNoop])
 
   const handleDragCancel = React.useCallback(() => {
     setActiveDragId(null)
     setActiveDragColId(null)
-    setDragType(null)
     setInvalidDropActive(false)
     setDragOverlayHtml(null)
     setDragOverlayWidth(null)
+    setDropIndicator(null)
   }, [])
 
-  // Reorderable column ids(non-locked,non-system) — 計算一次 cached
+  // Reorderable column ids(non-locked,non-system) — 用 TanStack runtime visible order
+  // **v14.10 fix**:之前用 columnsWithSelection 的 declaration order,user 控的 columnOrder
+  // state(tableOptions.state.columnOrder)被忽略 → side('before'/'after')算錯 → drop 落
+  // 在錯誤位置(user 報「Stock 移不到 Category/Price 之間」root cause)。
+  // 改用 `table.getVisibleLeafColumns()` 拿 live visual order(已套 columnPinning + columnOrder)。
   const reorderableColumnIds = React.useMemo(() => {
-    return columnsWithSelection
-      .map(c => (c.id as string | undefined) ?? '')
+    return table.getVisibleLeafColumns()
+      .map(c => c.id)
       .filter(id => id && !isSystemColumn(id))
       .filter(id => {
-        const def = columnsWithSelection.find(c => c.id === id)
-        return !((def?.meta as { locked?: boolean } | undefined)?.locked)
+        const meta = table.getColumn(id)?.columnDef.meta as { locked?: boolean } | undefined
+        return !meta?.locked
       })
-  }, [columnsWithSelection])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, columnsWithSelection, tableOptions?.state?.columnOrder])
+  // Sync ref(handleDragOver closure 抓不到最新 reorderableColumnIds)
+  React.useEffect(() => { reorderableColumnIdsRef.current = reorderableColumnIds }, [reorderableColumnIds])
 
   const handleDragEnd = React.useCallback((e: DragEndEvent) => {
     const { active, over } = e
     const type = (active.data?.current as { type?: 'row' | 'column' } | undefined)?.type ?? 'row'
     setActiveDragId(null)
     setActiveDragColId(null)
-    setDragType(null)
     setInvalidDropActive(false)
     setDragOverlayHtml(null)
     setDragOverlayWidth(null)
+    setDropIndicator(null)
     if (!over || active.id === over.id) return
     const sourceId = String(active.id)
     const targetId = String(over.id)
@@ -1771,6 +2153,9 @@ function DataTableInner<TData>(
       const newIdx = reorderableColumnIds.indexOf(targetId)
       if (oldIdx === -1 || newIdx === -1) return
       const position: 'before' | 'after' = oldIdx < newIdx ? 'after' : 'before'
+      // **v15.3 noop guard SSOT**(共用 isReorderNoop helper,跟 handleDragOver 同邏輯,
+      // 確保 indicator-suppress + commit-suppress 不漂移)
+      if (isReorderNoop(oldIdx, newIdx, position)) return
       onColumnReorder?.(sourceId, targetId, position)
       return
     }
@@ -1783,23 +2168,14 @@ function DataTableInner<TData>(
     const newIdx = siblings.indexOf(targetId)
     if (oldIdx === -1 || newIdx === -1) return
     const position: 'before' | 'after' = oldIdx < newIdx ? 'after' : 'before'
+    if (isReorderNoop(oldIdx, newIdx, position)) return
     onRowReorder?.(sourceId, targetId, position)
-  }, [allRowIds, parentMap, onRowReorder, onColumnReorder, reorderableColumnIds])
-
-  // v2 fix #5(2026-05-05):custom modifier — 鎖 Y 軸,排除 X 抖動。
-  // Row drag 是垂直 reorder 語義(同 parent siblings 上下移),X 軸抖動會觸發水平 transform
-  // → 進而 row width / measureElement loop → 視覺錯位。等同 @dnd-kit/modifiers `restrictToVerticalAxis`
-  // 行為(那 package 沒裝;inline 實作避免新增 dep)。
-  const restrictToVerticalAxis = React.useCallback(
-    ({ transform }: { transform: { x: number; y: number; scaleX: number; scaleY: number } }) => ({
-      ...transform,
-      x: 0,
-    }),
-    []
-  )
+  }, [allRowIds, parentMap, onRowReorder, onColumnReorder, reorderableColumnIds, isReorderNoop])
 
   // 2026-05-06 v11:column reorder collision detection — drag column 時 droppable filter
   // 只保留 column id(避免 over 觸發 row);drag row 走 sameParent canonical。
+  // v14.8:換 pointerWithin + rectIntersection composite(對齊 dnd-kit official canonical)
+  // 解 user 報「ghost 出來但 indicator 沒 / 不能 reorder」snap-back 同類問題。
   const dndCollisionDetection: CollisionDetection = React.useCallback((args) => {
     const activeData = args.active?.data?.current as { type?: 'row' | 'column' } | undefined
     if (activeData?.type === 'column') {
@@ -1807,7 +2183,9 @@ function DataTableInner<TData>(
         const cData = c.data?.current as { type?: 'row' | 'column' } | undefined
         return cData?.type === 'column' && c.id !== args.active?.id
       })
-      return closestCenter({ ...args, droppableContainers: filtered })
+      const filteredArgs = { ...args, droppableContainers: filtered }
+      const pointer = pointerWithin(filteredArgs)
+      return pointer.length > 0 ? pointer : rectIntersection(filteredArgs)
     }
     return sameParentCollisionDetection(args)
   }, [sameParentCollisionDetection])
@@ -1817,29 +2195,36 @@ function DataTableInner<TData>(
     return (
       <DndContext
         sensors={dndSensors}
+        // **v15.8 fix**:virtualized rows mount/unmount 期間 droppable rect cache stale →
+        // rectIntersection 找不到 over → indicator/reorder 不 fire。改 `Always` 每次 collision
+        // detection 都 re-measure droppables(SSOT 對齊 dnd-kit virtualized list canonical)。
+        measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
         collisionDetection={dndCollisionDetection}
-        // Column reorder 走水平,不適用 verticalAxis modifier;只 row drag 用
-        modifiers={dragType === 'column' ? [] : [restrictToVerticalAxis]}
+        // **v15.11 Ghost-cursor SSOT 復活**:
+        // - `snapToCursorModifier`(drag-visual.ts):ghost top-left 永遠對齊 cursor 位置,
+        //   保證「ghost 跟 cursor 維持初始 mousedown 時的相對位置」(M17 SSOT idea)。
+        //   v15.7 → v15.8 撤回原因是 `rectIntersection` collision 用 transform 後的
+        //   active.rect 找不到 over → 拖不動。v15.10 collision 改用 **DOM-based 直查
+        //   live row rects(忽略 active.rect)**,modifier 偏移 transform 不再影響
+        //   collision detection,可安全再用。
+        // - 三 drag scenario(row / column / TreeView)現在都 ghost-跟-cursor 對齊,
+        //   user directive「ghost-cursor SSOT」一致。
+        modifiers={[snapToCursorModifier]}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragCancel={handleDragCancel}
         onDragEnd={handleDragEnd}
       >
-        {/* 兩個 SortableContext 並列(非 nested):dnd-kit 允許單 DnDContext 內多 SortableContext,
-            useSortable 透過 enclosing context 找 items。Row drag = vertical strategy / column reorder
-            = horizontal strategy。Active item 透過 data.type 區分。 */}
-        <SortableContext items={enableColumnReorder ? reorderableColumnIds : []} strategy={horizontalListSortingStrategy}>
-          <SortableContext items={enableRowDrag ? allRowIds : []} strategy={verticalListSortingStrategy}>
-            {node}
-          </SortableContext>
-        </SortableContext>
+        {/* v15.0 Path B:無 SortableContext(useDraggable + useDroppable 各自獨立,不需 sort context)。
+            無 auto-shift visual reorder — source 留原位,indicator 顯 drop preview。 */}
+        {node}
         {/* DragOverlay portal — row 跟 column 都用同一個 overlay state(dragOverlayHtml /
             dragOverlayWidth),onDragStart 依 type 截不同 source DOM 寫入 state。 */}
         <DragOverlay dropAnimation={null}>
           {dragOverlayHtml ? (
             <div
               style={{ width: dragOverlayWidth ?? undefined }}
-              className="bg-surface-raised shadow-[var(--elevation-200)] rounded-md border border-border pointer-events-none opacity-90"
+              className="bg-surface-raised shadow-[var(--elevation-200)] rounded-md border border-border pointer-events-none"
               dangerouslySetInnerHTML={{ __html: dragOverlayHtml }}
             />
           ) : null}

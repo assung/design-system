@@ -30,6 +30,7 @@ function useOverflowCount(
   overflowEl: React.RefObject<HTMLDivElement | null>,
   totalCount: number,
   enabled: boolean,
+  gap: number = GAP,  // (2026-05-07 v15.13)stack avatar 模式傳 0
 ): { visibleCount: number; ready: boolean } {
   const [state, setState] = React.useState({ visibleCount: totalCount, ready: !enabled })
 
@@ -53,10 +54,10 @@ function useOverflowCount(
         const el = tagEls.current[i]
         if (!el) continue
         const w = el.offsetWidth
-        const next = used + (count > 0 ? GAP : 0) + w
+        const next = used + (count > 0 ? gap : 0) + w
         const remaining = totalCount - count - 1
         // width check FIRST(無 `count > 0` 短路):任何超寬都 break,包含 i=0 case
-        if (remaining > 0 && next + GAP + overflowW > available) break
+        if (remaining > 0 && next + gap + overflowW > available) break
         if (remaining === 0 && next > available) break
         used = next; count++
       }
@@ -69,7 +70,7 @@ function useOverflowCount(
     const obs = new ResizeObserver(calc)
     obs.observe(container)
     return () => obs.disconnect()
-  }, [containerRef, totalCount, enabled])
+  }, [containerRef, totalCount, enabled, gap])  // codex P2 fix(2026-05-07):gap 入 deps,runtime 改 tagAreaGapPx 才會 recalc
 
   return state
 }
@@ -84,12 +85,26 @@ interface OverflowTagListProps {
   renderTag: (item: { value: string; label: string }, index: number) => React.ReactNode
   onRemove?: (value: string) => void
   trailing?: React.ReactNode
+  /** Tag area gap in px(default 4)。Stack mode 傳 0 讓 negative margin 生效 */
+  gap?: number
+  /**
+   * Optional class merged into each tag's outer measurement wrapper `<div className="shrink-0">`.
+   * (2026-05-07 v15.13)為 PeoplePicker stack mode 提供 hook point — 讓 stack avatar 走
+   * `-ml-0.5 first:ml-0 relative inline-flex group/avatar` 達成 overlap + dismiss group selector,
+   * 同時保留 `useOverflowCount` 量測 wrapper(必要,不可移除)。
+   *
+   * **Caveat(Q2 known tradeoff)**:`-ml-0.5` 負 margin 不改 each wrapper 的 `offsetWidth` →
+   * `useOverflowCount` 累加按完整寬計算 → 視覺實際塞得進的 tag 數 > 量測判定能塞的數 →
+   * **+N indicator 偏保守**(視覺還有空間但已顯 `+N`)。當前 v1 接受此 tradeoff;若窄 trigger
+   * + 多人場景明顯不對,future 可加 `overlapPx` prop 讓量測補償。
+   */
+  tagWrapperClassName?: string
 }
 
-function OverflowTagList({ containerRef, items, size, wrap, renderTag, onRemove, trailing }: OverflowTagListProps) {
+function OverflowTagList({ containerRef, items, size, wrap, renderTag, onRemove, trailing, tagWrapperClassName, gap = GAP }: OverflowTagListProps) {
   const tagEls = React.useRef<(HTMLDivElement | null)[]>([])
   const overflowEl = React.useRef<HTMLDivElement>(null)
-  const { visibleCount, ready } = useOverflowCount(containerRef, tagEls, overflowEl, items.length, !wrap)
+  const { visibleCount, ready } = useOverflowCount(containerRef, tagEls, overflowEl, items.length, !wrap, gap)
   tagEls.current.length = items.length
 
   if (wrap) return <>{items.map((item, i) => renderTag(item, i))}{trailing}</>
@@ -100,7 +115,7 @@ function OverflowTagList({ containerRef, items, size, wrap, renderTag, onRemove,
   return (
     <span className="contents" style={{ opacity: ready ? 1 : 0 }}>
       {items.map((item, i) => (
-        <div key={item.value} ref={el => { tagEls.current[i] = el }} className="shrink-0">{renderTag(item, i)}</div>
+        <div key={item.value} ref={el => { tagEls.current[i] = el }} className={cn('shrink-0', tagWrapperClassName)}>{renderTag(item, i)}</div>
       ))}
       <div ref={overflowEl} className="shrink-0">
         <OverflowIndicator count={overflow} shape="tag" size={size}>
@@ -142,7 +157,7 @@ function ComboboxTagStack({
   // edit path tagAreaRef wrapper 已是 `flex-1 min-w-0`(NativeCombobox/CustomCombobox line 258 / 354),
   // display 必對稱才 SSOT。
   return (
-    <div ref={ownRef} className={cn('flex-1 min-w-0 flex items-center', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+    <div ref={ownRef} className={cn('flex-1 min-w-0 flex items-center', wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: GAP }}>
       {content}
     </div>
   )
@@ -181,6 +196,30 @@ export interface ComboboxProps {
   defaultOpen?: boolean
   /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
   onOpenChange?: (open: boolean) => void
+  /**
+   * Selected tag pill 客製 render(2026-05-07 v15.5)。
+   *
+   * 設了 → 每個 selected tag pill 走 consumer 提供的 ReactNode(收 item={value, label}
+   * + onRemove,consumer 自己組 onDismiss);沒設 → 走預設 `<Tag>` text-only pill。
+   *
+   * 用例:PeoplePicker(multi)用此 slot 把 selected tag 換成 avatar + name pill,而非
+   * 純文字 Tag。對齊 PeoplePicker = Combobox wrapper SSOT。
+   */
+  tagRenderer?: (item: { value: string; label: string }, onRemove: () => void) => React.ReactNode
+  /**
+   * Optional class merged into each tag's outer measurement wrapper (2026-05-07 v15.13)。
+   * Stack avatar 模式用此 hook point 達成 sibling-level overlap (`-ml-0.5`) + group selector
+   * (`group/avatar`)— 既保留 Combobox 必要 measurement wrapper,又讓 dismiss/overlap 視覺生效。
+   */
+  tagWrapperClassName?: string
+  /**
+   * Tag area gap in px (2026-05-07 v15.13)。預設 4(pill mode 標準 spacing)。
+   * Stack avatar 模式傳 0,讓 `tagWrapperClassName` 的 `-ml-0.5` negative margin 生效
+   * (CSS `gap` 套在 flex container 上會強制 sibling spacing,蓋過 negative margin)。
+   * **Q2 known tradeoff**:0 後 useOverflowCount 仍按 wrapper.offsetWidth 累加(不含 overlap
+   * 補償)→ +N 偏保守。當前接受;若需精準可 future 加 `overlapPx` 補償邏輯。
+   */
+  tagAreaGapPx?: number
 }
 
 const getIconSize = (size: string) => size === 'lg' ? 20 : 16
@@ -208,7 +247,7 @@ function ReadonlyMultiSelect({
   return (
     <div ref={containerRef}
       className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), hasTags && tagPadding[sz],
-        wrap ? 'flex-wrap py-1' : 'overflow-hidden', className)}
+        wrap ? 'flex-wrap py-1' : 'overflow-visible', className)}
       style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}>
       {hasTags ? (
         <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap}
@@ -259,7 +298,7 @@ function NativeCombobox({
       wrap && 'items-start py-1', error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode="edit" data-error={error ? '' : undefined}
       onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
-      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: GAP }}
         onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
         <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
           renderTag={(item) => (
@@ -294,8 +333,12 @@ function CustomCombobox({
   emptyPlaceholder = '選擇…', // i18n-allow: DS default
   defaultOpen = false,
   onOpenChange,
+  tagRenderer,
+  tagWrapperClassName,
+  tagAreaGapPx,
   'aria-label': ariaLabel,
 }: ComboboxProps) {
+  const tagAreaGap = tagAreaGapPx ?? GAP
   const fieldCtx = useFieldContext()
   const error = errorProp || (fieldCtx?.invalid ?? false)
   const disabled = disabledProp ?? fieldCtx?.disabled
@@ -356,12 +399,16 @@ function CustomCombobox({
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
       data-field-mode="edit" data-error={error ? '' : undefined}>
-      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: tagAreaGap }}>
         {value.length > 0 ? (
           <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
+            tagWrapperClassName={tagWrapperClassName}
+            gap={tagAreaGap}
             renderTag={(item) => (
-              <Tag size={size} className="shrink-0 relative z-10"
-                onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
+              tagRenderer
+                ? tagRenderer(item, () => handleRemove(item.value))
+                : <Tag size={size} className="shrink-0 relative z-10"
+                    onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
             )}
             onRemove={handleRemove}
             trailing={searchable && searchIn === 'trigger' ? (

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { X } from 'lucide-react'
 import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
@@ -21,12 +22,13 @@ export interface PersonData {
   status?: 'online' | 'away' | 'busy' | 'offline'
   /** Status 訊息(NameCard status section)。缺則顯 `—` */
   statusMessage?: React.ReactNode
-  /** Default field values — NameCard always render(缺顯 `—`)。對齊 NAMECARD_DEFAULT_FIELD_KEYS */
-  email?: string
-  phone?: string
-  department?: string
-  location?: string
-  /** 自訂額外 fields(在 default fields 之後 append) */
+  /** **2026-05-07 v15.7 user directive**:NameCard default 只 render `id` + `employeeNumber`,
+   *  其他 description 一律 opt-in by consumer 透過 `fields` array prop。對齊
+   *  `NAMECARD_DEFAULT_FIELD_KEYS = ['id', 'employeeNumber']`。 */
+  id?: string
+  employeeNumber?: string
+  /** 自訂額外 fields(在 default fields 之後 append)。Email / Phone / Department / Location
+   *  / 任何其他 description 一律走這個 prop(opt-in,consumer 自選)。 */
   fields?: { label: string; value: string }[]
   /** 跳至完整 profile 頁的 handler(hover NameCard 必含,不傳時 fallback noop placeholder) */
   onViewProfile?: () => void
@@ -40,8 +42,11 @@ function resolvePerson(value: PersonValue): PersonData {
 
 // buildPersonNameCard — DS 全域 person avatar hoverCard 的 canonical NameCard JSX 建構器。
 // SSOT for「avatar hover NameCard 一致視覺」— 任何 person avatar consumer 都走這個 helper,
-// 不可繞道直接 build NameCard。v11(2026-05-06):default field values(email/phone/department/
-// location)透過 `defaultFieldValues` 統一傳入,NameCard always render 這些 sections。
+// 不可繞道直接 build NameCard。
+//
+// **2026-05-07 v15.7 user directive**:default field values 只 `id` + `employeeNumber`,
+// 對齊 NAMECARD_DEFAULT_FIELD_KEYS。其他 description(email/phone/department/location/etc)
+// consumer 想顯式透過 `person.fields` opt-in 傳入。
 function buildPersonNameCard(person: PersonData): React.ReactNode {
   return (
     <NameCard
@@ -51,10 +56,8 @@ function buildPersonNameCard(person: PersonData): React.ReactNode {
       status={person.status}
       statusMessage={person.statusMessage}
       defaultFieldValues={{
-        email: person.email,
-        phone: person.phone,
-        department: person.department,
-        location: person.location,
+        id: person.id,
+        employeeNumber: person.employeeNumber,
       }}
       fields={person.fields}
       actions={<NameCardDefaultActions />}
@@ -151,15 +154,23 @@ function MultiPersonDisplay({
 
   return (
     <span className="inline-flex items-center min-w-0">
-      {visible.map((person, i) => (
-        <PersonAvatar
-          key={person.name + i}
-          person={person}
-          size={size}
-          className={`ring-2 ring-[var(--surface)] ${i > 0 ? '-ml-0.5' : ''}`}
-          style={{ zIndex: visible.length - i }}
-        />
-      ))}
+      {visible.map((person, i) => {
+        // **2026-05-07 v15.11 Bug D 升級 SSOT**:visible avatar 也支援 inline dismiss
+        // (對齊 user directive「avatar = tag」)。Dismiss overlay 走 `AvatarDismissOverlay`
+        // 共用 SSOT(下方 export),Combobox tagRenderer / 此處 / 任何 future avatar consumer
+        // 都用同一視覺 — 紅圈 X 對齊 avatar 右上,hover/focus-visible 才顯。
+        const handleDismiss = onRemove ? () => onRemove(value![i]) : undefined
+        return (
+          <span key={person.name + i} className={`relative inline-flex group/avatar ${i > 0 ? '-ml-0.5' : ''}`} style={{ zIndex: visible.length - i }}>
+            <PersonAvatar
+              person={person}
+              size={size}
+              className="ring-2 ring-[var(--surface)]"
+            />
+            {handleDismiss && <AvatarDismissOverlay onRemove={handleDismiss} label={person.name} />}
+          </span>
+        )
+      })}
       {overflow > 0 && (
         <OverflowIndicator
           count={overflow}
@@ -195,4 +206,83 @@ function MultiPersonDisplay({
 }
 MultiPersonDisplay.displayName = 'MultiPersonDisplay'
 
-export { PersonDisplay, MultiPersonDisplay, PersonAvatar, buildPersonNameCard, resolvePerson }
+// ── AvatarDismissOverlay ────────────────────────────────────────────────────
+// SSOT for「person avatar overlay dismiss」(2026-05-07 v15.12,user spec confirmed)。
+//
+// **Visual canonical**(對齊 DS new token `--surface-strong`):
+//   - **12×12 圓**(固定,不隨 field size 變)
+//   - **bg `--surface-strong`**(neutral-6),hover → `--surface-strong-hover`
+//     (light=neutral-5 / dark=neutral-7,跨 mode 對稱)
+//   - **X icon size=12 strokeWidth=3.5**(icon 跟底色一樣大,對齊 checkbox checkmark
+//     sm/md stroke 規格)
+//   - **text-on-emphasis**(白 X,確保飽和色底對比)
+//   - **位置 `absolute top-0 right-0`**(button 右上角貼齊 avatar 右上角,完全在 avatar
+//     內 — user-confirmed canonical)
+//
+// **a11y**(codex P1 fix):`opacity-0` 而非 `display:none` — element 在 DOM/tab-order,
+// keyboard tab 可達,觸控 focus-within 也顯。Hover / focus-within / focus-visible
+// 三條件之一觸發 `opacity-100`。
+//
+// **Why centralize**:Combobox tagRenderer (PeoplePicker stack mode) + MultiPersonDisplay
+// dismiss 共用 SSOT,改 1 處全 sync(M17 propagation)。
+function AvatarDismissOverlay({ onRemove, label }: { onRemove: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); onRemove() }}
+      aria-label={`移除 ${label}`}
+      className={[
+        // **Position(2026-05-07 v15.15 user-confirmed)**:asymmetric `-top-px -right-1`
+        // (top -1px / right -4px)— field padding-y(4px sm/md)緊 → top 只 -1px 安全;
+        // padding-x 12px 寬鬆 → right 凸 4px 達 badge canonical visual。對齊 ClickUp
+        // 世界級 idiom(asymmetric offset by avatar/field size constraint)。
+        'absolute -top-px -right-1 z-10',
+        'inline-flex items-center justify-center',
+        // **12×12 + 2px white ring**(SSOT match stacked avatar,Slack/Material/iOS
+        // notification badge 2px ring canonical)。改用 `[box-shadow:...]` 而非 `ring-2`
+        // 避免跟下方 `focus-visible:ring-2` 在 tailwind-merge 衝突(同 ring family
+        // override 互殺)。Box-shadow inset 0 不影響 layout,也不被 focus-visible ring
+        // 蓋掉(focus 那邊另一條 outline ring 不同 layer)。
+        'w-3 h-3 rounded-full [box-shadow:0_0_0_2px_var(--surface)]',
+        // bg-surface-strong = neutral-6-opaque / hover = neutral-7-opaque(both modes,
+        // step-7 dark 公式自動 lighter → engaged 跨 mode 對稱)
+        'bg-surface-strong text-on-emphasis hover:bg-surface-strong-hover',
+        // a11y(codex P1 fix):opacity 而非 display:none — element 在 DOM/tab-order,
+        // keyboard 可達。Hover / focus-within / focus-visible 三條件之一觸發。
+        'opacity-0 group-hover/avatar:opacity-100 group-focus-within/avatar:opacity-100 focus-visible:opacity-100',
+        'transition-opacity duration-150',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+      ].join(' ')}
+    >
+      <X size={12} strokeWidth={3.5} aria-hidden />
+    </button>
+  )
+}
+
+// ── PersonAvatarTag(Combobox tagRenderer SSOT for stack mode)─────────────
+// PeoplePicker `multiDisplay='stack'` 模式 wraps Combobox,tagRenderer 不能用 Tag pill
+// (那是 pill mode),改 render 此元件 — Avatar overlap 視覺 + AvatarDismissOverlay。
+// 對齊 user directive「avatar = tag 概念,差別只在視覺,SSOT 一致」(2026-05-07 v15.13)。
+//
+// **架構**(v15.13 重構):本元件**不自包** `group/avatar` / `-ml-0.5` overlap wrapper,
+// 因 Combobox `tagRenderer` 結果會被內部 `<div shrink-0>` 包成 measurement wrapper
+// (useOverflowCount 必要)。把 overlap + group 拉到 Combobox 的 `tagWrapperClassName`
+// 上,sibling-level overlap + group selector 才能正確 chain → AvatarDismissOverlay 的
+// `group-hover/avatar:opacity-100` 才會通。
+function PersonAvatarTag({
+  person, size = 'md', onRemove,
+}: {
+  person: PersonData
+  size?: 'sm' | 'md' | 'lg'
+  onRemove?: () => void
+}) {
+  return (
+    <>
+      <PersonAvatar person={person} size={size} className="ring-2 ring-[var(--surface)]" />
+      {onRemove && <AvatarDismissOverlay onRemove={onRemove} label={person.name} />}
+    </>
+  )
+}
+PersonAvatarTag.displayName = 'PersonAvatarTag'
+
+export { PersonDisplay, MultiPersonDisplay, PersonAvatar, PersonAvatarTag, buildPersonNameCard, resolvePerson }
