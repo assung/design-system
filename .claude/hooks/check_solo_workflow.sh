@@ -86,7 +86,11 @@ sys.exit(1)
 " 2>/dev/null
 }
 
-# Helper: shell-aware gh pr create / gh api pulls detect
+# Helper: shell-aware gh pr create / gh api pulls **WRITE** detect
+# 2026-05-09 fix(user-authorized):區分 read(default GET)vs write(POST/PATCH/PUT/DELETE)。
+# `gh api repos/.../pulls/N/comments` 預設 GET = read,**不** block;
+# `gh api -X POST repos/.../pulls`(or `-f`/`-F` field flags 暗示 POST)= 真 PR write 才 block。
+# Why:read-only API(check codex reply / read PR meta)是合法 collab,不該被 R2 PR-create 規則攔。
 detect_gh_pr_create() {
   python3 -c "
 import shlex, sys
@@ -94,14 +98,30 @@ try:
     tokens = shlex.split(sys.stdin.read(), comments=True)
 except Exception:
     sys.exit(1)
+WRITE_METHODS = {'POST', 'PATCH', 'PUT', 'DELETE'}
 for i in range(len(tokens) - 2):
     if tokens[i] == 'gh':
+        # gh pr create — always block(create 本身是 write)
         if tokens[i+1] == 'pr' and tokens[i+2] == 'create':
             sys.exit(0)
+        # gh api ... pulls ... — only block if write method OR form fields(-f/-F = POST default)
         if tokens[i+1] == 'api':
-            for j in range(i+2, min(i+8, len(tokens))):
-                if 'pulls' in tokens[j]:
+            cmd_tokens = tokens[i:]
+            has_pulls = any('pulls' in t for t in cmd_tokens[:8])
+            if not has_pulls:
+                continue
+            # Detect explicit write method
+            for k in range(len(cmd_tokens)):
+                t = cmd_tokens[k]
+                if t in ('-X', '--method') and k + 1 < len(cmd_tokens):
+                    if cmd_tokens[k+1].upper() in WRITE_METHODS:
+                        sys.exit(0)
+                if t.startswith('--method=') and t.split('=', 1)[1].upper() in WRITE_METHODS:
                     sys.exit(0)
+                # -f / -F flags imply POST(form fields)
+                if t in ('-f', '-F'):
+                    sys.exit(0)
+            # GET(default)= read,allow through
 sys.exit(1)
 " 2>/dev/null
 }

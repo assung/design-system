@@ -1,15 +1,24 @@
 ---
 component: FieldControlGroup
 family: self-contained
+variants: {}
+sizes: {}
+traits: []
+# traits: [] rationale(2026-05-15 audit Dim 29 fix):layout-primitive,no trait variants(border-collapse only)。
+# 對齊 spec frontmatter schema completeness — 即便 N/A 也明示 empty array + rationale comment,避免 audit gap。
 benchmark:
   - Ant Design Space.Compact: github.com/ant-design/ant-design/blob/master/components/style/compact-item.ts
   - Bootstrap input-group: github.com/twbs/bootstrap/blob/v5.3.3/scss/forms/_input-group.scss
   - Chakra UI Group + InputGroup: github.com/chakra-ui/chakra-ui/blob/main/apps/www/content/docs/components/input.mdx
 ---
 
+<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+
 # FieldControlGroup spec
 
 ## 定位
+
+**Layout Family**:self-contained(form composition layout-primitive,非 4-Family element layout — 對齊 frontmatter `family: self-contained`)。
 
 **多個 Field controls 視覺接合成一個 input frame**(border-collapse pattern)。對齊 ButtonGroup 同類接合 idiom — `<X>Group` 命名一致(X = button → ButtonGroup;X = field control → FieldControlGroup)。
 

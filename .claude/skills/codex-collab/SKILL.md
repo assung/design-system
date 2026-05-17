@@ -1,6 +1,6 @@
 ---
 name: codex-collab
-description: Structured discussion-mode collaboration with OpenAI Codex (via @codex GitHub mention) for visual/SSOT/canonical decisions and deep audit. Codex acts as second-opinion gatekeeper; Claude is synthesizer + implementer. Discussion-first (no auto-commit), persists across sessions via this SSOT. Invoke via /codex-collab when user asks to "與 codex 討論 / 跟 codex 確認 / let's get codex's take".
+description: Codex dual-track collab for visual/SSOT/canonical decisions. Claude own → codex own → 比稿 synthesize(永遠 3-step,不 pass-through)。Local `codex exec` 為主 transport(地端);GitHub PR comment 為 fallback。Queue SSOT `.claude/memory/codex-brief-queue.jsonl`。Invoke when user asks「跟 codex 討論 / 比稿 / 確認」.
 ---
 
 # Codex Collaboration Workflow
@@ -16,7 +16,64 @@ description: Structured discussion-mode collaboration with OpenAI Codex (via @co
 | 對 user 負責 | YES(最終結論由我 report) | NO(透過我轉述) |
 | Benchmark cite | M22 mandate | 也須 cite source(我 enforce) |
 
-**核心原則**:Codex 不直接 commit。所有結論由 Claude 收斂、跑完 M1-M27 自檢、user approve 後由我落地。
+**核心原則**:Codex 不直接 commit。所有結論由 Claude 收斂、跑完 M1-M31 自檢、user approve 後由我落地。
+
+## ⚠️ Step 0 入口 gate(2026-05-10 加,fix auto-fire anti-pattern)
+
+**啟 codex collab 前 explicit check 兩條件,缺一就不 fire**:
+
+(a) **Claude 自試完仍卡**:跑完 grep / read source / DS canonical cite / WebFetch 外部 source 後,仍**無法**確定 root cause 或 design tradeoff
+(b) **User 明確 keyword**:「跟 codex 討論 / 比稿 / 找他確認 / 跟他辯論 / dual-track」
+
+**任一通過即可 fire;兩個都不滿足 = 不 fire**(per M31 Step 0 + 本 SKILL L50 主原則)。
+
+**Anti-pattern 錨**(2026-05-10):Phase A Breadcrumb commit `5ab31ce` 我已 grep + read spec + 有 cite 充分仍 auto-fire codex,user 抓「沒主動叫你也會自動觸發?」+ 撤回 unnecessary collab。本 anti-pattern codified for 反向 reference。
+
+## ⚠️ Step 0.4 — Transport discovery(2026-05-17 P0,fix「找 codex 找錯位置」amnesia)
+
+**Rule**:啟 codex 前必跑 3-test,**順序固定**:
+
+```bash
+ls -la node_modules/.bin/codex && node_modules/.bin/codex --version   # 1 Local CLI(primary)
+which codex 2>/dev/null && codex --version 2>/dev/null                 # 2 Global(罕見)
+ls -la ~/.codex/auth.json                                              # 3 Auth(sanity)
+```
+
+**Decision**:1 ✅ → local CLI(canonical per `references/transport.md:36-40`)/ 1 ❌ + 2 ✅ → global / 1+2 ❌ + 3 ✅ → `npm install`(`@openai/codex` 已 npm dep)/ 全 ❌ → 報 user。**禁 fallback Explore agent 當 codex**(M31 違反:Explore 同模型,不滿足 dual-track 第 2 bias)。
+
+**Anti-pattern**:`which codex` 失敗就斷言 unreachable → 嘗試 sudo install / 繞 M28 開 PR / Explore 替身。詳 `.claude/memory/feedback_codex_local_transport_node_modules.md`。
+
+**Hook 機械強制**:`stop_self_audit.sh` 偵測「codex/dual-track/比稿 keyword + 無 `node_modules/.bin/codex` cmd trace」→ BLOCKER。
+
+## ⚠️ Step 0.05 — User-verbatim faithful relay invariant(2026-05-15 P0)
+
+**Rule**:Brief 必含 **3 block**:(1) `## User 原話` verbatim quote(不 paraphrase / 中英 / 標點 / 圖文 ref 全保)(2) `## Claude 理解 + 脈絡` paraphrase + file:line + 已驗 source + 自試 hypothesis + 不確定點(3) `## 請獨立解讀 user 原話` codex 不被 §2 框架限。**禁** 只送 paraphrase。
+
+**User 原話 SSOT**(2026-05-15):「也要告訴他我的原話,讓他也能有機會解讀我的原話 ... 說不定codex在解讀別人的問題比你還有慧根 ... 請你在infra上避免你下次又在局限codex發現問題的能力」
+
+**Why**:Paraphrase 過濾 user 細節 / 加 Claude 偏見 / frame 問題 → codex 只能在 Claude 框架答 surgical fix → root cause 沒抓到。錨例 2026-05-15:I1 placeholder ellipsis + I3 overflow 兩 bug user 提 2-3 次,每次送 paraphrase → 冰山修。Hook TBD `check_codex_brief_verbatim.sh`(grep `## User 原話` heading missing → warn)。
+
+## ⚠️ M31 Universal 5-step canonical(2026-05-10 user directive)
+
+「你跟 codex 都要各自驗證過並視覺稽核過,最後你整合出完美完整的版本」+「據理力爭但要有依據,各自熟讀所有檔案,infra 強迫整合前有此 mindset,避免被 codex 錯誤解法牽著走」。
+
+**每次 codex collab 必走 5-step,不論 agree 或 disagree(不只 disagree 才啟動)**:
+
+| Step | Claude | Codex | 共通 invariant |
+|---|---|---|---|
+| **1 各自熟讀** | grep / read spec.md / canonical / source 真讀 | `exec -s read-only` grep / git show / read source | 憑印象 propose = M31 違反 |
+| **2 各自驗證** | `npx tsc -b` + invariant + audit script | `exec` 跑 grep / git show 證據 | 任一方未跑真 verify 撤回 propose |
+| **3 各自視覺稽核** | playwright screenshot + DOM + pixel audit | code-read + diff + grep visual path | 只 code 跳 visual 違反 user directive |
+| **4 各自 cite-based propose** | 3-column:`spec.md path:line / 引文 / reasoning` | 同上獨立出 | hand-wave 無 cite 撤回 |
+| **5 整合完美版本**(NOT pass-through)| Agree → synthesize 補對方缺漏;Disagree → cite battle verify 對方 cite + counter-cite | 同上雙向 | **絕禁** Claude pass-through codex / 只一方驗證跳整合 |
+
+**Hook 機械強制**(P1 soft):`check_codex_collab_5step.sh` 攔 git commit message 含 codex/Layer A/B keyword 必同含 spec.md cite + verify keyword + verdict keyword。缺任一 → stderr 警告。
+
+**Anti-pattern 錨例**:
+- **Issue 8 cell border**(2026-05-10):codex 「Field edit border 透明」→ Claude pass-through ship → user 「白癡 被 codex 牽著走」→ cite battle 修正(field-controls.spec.md Field state machine SSOT 反駁)→ 落地雙 owner。**違反 Step 1-3-5**。
+- **Issue 11 controller retire**(2026-05-10):codex disagree(RFC Contract 3/6 cite)→ Claude 完整 5-step counter-cite(grep zero consumer + Phase 7 commit `c5eb054` 證據)→ codex round 2 grep 確認 → synthesize retire+RFC backfill。**M31 正確 pattern 參考錨**。
+
+**Transport: Cloud vs Local(2026-05-08)**:Step 0.5 / 4.5 / 4.6 / 5 dual-track invariants 不分 transport — 換 channel 不換 discipline。詳 `references/transport.md`。簡述:雲端 Claude Code → cloud(`@codex` GitHub);地端 Claude Code → local(`codex` CLI,須 `codex login` 一次)。Default cloud(留 PR trail);敏議題 / 同 session 急 round-trip / cloud 失敗 fallback → local。
 
 **Codex 輸出全來源 invariant(2026-05-07 user 拍板)**:
 任何 codex 輸出 — **DISCUSS-ONLY 深 reply / bot 自動 PR review(`chatgpt-codex-connector[bot]`)/ PR comment / inline review thread** — 統一視為 **2nd-opinion 輸入,非 directive**。任何來源都必過完整 Step 4.5 verify + Step 5 比稿 才動 code。**禁止「bot review = 直接修」短路**。歷史錨例:2026-05-07 commit `775d879` 我把 codex bot 兩條 P2 直接修沒做 own-version + 比稿,user 糾正 → commit `f24998f` 補上完整 own-version + 比稿 documentation。本 invariant 永久 codified。
@@ -47,73 +104,21 @@ description: Structured discussion-mode collaboration with OpenAI Codex (via @co
 
 User 說「跟 codex 討論 X」或本 skill 自動 trigger condition 滿足。
 
-### Step 0.5:**Claude 自己先跑一遍完整版**(不可省 — anti-pass-through invariant)
+### Step 0.1:**DS Anchor Preflight**(M29 mandatory,2026-05-08)
 
-**User 拍板 directive(2026-05-07)**:「**我跑一版 → codex 跑一版 → 我比稿 → 取優棄劣 → final 最佳方案**。每次 collab 都這樣,不可只當守門員」。
+Brief 前必查 `.claude/references/ssot-index.md` + grep `*.spec.md` 找 anchor canonical,brief 內含 **3-column owner table**(`Candidate owner spec` / `Canonical sentence` / `Conflicting code/comment`)。**若 spec ≠ code → STOP 寫 RFC**(`.claude/planning/<topic>-rfc.md`),等 user 拍板才進 Step 0.5。詳 `.claude/memory/feedback_ds_anchor_preflight.md`。
 
-**Why this exists**:之前 SKILL 只有「draft brief → send codex → self-check reply」,我容易退化成 pass-through(直接 paste codex 結論問 user 拍 A/B/C)。User invariant:
-- 品質 100% 不打折 + 要完美 + 世界級 + 符合 DS SSOT
-- **不以省工為前提**(2-AI dual-track 是 cost,不是 cost reduction tool)
-- 我要當 synthesizer 不是 dispatcher
+### Step 0.5:**Claude own-version v1 + dimension matrix**(合併原 Step 0.5+0.6,anti-pass-through)
 
-**強制動作**(在 Step 1 寫 brief 前必跑):
-1. **我自己跑一版完整分析**(eg. 同題若是 audit → 我自己跑 /knowledge-prune 全 phase,grep / read / verify 走完;若是 design decision → 我自己跑 propose-options 4-Q + WebFetch 3 source)
-2. **記錄 my own findings** 在 brief 內(讓 codex 知道我已查到什麼,他補我沒查到的角度,不重複 grep)
-3. **明確列我自己的 hypothesis + recommendation**(不只 question)— codex 回時針對我具體 propose challenge
+**User directive(2026-05-07)**:「我跑一版 → codex 跑一版 → 我比稿 → 取優棄劣 → final 最佳方案」+「品質 100% 不打折 + Claude = synthesizer not dispatcher」。
 
-**禁止**:用「請 codex 幫我看 X」的問句送 brief,沒附我自己的 own-version 結論。違反 = pass-through 退化。
+**強制(寫 brief 前必跑)**:(1) 我自己跑完整分析(audit + WebFetch ≥3 source)(2) Brief 內**先寫「我 v1 = X 因為 Y」+ dimension matrix**(禁只列 options 求 codex pick = round 7 trap)(3) 列具體 hypothesis + recommendation。Codex reply 必獨立寫他 v1 + per-axis 比稿,不可「pick best option」。違 = pass-through。
 
 ### Step 1:Claude 草擬 Discussion Brief(以 Step 0.5 own-version 為基礎)
 
-**Brief format invariant(2026-05-07 user 拍板,絕對禁短 format)**:
+**Brief format + 6-section template + 歷史錨點** → `references/brief-template.md`(SSOT 收錄)。
 
-> 「我要你找他的時候都是希望他完全深度評估並用自己的模型給出完整的 2nd opinion」
-> 「品質 100% 不打折 + 不以省工為前提」
-
-**禁止**(violates user invariant):
-- ❌ Brief ≤ 220 字 1-Q 短 format(品質打折:cite 廣度 / counter-example / A/B/C trade-off 全失)
-- ❌ Reply ≤ 200 字限字(codex 模型沒空間給深度)
-- ❌ 「結論→原因→下一步」3-line 模板(失去 architectural depth)
-- ❌ 為了 codex Cloud 速度刻意 truncate(用戶接受 15-30 min 等)
-
-**強制**:
-- ✅ Deep brief 不限字 + Q1-Q5+ multi-question if needed
-- ✅ ≥ 3 world-class DS source cite per benchmark Q(M22 mandate)
-- ✅ A/B/C trade-off matrix + counter-example scan(M9)
-- ✅ Counter-proposal request(挑戰我的 hypothesis,要 codex 提第 4 條路)
-- ✅ Reply 不限字 + DS-first verify(M23)+ namespace check(M27)
-
-歷史錨點:2026-05-07 我嘗試「短 format 加速 codex」(brief ≤220 字 / reply ≤200 字),user 糾正:「我要 codex 完全深度評估給完整 2nd opinion,即使慢」。撤回短 format,本 SKILL 永久禁。
-
-格式(必含 6 段,**禁略**):
-
-```markdown
-@codex DISCUSS-ONLY (no commit) — <topic>
-
-## Problem
-<1-2 句客觀描述,含 reproduce path>
-
-## My Hypothesis (Claude)
-<我目前判斷的 root cause + 提議方向>
-
-## Benchmark Cited (M22/M26)
-- <DS source 1 + URL/path>
-- <DS source 2 + URL/path>
-- <DS source 3 + URL/path>
-
-## DS Internal Canonical Consulted (M23)
-- <既有 token / variant / spec.md path>
-
-## Specific Questions for Codex
-1. <root cause 對嗎?還有 alternative?>
-2. <benchmark 是否漏掉 world-class case?>
-3. <SSOT 是否該抽到更上層 primitive?>
-
-## Constraints
-- DS 原則 M1-M27 全適用(尤其 M8 benchmark / M17 SSOT / M22 cite / M23 DS-first / M27 namespace)
-- 不可 commit,純文字討論
-- 程式碼建議須 cite world-class DS source
-```
+核心禁忌(永久 ban):Brief ≤220 字 / Reply ≤200 字 / 3-line 模板 / 為 cloud 速度 truncate。深度 invariant 不分 transport。
 
 ### Step 2:Post to PR via mcp__github__add_issue_comment
 

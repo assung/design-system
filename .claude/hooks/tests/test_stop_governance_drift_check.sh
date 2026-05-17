@@ -10,7 +10,8 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../lib/stop_governance_drift_check.sh"
+# Cluster B merge(2026-05-10):stop_governance_drift_check.sh fold 進 stop_passive_logging.sh dispatcher R4。
+HOOK="$SCRIPT_DIR/../stop_passive_logging.sh"
 
 if [ ! -x "$HOOK" ]; then
   echo "FATAL: hook not executable: $HOOK"

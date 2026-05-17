@@ -1,0 +1,88 @@
+{
+  "ts": "2026-05-15T12:06:51.982Z",
+  "results": [
+    {
+      "testId": "Bug3-multi-default-wide",
+      "description": "Multi length=4 default wide trigger (~320px max-w-xs)",
+      "narrowPx": null,
+      "clickToOpen": false,
+      "triggerWidth": 320,
+      "personAvatarCount": 4,
+      "truncs": [],
+      "hasOverflow": false,
+      "overflowText": ""
+    },
+    {
+      "testId": "Bug3-multi-narrow-180",
+      "description": "Multi length=4 with 180px narrow trigger (simulate cell)",
+      "narrowPx": 180,
+      "clickToOpen": false,
+      "triggerWidth": 180,
+      "personAvatarCount": 4,
+      "truncs": [],
+      "hasOverflow": false,
+      "overflowText": ""
+    },
+    {
+      "testId": "Bug3-multi-narrow-120",
+      "description": "Multi length=4 with 120px very narrow trigger",
+      "narrowPx": 120,
+      "clickToOpen": false,
+      "triggerWidth": 120,
+      "personAvatarCount": 4,
+      "truncs": [],
+      "hasOverflow": false,
+      "overflowText": ""
+    },
+    {
+      "testId": "Bug3-multi-narrow-180-opened",
+      "description": "Multi length=4 narrow 180px + open panel-search",
+      "narrowPx": 180,
+      "clickToOpen": true,
+      "triggerWidth": 180,
+      "personAvatarCount": 4,
+      "truncs": [],
+      "hasOverflow": false,
+      "overflowText": ""
+    },
+    {
+      "testId": "Bug1-multi-length1-default",
+      "description": "Multi length=1 with defaultpx trigger",
+      "triggerWidth": 320,
+      "truncs": [
+        {
+          "text": "Diana Huang",
+          "scrollW": 238,
+          "clientW": 238,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "testId": "Bug1-multi-length1-180",
+      "description": "Multi length=1 with 180px trigger",
+      "triggerWidth": 180,
+      "truncs": [
+        {
+          "text": "Diana Huang",
+          "scrollW": 98,
+          "clientW": 98,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "testId": "Bug1-multi-length1-120",
+      "description": "Multi length=1 with 120px trigger",
+      "triggerWidth": 120,
+      "truncs": [
+        {
+          "text": "Diana Huang",
+          "scrollW": 83,
+          "clientW": 38,
+          "truncated": true
+        }
+      ]
+    }
+  ]
+}

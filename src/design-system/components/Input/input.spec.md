@@ -13,6 +13,8 @@ benchmark:
   - Carbon TextInput: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/TextInput
 ---
 
+<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+
 # Input 設計原則
 
 ## 定位
@@ -91,6 +93,10 @@ startIcon 不隨 value 變化——它描述的是 input 的用途，不是 valu
 - null / undefined / 空字串：`—`（em dash），`text-fg-muted`
 
 ---
+
+## Loading
+
+`loading?: boolean`(Field SSOT,詳 `Field/field-controls.spec.md` L70-115):右側 endAction 自動顯 `<CircularProgress/>` + `aria-busy="true"`;input 維持可編輯(Ant Input.Search editable 派,反 Material readonly 派,適合 search debounce)。
 
 ## 禁止事項
 

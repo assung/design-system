@@ -2,7 +2,19 @@
 component: Steps
 family: 2
 variants: {}
-sizes: {}
+sizes:
+  sm:
+    px: 12
+    when: "Sidebar / 緊湊 onboarding;indicator 12px,text-body"
+    world-class: ["Ant Design Steps small", "MUI Stepper compact"]
+  md:
+    px: 16
+    when: "預設 — 主流程 wizard / checkout / 註冊"
+    world-class: ["Ant Design Steps default(16-20)", "MUI Stepper default", "Linear setup wizard"]
+  lg:
+    px: 20
+    when: "Marketing 流程展示 / 重要 onboarding(高 attention)"
+    world-class: ["Material 3 large step indicator"]
 traits:
   - hasSizes
   - hasInteractiveStates
@@ -425,3 +437,9 @@ Item-level **內容狀態色彩**(completed / current / upcoming / error indicat
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `progress-bar.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `horizontal-overflow.spec.md`

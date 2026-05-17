@@ -61,9 +61,20 @@ const buttonVariants = cva(
     'whitespace-nowrap font-medium',
     'border border-transparent',
     'transition-colors duration-150',
-    'cursor-pointer select-none disabled:cursor-not-allowed',
+    'cursor-pointer select-none disabled:cursor-not-allowed aria-disabled:cursor-not-allowed',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+    // 2026-05-12 Round 4.5 fix(codex M31 Layer C 抓):`aria-disabled` visual 分支補(per WAI-ARIA APG —
+    // aria-disabled 給語意 + visual,但不 suppress functionality;functionality 由 consumer 阻 e.g.
+    // RowDragHandle listeners 只在 canDrag spread)。**故意不加** `aria-disabled:pointer-events-none`
+    // — Round 4 RowDragHandle Tooltip flicker fix root cause:aria-disabled buttons 必保 pointer events
+    // 讓 Radix Tooltip pointerenter 通過。HTML `disabled` 保 PE:none(完全 inactive)。
     'disabled:pointer-events-none',
+    // 2026-05-12 fix v2(playwright pixel-quantified verify 抓 opacity=1 不生效):
+    // `opacity-disabled` 是 custom Tailwind v4 `@utility`(opacity.css:21),variant prefix
+    // `aria-disabled:` 跟 custom @utility 不 compose(`aria-disabled:cursor-not-allowed` 標準
+    // utility 能 work,custom 不行)。改 arbitrary value `opacity-[var(--opacity-disabled)]`
+    // 繞 custom @utility 限制(Tailwind v4 arbitrary value 直接生 `opacity: var(--opacity-disabled)`)。
+    'aria-disabled:opacity-[var(--opacity-disabled)]',
     'rounded-md',
     // Defensive:SVG 不被 flex shrink 擠扁(防 inner-area 計算誤差導致 icon 被擠成
     // width<intrinsic 的 asymmetric 顯示)。詳 ICON_ONLY_PX 段 rationale。

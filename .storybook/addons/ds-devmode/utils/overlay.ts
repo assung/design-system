@@ -3,16 +3,17 @@
  * Built imperatively (no React) — cheap + no iframe bundling concerns.
  *
  * Visual idiom mix(2026-04-25):
- * - Element badge + 18×12 size gate → 對齊 **Chrome `tool_highlight.ts`**(實際 source
- *   verified:`drawElementTitle` arrow-width + arrowInset 同源)。
+ * - Element badge + 18×12 size gate → **Inspired by** Chrome `tool_highlight.ts`(2026-05-13 codex Q3 fix:
+ *   原「同源」claim 降「inspired by」— `drawElementTitle` arrow-width + arrowInset idiom 對齊,但無 source-level port)。
  * - Distance line + T-cap + extension lines + red label → **Sketch / Figma / CAD redline 派**
  *   (Chrome 沒 inter-element distance 測量功能,inspector_overlay 無此 component)。
  * - Padding/margin per-side 數字 → **不畫於 canvas**(Chrome 只畫色塊,per-side 數字僅
  *   在 panel — 我們同 idiom)。
  *
  * Panel canonical:任何 value 都能在 Panel 看到 — 4-rect anatomy(margin/border/padding/
- * content + position 5 層,Chrome `MetricsSidebarPane.ts` 同源)/ 4 邊 padding / margin /
- * distancesToParent / Author CSS。
+ * content + position 5 層,**Inspired by** Chrome `MetricsSidebarPane.ts` 5-layer model concept
+ * — 2026-05-13 codex Q3 fix:真 Chromium source `metricsSidebarPane.css` 是 flex 非 grid,layout
+ * primitive 不同,降「同源」claim 為「inspired by」)/ 4 邊 padding / margin / distancesToParent / Author CSS。
  *
  * 落地規則:
  * - Property badge:rect.width < BADGE_MIN_W OR rect.height < BADGE_MIN_H → suppress。

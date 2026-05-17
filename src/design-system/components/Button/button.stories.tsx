@@ -1,4 +1,5 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
+// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase(2026-05-15 F-migration);Default scenario 由 Pressed / IconOnly / 各 variant 真實業務情境 story 覆蓋。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Plus, Trash2, Search, ChevronDown, Settings, Download, Bell, RefreshCw, Maximize2, Save } from 'lucide-react'
 import { Button } from './button'
@@ -68,27 +69,8 @@ const meta: Meta<typeof Button> = {
 export default meta
 type Story = StoryObj<typeof Button>
 
-// ── 基本 variants ──────────────────────────────────────────────
-// 5 variants 合併為單一 AllVariants story(2026-04-25 Dim 24 audit consolidation)。
-// 原個別 Primary/Secondary/Tertiary/Text/Link 是 `args:{variant}` minimal stub,重複
-// ColorMatrix(anatomy)的 variant 視覺。合併保留每 variant 的 real-world 場景示意。
-// 「何時用哪 variant」由 principles.VariantRule + DangerRule + OrderRule 教。
-
-export const AllVariants: Story = {
-  name: 'All variants',
-  render: () => (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button variant="primary">新增</Button>
-      <Button variant="secondary">儲存草稿</Button>
-      <Button variant="tertiary">取消</Button>
-      <Button variant="text">查看更多</Button>
-      <Button variant="link">前往設定</Button>
-    </div>
-  ),
-}
-
 export const Pressed: Story = {
-  name: 'Pressed',
+  name: '按下狀態',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -113,7 +95,7 @@ export const Pressed: Story = {
 // ── danger prop ─────────────────────────────────────────────────
 
 export const Danger: Story = {
-  name: 'Danger prop',
+  name: 'Danger 語意',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-3">
@@ -135,35 +117,12 @@ export const Danger: Story = {
 // principles story(含視覺 + do/don't + 規則註解),display 層重複教相同原則 = noise。
 // 需要 startIcon / endIcon 的 quick reference → 參考 `.principles.stories.tsx`。
 
-// ── icon slots(start / end 對照,對齊 Polaris)──────────────────────────
-
-export const WithIcon: Story = {
-  // Manual story 拆分原則(.claude/rules/story-rules.md)— startIcon / endIcon 同 slot rule
-  // (LucideIcon prop slot,size 由元件控)→ 合併對照 grid。
-  name: 'Icon Slots',
-  args: { size: 'sm' },
-  render: (args) => (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <p className="w-full text-caption text-fg-muted">startIcon — 動作前綴</p>
-        <Button size={args.size} variant="primary" startIcon={Bell}>通知設定</Button>
-        <Button size={args.size} variant="tertiary" startIcon={Bell}>查看通知</Button>
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <p className="w-full text-caption text-fg-muted">endIcon — 後綴提示(常用 ChevronDown 表展開)</p>
-        <Button size={args.size} variant="tertiary" endIcon={ChevronDown}>展開選單</Button>
-        <Button size={args.size} variant="primary" endIcon={ChevronDown}>新增項目</Button>
-      </div>
-    </div>
-  ),
-}
-
 // ── badge slot(獨立 rule,跟 Chip 一致)────────────────────────────────
 
 export const WithBadge: Story = {
   // badge 是獨立 slot rule(inline 在 pill 內),不合進 WithIcon — 對齊 Chip 一致。
   // Compound(badge + endIcon)順帶展示 layering 真實情境(教 layering coexistence)。
-  name: 'Badge Slot',
+  name: 'Badge 槽位',
   args: { size: 'sm' },
   render: (args) => (
     <div className="flex flex-col gap-4">
@@ -184,7 +143,7 @@ export const WithBadge: Story = {
 // ── Icon-only ──────────────────────────────────────────────────
 
 export const IconOnly: Story = {
-  name: 'Icon Only',
+  name: '純圖示',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -212,33 +171,10 @@ export const IconOnly: Story = {
   ),
 }
 
-// ── 尺寸 ────────────────────────────────────────────────────────
-
-export const AllSizes: Story = {
-  name: 'Sizes',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-3">
-        <Button size="xs" startIcon={Plus}>xs（固定）</Button>
-        <Button size="sm" startIcon={Plus}>sm</Button>
-        <Button size="md" startIcon={Plus}>md ← 預設</Button>
-        <Button size="lg" startIcon={Plus}>lg</Button>
-      </div>
-      <div className="flex flex-wrap items-end gap-3">
-        <p className="w-full text-caption text-fg-muted">icon-only（同樣四種尺寸）</p>
-        <Button size="xs" iconOnly startIcon={Plus} aria-label="新增 xs" />
-        <Button size="sm" iconOnly startIcon={Plus} aria-label="新增 sm" />
-        <Button size="md" iconOnly startIcon={Plus} aria-label="新增 md" />
-        <Button size="lg" iconOnly startIcon={Plus} aria-label="新增 lg" />
-      </div>
-    </div>
-  ),
-}
-
 // ── 狀態 ────────────────────────────────────────────────────────
 
 export const Disabled: Story = {
-  name: 'Disabled',
+  name: '停用',
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
@@ -283,7 +219,7 @@ export const Disabled: Story = {
 }
 
 export const Loading: Story = {
-  name: 'Loading',
+  name: '載入中',
   render: () => (
     <div className="flex flex-col gap-6">
       {/* 行為對照 */}
@@ -353,7 +289,7 @@ export const Loading: Story = {
 }
 
 export const FullWidth: Story = {
-  name: 'Full Width',
+  name: '全寬',
   render: () => (
     <div className="flex flex-col gap-3 max-w-xs">
       <Button fullWidth>確認送出</Button>
@@ -390,7 +326,7 @@ export const HoverFocusState: Story = {
 }
 
 export const TooltipVisible: Story = {
-  name: 'Tooltip on Icon Only',
+  name: '純圖示加 Tooltip',
   tags: ['!autodocs'],
   render: () => (
     <div className="p-12">

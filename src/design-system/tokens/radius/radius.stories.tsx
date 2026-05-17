@@ -23,7 +23,7 @@ type Story = StoryObj
 
 
 export const Overview: Story = {
-  name: 'Overview',
+  name: '總覽',
   render: () => (
     <div className="max-w-2xl space-y-8">
       {/* rounded-xs */}

@@ -25,6 +25,9 @@ REL=$(echo "$FILE_PATH" | sed "s|$PROJECT_DIR/||")
 for d in "${DIRS[@]}"; do
   case "$REL" in
     "$d"/*)
+      # Charter README itself escape(2026-05-17 chicken-and-egg fix):
+      # 不能擋 README 本身建立(否則 charter 永遠無法被 init)
+      case "$REL" in "$d"/README.md) exit 0 ;; esac
       CHARTER="$PROJECT_DIR/$d/README.md"
       if [ ! -f "$CHARTER" ]; then
         # P0:charter missing → block via stderr + exit 2

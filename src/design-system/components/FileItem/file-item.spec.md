@@ -279,9 +279,9 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
 
 ### List wrapper 本身不加視覺
 
-### List wrapper 本身不加視覺
-
-- **無 border / 無 rounded / 無 overflow-hidden**:FileItem rich 自帶 card,list 若再加外框 → 雙重 card / 強制邊框合併(user 2026-04-22 指出的 `border rounded-lg overflow-hidden` 反例)
+**規則**(2026-04-22 user 直指):FileItem 各自 own 視覺(rich card / compact bg),list wrapper 只負責垂直排列 + gap。**不應該有外框**(無 `border` / 無 `rounded-*` / 無 `overflow-hidden`)— 否則:
+- FileItem rich 自帶 card,list 再加外框 → 雙重 card
+- 強制邊框合併(user 2026-04-22 指出的 `border rounded-lg overflow-hidden` 反例)
 
 ```tsx
 // ✅ Rich list
@@ -304,28 +304,7 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
   {allFiles.map(f => <FileItem key={f.id} mode="compact" status={f.isUploading ? 'uploading' : undefined} {...f} />)}
 </div>
 
-// ❌ 反例:list 加外框 + overflow-hidden
-<div className="flex flex-col border rounded-lg overflow-hidden">
-  {files.map(f => <FileItem key={f.id} mode="rich" {...f} />)}
-</div>
-```
-
-**List wrapper 本身的視覺**(2026-04-22 user 直指):
-- **不應該有外框**(無 `border` / 無 `rounded-*` / 無 `overflow-hidden`)
-- FileItem 各自 own 視覺(rich card / compact bg),list wrapper 只負責垂直排列 + gap
-
-```tsx
-// ✅ Rich list
-<div className="flex flex-col gap-2">
-  {files.map(f => <FileItem key={f.id} mode="rich" {...f} />)}
-</div>
-
-// ✅ Compact form attachment list(靜態,有 bg-secondary)
-<div className="flex flex-col gap-1">
-  {files.map(f => <FileItem key={f.id} mode="compact" {...f} />)}
-</div>
-
-// ❌ 反例:list wrapper 加 border + overflow-hidden 強制邊框相黏
+// ❌ 反例:list 加外框 + overflow-hidden(雙重 card / 強制邊框相黏)
 <div className="flex flex-col border rounded-lg overflow-hidden">
   {files.map(f => <FileItem key={f.id} mode="rich" {...f} />)}
 </div>

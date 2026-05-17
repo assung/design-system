@@ -71,7 +71,7 @@ export const SolidWithDescription = {
 }
 
 export const CornerActionGroup = {
-  name: 'Chrome corner action group',
+  name: 'Chrome 角落操作群組',
   render: () => (
     <div className="flex flex-col gap-4 max-w-lg">
       <span className="text-caption text-fg-muted">
@@ -108,7 +108,7 @@ export const CornerActionGroup = {
 }
 
 export const Fixed = {
-  name: 'Fixed',
+  name: '固定顯示',
   render: () => (
     <div className="flex flex-col gap-6">
       <span className="text-caption text-fg-muted">固定在 header 底下,無圓角,full-width。</span>

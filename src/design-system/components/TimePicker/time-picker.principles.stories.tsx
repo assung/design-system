@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // M22 retrofit DONE 2026-05-03 v11(spec.md SSOT bears full citations; this file's claims are spec-derived rationale stories)
 import * as React from 'react'
 import LinkTo from '@storybook/addon-links/react'
@@ -71,7 +72,7 @@ export const UsageGuidance: Story = {
 }
 
 export const RuleMinuteStepForMeetings: Story = {
-  name: 'Rule:會議類情境一律 minuteStep=15',
+  name: '會議時段用 15 分鐘間隔',
   render: () => (
     <div className="flex gap-8">
       <Field>
@@ -92,7 +93,7 @@ export const RuleMinuteStepForMeetings: Story = {
  * consumer 用兩個 TimePicker + arrow 達成營業時段 / 會議時段等 range 場景。
  */
 export const RuleRangeComposition: Story = {
-  name: 'Rule:Range 用兩個 TimePicker 組合,不內建',
+  name: 'Range 用兩個 TimePicker 組合,不內建',
   render: () => {
     const [open, setOpen] = React.useState('10:00')
     const [close, setClose] = React.useState('22:00')
@@ -116,7 +117,7 @@ export const RuleRangeComposition: Story = {
  * `<Button>清除</Button>` 作 clear。
  */
 export const RuleClearNoLabelButton: Story = {
-  name: 'Rule:clearable 用 X Inline Action,禁用 label Button',
+  name: '清除用 X inline action,不用 label button',
   render: () => {
     const [t, setT] = React.useState<string>('14:30')
     return (

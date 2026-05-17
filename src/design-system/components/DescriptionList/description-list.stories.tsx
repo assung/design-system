@@ -19,7 +19,7 @@ type Story = StoryObj<typeof DescriptionList>
 
 /* ── User profile(Email / Role / Team)─────────────────────────────── */
 export const UserProfile: Story = {
-  name: 'User profile',
+  name: '使用者個資',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-md">
       <DescriptionList cols={1}>
@@ -35,7 +35,7 @@ export const UserProfile: Story = {
 
 /* ── Product spec(iPhone 規格對照風格)─────────────────────────────── */
 export const ProductSpec: Story = {
-  name: 'Product spec',
+  name: '產品規格',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-2xl">
       <DescriptionList cols={2}>
@@ -73,7 +73,7 @@ export const OrderSummary: Story = {
 
 /* ── Detail panel(三欄 dense)────────────────────────────────────── */
 export const DetailPanel: Story = {
-  name: 'Detail panel',
+  name: '詳情面板',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-3xl">
       <DescriptionList cols={3}>
@@ -90,7 +90,7 @@ export const DetailPanel: Story = {
 
 /* ── Horizontal direction(label 左 / value 右,divided=false)──────── */
 export const Horizontal: Story = {
-  name: 'Horizontal',
+  name: '水平佈局',
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-md">
       {/* title 到第一個 item 的間距 = item 之間間距(Gestalt proximity canonical,見 spec) */}

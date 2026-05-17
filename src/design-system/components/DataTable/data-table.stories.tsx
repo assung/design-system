@@ -3,9 +3,10 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table'
-import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, EyeOff, Lock, GripVertical, RotateCcw, Download, Plus, ArrowUpDown, X as XIcon } from 'lucide-react'
+import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, Download, Plus, ArrowUpDown } from 'lucide-react'
 import { DataTable } from './data-table'
 import { DataTableSortManager } from './data-table-sort-manager'
+import { DataTableColumnVisibilityPanel } from './data-table-column-visibility-panel'
 import { DataTableFilterPanel, evaluateTree, createEmptyFilterTree, isFilterTreeActive, type FilterTree } from './data-table-filter-panel'
 import { getFilteredRowModel, type SortingState } from '@tanstack/react-table'
 import { Button } from '@/design-system/components/Button/button'
@@ -13,15 +14,10 @@ import { Empty } from '@/design-system/components/Empty/empty'
 import { Input } from '@/design-system/components/Input/input'
 import { BulkActionBar } from '@/design-system/components/BulkActionBar/bulk-action-bar'
 import { Alert } from '@/design-system/components/Alert/alert'
-import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverFooter, PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
-import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
-import { ButtonDivider } from '@/design-system/components/Button/button-group'
-import { ItemPrefix, ItemLabel, ItemInlineActionButton, ROW_PADDING_BY_SIZE } from '@/design-system/patterns/element-anatomy/item-anatomy'
-import { cn } from '@/lib/utils'
-import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { dragSourceStyle } from '@/design-system/lib/drag-visual'
+import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
+// Issue 3 cleanup(2026-05-10):ScrollArea / ButtonDivider / ItemPrefix / ItemLabel /
+// ItemInlineActionButton / ROW_PADDING_BY_SIZE / cn / DnD / dragSourceStyle imports retired —
+// 全 column visibility row state machine 移到 <DataTableColumnVisibilityPanel> primitive。
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -131,73 +127,9 @@ const meta: Meta<typeof DataTable> = {
 export default meta
 type Story = StoryObj
 
-/* ── Column Types ── */
-export const ColumnTypes: Story = {
-  name: '欄位型別',
-  render: () => {
-    interface TypeDemo {
-      name: string
-      quantity: number
-      price: number
-      date: string
-      active: boolean
-      status: string
-      tags: string[]
-      seller: PersonData
-      url: string
-    }
-
-    const typeCol = createColumnHelper<TypeDemo>()
-    const statusOptions = [
-      { value: 'in_stock', label: 'In stock' },
-      { value: 'low_stock', label: 'Low stock' },
-      { value: 'out_of_stock', label: 'Out of stock' },
-    ]
-    const tagOptions = [
-      { value: 'electronics', label: 'Electronics' },
-      { value: 'lifestyle', label: 'Lifestyle' },
-      { value: 'food', label: 'Food' },
-    ]
-    const typeCols = [
-      typeCol.accessor('name', { header: 'Text', meta: { type: 'string', width: 160 } }),
-      typeCol.accessor('quantity', { header: 'Number', meta: { type: 'number', width: 90 } }),
-      typeCol.accessor('price', { header: 'Currency', meta: { type: 'currency', prefix: '$', width: 100 } }),
-      typeCol.accessor('date', { header: 'Date', meta: { type: 'date', width: 110 } }),
-      typeCol.accessor('active', { header: 'Boolean', meta: { type: 'boolean', width: 80 } }),
-      typeCol.accessor('status', { header: 'Select', meta: { type: 'select', options: statusOptions, width: 110 } }),
-      typeCol.accessor('tags', { header: 'MultiSelect', meta: { type: 'multiSelect', options: tagOptions, width: 180 } }),
-      typeCol.accessor('seller', { header: 'Person', meta: { type: 'person', width: 140 } }),
-      typeCol.accessor('url', { header: 'Link', meta: { type: 'url', width: 160 } }),
-    ]
-    const typeData: TypeDemo[] = [
-      { name: 'Wireless Headphones', quantity: 142, price: 2490, date: '2025-03-12', active: true, status: 'in_stock', tags: ['electronics', 'lifestyle'], seller: SELLERS[0], url: 'https://example.com/headphones' },
-      { name: 'Office Chair', quantity: 38, price: 8900, date: '2025-03-14', active: false, status: 'low_stock', tags: ['lifestyle'], seller: SELLERS[1], url: 'https://example.com/chair' },
-      { name: 'Green Tea 100 Bags', quantity: 520, price: 350, date: '2025-03-15', active: true, status: 'in_stock', tags: ['food', 'lifestyle', 'electronics'], seller: SELLERS[2], url: 'https://example.com/tea' },
-    ]
-
-    return (
-      <div>
-        <p className="text-caption text-fg-muted mb-3">所有 9 種 column type 的自動渲染——指定 meta.type 即可，不需要自訂 cell renderer</p>
-        <DataTable columns={typeCols} data={typeData} height="auto" />
-      </div>
-    )
-  },
-}
-
-/* ── 三種尺寸 ── */
-export const AllSizes: Story = {
-  name: '尺寸',
-  render: () => (
-    <div className="flex flex-col gap-8">
-      {(['sm', 'md', 'lg'] as const).map(size => (
-        <div key={size}>
-          <h3 className="text-body font-bold text-foreground mb-2">size="{size}"</h3>
-          <DataTable columns={baseColumns} data={sampleData.slice(0, 3)} size={size} height="auto" />
-        </div>
-      ))}
-    </div>
-  ),
-}
+// Retired 2026-05-16 audit Dim 24:`ColumnTypes` 跟 anatomy.stories.tsx:167 重複(同 9-type 自動渲染 + col helper demo)。
+// Anatomy 是 type-system structural canonical home(用 Product col helper 對齊其他 anatomy 範例);
+// 本 showcase 版用 custom `TypeDemo` interface,不對齊 anatomy 通用 type → noise。Retire showcase 版,anatomy 保留。
 
 /* ── 數字靠右對齊 ── */
 export const NumberAlignment: Story = {
@@ -212,28 +144,39 @@ export const ColumnResize: Story = {
   name: '欄寬調整',
   render: () => {
     const [widths, setWidths] = React.useState<Record<string, number>>({})
+    const [pinnedWidths, setPinnedWidths] = React.useState<Record<string, number>>({})
     return (
-      <div className="flex flex-col gap-3 max-w-5xl">
-        <p className="text-caption text-fg-muted">
-          enableColumnResize=true:所有 data column 可拖 header 右邊分隔線調整寬度。
-          <br />
-          - Hover handle:分隔線從 divider(淡灰)變 border-hover(深灰),cursor: col-resize
-          <br />
-          - 拖動中:column 即時跟動 cursor(<code>columnResizeMode: 'onChange'</code>),分隔線變 primary(藍)
-          <br />
-          - more 選單「自動調整寬度」:scan column 內容 max scrollWidth + buffer 自動 fit
-          <br />
-          - System columns(__select__ 等)永遠 fixed,不在 resize 集合
-          <br />
-          目前 widths:{JSON.stringify(widths)}
-        </p>
-        <DataTable
-          columns={columnsWithPrice}
-          data={sampleData}
-          height="auto"
-          enableColumnResize
-          onColumnResize={(id, w) => setWidths(prev => ({ ...prev, [id]: w }))}
-        />
+      <div className="flex flex-col gap-8 max-w-5xl">
+        <div>
+          <h3 className="text-body font-bold text-foreground mb-2">基本 — 全 data column 可拖</h3>
+          <p className="text-caption text-fg-muted mb-3">
+            拖 header 右側分隔線可調整欄寬。滑到分隔線上會變色提示,拖動時會跟著游標即時調整。
+            勾選欄等系統欄位寬度固定,不可調整。
+            <br />目前各欄寬度:{JSON.stringify(widths)}
+          </p>
+          <DataTable
+            columns={columnsWithPrice}
+            data={sampleData}
+            height="auto"
+            enableColumnResize
+            onColumnResize={(id, w) => setWidths(prev => ({ ...prev, [id]: w }))}
+          />
+        </div>
+        <div>
+          <h3 className="text-body font-bold text-foreground mb-2">Pinned + Resize 並存(USER #43 sanity)</h3>
+          <p className="text-caption text-fg-muted mb-3">
+            把 SKU 跟產品名稱固定在左側,依然可以拖動分隔線調整這兩欄的寬度。
+            <br />目前各欄寬度:{JSON.stringify(pinnedWidths)}
+          </p>
+          <DataTable
+            columns={columnsWithPrice}
+            data={sampleData}
+            height="auto"
+            pinnedLeftColumns={['sku', 'name']}
+            enableColumnResize
+            onColumnResize={(id, w) => setPinnedWidths(prev => ({ ...prev, [id]: w }))}
+          />
+        </div>
       </div>
     )
   },
@@ -293,10 +236,17 @@ export const ColumnReorder: Story = {
 export const RowAutoHeightInlineEdit: Story = {
   name: '自動行高 × 內聯編輯(verify display↔edit position)',
   render: () => {
-    const [list, setList] = React.useState<Product[]>(generateLargeData(4))
+    // 2026-05-14 I7 fix(per codex verdict):note 初始化進 state 一次,commit 寫同一 state。
+    // 原 `dataWithNotes = list.map(...)` 每 render derive 覆蓋 commit value → user 看似不能編。
+    const [list, setList] = React.useState<(Product & { note: string })[]>(() =>
+      generateLargeData(4).map((r, i) => ({
+        ...r,
+        note: i % 2 === 0
+          ? 'This product requires special packaging for international shipping. Please verify customs documentation before dispatch.'
+          : 'Standard delivery.',
+      }))
+    )
     const cols: ColumnDef<Product & { note: string }>[] = [
-      // 2026-05-06 v14.3 DS canonical: column 寬度走 `meta.width`(避開 `size: 'sm'|'md'|'lg'`
-      // density 命名衝突)。內部 pre-process copy 到 TanStack root size,resize feature 仍正常。
       { accessorKey: 'sku', header: 'SKU', meta: { type: 'string', width: 100 } },
       { accessorKey: 'name', header: 'Product', meta: { type: 'string', editable: true, width: 240 } },
       { accessorKey: 'category', header: 'Category', meta: { type: 'select', editable: true, width: 160, options: [
@@ -308,12 +258,6 @@ export const RowAutoHeightInlineEdit: Story = {
       { accessorKey: 'note', header: 'Note (wrap text)', meta: { type: 'string', editable: true, width: 360 } },
       { accessorKey: 'price', header: 'Price', meta: { type: 'currency', editable: true, width: 100 } },
     ]
-    const dataWithNotes = list.map((r, i) => ({
-      ...r,
-      note: i % 2 === 0
-        ? 'This product requires special packaging for international shipping. Please verify customs documentation before dispatch.'
-        : 'Standard delivery.',
-    }))
     return (
       <div className="max-w-5xl">
         <p className="text-caption text-fg-muted mb-2">
@@ -322,7 +266,7 @@ export const RowAutoHeightInlineEdit: Story = {
           frame 填 cell,Field 自帶 state ring(focus-within → primary)。
         </p>
         <DataTable
-          columns={cols} data={dataWithNotes} height="auto" autoRowHeight inlineEdit
+          columns={cols} data={list} height="auto" autoRowHeight inlineEdit
           onCellCommit={(rowId, col, val) => {
             setList((prev) => prev.map((r) => r.sku === rowId ? { ...r, [col]: val as never } : r))
           }}
@@ -625,8 +569,9 @@ export const InlineEdit: Story = {
     return (
       <div>
         <p className="text-caption text-fg-muted mb-3">
-          11 cell type 全覆蓋:string / number / currency / date / time / select / multiSelect / person / multiPerson / boolean / url。
-          SKU 唯讀;boolean=點 Checkbox 即時 toggle;url=hover cell 顯示 Pencil → click;其他 click cell 進 edit → Enter/blur commit / Esc cancel。
+          所有資料型別都能就地編輯:文字、數字、金額、日期、時間、單/多選、人員、人員列表、開關、連結。
+          SKU 是唯讀的;開關欄位直接點即可切換;連結欄位 hover 才顯示鉛筆改值,直接點開連結;
+          其他點一下進編輯,Enter 或失焦存檔,Esc 取消。
         </p>
         <DataTable
           columns={editableColumns}
@@ -636,6 +581,185 @@ export const InlineEdit: Story = {
           tableOptions={{ getRowId: (row) => row.sku }}
           getRowId={(row) => row.sku}
           onCellCommit={handleCommit}
+        />
+      </div>
+    )
+  },
+}
+
+/**
+ * Slice D spreadsheet semantics + overlay 整合 demo(2026-05-10 Issue 7 移過來)。
+ *
+ * 啟 4 條 spreadsheet flag:
+ *   1. `inlineEdit` — base inline edit
+ *   2. `experimentalSpreadsheetOverlay` — hover/selected/range overlay layer(Contract 8 「one
+ *      geometry owner, two paint owners」)
+ *   3. `spreadsheetMode` — Excel-like cell selection: click 1=select / click 2=edit /
+ *      Shift+click=range / ArrowKeys=nav
+ *   4. `experimentalActiveEditorController` — portal Field active editor(Slice D Step 5 D.3,
+ *      cell 永遠 mode="display" SSOT preserved + portal host renders mode="edit")
+ *
+ * 驗證點:
+ *   - hover editable cell → 1px overlay 邊框 var(--border-hover)
+ *   - sku(readonly)/ inStock(boolean)/ url(openAction)→ 不出現 hover overlay(Contract 15)
+ *   - click 1 → cell selected(2px primary border outline)
+ *   - click 2 / Enter / F2 → enter edit(portal Field, cell mode 不變)
+ *   - Shift+click → range(focus = 2px primary outline + 內 cells `--primary-subtle` bg)
+ *   - cell border-box 對齊(0.5px sub-pixel snap;dtCellGrid 4-edge inset divider 共軌)
+ *   - Issue 6 viewport clip:H scroll cell out → overlay 被 panel ClipMask 裁切不溢出
+ */
+export const InlineEditWithSpreadsheetOverlay: Story = {
+  name: '就地編輯 + 試算表 overlay',
+  render: () => {
+    const [data, setData] = React.useState(editableSampleData)
+    const editCol = createColumnHelper<EditableProduct>()
+    const editableColumns = React.useMemo(
+      () => [
+        editCol.accessor('sku', { header: 'SKU', meta: { type: 'string', width: 100 } }),
+        editCol.accessor('name', { header: 'Product', meta: { type: 'string', editable: true, width: 200 } }),
+        editCol.accessor('qty', { header: 'Qty', meta: { type: 'number', editable: true, width: 110 } }),
+        editCol.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true, width: 150 } }),
+        editCol.accessor('inStock', { header: 'In', meta: { type: 'boolean', editable: true, width: 90 } }),
+        editCol.accessor('url', { header: 'URL', meta: { type: 'url', editable: true, width: 180 } }),
+      ],
+      []
+    )
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      setData((prev) => prev.map((row) => row.sku === rowId ? { ...row, [colId]: value } : row))
+    }
+    return (
+      <div>
+        <p className="text-caption text-fg-muted mb-3">
+          試算表式操作:第一次點 cell 選取(藍框),第二次點才進編輯。Shift+點另一格選範圍,
+          方向鍵移動。Hover 可編輯的 cell 會出現淺邊框提示;唯讀 / 開關 / 連結欄位沒有 hover 提示
+          (這些格子不需編輯,點下去直接 toggle 或開連結)。
+        </p>
+        <DataTable
+          columns={editableColumns}
+          data={data}
+          height="auto"
+          inlineEdit
+          experimentalSpreadsheetOverlay
+          spreadsheetMode
+          experimentalActiveEditorController
+          tableOptions={{ getRowId: (row) => row.sku }}
+          getRowId={(row) => row.sku}
+          onCellCommit={handleCommit}
+        />
+      </div>
+    )
+  },
+}
+
+/**
+ * Issue 9 cell error system(2026-05-10):consumer-supplied `cellErrors` map shows error message
+ * 14px text-error 在 display content 下方,gap-1 spacing。Edit cell 自動 clear visual error。
+ * Multi-error 用 array → ul li 分行。aria-describedby + aria-invalid for AT。
+ *
+ * 對齊 AG Grid `cellClassRules='ag-cell-error'` + Material X-DataGrid `errorMessage` cell prop +
+ * Airtable record validation idiom。
+ */
+export const CellErrors: Story = {
+  name: '欄位錯誤訊息',
+  render: () => {
+    const [data, setData] = React.useState(editableSampleData)
+    const editCol = createColumnHelper<EditableProduct>()
+    const editableColumns = React.useMemo(
+      () => [
+        editCol.accessor('sku', { header: 'SKU', meta: { type: 'string', width: 110 } }),
+        editCol.accessor('name', { header: 'Product', meta: { type: 'string', editable: true, width: 240 } }),
+        editCol.accessor('qty', { header: 'Qty', meta: { type: 'number', editable: true, width: 110 } }),
+        editCol.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true, width: 160 } }),
+      ],
+      []
+    )
+    // Demo cellErrors map(consumer 自管 state;edit commit 後可清 / 加 error)
+    const [cellErrors, setCellErrors] = React.useState<Record<string, string | string[]>>({
+      'PRD-001:name': '必填欄位:Product 名稱不可為空白',
+      'PRD-002:qty': ['必須 ≥ 0', '必須是整數(目前小數)'],
+      'PRD-003:category': '選擇的分類已不在 active catalog,請改選有效項目',
+    })
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      setData((prev) => prev.map((row) => row.sku === rowId ? { ...row, [colId]: value } : row))
+      // 範例:commit 後 clear 該 cell error
+      setCellErrors((prev) => {
+        const next = { ...prev }
+        delete next[`${rowId}:${colId}`]
+        return next
+      })
+    }
+    return (
+      <div className="flex flex-col gap-3 max-w-4xl">
+        <p className="text-caption text-fg-muted">
+          欄位驗證錯誤直接顯示在內容下方,不蓋住資料。一格多個錯誤分行條列。點進該格編輯時暫時隱藏錯誤,
+          交給使用者修正;commit 後由 app 端決定是否還要顯示。
+        </p>
+        {/* 2026-05-10 fix(user 第二次糾正):restore `autoRowHeight` — 原本 story 用全表
+            auto-row 是正確 baseline,error row 自然撐高 + 其他 row 仍 auto(內容驅動)。 */}
+        <DataTable
+          columns={editableColumns}
+          data={data}
+          height="auto"
+          inlineEdit
+          autoRowHeight
+          getRowId={(row) => row.sku}
+          tableOptions={{ getRowId: (row) => row.sku }}
+          onCellCommit={handleCommit}
+          cellErrors={cellErrors}
+        />
+      </div>
+    )
+  },
+}
+
+/**
+ * 固定行高表格遇到欄位錯誤時的特殊行為(2026-05-10 per user 確認 ask):
+ * 整個 table 預設 fixed 行高,但**任一格出現錯誤訊息的那一 row 會自動撐高**(改成 auto)讓
+ * 訊息完整顯示。其他沒錯誤的 row 維持 fixed 高度不受影響。錯誤被修掉之後該 row 自動回 fixed。
+ * 這是 per-row 行為,不是整表切換 mode。
+ */
+export const CellErrorsFixedRowOverride: Story = {
+  name: '欄位錯誤訊息(固定行高 + per-row 撐高)',
+  render: () => {
+    const [data, setData] = React.useState(editableSampleData)
+    const editCol = createColumnHelper<EditableProduct>()
+    const editableColumns = React.useMemo(
+      () => [
+        editCol.accessor('sku', { header: 'SKU', meta: { type: 'string', width: 110 } }),
+        editCol.accessor('name', { header: 'Product', meta: { type: 'string', editable: true, width: 240 } }),
+        editCol.accessor('qty', { header: 'Qty', meta: { type: 'number', editable: true, width: 110 } }),
+        editCol.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true, width: 160 } }),
+      ],
+      []
+    )
+    const [cellErrors, setCellErrors] = React.useState<Record<string, string | string[]>>({
+      'PRD-001:name': '必填欄位:Product 名稱不可為空白',
+      'PRD-003:category': '選擇的分類已不在 active catalog,請改選有效項目',
+    })
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      setData((prev) => prev.map((row) => row.sku === rowId ? { ...row, [colId]: value } : row))
+      setCellErrors((prev) => {
+        const next = { ...prev }
+        delete next[`${rowId}:${colId}`]
+        return next
+      })
+    }
+    return (
+      <div className="flex flex-col gap-3 max-w-4xl">
+        <p className="text-caption text-fg-muted">
+          表格本身是固定行高(沒開 autoRowHeight),但 PRD-001 跟 PRD-003 有錯誤訊息 → 這兩 row
+          自動撐高顯示訊息;PRD-002、PRD-004 沒錯誤,維持原本的固定行高,內容垂直置中。
+          觀察 row 之間高度差,以及同一 row 內所有 cell 對齊一致(撐高 row 全頂對齊,固定 row 全置中)。
+        </p>
+        <DataTable
+          columns={editableColumns}
+          data={data}
+          height="auto"
+          inlineEdit
+          getRowId={(row) => row.sku}
+          tableOptions={{ getRowId: (row) => row.sku }}
+          onCellCommit={handleCommit}
+          cellErrors={cellErrors}
         />
       </div>
     )
@@ -816,58 +940,8 @@ export const VirtualScroll: Story = {
    - 各 chrome 元件 self-pad px-loose;table mx-loose 對齊 chrome 內容左右邊界
    - bordered=true(height="100%" 為垂直滾動 trigger,per spec)
    - Alert variant="neutral"(資訊性 hint,非 info hue) */
-// VisibilityRow:DnD-enabled row(GripVertical 為 drag handle / locked 顯示 Lock)。
-function VisibilityRow({
-  id, label, visible, locked, onToggle,
-}: {
-  id: string
-  label: string
-  visible: boolean
-  locked: boolean
-  onToggle: () => void
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: locked })
-  // 對齊 lib/drag-visual.ts SSOT(--opacity-disabled token)
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    ...dragSourceStyle(isDragging),
-  }
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        'flex items-start gap-2 w-full px-[var(--layout-space-loose)]',
-        ROW_PADDING_BY_SIZE.md,
-      )}
-    >
-      <ItemPrefix>
-        {locked
-          ? <Lock size={14} className="text-fg-muted" aria-hidden />
-          : <ItemInlineActionButton
-              icon={GripVertical}
-              size="md"
-              aria-label="拖曳重排"
-              className="cursor-grab active:cursor-grabbing"
-              {...attributes}
-              {...listeners}
-            />}
-      </ItemPrefix>
-      <ItemLabel className={locked ? 'text-fg-disabled' : undefined}>{label}</ItemLabel>
-      {/* Eye toggle 走 ItemInlineActionButton(對齊 same-row consistency canonical:同 row 不混
-          Inline Action + Button — 消除 box size 不一致 gap 斷裂)。size=md = 16+18 hover bg */}
-      <ItemInlineActionButton
-        icon={visible ? Eye : EyeOff}
-        size="md"
-        aria-label={visible ? '隱藏此欄' : '顯示此欄'}
-        disabled={locked}
-        onClick={onToggle}
-        className={locked ? 'cursor-not-allowed opacity-30' : ''}
-      />
-    </div>
-  )
-}
+// Issue 3(2026-05-10):VisibilityRow inline helper retired — 移到
+// `<DataTableColumnVisibilityPanel>` primitive 內部(SSOT)。
 
 export const WithBulkActions: Story = {
   name: '選取 + 批次操作',
@@ -877,7 +951,8 @@ export const WithBulkActions: Story = {
     const [allSelected, setAllSelected] = React.useState(false)
     const [search, setSearch] = React.useState('')
     const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
-    const [columnSearch, setColumnSearch] = React.useState('')
+    // Issue 3(2026-05-10):columnSearch 移到 `<DataTableColumnVisibilityPanel>` 內 own,
+    // story 不再 hold;columnOrder 仍 hold(table 跟 panel 共用同 state)。
     const [columnOrder, setColumnOrder] = React.useState<string[]>(() =>
       baseColumns.map((c) => (c as any).accessorKey ?? (c as any).id)
     )
@@ -958,116 +1033,22 @@ export const WithBulkActions: Story = {
                 <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
               </PopoverTrigger>
               <PopoverContent align="end" className="w-72 p-0">
-                {/* B 派(Notion-style):視覺 primitive 自組 panel list row(非 MenuItem)
-                    依據:MenuItem 是 menu specialization(px-3 menu-style + icon 色繼承),
-                    panel list 需對齊 chrome `loose` + drag/lock icon utility-color(neutral-7)。
-                    對齊 user 洞察「panel 場景繼承視覺 primitive 而非 MenuItem」。
-                    Row click ≠ Eye click(對齊 Notion / ClickUp / Linear,row 不互動 = 不顯 hover bg)。
-                    Drag 暫隱 — A.4 phase 接 DnD 才 show(避免騙人視覺)。 */}
-                <PopoverHeader hideClose>
-                  {/* hideClose + 自管 close X 進同一 flex 容器 → ButtonDivider 兩側 mx-1 對稱
-                      對齊 button-group.tsx ButtonDivider canonical「自身左右各 4px 對稱距離」 */}
-                  <div className="flex items-center gap-1 w-full min-w-0">
-                    <PopoverTitle className="flex-1">欄位顯示</PopoverTitle>
-                    {Object.values(columnVisibility).some(v => v === false) && (
-                      <>
-                        <Button
-                          variant="text" size="sm" iconOnly startIcon={RotateCcw}
-                          aria-label="恢復預設"
-                          onClick={() => setColumnVisibility({})}
-                        />
-                        <ButtonDivider />
-                      </>
-                    )}
-                    <PopoverClose asChild>
-                      <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
-                    </PopoverClose>
-                  </div>
-                </PopoverHeader>
-                {/* Q2 對稱:控件 wrapper pt-tight 省 pb,list py-2 + item py-1.5 接管下方
-                    (layoutSpace.spec.md 規則 3 補充:List 場景 inline → block 累加) */}
-                <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
-                  <Input
-                    size="md"
-                    placeholder="搜尋欄位…"
-                    value={columnSearch}
-                    onChange={(e) => setColumnSearch(e.target.value)}
-                    startIcon={Search}
-                  />
-                </div>
-                <ScrollArea className="max-h-72">
-                  {/* DnD column reorder via @dnd-kit + columnOrder state to DataTable。
-                      Drag handle 取代 lock 位置(locked → Lock,unlocked → drag handle)— 對齊 ref 圖。 */}
-                  <div className="py-2 flex flex-col" style={{ '--item-prefix-slot': '16px' } as React.CSSProperties}>
-                    <DndContext collisionDetection={closestCenter} onDragEnd={(e: DragEndEvent) => {
-                      const { active, over } = e
-                      if (!over || active.id === over.id) return
-                      const oldIdx = columnOrder.indexOf(active.id as string)
-                      const newIdx = columnOrder.indexOf(over.id as string)
-                      if (oldIdx < 0 || newIdx < 0) return
-                      // SKU(locked)鎖在第一位,不允許 reorder 動到
-                      if (columnOrder[0] === 'sku' && (oldIdx === 0 || newIdx === 0)) return
-                      const next = [...columnOrder]
-                      const [m] = next.splice(oldIdx, 1)
-                      next.splice(newIdx, 0, m)
-                      setColumnOrder(next)
-                    }}>
-                      <SortableContext items={columnOrder.filter(id => id !== 'sku')} strategy={verticalListSortingStrategy}>
-                        {columnOrder
-                          .map((id) => {
-                            const col = baseColumns.find(c => ((c as any).accessorKey ?? (c as any).id) === id)
-                            const headerLabel = typeof (col as any)?.header === 'string' ? (col as any).header : id
-                            return { id, headerLabel }
-                          })
-                          .filter(({ headerLabel }) =>
-                            columnSearch ? headerLabel.toLowerCase().includes(columnSearch.toLowerCase()) : true
-                          )
-                          .map(({ id, headerLabel }) => {
-                            const visible = columnVisibility[id] !== false
-                            const locked = id === 'sku'
-                            return (
-                              <VisibilityRow
-                                key={id}
-                                id={id}
-                                label={headerLabel}
-                                visible={visible}
-                                locked={locked}
-                                onToggle={() => setColumnVisibility(prev => ({ ...prev, [id]: !visible }))}
-                              />
-                            )
-                          })}
-                      </SortableContext>
-                    </DndContext>
-                  </div>
-                </ScrollArea>
-                {/* 對齊 Linear / Airtable / Material X-Grid:bidirectional toggle —
-                    任何欄位隱藏 → 「顯示全部」;全部可見 → 「全部隱藏」(locked 欄保留)。
-                    Notion 派(disabled when all visible)語義較弱,Linear 派教育性更高。 */}
-                <PopoverFooter className="justify-start">
-                  {(() => {
-                    const togglableIds = baseColumns
-                      .map((c) => ((c as any).accessorKey ?? (c as any).id) as string)
-                      .filter((id) => id !== 'sku')
-                    const allVisible = togglableIds.every((id) => columnVisibility[id] !== false)
-                    return (
-                      <Button
-                        variant="tertiary"
-                        size="sm"
-                        onClick={() => {
-                          if (allVisible) {
-                            const next: Record<string, boolean> = {}
-                            togglableIds.forEach((id) => { next[id] = false })
-                            setColumnVisibility(next)
-                          } else {
-                            setColumnVisibility({})
-                          }
-                        }}
-                      >
-                        {allVisible ? '全部隱藏' : '顯示全部'}
-                      </Button>
-                    )
-                  })()}
-                </PopoverFooter>
+                {/* Issue 3(2026-05-10):從 inline 149-line panel 改用 SSOT primitive
+                    `<DataTableColumnVisibilityPanel>`(全 feature flag opt-in:search +
+                    reset + DnD reorder + lock)。SKU 永遠鎖在第一位 = `lockedIds=['sku']`。 */}
+                <DataTableColumnVisibilityPanel
+                  columns={baseColumns.map((c) => ({
+                    id: ((c as any).accessorKey ?? (c as any).id) as string,
+                    label: typeof (c as any).header === 'string' ? (c as any).header : ((c as any).accessorKey ?? (c as any).id),
+                  }))}
+                  visibility={columnVisibility}
+                  onVisibilityChange={setColumnVisibility}
+                  columnOrder={columnOrder}
+                  onColumnOrderChange={setColumnOrder}
+                  lockedIds={['sku']}
+                  searchable
+                  resettable
+                />
               </PopoverContent>
             </Popover>
             <Button variant="primary" size="sm" startIcon={Plus}>新增商品</Button>
@@ -1540,6 +1521,420 @@ export const RowDragWithVirtualization: Story = {
           enableRowDrag
           onRowReorder={handleReorder}
         />
+      </div>
+    )
+  },
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * RoadmapInteractive — Slice A RFC §Demo deliverable(per S5 codex feedback +
+ * USER #50 verbatim「DataTable demo 就可以開始做了啊」+ codex 2026-05-10 review red-light fixes)。
+ *
+ * 場景:Product Initiative Roadmap(Q2 2026 PM OKR)。13 column 全 cell type 覆蓋。
+ *
+ * Cell type:string(readonly id + editable title)/ select(status / priority)/
+ *            multiSelect(tags)/ person(owner)/ multiPerson(reviewers)/
+ *            date(start / due)/ number(progress / hours)/ url(spec)/ boolean(shipped)
+ *
+ * World-class M22 cite(per codex review,2026-05-10):
+ *   - Linear Display options: https://linear.app/docs/display-options
+ *   - Asana Custom fields: https://developers.asana.com/docs/custom-fields-guide
+ *   - Jira Product Discovery fields reference: https://support.atlassian.com/jira-product-discovery/docs/jira-product-discovery-fields-reference/
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+interface RoadmapItem {
+  id: string
+  title: string
+  status: 'not-started' | 'in-progress' | 'blocked' | 'done' | 'cancelled'
+  priority: 'P0' | 'P1' | 'P2' | 'P3'
+  owner: PersonData
+  reviewers: PersonData[]
+  tags: string[]
+  startDate: string
+  dueDate: string
+  progress: number
+  spec: string
+  hours: number
+  /** Standup time(per user 2026-05-10 「補一個會出現 timepicker 的欄位」)。HH:MM 格式 */
+  standup: string
+  /** Nested sub-tasks(per Issue 7 nested rows requirement, 2026-05-10)*/
+  children?: RoadmapItem[]
+}
+
+const STATUS_OPTIONS = [
+  { value: 'not-started', label: '未開始' },
+  { value: 'in-progress', label: '進行中' },
+  { value: 'blocked', label: '受阻' },
+  { value: 'done', label: '完成' },
+  { value: 'cancelled', label: '取消' },
+]
+
+const PRIORITY_OPTIONS = [
+  { value: 'P0', label: 'P0', tagVariant: 'red' as const },
+  { value: 'P1', label: 'P1', tagVariant: 'orange' as const },
+  { value: 'P2', label: 'P2', tagVariant: 'yellow' as const },
+  { value: 'P3', label: 'P3', tagVariant: 'neutral' as const },
+]
+
+const TAG_LABELS = [
+  { value: 'design', label: 'design' },
+  { value: 'frontend', label: 'frontend' },
+  { value: 'backend', label: 'backend' },
+  { value: 'qa', label: 'qa' },
+  { value: 'ops', label: 'ops' },
+  { value: 'docs', label: 'docs' },
+  { value: 'mobile', label: 'mobile' },
+  { value: 'spike', label: 'spike' },
+]
+
+const ROADMAP_DATA: RoadmapItem[] = [
+  { id: 'RDM-001', title: '結帳流程改版 v2', status: 'in-progress', priority: 'P0', owner: SELLERS[0], reviewers: [SELLERS[1], SELLERS[2]], tags: ['frontend', 'design'], startDate: '2026-04-01', dueDate: '2026-05-30', progress: 65, spec: 'https://notion.so/checkout-v2', hours: 120, standup: '10:00' },
+  { id: 'RDM-002', title: '會員忠誠度系統', status: 'not-started', priority: 'P1', owner: SELLERS[1], reviewers: [SELLERS[3]], tags: ['backend', 'spike'], startDate: '2026-05-15', dueDate: '2026-07-30', progress: 0, spec: 'https://notion.so/loyalty', hours: 0, standup: '10:00' },
+  { id: 'RDM-003', title: '行動端 push 通知', status: 'blocked', priority: 'P1', owner: SELLERS[2], reviewers: [SELLERS[0], SELLERS[4]], tags: ['mobile', 'backend'], startDate: '2026-04-15', dueDate: '2026-06-15', progress: 30, spec: 'https://notion.so/push', hours: 45, standup: '10:00' },
+  { id: 'RDM-004', title: '搜尋 SEO 優化', status: 'done', priority: 'P2', owner: SELLERS[3], reviewers: [SELLERS[2]], tags: ['frontend', 'docs'], startDate: '2026-02-01', dueDate: '2026-04-01', progress: 100, spec: 'https://notion.so/seo', hours: 80, standup: '10:00' },
+  { id: 'RDM-005', title: '客服 CSAT 儀表板', status: 'in-progress', priority: 'P2', owner: SELLERS[4], reviewers: [SELLERS[5]], tags: ['frontend', 'design', 'docs'], startDate: '2026-04-10', dueDate: '2026-05-25', progress: 50, spec: 'https://notion.so/csat-dashboard', hours: 65, standup: '10:00' },
+  { id: 'RDM-006', title: '物流即時追蹤', status: 'not-started', priority: 'P3', owner: SELLERS[5], reviewers: [SELLERS[1]], tags: ['backend', 'qa'], startDate: '2026-06-01', dueDate: '2026-09-15', progress: 0, spec: 'https://notion.so/tracking', hours: 0, standup: '10:00' },
+  { id: 'RDM-007', title: 'A/B 測試平台', status: 'cancelled', priority: 'P3', owner: SELLERS[0], reviewers: [], tags: ['ops', 'spike'], startDate: '2026-03-01', dueDate: '2026-05-01', progress: 15, spec: 'https://notion.so/ab-test', hours: 20, standup: '10:00' },
+  { id: 'RDM-008', title: 'Dark mode 全站支援', status: 'in-progress', priority: 'P2', owner: SELLERS[1], reviewers: [SELLERS[0], SELLERS[3]], tags: ['frontend', 'design'], startDate: '2026-04-20', dueDate: '2026-06-10', progress: 75, spec: 'https://notion.so/dark-mode', hours: 90, standup: '10:00' },
+]
+
+// Roadmap shared columns helper(主 demo + 5 stress stories 共用)
+function useRoadmapColumns() {
+  const col = createColumnHelper<RoadmapItem>()
+  return React.useMemo(
+    () => [
+      col.accessor('id', { header: 'ID', meta: { type: 'string', width: 100 } }),
+      col.accessor('title', { header: '標題', meta: { type: 'string', editable: true, width: 240 } }),
+      col.accessor('status', { header: '狀態', meta: { type: 'select', options: STATUS_OPTIONS, editable: true, width: 130 } }),
+      col.accessor('priority', { header: '優先級', meta: { type: 'select', options: PRIORITY_OPTIONS, editable: true, width: 100 } }),
+      col.accessor('owner', { header: '負責人', meta: { type: 'person', people: SELLERS, editable: true, width: 160 } }),
+      col.accessor('reviewers', { header: '審核', meta: { type: 'multiPerson', people: SELLERS, editable: true, width: 140 } }),
+      col.accessor('tags', { header: '標籤', meta: { type: 'multiSelect', options: TAG_LABELS, editable: true, width: 200 } }),
+      col.accessor('startDate', { header: '開始', meta: { type: 'date', editable: true, width: 120 } }),
+      col.accessor('dueDate', { header: '截止', meta: { type: 'date', editable: true, width: 120 } }),
+      col.accessor('progress', { header: '進度%', meta: { type: 'number', editable: true, width: 100 } }),
+      col.accessor('spec', { header: '規格', meta: { type: 'url', editable: true, width: 180 } }),
+      col.accessor('hours', { header: '工時', meta: { type: 'number', editable: true, width: 90 } }),
+      // 2026-05-10(per user 補 timepicker 欄位):time column type 用 standup HH:MM
+      col.accessor('standup', { header: '站立', meta: { type: 'time', editable: true, width: 100 } }),
+      // 已出(shipped boolean)retired per user directive 2026-05-10
+    ],
+    []
+  )
+}
+
+/**
+ * **單一整合 demo**(2026-05-10 user 拍板「全部合起來放在同一個範例方便我檢查」+ codex Layer B
+ * 比稿 confirm「one primary integrated demo」):取代 6 個分散 stories(原 RoadmapInteractive +
+ * 5 stress stories: Pinned / AllSizes / SpreadsheetOverlay / Selection / BigData)。
+ *
+ * 整合所有 DataTable 主功能,模擬真實 product UI(無 inner title / 無 demo description,
+ * 對齊 user 圖4 reference「整個範例看起來是真實的」+ codex Q4.2 confirm):
+ *   - Search(consumer-side filter via Input)
+ *   - Filter panel(DataTableFilterPanel + evaluateTree)
+ *   - Sort manager(DataTableSortManager 多欄條件)
+ *   - Column visibility(Popover + checkbox per column)
+ *   - Selection + bulk actions(BulkActionBar)
+ *   - Pinned columns(left=id,right=shipped)
+ *   - Spreadsheet overlay(experimentalSpreadsheetOverlay + Contract 8/15)
+ *   - 500 rows + virtualization(per fold-in BigData)
+ *   - Inline edit(per Contract 12)
+ *
+ * Play function assertion(virtualization invariant per codex Q-3):500 rows + 固定高 →
+ * rendered rows ≤ 30(VIRTUAL_THRESHOLD + overscan;非全 500)。從原 RoadmapBigData fold 進。
+ *
+ * Layer C dissent vs codex Layer B:codex 建議 retain BigData 獨立,Layer A own DISAGREE
+ * 採 user explicit「全部合起來」— play assertion fold 進整合 demo 不另留 separate story。
+ */
+export const RoadmapAllInOne: Story = {
+  name: 'Roadmap 全功能整合 demo',
+  parameters: { layout: 'fullscreen' },
+  render: () => {
+    // 500 top-level rows derived from ROADMAP_DATA(fold-in BigData per codex Q4.1 + user 整合 ask)。
+    // **Issue 7(2026-05-10):前 8 rows 補 sub-tasks** 展示 nested row tree-table — 其餘 row 維持 flat
+    // 確保 virtualization invariant 仍在 500-row scale 驗證。
+    const bigData = React.useMemo(() => {
+      const arr: RoadmapItem[] = []
+      for (let i = 0; i < 500; i++) {
+        const base = ROADMAP_DATA[i % ROADMAP_DATA.length]
+        const id = `RDM-${String(i + 100).padStart(3, '0')}`
+        const item: RoadmapItem = {
+          ...base,
+          id,
+          title: `${base.title} (#${i + 1})`,
+        }
+        // 前 8 個 top row 補 sub-tasks(展示 nested row + drag canonical:top-level only)
+        if (i < 8) {
+          item.children = [
+            { ...base, id: `${id}-1`, title: `${base.title} 子任務 A`, progress: Math.min(100, base.progress + 10), hours: Math.max(0, Math.floor(base.hours / 3)) },
+            { ...base, id: `${id}-2`, title: `${base.title} 子任務 B`, progress: Math.max(0, base.progress - 10), hours: Math.max(0, Math.floor(base.hours / 4)) },
+          ]
+        }
+        arr.push(item)
+      }
+      return arr
+    }, [])
+    const [data, setData] = React.useState(bigData)
+    const columns = useRoadmapColumns()
+    const [search, setSearch] = React.useState('')
+    const [selection, setSelection] = React.useState<string[]>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
+    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [filterTree, setFilterTree] = React.useState<FilterTree>(() => createEmptyFilterTree('flat'))
+    const [filterOpen, setFilterOpen] = React.useState(false)
+    const [sortOpen, setSortOpen] = React.useState(false)
+    // Issue 7:nested row expansion state(預設展開前 2 個 top-row 的 sub-tasks)
+    const [expanded, setExpanded] = React.useState<Record<string, boolean>>({ 'RDM-100': true, 'RDM-101': true })
+    // Issue 7:column order(enableColumnReorder 用 controlled state,DnD 後 setColumnOrder)
+    const [columnOrder, setColumnOrder] = React.useState<string[]>([])
+
+    // Search consumer-side filter(per codex Q4.3「Search not a DataTable prop;
+    // story implements consumer-side filtering」)。Filter / sort 走 TanStack state。
+    const filteredData = React.useMemo(
+      () => search
+        ? data.filter(r => r.title.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase()))
+        : data,
+      [data, search]
+    )
+
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      const updateRow = (rows: RoadmapItem[]): RoadmapItem[] =>
+        rows.map((r) => {
+          if (r.id === rowId) return { ...r, [colId]: value }
+          if (r.children) return { ...r, children: updateRow(r.children) }
+          return r
+        })
+      setData((prev) => updateRow(prev))
+    }
+
+    // Issue 7:enableRowDrag handler — top-level only(nested children 不可拖,per NestedRowsWithDrag canonical)
+    const handleRowReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {
+      setData((prev) => {
+        const sourceIdx = prev.findIndex((r) => r.id === sourceId)
+        const targetIdx = prev.findIndex((r) => r.id === targetId)
+        if (sourceIdx === -1 || targetIdx === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(sourceIdx, 1)
+        const adjustedTarget = next.findIndex((r) => r.id === targetId)
+        const insertAt = position === 'before' ? adjustedTarget : adjustedTarget + 1
+        next.splice(insertAt, 0, moved)
+        return next
+      })
+    }
+
+    // Issue 7:enableColumnReorder handler(對齊 ColumnReorder canonical L256-265)
+    const handleColumnReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {
+      setColumnOrder((prev) => {
+        // 用既有 column accessorKey 順序作 fallback initial
+        const accessorKeys = columns.map((c) => (c as any).accessorKey ?? (c as any).id) as string[]
+        const base = prev.length > 0 ? prev : accessorKeys
+        const next = base.filter((id) => id !== sourceId)
+        const targetIdx = next.indexOf(targetId)
+        if (targetIdx === -1) return prev
+        const insertAt = position === 'before' ? targetIdx : targetIdx + 1
+        next.splice(insertAt, 0, sourceId)
+        return next
+      })
+    }
+
+    return (
+      <div className="flex flex-col w-full h-screen bg-canvas">
+        {/* Toolbar — 左 search / 右 ops(對齊 WithBulkActions canonical L922+ Gmail/Linear/Notion idiom)*/}
+        <div className="flex items-center justify-between gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+          <div className="flex-1 max-w-sm">
+            <Input
+              size="sm"
+              placeholder="搜尋 ID / 標題"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              startIcon={Search}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" pressed={isFilterTreeActive(filterTree)} />
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-auto p-0">
+                <DataTableFilterPanel
+                  mode="flat"
+                  columns={columns}
+                  value={filterTree}
+                  onChange={setFilterTree}
+                  onClose={() => setFilterOpen(false)}
+                />
+              </PopoverContent>
+            </Popover>
+            <Popover open={sortOpen} onOpenChange={setSortOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="text" size="sm" iconOnly startIcon={ArrowUpDown} aria-label="排序" pressed={sorting.length > 0} />
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-auto p-0">
+                <DataTableSortManager
+                  columns={columns}
+                  sorting={sorting}
+                  onSortingChange={setSorting}
+                  onReset={() => setSorting([])}
+                  onClose={() => setSortOpen(false)}
+                />
+              </PopoverContent>
+            </Popover>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-72 p-0">
+                {/* Issue 3(2026-05-10)+ F1 fix(2026-05-10):primitive
+                    `<DataTableColumnVisibilityPanel>` + columnOrder/onColumnOrderChange wired
+                    →  panel 內啟 drag handle(per user 抓「為什麼還會有偏移?為什麼沒 drag?」)。
+                    Roadmap 跟 WithBulkActions(L1050+ canonical)現在對齊 — panel 內 drag 是
+                    primary reorder UX,DataTable header drag handle 是 secondary parallel
+                    affordance。 */}
+                <DataTableColumnVisibilityPanel
+                  columns={columns.map((c) => ({
+                    id: ((c as any).accessorKey ?? (c as any).id) as string,
+                    label: typeof (c as any).header === 'string' ? (c as any).header : ((c as any).accessorKey ?? (c as any).id),
+                  }))}
+                  visibility={columnVisibility}
+                  onVisibilityChange={setColumnVisibility}
+                  columnOrder={columnOrder.length > 0 ? columnOrder : columns.map((c) => ((c as any).accessorKey ?? (c as any).id) as string)}
+                  onColumnOrderChange={setColumnOrder}
+                  searchable
+                  resettable
+                />
+              </PopoverContent>
+            </Popover>
+            <Button variant="primary" size="sm" startIcon={Plus}>新增</Button>
+            <Button variant="text" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
+          </div>
+        </div>
+
+        {/* DataTable container — flex-1 min-h-0(撐滿 toolbar 跟 footer 之間 space) */}
+        <div className="flex-1 min-h-0 mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)] flex flex-col">
+          <DataTable
+            columns={columns}
+            data={filteredData}
+            height="100%"
+            inlineEdit
+            selectable
+            selection={selection}
+            onSelectionChange={setSelection}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={setColumnVisibility}
+            pinnedLeftColumns={['id']}
+            // 2026-05-10:retire pinnedRightColumns(原 shipped boolean,user 拿掉「已出」欄位)
+            // 2026-05-10 B4:啟 enableColumnResize(per user「Roadmap demo 應該要有欄寬調整」)。
+            // H2 fix:pinned 欄位右邊也可 resize(panel boundary col hot zone 可拖)。
+            // H3:system cols + meta.resizable=false col 自動 lock 不允許拖。
+            enableColumnResize
+            enableRowDrag
+            onRowReorder={handleRowReorder}
+            enableColumnReorder
+            onColumnReorder={handleColumnReorder}
+            // 2026-05-10(per user「操作列只要 ⋯ 一個 action」):3 buttons → 1 MoreVertical
+            rowActions={() => (
+              <Button variant="text" size="xs" iconOnly startIcon={MoreVertical} aria-label="更多操作" />
+            )}
+            getRowId={(row) => row.id}
+            onCellCommit={handleCommit}
+            tableOptions={{
+              state: {
+                sorting,
+                globalFilter: filterTree,
+                expanded,
+                ...(columnOrder.length > 0 ? { columnOrder } : {}),
+              },
+              onSortingChange: (updater) => {
+                setSorting(typeof updater === 'function' ? updater(sorting) : updater)
+              },
+              onGlobalFilterChange: setFilterTree,
+              globalFilterFn: (row, _columnId, t: FilterTree) => evaluateTree(t, row.original),
+              getFilteredRowModel: getFilteredRowModel(),
+              // Issue 7 nested rows:tree-table 啟用
+              getSubRows: (row: RoadmapItem) => row.children,
+              getRowCanExpand: (row) => Boolean(row.original.children?.length),
+              onExpandedChange: setExpanded as any,
+            }}
+          />
+        </div>
+
+        {/* Bulk action bar — 底部 chrome,只在 selection 有值時顯示 */}
+        {selection.length > 0 && (
+          <BulkActionBar
+            selection={selection}
+            onClear={() => setSelection([])}
+            actions={
+              <>
+                <Button variant="tertiary" size="md" startIcon={Download}>匯出</Button>
+                <Button variant="tertiary" size="md" startIcon={Trash2} danger>移除</Button>
+              </>
+            }
+          />
+        )}
+      </div>
+    )
+  },
+  play: async ({ canvasElement }) => {
+    // Virtualization perf invariant(fold-in 自原 RoadmapBigData play function,per codex Q-3):
+    // 500 rows + height 100% → rendered rows 應 << 500(virtualizer 應只 render visible viewport
+    // + overscan)。Threshold 100 height-aware:full-screen viewport(~1080px viewport)~ 25 visible
+    // rows + overscan padding → 50-70 typical;遠 < 200 → virtualization work。
+    await new Promise((r) => setTimeout(r, 300))
+    const dataRows = canvasElement.querySelectorAll('[role="row"][data-row-index]')
+    const visibleCount = dataRows.length
+    if (visibleCount > 200) {
+      throw new Error(`Virtualization broken:rendered ${visibleCount} rows,expected ≤ 200(viewport-aware)`)
+    }
+    if (visibleCount < 5) {
+      throw new Error(`Virtualization too aggressive:rendered only ${visibleCount} rows`)
+    }
+  },
+}
+
+/* ── 2026-05-14 U Feature-split perf budget story(per codex perf debate verdict + user
+   「完美的解法」「沒有改壞原本的東西」directive):──────────────────────────────────────
+   獨立 perf 量測 story — 同 Roadmap 13 cols rich-cell data,但**禁用** row drag /
+   column reorder / column resize / selection / spreadsheet overlay,只保 inline edit display。
+   目的:驗證 H6 hypothesis「Roadmap 119ms 主因是 feature stack 疊加(SortableRowProvider /
+   filter/sort/columnOrder state)」。若此 story scroll <50ms = confirmed;若仍 >100ms = 純
+   rich cell 內在 cost。**不動** RoadmapAllInOne demo IA(user 2026-05-10 directive 全合一)。
+   對齊 codex 5-path 推薦 U + Layer A synthesize verdict。 */
+export const RoadmapPerfBudget: Story = {
+  name: 'Roadmap perf budget(feature-stack 隔離量測)',
+  parameters: { layout: 'fullscreen' },
+  tags: ['!autodocs'],
+  render: () => {
+    const bigData = React.useMemo(() => {
+      const arr: RoadmapItem[] = []
+      for (let i = 0; i < 500; i++) {
+        const base = ROADMAP_DATA[i % ROADMAP_DATA.length]
+        const id = `RDM-${String(i + 100).padStart(3, '0')}`
+        arr.push({ ...base, id, title: `${base.title} (#${i + 1})` })
+      }
+      return arr
+    }, [])
+    const [data, setData] = React.useState(bigData)
+    const columns = useRoadmapColumns()
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      setData((prev) => prev.map((r) => r.id === rowId ? { ...r, [colId]: value } : r))
+    }
+    return (
+      <div className="flex flex-col h-full">
+        <div className="px-[var(--layout-space-loose)] py-3 bg-surface border-b border-divider">
+          <p className="text-caption text-fg-muted">
+            Perf budget isolation:同 Roadmap 13 cols rich-cell + 500 rows + inline-edit,但**禁** row drag / column reorder / resize / selection / spreadsheet overlay。target avg ≤ 50ms / p95 ≤ 80ms。
+          </p>
+        </div>
+        <div className="mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)]">
+          <DataTable
+            columns={columns}
+            data={data}
+            height="600px"
+            inlineEdit
+            getRowId={(row) => row.id}
+            onCellCommit={handleCommit}
+          />
+        </div>
       </div>
     )
   },

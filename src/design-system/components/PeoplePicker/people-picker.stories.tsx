@@ -136,3 +136,27 @@ export const SizeAlignment: Story = {
     </div>
   ),
 }
+
+// @story-name-canonical-allow: race-test fixture for Playwright deterministic state injection
+// @story-trait-rationale: test fixture exposing window setter, not a consumer-facing variant
+const RaceTestPicker = () => {
+  const [val, setVal] = React.useState<PersonValue[]>([])
+  React.useEffect(() => {
+    ;(window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestSetVal = setVal
+    ;(window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestPeople = samplePeople
+    return () => {
+      delete (window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestSetVal
+      delete (window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestPeople
+    }
+  }, [])
+  return (
+    <div className="max-w-xs">
+      <PeoplePicker value={val} people={samplePeople} onChange={setVal} />
+    </div>
+  )
+}
+
+export const RaceTest: Story = {
+  name: 'race test',
+  render: () => <RaceTestPicker />,
+}

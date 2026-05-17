@@ -2,14 +2,10 @@
 set -uo pipefail
 # PreToolUse Edit/Write: enforce per-file line budgets for governance files.
 #
-# Budgets (from CLAUDE.md # 資訊治理 canonical):
-#   CLAUDE.md        ≤ 400 lines  (loaded every turn — must stay tight)
-#   spec.md          ≤ 300 lines  (per-component / per-pattern)
-#   SKILL.md         ≤ 250 lines  (references/ can extend — keep SKILL tight)
-#   memory file      ≤ 100 lines  (cross-session memory — keep tight)
-#
-# Transition period (2026-04-24 → 2026-07-24): CLAUDE.md soft cap 800 (not hard block)
-# while /knowledge-prune reduces from current 1225.
+# Budgets — SSOT 是 CLAUDE.md `# 治理 canonical` 「行數預算」段。
+# 本檔不再硬寫(避免 漂移 — 2026-05-15 Fix 4 per sub-agent a9e6d53c finding 6:
+# 之前硬寫 400 vs CLAUDE.md「target 200 / transition 400 / hard cap 800」三 home 三 baseline)。
+# 改 dynamic 從 CLAUDE.md grep,fallback 寫死值。SSOT 改一處全處跟動。
 #
 # Non-blocking: injects warning via hookSpecificOutput additionalContext; Claude
 # decides whether to split or ack. Hard block would paralyse edits to legitimately

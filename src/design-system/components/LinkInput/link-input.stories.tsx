@@ -1,3 +1,4 @@
+// @story-trait-rationale: isInputLike WithError 由 Field 消費者處理(LinkInput 在 Field 內透過 fieldCtx.invalid 自動套 error border);showcase 不重複 Field state machine 覆蓋的 case。
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { LinkInput } from './link-input'
@@ -120,7 +121,7 @@ export const Modes: Story = {
 
 /* ── Display（DataTable cell 用）── */
 export const Display: Story = {
-  name: 'Display',
+  name: '展示樣式',
   render: () => (
     <div className="flex flex-col gap-3">
       <LinkInput mode="display" value="https://www.example.com/path/to/page" />

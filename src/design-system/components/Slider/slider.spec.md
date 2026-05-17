@@ -2,7 +2,19 @@
 component: Slider
 family: 4
 variants: {}
-sizes: {}
+sizes:
+  sm:
+    px: 28
+    when: "Toolbar / inline 編輯;對齊 field-height-sm"
+    world-class: ["VS Code zoom slider", "Figma toolbar inline"]
+  md:
+    px: 36
+    when: "預設 — Form + 設定面板 + DataTable cell inline edit"
+    world-class: ["Material Slider default", "Polaris RangeSlider", "Ant Slider"]
+  lg:
+    px: 44
+    when: "Marketing hero 互動 / 高 touch 區"
+    world-class: ["Apple HIG slider touch zone"]
 traits:
   - hasSizes
   - hasInteractiveStates

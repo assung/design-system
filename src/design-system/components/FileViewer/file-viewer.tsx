@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // code-quality-allow: file-size — composite 拼裝(Toolbar / ZoomInput / InfoPanel / Filmstrip + Dialog shell + renderer registry);拆檔會把 useState/useEffect/key handler 跨檔同步過於複雜
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'

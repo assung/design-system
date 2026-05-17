@@ -9,6 +9,10 @@ export const EVENTS = {
   CLEAR: `${ADDON_ID}/clear`,
   /** Panel → preview:set forced pseudo-class state on pinned element */
   FORCE_STATE: `${ADDON_ID}/force-state`,
+  /** R6 v3(2026-05-13):Panel → preview「點 token 名 highlight 所有用此 token 的 elements」 */
+  HOTMAP_HIGHLIGHT: `${ADDON_ID}/hotmap-highlight`,
+  /** R6 v3:Panel → preview「clear hot map highlight overlay」 */
+  HOTMAP_CLEAR: `${ADDON_ID}/hotmap-clear`,
 } as const
 
 export type DevmodeMode = 'off' | 'live' | 'pin'
@@ -26,7 +30,7 @@ export interface InspectPayload {
   padding: { top: number; right: number; bottom: number; left: number }
   margin: { top: number; right: number; bottom: number; left: number }
   border: { top: number; right: number; bottom: number; left: number }
-  /** Position offsets — 對齊 Chrome `MetricsSidebarPane.ts` 的 5-layer model。`type` = static 時
+  /** Position offsets — **Inspired by** Chrome `MetricsSidebarPane.ts` 的 5-layer model(2026-05-13 verify Chromium source 真是 flex 非 grid,本 addon 用 grid 但 5-layer 概念對齊)。`type` = static 時
    * 4 邊值無意義(panel 顯 N/A)。non-static(absolute/relative/fixed/sticky)才有意義。 */
   position: {
     type: string

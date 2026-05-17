@@ -3,7 +3,7 @@ import { Pencil } from 'lucide-react'
 import type { VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
@@ -67,6 +67,14 @@ export interface LinkInputProps
   disabled?: boolean
   /** 自訂顯示文字（非編輯時） */
   label?: string
+  /**
+   * Display 是否包 Field naked wrapper(D-path opt-in,2026-05-08)
+   * — DataTable cell display↔edit 像素級對齊用。預設 false(裸 anchor,backward compat)。
+   * 設 true 時 display 走 fieldWrapperStyles(naked variant)包覆 anchor,
+   * 與 cell edit (`<Input naked>`) 同 DOM 結構,消除 Layer-B padding mismatch。
+   * **本元件 edit 無 endIcon(UrlCell 用 plain Input edit)→ display 也無 ItemSuffix**(僅 wrapper)。
+   */
+  showDisplayEndIcon?: boolean
 }
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
@@ -83,6 +91,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
       className,
       disabled: disabledProp,
       label,
+      showDisplayEndIcon = false,
       id: idProp,
       'aria-describedby': ariaDescribedByProp,
       'aria-errormessage': ariaErrorMessageProp,
@@ -103,10 +112,31 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     // ── mode='display' ─────────────────────────────────────────────────────
     // 純展示:無 input chrome / 無 hover affordance / 無 Pencil edit 入口。
     // 取代既有 LinkInputDisplay sub-component(2026-05-05 Phase B3 retire)。
-    // chrome 對 display 無視覺意義(display 完全無 wrapper)。
+    // Default(showDisplayEndIcon=false):無 wrapper 裸 anchor — backward compat。
+    // Opt-in(showDisplayEndIcon=true,2026-05-08 D-path):Field naked wrapper 包覆 anchor,
+    // 與 cell edit (`<Input naked>`) 同 DOM 結構消除像素偏移(無 ItemSuffix,因 edit 也無 endIcon)。
     if (resolvedMode === 'display') {
-      if (!value) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
-      return renderLinkAnchor(value, label)
+      if (!showDisplayEndIcon) {
+        // 2026-05-14 I2 fix(spec contract (e) display typography canonical):非 D-path bare
+        // anchor / span 必套 `fieldDisplayTextClass(size)`(sm/md→text-body,lg→text-body-lg)
+        // — 對齊跨 Field family display 視覺尺寸統一。原無 font-size class → 用 browser default
+        // 字體 → 跟其他 Field display 不一致(user 抓 I2)。truncate 同需,長 URL ellipsis(I1)。
+        if (!value) return <span className={cn(fieldDisplayTextClass(size), 'text-fg-muted block truncate')}>{EMPTY_DISPLAY}</span>
+        return <span className={cn(fieldDisplayTextClass(size), 'block truncate')}>{renderLinkAnchor(value, label)}</span>
+      }
+      return (
+        <div
+          className={cn(fieldWrapperStyles({ mode: 'display', variant: resolvedVariant, size }), className)}
+          data-field-mode="display"
+        >
+          <span className="flex-1 min-w-0 truncate">
+            {value
+              ? renderLinkAnchor(value, label)
+              : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+            }
+          </span>
+        </div>
+      )
     }
 
     const [editing, setEditing] = React.useState(false)
@@ -130,9 +160,17 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     const showLink = isEditable && hasValidValue && !editing && !localError
     const error = errorProp || localError
 
+    // 2026-05-16 audit codex Round 6:capture rAF + cancel on unmount(defensive hygiene)
+    const focusRafIdRef = React.useRef<number>(0)
+    React.useEffect(() => () => { if (focusRafIdRef.current) cancelAnimationFrame(focusRafIdRef.current) }, [])
+
     const handleEdit = () => {
       setEditing(true)
-      requestAnimationFrame(() => inputRef.current?.focus())
+      if (focusRafIdRef.current) cancelAnimationFrame(focusRafIdRef.current)
+      focusRafIdRef.current = requestAnimationFrame(() => {
+        focusRafIdRef.current = 0
+        inputRef.current?.focus()
+      })
     }
 
     const handleBlur = () => {

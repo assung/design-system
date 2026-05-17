@@ -1,7 +1,8 @@
 #!/bin/bash
 # Smoke test for stop_harvest_corrections.sh
 set -u
-HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/stop_harvest_corrections.sh"
+# Cluster B merge(2026-05-10):stop_harvest_corrections.sh fold 進 stop_passive_logging.sh dispatcher R2。
+HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../stop_passive_logging.sh"
 [ -x "$HOOK" ] || { echo "FATAL"; exit 1; }
 echo "Test 1: minimal payload → no crash"
 STDOUT=$(echo '{}' | bash "$HOOK" 2>&1); EXIT=$?

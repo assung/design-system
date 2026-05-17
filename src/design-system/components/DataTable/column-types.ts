@@ -64,6 +64,13 @@ declare module '@tanstack/react-table' {
     /** Allow text wrapping (only effective when autoRowHeight is true) */
     wrap?: boolean
     /**
+     * Max visible lines before ellipsis(2026-05-14 I9 per codex verdict + user 拍板)。
+     * Only effective when `autoRowHeight + wrap=true`。Display 用 `line-clamp-N`,edit textarea
+     * 高度 match clamp。對齊 Notion 「Truncate」row toggle / AG Grid `cellClassRules` 上限 row height。
+     * Default = undefined(無 clamp,完整 wrap)。
+     */
+    maxLines?: number
+    /**
      * Column 寬度(px)— DS canonical 命名(2026-05-06 v14.3)。
      *
      * **為何不用 TanStack 的 `size`** — DS 內 `size` 既定意為元件 density string
@@ -89,6 +96,19 @@ declare module '@tanstack/react-table' {
      * Column 最大寬度(px)— resize 模式下的拖拉上限。預設無上限。
      */
     maxWidth?: number
+    /**
+     * Column 是否可被 user 拖拉 resize(opt-out per col)。Default `true`(when `enableColumnResize` 也 true)。
+     *
+     * Set `false` 表「此 col 寬度由內容決定不允許 resize」(2026-05-10 加,per user
+     * 「操作列這種內容決定寬度的欄位應該不允許 resize」)。對齊 AG Grid `colDef.resizable` /
+     * Material X-DataGrid 同 API。
+     *
+     * System cols(__select__ / __drag__ / __actions__)自動 false(內部 hard-code,
+     * consumer 不需設)— 永遠固定寬。
+     *
+     * 典型 use case:custom 圖示欄、status indicator 欄、密度太緊不該 user 動的欄。
+     */
+    resizable?: boolean
     /**
      * Explicit opt-out from filter UI(預設 accessor column 有 type 即 filterable)。
      *
@@ -133,6 +153,22 @@ declare module '@tanstack/react-table' {
      * Esc cancel / blur or Enter commit。Commit 觸發 `onCellCommit`。
      */
     editable?: boolean | ((row: TData) => boolean)
+    /**
+     * Inline disabled state(2026-05-13 Stream C Cluster B Q3 ship,per codex Q3 verdict):
+     * cell 不可操作 state(orthogonal to editable readonly)。
+     * - `true`:cell 永遠 disabled
+     * - `false` / undef(default):cell normal
+     * - `(row) => boolean`:per-row 動態(e.g. row.archived 或 row.locked 才 disabled)
+     *
+     * 視覺(per `color.spec.md` `--bg-disabled` component-state token):
+     * - TD 外殼:`bg-disabled` + `cursor-not-allowed` + 抑制 hover ring
+     * - Cell content(Field family):`mode='disabled'` → 各 Field type 內部走具體 disabled token
+     * - edit entry 抑制:disabled cell 點擊不進 edit(對齊 `editable && !disabled` invariant)
+     *
+     * 跟 `editable=false` 區分:editable=false = readonly(可看不可編);disabled = 不可操作 state。
+     * 對齊 MUI X `isCellEditable` + cellClassName / AG Grid `cellClassRules` / Notion locked properties。
+     */
+    disabled?: boolean | ((row: TData) => boolean)
     /**
      * Locked column — column reorder 不可拖,Notion 「primary column」 pattern。
      * 對齊 SKU / ID 等不可移欄位。

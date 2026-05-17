@@ -112,39 +112,10 @@ export const InField: Story = {
   },
 }
 
-/* ── 尺寸對照 ── */
-export const AllSizes: Story = {
-  name: '尺寸對照',
-  render: () => (
-    <div className="flex flex-col gap-6 w-[520px]">
-      <div className="flex flex-col gap-2">
-        <span className="text-caption font-medium text-fg-secondary">sm — 商品列表、DataTable cell 內</span>
-        <div className="flex items-center gap-3 p-3 border border-border rounded-md">
-          <Rating value={4.5} readOnly precision="half" size="sm" aria-label="平均 4.5 星" />
-          <span className="text-caption text-fg-secondary">4.5</span>
-          <span className="text-caption text-fg-muted">(8,921)</span>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <span className="text-caption font-medium text-fg-secondary">md — 一般卡片、評論列表（預設）</span>
-        <div className="flex items-center gap-3 p-3 border border-border rounded-md">
-          <Rating value={5} readOnly size="md" aria-label="這則評論 5 星" />
-          <span className="text-caption text-fg-muted">匿名使用者 · 2 天前</span>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <span className="text-caption font-medium text-fg-secondary">lg — 送出評分 form 的主 CTA 區</span>
-        <div className="flex items-center gap-3 p-4 border border-border rounded-md">
-          <Rating defaultValue={0} size="lg" aria-label="為這次用餐評分" />
-        </div>
-      </div>
-    </div>
-  ),
-}
-
-/* ── Disabled 狀態 ── */
+/* @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。 */
+/* ── 停用狀態 ── */
 export const Disabled: Story = {
-  name: 'Disabled 狀態',
+  name: '停用狀態',
   render: () => (
     <div className="flex flex-col gap-4 w-[420px]">
       <p className="text-caption text-fg-muted">

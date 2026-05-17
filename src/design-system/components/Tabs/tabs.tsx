@@ -241,6 +241,9 @@ const MenuTabsList = React.forwardRef<
   // 不用 useOverflowIndices 因為 menu 永遠顯示全部,不需要動態 overflow 計算。
   // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
   const itemRefs = React.useRef<Map<number, HTMLElement>>(new Map())
+  // 2026-05-16 audit codex Round 6:capture rAF + cancel on unmount(defensive hygiene)
+  const scrollRafIdRef = React.useRef<number>(0)
+  React.useEffect(() => () => { if (scrollRafIdRef.current) cancelAnimationFrame(scrollRafIdRef.current) }, [])
   const registerItem = React.useCallback(
     (index: number) => (el: HTMLElement | null) => {
       if (el) itemRefs.current.set(index, el)
@@ -269,9 +272,10 @@ const MenuTabsList = React.forwardRef<
     (triggerValue: string, index: number) => {
       onValueChange?.(triggerValue)
       // 下一個 tick 再 scroll, 讓 Radix 先完成 data-state 更新
-      requestAnimationFrame(() => {
-        const el = itemRefs.current.get(index)
-        el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+      if (scrollRafIdRef.current) cancelAnimationFrame(scrollRafIdRef.current)
+      scrollRafIdRef.current = requestAnimationFrame(() => {
+        scrollRafIdRef.current = 0
+        itemRefs.current.get(index)?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
       })
     },
     [onValueChange]

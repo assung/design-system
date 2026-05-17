@@ -111,11 +111,13 @@ export const toastMeta = {
   component: 'Toast',
   family: null, // non-family composite / overlay / layout
   variants: {
-
+    neutral: { when: '非狀態通知;一般 announcement / tip' },
+    info: { when: '資訊性提示(新版本 / 同步完成)' },
+    success: { when: '成功確認(已寄送 / 付款完成)' },
+    warning: { when: '可恢復警告(未儲存 / 連線不穩)' },
+    error: { when: '錯誤(匯入失敗 / 權限不足);action prop 可加重試' },
   },
-  sizes: {
-
-  },
+  sizes: {},
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
     bg: ['bg-error', 'bg-info', 'bg-surface-raised', 'bg-warning'],

@@ -153,7 +153,7 @@ export const UsageGuidance: Story = {
 }
 
 export const IndeterminateVsDeterminateRule: Story = {
-  name: 'Indeterminate vs Determinate',
+  name: '不確定 vs 確定進度',
   render: () => (
     <div>
       <Rule

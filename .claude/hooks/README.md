@@ -12,46 +12,48 @@
 
 ## 當前居民(2026-04-26 重整,以 `settings.json` 註冊為準)
 
-### PreToolUse(Edit / Write / MultiEdit)
+### PreToolUse(Bash / Edit / Write / MultiEdit / mcp__github__*)
 
 | Hook | 做什麼 |
 |------|--------|
+| `check_solo_workflow.sh` | M28 git ops gate(branch sprawl / PR / merge — solo work canonical) |
+| `check_codex_collab_5step.sh` | M31 codex collab 5-step gate(claude+codex dual-track discipline) |
 | `enforce_home_charter.sh` | classification-sensitive dir / 新檔案的 charter gate(Write only) |
 | `check_file_size_budget.sh` | CLAUDE.md / spec / SKILL / memory 行數預算警告 |
-| `check_story_anatomy.sh` | **BLOCKS** stories 繞 DS canonical hand-craft(raw `<div>` 不用 MenuItem / Empty / Popover 等) |
-| `check_story_slot_split.sh` | stories slot 拆分結構(同 slot rule 不該拆兩 story:WithStartIcon + WithEndIcon → WithIcon grid) |
-| `check_story_category.sh` | stories trait coverage(hasSizes → AllSizes / isOverlay → OpenSnapshot / isInputLike → WithError) |
-| `check_principles_canonical.sh` | `*.principles.stories.tsx` Polaris-aligned core(WhenToUse / WhenNotToUse / Vs*Rule / ContentGuidelines)≥ 2 攔截 |
-| `check_l3_primitive_import.sh` | L3 primitive(L1 token / L2 atom)使用順序驗證 |
+| `check_story_invariants.sh` | stories 合一 invariant 檢查(anatomy / slot-split / category / principles canonical — 2026-05-10 已合併 5 個 sub-hook) |
+| `check_canonical_propagation.sh` | canonical 改動(spec / token / primitive)時 consumer propagation 檢查 |
+| `check_pattern_invariants.sh` | pattern 層 invariant(overlay-surface / item-anatomy / action-bar / 等) |
+| `check_naming_and_abstraction.sh` | M21 prop variant test + M27 prop name conflict + naming 三 test |
+| `check_benchmark_citation.sh` | M22 benchmark claim inline cite verify |
+| `check_wrapper_primitive_schema_drift.sh` | M30 wrapper schema 必 extends primitive |
+| `check_field_family_invariants.sh` | Field family layout / state machine 統一 |
+| `check_datatable_invariants.sh` | DataTable canonical(virtualizer / column-types / autoRow / overflow) |
+| `check_opacity_token_usage.sh` | opacity token 使用紀律 |
+| `check_substantive_edit_approval_preflight.sh` | substantive edit 前 user 拍板 preflight |
 
 ### PostToolUse(Edit / Write / MultiEdit)
 
 | Hook | 做什麼 |
 |------|--------|
 | `block_prototype_imports.py` | 產品 code 禁止 import `explorations/` |
-| `check_token_hygiene.sh` | 硬寫 shadow / shadcn compat alias / overflow raw class |
-| `check_hardcoded_strings.sh` | 偵測元件 / spec 內疑似硬寫字串(應走 token / 變數) |
-| `check_code_quality.sh` | clean-code 量化警告(`any` / dead export / long function / magic number) |
-| `check_cva_default_sync.sh` | 動到 cva `defaultVariants` 時三方(code / spec / story)同步警告 |
-| `check_story_compile_drift.sh` | 改元件 tsx / spec 自動跑 compile-stories `--check`(stories 機械產 vs hand-edit drift) |
-| `check_layout_space_canonical.sh` | layoutSpace 規則違規(block 旁邊 tight margin / 全 inline form 用 gap-tight)|
-| `check_story_name_jargon.sh` | story name 含 spec 內部代號(L1-L7 / canonical / spec X)|
-| `check_person_data_richness.sh` | sparse PersonData literal 違反 NameCard 一致呈現 canonical |
+| `post_edit_dispatcher.sh` | **Dispatcher**(2026-05-13 prune):一次 orchestrate 8 個 lib helper(token_hygiene / hardcoded_strings / code_quality / layout_space / person_data / overlay_handcraft / cva_default_sync / story_compile_drift)— hook count 32 → 24 |
+| `check_story_invariants.sh` | (同上,PostToolUse 路徑做 disk read drift check) |
+| `check_pixel_quantified_audit.sh` | M32 audit script 必 pixel-quantified verify(scans audit scripts for `getAttribute(` without `getBoundingClientRect(`) |
+| `check_field_controls_contracts.sh` | Field controls contract 強制(c)/(e)/(f) 等 |
 | `log_governance_fires.sh` | 治理檔 fire log 寫入 `.claude/logs/hook-fires.jsonl`(L2 anti-bloat) |
 
 ### PostToolUse(Skill)
 
 | Hook | 做什麼 |
 |------|--------|
-| `log_skill_invokes.sh` | skill invoke log 寫入 `.claude/logs/skill-invokes.jsonl` |
+| `log_skill_invokes.sh` | skill invoke log(本 hook 僅捕 Skill tool 呼叫,slash-command 走 user prompt 不被捕 — known limitation) |
 
 ### Stop
 
 | Hook | 做什麼 |
 |------|--------|
-| `stop_tsc_sanity.sh` | turn 動到 `.ts` / `.tsx` 時跑 `tsc -b` 檢查 |
-| `stop_governance_drift_check.sh` | turn 動到 governance 檔(CLAUDE.md / rules / skills / memory)時 drift 檢查 |
-| `stop_self_audit.sh` | turn 行為 audit(claim 沒 verify / prune trigger / topic 重複 ≥ 3 次 → silent log,不 inject — 詳 known issue 段) |
+| `stop_passive_logging.sh` | **Dispatcher**(2026-05-13 prune):一次跑 5 rule(tsc sanity / harvest corrections / capture metrics / governance drift / infra best-practice score)— stop hook count 3 → 2 |
+| `stop_self_audit.sh` | turn 行為 audit(claim 沒 verify / prune trigger / topic 重複 ≥ 3 次 → BLOCKER inject,M20 100+ failure mode 升級 2026-05-13) |
 | `stop_meta_self_audit.sh` | turn infra-score audit(8 維 score 跌 ≥ 5 / 任何 dim < 80 → silent log,不 inject — 詳 known issue 段) |
 | `stop_harvest_corrections.sh` | 掃 session 的 user 糾正信號寫 `.claude/logs/user-corrections.jsonl` |
 | `stop_capture_metrics.sh` | session 結束 metric snapshot |
@@ -76,7 +78,7 @@
 
 ## Anti-bloat 落地
 
-- **L1 Pre-write**:`check_file_size_budget.sh` + `check_l3_primitive_import.sh` + `check_principles_canonical.sh` 等(PreToolUse 阻擋 / 警告)
+- **L1 Pre-write**:`check_file_size_budget.sh` + `check_story_invariants.sh`(內含 principles canonical + l3 primitive 等 5 個合一)等(PreToolUse 阻擋 / 警告)
 - **L2 Per-commit**:`log_governance_fires.sh` → `.claude/logs/hook-fires.jsonl`(governance file 編輯軌跡)+ `log_skill_invokes.sh`
 - **L3 Periodic**:`/knowledge-prune` skill 季度跑,retire ≥ 5%
 

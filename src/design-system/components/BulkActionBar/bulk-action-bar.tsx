@@ -43,6 +43,18 @@ export interface BulkActionBarProps extends React.HTMLAttributes<HTMLDivElement>
   actions?: React.ReactNode
   /** Filter 模式:hidden 數量,顯示在 count 區 inline「{N} 已選 · {M} 個被 filter 隱藏」 */
   hiddenByFilter?: number
+  /**
+   * 「擴選整個 dataset」狀態(2026-05-13 ship,per user 抓 Alert「已選 5370」但 BulkActionBar
+   * 仍顯「已選 50 項」regression):
+   * - undefined / null(default):count 走 `selection.length`(page-level 視覺選取)
+   * - number:count 走此數值(整個 dataset 擴選後 user 已選的真總數)
+   *
+   * Canonical pattern:consumer 把 BulkActionBar 跟「Alert info banner(提示擴選 dataset)」
+   * 一起 mount,Alert 點「點此選取全部 N 個」→ setTotalSelected(N) → BulkActionBar count 同步。
+   * 對齊 Gmail / Linear / Notion 全選 dataset hint pattern。
+   * 詳 `bulk-action-bar.spec.md`「Extend dataset pattern」段。
+   */
+  totalSelected?: number | null
   /** i18n labels(Partial,merge with default) */
   labels?: Partial<BulkActionBarLabels>
 }
@@ -62,7 +74,7 @@ export interface BulkActionBarProps extends React.HTMLAttributes<HTMLDivElement>
 
 const BulkActionBar = React.forwardRef<HTMLDivElement, BulkActionBarProps>(
   function BulkActionBar(
-    { selection, onClear, actions, hiddenByFilter, labels: labelsOverride, className, ...props },
+    { selection, onClear, actions, hiddenByFilter, totalSelected, labels: labelsOverride, className, ...props },
     ref
   ) {
     const labels: BulkActionBarLabels = React.useMemo(
@@ -108,7 +120,8 @@ const BulkActionBar = React.forwardRef<HTMLDivElement, BulkActionBarProps>(
             World-class 共識:Linear/Notion/Carbon/Polaris 均用 primary foreground;muted 化弱化 state signal
             hiddenByFilter suffix 維持 muted(這是次資訊,視覺層次正確) */}
         <span className="text-body text-foreground tabular-nums">
-          {labels.count(selection.length)}
+          {/* 2026-05-13:totalSelected override 走 dataset 擴選後真總數,否則 fallback page-level selection.length */}
+          {labels.count(typeof totalSelected === 'number' ? totalSelected : selection.length)}
           {hiddenByFilter !== undefined && hiddenByFilter > 0 && (
             <span className="text-fg-muted font-normal"> {labels.hiddenSuffix(hiddenByFilter)}</span>
           )}

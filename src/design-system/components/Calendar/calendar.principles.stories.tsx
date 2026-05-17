@@ -122,7 +122,7 @@ export const ColorSemantic: Story = {
 
 // ── 原則 — MVP scope:月 view only ─────────────────────────────────────────
 export const MvpScope: Story = {
-  name: 'MVP scope',
+  name: 'MVP 範圍',
   render: () => (
     <div className="space-y-6">
       <Rule

@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import {
   TransformWrapper,
@@ -44,6 +45,10 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
   const imgRef = React.useRef<HTMLImageElement | null>(null)
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const [loaded, setLoaded] = React.useState(false)
+  // 2026-05-16 Round 5 codex audit fix:capture image-load rAF ID + cancel on unmount
+  // (原 uncancelled rAF 可能 unmount 後 fire onZoomChange → setState 後 component 已 gone)
+  const handleImageLoadRafIdRef = React.useRef<number>(0)
+  React.useEffect(() => () => { if (handleImageLoadRafIdRef.current) cancelAnimationFrame(handleImageLoadRafIdRef.current) }, [])
   // Q2 RWD:track「user 最後一次的 zoom 意圖」— fit-page / fit-width 自動 reflow,manual 不動。
   // 對齊 Apple Photos / Drive canonical:resize 時若 user 在 fit mode → recompute,manual zoom → 維持。
   const lastFitModeRef = React.useRef<FitMode | 'manual'>('fit-page')
@@ -103,7 +108,9 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
     const pct = clampToPct(scale)
     lastFitModeRef.current = 'fit-page'
     // 等 transform 就緒再更新(避免 initialScale=1 → fit 過程跳兩段)
-    requestAnimationFrame(() => {
+    if (handleImageLoadRafIdRef.current) cancelAnimationFrame(handleImageLoadRafIdRef.current)
+    handleImageLoadRafIdRef.current = requestAnimationFrame(() => {
+      handleImageLoadRafIdRef.current = 0
       onZoomChange(pct)
     })
   }, [computeFitScale, clampToPct, onZoomChange])

@@ -33,7 +33,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 
 export const Overview: Story = {
-  name: 'Overview',
+  name: '總覽',
   render: () => (
     <div className="space-y-8">
       <div>

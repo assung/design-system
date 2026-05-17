@@ -1,6 +1,6 @@
 ---
 name: scan-similar-bugs
-description: Auto-invoke after fix commits — extracts root-cause anti-pattern from last fix, greps DS-wide for same pattern, runs visual verify (Playwright when applicable), batches related fixes. Closes M10 (proactive exhaustive scan) mechanical gap — previously M10 was markdown-only,causing repeated「修一處沒掃 DS-wide」violations(本 conv: Button iconOnly 14×16 fix 沒掃,user 質疑後才發現 SegmentedControl 同 pattern)。Invoke directly via /scan-similar-bugs OR auto-chained by session_start_governance_check.sh when recent fix( commit untouched by this skill.
+description: Auto-invoke after fix commits — extracts root-cause anti-pattern, greps DS-wide for same pattern, runs visual verify, batches related fixes. Closes M10 mechanical gap. Invoke via /scan-similar-bugs.
 ---
 
 # /scan-similar-bugs — Fix-time DS-wide Exhaustive Scan
@@ -15,19 +15,21 @@ description: Auto-invoke after fix commits — extracts root-cause anti-pattern 
 **對位其他 skill**:
 - `/design-system-audit` 是**定期 batch** 7 維 audit
 - `/visual-audit` 是**單次視覺對齊** check
-- 本 skill 是 **immediate-after-fix grep + verify**(每 fix 一次)
+- 本 skill 是 **batch-end-only root-pattern scan**(2026-05-12 codex 抓 infra conflict 重構:per-fix → batch-end,對齊 `/bug-fix-rhythm` Phase 2-3 batch fix + single end-verify canonical;M32 split 後 batch-end home 移至 bug-fix-rhythm skill)
 
 ## When to invoke
 
-**強制(auto-chain)**:
-- 任何 commit message 含 `fix(` 或 `bugfix:` 或「修」「修復」「bug」keyword 後
-- session_start_governance_check.sh 偵測 24h 內有 fix commit 但 skill-invokes log 沒對應 invoke → 提醒 user
+**強制(auto-chain)— batch-end only**(2026-05-12 重構,per codex):
+- multi-issue session 結束後**一次**(不是每 fix 一次)
+- session 內 ≥ 2 fix commit 觸發批次 root-pattern scan
+- session_start_governance_check.sh 偵測 上 session 有 ≥ 2 fix commit 但 batch-end scan 沒跑 → 提醒
 
 **手動 invoke**:
 - user 明言「掃同類 bug / 看其他元件有沒有 / 全 DS scan」
-- 修完任何元件 padding / sizing / a11y / token-leak 後
+- multi-issue batch session 結束想驗 root-pattern DS-wide
 
-**不 invoke**:
+**不 invoke**(對齊 Anthropic Best Practice 小修 skip plan):
+- **Surgical visual bug**(user 列 N 個 visual defects + 無 canonical / API / cross-component → 批 fix + final verify only,不必 scan-similar)
 - pure refactor(無 bug 修復語義)
 - spec.md / docs only commit
 - 純 typo / import cleanup

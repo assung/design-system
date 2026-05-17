@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import { Plus, Search } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -8,9 +9,11 @@ import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandS
 import { Command as CommandPrimitive } from 'cmdk'
 import { MenuItem, MenuFooter } from '@/design-system/components/Menu/menu-item'
 import { Empty } from '@/design-system/components/Empty/empty'
+import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
 import { OVERLAY_SIDE_OFFSET } from '@/design-system/tokens/elevation/overlay-geometry'
 import { getMenuListMinHeight } from '@/design-system/components/Field/field-types'
 import { RowSizeProvider } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { applySelectAll, clearSelection } from '@/design-system/lib/multi-select-ordering'
 
 /**
  * SelectMenu — Popover + Command 組成的完整下拉選單
@@ -77,6 +80,12 @@ export interface SelectMenuProps {
   searchPlaceholder?: string
   /** 空選項提示 */
   emptyText?: string
+  /** Loading 狀態(2026-05-15 audit B fix per user verbatim「dropdown 隨時可開,讀取在 panel 中間 CircularProgress」)
+   *  true → render `<Empty icon={<CircularProgress size={48}/>} description={loadingText} />` 取代 options;
+   *  trigger 不變,user 隨時可開 dropdown。對齊 MUI Autocomplete `loadingText` dropdown-body + Ant Select
+   *  loading idiom + DS 既有 `empty.spec.md:182` 「全頁 loading = Empty + CircularProgress compose」SSOT。
+   */
+  loading?: boolean
 
   /** 尺寸 */
   size?: SizeKey
@@ -89,6 +98,8 @@ export interface SelectMenuProps {
 
   /** 受控 open 狀態 */
   open?: boolean
+  /** 預設打開(uncontrolled initial state)— 2026-05-15 audit Dim 26 V1 fix per user verbatim「A:1」approval */
+  defaultOpen?: boolean
   /** open 狀態變更 callback */
   onOpenChange?: (open: boolean) => void
 
@@ -123,11 +134,13 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
   children,
   searchPlaceholder = '搜尋…', // i18n-allow: DS default; consumer override via searchPlaceholder prop
   emptyText = '沒有符合的選項', // i18n-allow: DS default; consumer override via emptyText prop
+  loading = false,
   size = 'md',
   align = 'start',
   minRows = 3,
   minWidth,
   open: controlledOpen,
+  defaultOpen,
   onOpenChange: controlledOnOpenChange,
   renderLabel,
   onOpenAutoFocus,
@@ -135,7 +148,7 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
   className,
 }, _ref) {
   // ── State ──
-  const [internalOpen, setInternalOpen] = React.useState(false)
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen ?? false)
   const open = controlledOpen ?? internalOpen
   const setOpen = controlledOnOpenChange ?? setInternalOpen
   const [search, setSearch] = React.useState('')
@@ -180,14 +193,25 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
     return 'indeterminate'
   }, [multiple, selectableOptions, isSelected])
 
+  // 2026-05-16 SSOT canonical fix(Claude+Codex M31 Round 4 共識 + user verbatim「就照你們
+  // 的共識做到完美確保有 SSOT」):
+  //
+  // 原 fully-replace `selectableOptions.map(v)` = source order reset,但**Ant Design 跨元件 grep
+  // 證據顯示 source-reset 沒 Ant precedent**(Transfer + Table rowSelection 都是 preserve+append)。
+  // 改 `applySelectAll(selectedValues, all)` SSOT primitive 對齊 Ant Transfer canonical:
+  //   `Array.from(new Set([...prevKeys, ...keys]))` — preserve existing + append unselected。
+  //
+  // SSOT in `@/design-system/lib/multi-select-ordering` — 未來新 multi-select with Select All
+  // footer 必 consume 此 primitive(hook `check_select_all_canonical.sh` 機械強制),
+  // 不再各自 reimplement → 防 ordering policy drift。
   const handleSelectAll = React.useCallback(() => {
     if (!multiple) return
     if (allState === true) {
-      onValueChange?.([])
+      onValueChange?.(clearSelection())
     } else {
-      onValueChange?.(selectableOptions.map((o) => o.value))
+      onValueChange?.(applySelectAll(selectedValues, selectableOptions.map((o) => o.value)))
     }
-  }, [multiple, allState, selectableOptions, onValueChange])
+  }, [multiple, allState, selectableOptions, selectedValues, onValueChange])
 
   // ── Creatable ──
   const showCreate = React.useMemo(() => {
@@ -298,7 +322,9 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
               className="flex items-center justify-center"
               style={{ minHeight: getMenuListMinHeight(size, minRows) }}
             >
-              <Empty description={emptyText} className="py-6" />
+              {loading
+                ? <Empty icon={<CircularProgress size={48}/>} className="py-6" />
+                : <Empty description={emptyText} className="py-6" />}
             </CommandEmpty>
 
             {groupedOptions.map((group, gi) => (

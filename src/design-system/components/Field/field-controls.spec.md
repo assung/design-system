@@ -1,5 +1,5 @@
 ---
-component: field-controls
+component: FieldControls
 traits:
   - hasVariants
   - hasSizes
@@ -280,6 +280,25 @@ col.accessor('status', {
 ```
 
 兩者可在同一張 table 混用。
+
+---
+
+## 共享 contract(2026-05-12 Stream C — Selected renderer / Placeholder vocabulary / Cell surface)
+
+**(a) Selected value renderer**:rich display(avatar+name/icon+label)元件**必**提供 consumer renderer slot,**display/readonly/disabled/edit** 4 mode 共享同一 renderer(禁 edit-only)。`Select.selectedItemRenderer` / `Combobox.tagRenderer`(edit 已接;display path unify deferred 下 cycle)/ PeoplePicker 走 `PersonDisplay`+`MultiPersonDisplay`+`Combobox.tagRenderer`。對齊 MUI Autocomplete `renderValue` / Ant Select `tagRender`+`labelRender`+`optionRender` / MUI DataGrid `renderCell`+`renderEditCell` 共享 params。
+
+**(b) Placeholder vocabulary**(3 props 對 3 UI state,**不可混用**):
+- `placeholder` — trigger empty(沒選值,例「請選擇人員」)— Ant/Polaris/Carbon canonical
+- `searchPlaceholder` — search input hint(例「搜尋人員…」)— Ant `searchPlaceholder`
+- `emptyText`/`noResultsText` — filtered menu 無結果(例「沒有符合的人員」)— Ant `notFoundContent` / Material X `localeText.noResultsOverlayLabel`
+
+**禁**:wrapper 把 `emptyText`(search-empty)silent forward 成 `emptyPlaceholder`(trigger-empty);**Combobox `emptyPlaceholder` deprecated**,保留 1 cycle fallback,future `placeholder` 唯一 trigger source。Hook `check_field_controls_contracts.sh` (contract b) 機械強制。
+
+**(c) Cell surface metrics**:Field family 在 cell 內**禁** hardcode padding(`tagAreaPaddingLeftPx={isEmpty ? undefined : 8}` 反 pattern)。改 **`FieldSurface` context**(`'form' | 'toolbar' | 'table-cell'`):`useFieldSurface()` 取值,`<FieldSurfaceProvider surface="table-cell">` 自動套於 `cell-registry.resolveCellComponent`。Consumer 用 `surface === 'table-cell'` 顯式 query(取代 `variant === 'naked'` heuristic)。**risk mitigation**:`avatar.left = cell.left + computed(--table-cell-px)`,禁再加 magic 8px(double-count)。**Token scope**:`--table-cell-px/py` 是 DataTable-scoped metric(CSS 定義在 `data-table.css`,Field naked variant 是 DataTable cell substrate sub-component 故 cross-path reference 不算真 cross-component),per 2026-05-13 codex Q2 verdict + AG Grid `cellHorizontalPadding`(grid theme param)/ MUI X `cellClassName`(per-cell)/ Carbon spacing scale primitive(不升 cell padding 全域 token)idiom — **不**升 `tokens/layoutSpace/` canonical。對齊 AG Grid cellRendererSelector / Material X DataGrid 共享 params / Notion property type registry。Hook `check_field_controls_contracts.sh` (contract c) 機械強制。
+
+**(d) Default variant display = zero chrome SSOT**(2026-05-13 user 拍板 Path Ⅰ + codex V2 verdict):default `mode='display'` **必** zero chrome。Display 純展示語意,真要包 chrome 走 `readonly` 或 `showDisplayEndIcon=true` opt-in。**Impl**:`field-wrapper.tsx` + `textarea.tsx` compoundVariants `mode:'display'+variant:'default'` 加 `!px-0 !py-0`。對齊 Carbon read-only / Stripe display / Notion property / Polaris readonly。Hook `check_field_controls_contracts.sh` (contract d) propose。
+
+**(e) Display typography canonical**(2026-05-14 user I2 + codex M31 verdict):Field family display path **必** consume `fieldWrapperStyles` size variants typography token — `sm/md → text-body`(14px line-height 1.5)/ `lg → text-body-lg`(16px)。**禁**:LinkInput / Select / Combobox 非 D-path 的 bare-span 直接 render 無 font-size class(瀏覽器 default 字體);**必**包 `text-body` (sm/md) / `text-body-lg` (lg) class。對齊跨 Field family display 視覺尺寸統一(user 抓 LinkInput display 字體跟其他 Field 不一致 = SSOT 違反 漏接 typography token)。**Impl**:LinkInput / Select / Combobox / DatePicker / TimePicker non-D-path bare-span 加 size-aware text class。world-class cite:MUI X DataGrid `Typography` consistent / Atlassian @atlaskit/textfield size-prop typography token / Polaris TextField typographyToken size-aware。
 
 ---
 

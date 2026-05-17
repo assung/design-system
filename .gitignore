@@ -23,6 +23,9 @@ Icon?
 .vscode/
 .idea/
 .claude/settings.local.json
+# Hook runtime state files(per-machine,not for commit)
+.claude/logs/.last-blocked-*.txt
+.claude/scheduled_tasks.lock
 
 # Figma plugin (local dev only)
 figma-plugin/

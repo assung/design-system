@@ -180,8 +180,10 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
 ### plain 模式
 
 - 原生 select 純文字 + ChevronDown
-- 可搭配 `startIcon`——代表 value 的圖示（如狀態 icon），不是裝飾
-- startIcon 的語意是「描述目前選中的值」，不是「描述這個 field 的用途」
+- 可搭配 `startIcon`——**field-level leading indicator**(色 muted,對齊 `Input.startIcon` search-icon pattern;`Mail` / `Globe` / `Lock` / `Flag` 等提示「這個 field 的類型 / 屬性」,跟 selected value 變動無關)
+- **代表 value 的 icon(value-bound)走 `option.icon` per-option API**,Select 渲 selected 時 inherit fg-default(對齊 `MenuItem.startIcon` 跨元件 SSOT)
+- 兩 prop 不互斥:`startIcon` field-level 顯示時優先;unset 才落到 selected `option.icon` fallback(select.tsx:197/369 `SelectedIcon` path)
+- **icon kind canonical(2026-05-09 clarified)**:DS 兩種 icon 角色明確區分 — **value icon**(代表 label / 選中項)→ fg-default(MenuItem 內 / `option.icon`)/ **indicator icon**(field-level leading hint)→ muted(Input.startIcon / Select.startIcon)
 
 ### tag 模式
 
@@ -216,6 +218,12 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
 
 **誤解**：「選項超過 N 個一定要開 searchable」。
 **事實**：主判準是 label 性質，不是數量。見「Searchable 開啟判斷」。
+
+---
+
+## Loading
+
+`loading?: boolean`(forward 給 SelectMenu SSOT,2026-05-15 audit B 補):dropdown body 內取代 options 顯 `<Empty icon={<CircularProgress size={48}/>}/>`(消費 既有 empty.spec.md:182 SSOT)+ `aria-busy`。Trigger 不變(chevron 保留,user 隨時可開)。對齊 MUI Autocomplete `loadingText` 雙層 + Ant Select loading,反 trigger spinner 派。
 
 ---
 

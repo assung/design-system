@@ -200,6 +200,7 @@ function isPersonObject(v: unknown): v is { name: string } {
   return !!v && typeof v === 'object' && 'name' in v
 }
 
+// code-quality-allow: long-function — 13-operator switch dispatch table,table-driven 重構會把 op-specific guards 拆出反增 indirection
 function matchOperator(op: string, cellValue: unknown, filterValue: unknown): boolean {
   // 不需 value 的 op
   switch (op) {
@@ -233,8 +234,20 @@ function matchOperator(op: string, cellValue: unknown, filterValue: unknown): bo
   switch (op) {
     case 'contains':         return String(cellValue ?? '').toLowerCase().includes(String(filterValue).toLowerCase())
     case 'does_not_contain': return !String(cellValue ?? '').toLowerCase().includes(String(filterValue).toLowerCase())
-    case 'is':               return String(cellValue ?? '').toLowerCase() === String(filterValue).toLowerCase()
-    case 'is_not':           return String(cellValue ?? '').toLowerCase() !== String(filterValue).toLowerCase()
+    // 2026-05-12 Round 6 fix(user 抓 Roadmap 進階篩選「全部」結果空)— impl-vs-spec drift。
+    // Per `advanced-filter-operators.draft.md` L116「is 直接接受多值,不另設 is_any_of」+ L103-116
+    // select(is/is_not + select_multi ValueShape OR 語意)+ L31-32(select.is / person.is 都走
+    // select_multi / person_multi ValueShape)。原 impl 只做 single-value 比對,filterValue 是
+    // array(全選 options)→ String(array)= "v1,v2" → 永遠 != single cellValue → 結果空。
+    // Fix:加 array handling,走 OR 語意:any → match;is_not → every-not-match。
+    case 'is':
+      if (Array.isArray(filterValue))
+        return filterValue.some((v) => String(cellValue ?? '').toLowerCase() === String(v).toLowerCase())
+      return String(cellValue ?? '').toLowerCase() === String(filterValue).toLowerCase()
+    case 'is_not':
+      if (Array.isArray(filterValue))
+        return filterValue.every((v) => String(cellValue ?? '').toLowerCase() !== String(v).toLowerCase())
+      return String(cellValue ?? '').toLowerCase() !== String(filterValue).toLowerCase()
     case 'starts_with':      return String(cellValue ?? '').toLowerCase().startsWith(String(filterValue).toLowerCase())
     case 'ends_with':        return String(cellValue ?? '').toLowerCase().endsWith(String(filterValue).toLowerCase())
 

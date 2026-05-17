@@ -1,0 +1,91 @@
+{
+  "$schema": "./utility-registry.schema.json",
+  "_meta": {
+    "purpose": "Single SSOT for Tailwind utility allow/block — extracted from typography/radius/opacity/elevation/color spec.md 禁止 lists. Hook reads this(not grep spec.md)to enforce token-first discipline. New token additions or removals → update here first, spec.md cite registry.",
+    "owner": "src/design-system/tokens/utility-registry.json",
+    "consumed_by": [
+      ".claude/hooks/check_opacity_token_usage.sh(rename → check_tailwind_token_registry.sh)",
+      ".claude/hooks/check_token_hygiene.sh",
+      ".claude/skills/design-system-audit/references/audit-prompts.md Dim 5"
+    ],
+    "spec_sources": [
+      "src/design-system/tokens/typography/typography.spec.md L91-105",
+      "src/design-system/tokens/radius/radius.spec.md L57-71",
+      "src/design-system/tokens/opacity/opacity.spec.md L53-57",
+      "src/design-system/tokens/color/color.spec.md(hardcoded hex/rgb canonical)",
+      "src/design-system/tokens/elevation/elevation.spec.md(shadow-{sm,md,lg,xl,2xl} 禁)"
+    ],
+    "rationale": "World-class DS(Atlassian @atlaskit/tokens / Carbon @carbon/themes / Ant ConfigProvider / Polaris polaris-tokens)用 registry + lint, 不靠 grep 各處 spec.md。Rule-of-3 violation 已存在(典型禁止 list 在 3 個 spec.md 各寫一份)— 本檔抽 SSOT。"
+  },
+  "typography": {
+    "allow": [
+      "text-h1", "text-h2", "text-h3", "text-h4", "text-h5", "text-h6",
+      "text-body", "text-caption", "text-helper", "text-label",
+      "leading-compact", "leading-normal",
+      "font-normal", "font-medium", "font-bold",
+      "tracking-shortcut"
+    ],
+    "block": {
+      "size_raw": ["text-xs", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl", "text-3xl", "text-4xl", "text-5xl", "text-6xl", "text-7xl", "text-8xl", "text-9xl"],
+      "weight_raw": ["font-thin", "font-extralight", "font-light", "font-semibold", "font-extrabold", "font-black"],
+      "leading_numeric": "leading-{N}(use leading-compact / leading-normal token)",
+      "tracking_raw": ["tracking-tighter", "tracking-tight", "tracking-wide", "tracking-wider", "tracking-widest"],
+      "tracking_raw_rationale": "Block raw Tailwind tracking-* utility(unscoped letter-spacing leaks 跨元件不一致)。需要 wider letter-spacing 場景必 codify role-specific semantic utility — 例如 `tracking-shortcut`(鍵盤快捷鍵 hint,0.1em,對應 --tracking-shortcut token)。新 role 必走 typography.css 新增 `--tracking-<role>` + `@utility tracking-<role>`,再 allow 進本 registry。",
+      "inline_style": "style={{ fontSize: ..., lineHeight: ... }}",
+      "rationale_path": "src/design-system/tokens/typography/typography.spec.md L91-105"
+    }
+  },
+  "radius": {
+    "allow": ["rounded-xs", "rounded-sm", "rounded-md", "rounded-lg", "rounded-full"],
+    "block": {
+      "out_of_range": ["rounded-xl", "rounded-2xl", "rounded-3xl"],
+      "ambiguous_default": "rounded(use rounded-md explicit)",
+      "arbitrary_value": ["rounded-[6px]", "rounded-[var(--radius-md)]"],
+      "inline_style": "style={{ borderRadius: ... }}",
+      "rationale_path": "src/design-system/tokens/radius/radius.spec.md L57-71"
+    }
+  },
+  "opacity": {
+    "allow": ["opacity-0", "opacity-100", "opacity-disabled"],
+    "block": {
+      "numeric_tier": ["opacity-5", "opacity-10", "opacity-20", "opacity-25", "opacity-30", "opacity-40", "opacity-50", "opacity-60", "opacity-70", "opacity-75", "opacity-80", "opacity-90", "opacity-95"],
+      "arbitrary_value": "opacity-[0.N](use --opacity-disabled or token swap)",
+      "rationale_path": "src/design-system/tokens/opacity/opacity.spec.md L53-57",
+      "philosophy": "Single semantic token(0.45)vs Tailwind multi-tier(對齊 Polaris / Material / Apple 單值哲學)"
+    }
+  },
+  "elevation": {
+    "allow": ["shadow-[var(--elevation-100)]", "shadow-[var(--elevation-100-hover)]", "shadow-[var(--elevation-200)]", "shadow-[var(--elevation-200-hover)]"],
+    "block": {
+      "tailwind_size": ["shadow-sm", "shadow", "shadow-md", "shadow-lg", "shadow-xl", "shadow-2xl", "shadow-inner"],
+      "rationale_path": "src/design-system/tokens/elevation/elevation.spec.md",
+      "philosophy": "DS 採 2-tier elevation(100 / 200)語意而非 Tailwind size ladder"
+    }
+  },
+  "spacing": {
+    "allow_canonical": "對齊 spec(gap-2/3/4/6/8 等;layout-space token via var())",
+    "warn": {
+      "micro_gap": ["gap-px", "gap-0.5", "gap-1.5"],
+      "rationale": "<4px gap 通常違反 item-anatomy slot 幾何。Allow exception in spec.md(Skeleton bone / inline action 等)but flag for human review."
+    }
+  },
+  "sizing": {
+    "warn": {
+      "fraction": ["w-1/3", "w-2/3", "w-1/4", "w-3/4", "w-1/5", "w-2/5", "w-3/5", "w-4/5", "w-1/6", "w-5/6", "w-1/12", "w-5/12", "w-7/12", "w-11/12"],
+      "rationale": "Fraction width 通常 inside DS component = layout SSOT 漂移。Allow if component spec owns layout(eg. Field labelWidth 比例)but flag。"
+    }
+  },
+  "shadcn_alias": {
+    "block": {
+      "color_alias": ["bg-popover", "text-popover-foreground", "text-muted-foreground", "bg-accent", "text-accent-foreground", "bg-destructive", "bg-background", "text-background", "border-input"],
+      "rationale": "shadcn compat alias 不聯動 DS dark mode。改用 direct token(--surface-raised / --fg-muted / --error 等)",
+      "rationale_path": "CLAUDE.md `# 失敗記憶索引` shadcn compat alias 回流"
+    }
+  },
+  "primitive_color_as_utility": {
+    "block": {
+      "primitive_class": ["bg-neutral-1", "bg-neutral-2", "text-blue-6", "text-red-7", "border-blue-3"],
+      "rationale": "primitive 色名作 utility = 越過 semantic 層。用 semantic utility(bg-surface / text-fg-secondary 等)或 var() bracket(bg-[var(--color-blue-6)])"
+    }
+  }
+}

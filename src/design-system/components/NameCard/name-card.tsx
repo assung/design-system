@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import { MessageCircle, Phone, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -94,7 +95,7 @@ const STATUS_LABEL: Record<StatusType, string> = {
 // Email / Phone / Department / Location 等其他 description 一律 opt-in by consumer 透過
 // `fields` array prop。對齊 user 明確「應該確保所有都只有這兩個,因為我並沒有要求你要選其他的」。
 export const NAMECARD_DEFAULT_FIELD_KEYS = ['id', 'employeeNumber'] as const
-export type NameCardDefaultFieldKey = typeof NAMECARD_DEFAULT_FIELD_KEYS[number]
+type NameCardDefaultFieldKey = typeof NAMECARD_DEFAULT_FIELD_KEYS[number]
 
 const DEFAULT_FIELD_LABEL: Record<NameCardDefaultFieldKey, string> = {
   id: 'ID',
@@ -242,31 +243,36 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
           )}
         </div>
 
-        {/* ── BODY(可捲動,v11 always-render canonical): status + fields ──
-            前 v10 用 `hasStatus || hasFields` conditional render → consumer 漏傳 → section
-            消失 + 視覺結構在不同 consumer 不一致。v11:**永遠 render 兩個 section**(缺資料顯
-            placeholder),user explicit「視覺結構統一」rule。 */}
+        {/* ── BODY(可捲動,v12 status-conditional 2026-05-14):status + fields ──
+            **v12 rule**(per user 拍板「不應該顯示『狀態沒有被設定』,production 每 user 一定有
+            presence state,undefined 頂多是 loading transient 還沒讀到」):status undefined →
+            隱藏整 status badge + status message block(loading 期間 skip),禁 render「Status not
+            set」這種 placeholder(語義錯,user presence 不會「沒設定」)。**NameCard-specific 不外推
+            至 DS 其他元件**(FileItem / DescriptionList / DataTable cell 各自 placeholder 邏輯
+            unrelated)。Fields section 仍 always-render(info schema 性質)。 */}
         <ScrollArea className="flex-1 min-h-0 border-t border-divider">
-          <div className="px-4 py-3 flex flex-col gap-3">
-            {/* Status badge — dot 色走 --status-* presence token;無 status → muted 樣式 */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md">
-              <span
-                className="w-2.5 h-2.5 rounded-full shrink-0"
-                style={{ backgroundColor: status ? STATUS_DOT_COLOR[status] : 'var(--color-neutral-5)' }}
-              />
-              <span className={cn('text-body', !status && 'text-fg-muted')}>
-                {status ? STATUS_LABEL[status] : 'Status not set'}
-              </span>
+          {/* Status section:`status` defined 才 render(v12 conditional canonical) */}
+          {status && (
+            <div className="px-4 py-3 flex flex-col gap-3">
+              <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md">
+                <span
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: STATUS_DOT_COLOR[status] }}
+                />
+                <span className="text-body">{STATUS_LABEL[status]}</span>
+              </div>
+              {/* Status message — 只在 status defined 才 render(語意配對:status badge + status
+                  message 是一組;沒 status 就沒 status message)。缺 statusMessage 顯 placeholder。 */}
+              <DescriptionList>
+                <DescriptionItem label="Status message">
+                  {statusMessage ?? <span className="text-fg-muted">{FIELD_PLACEHOLDER}</span>}
+                </DescriptionItem>
+              </DescriptionList>
             </div>
-            {/* Status message — 包 DescriptionList 維持 dl/dt/dd 語意。缺則顯 placeholder */}
-            <DescriptionList>
-              <DescriptionItem label="Status message">
-                {statusMessage ?? <span className="text-fg-muted">{FIELD_PLACEHOLDER}</span>}
-              </DescriptionItem>
-            </DescriptionList>
-          </div>
+          )}
 
-          <div className="border-t border-divider px-4 py-3">
+          {/* Fields section:status defined 才有 border-t separator;無 status section 時去除 border-t(因 ScrollArea 起點已有上方 border-t,不重疊) */}
+          <div className={cn('px-4 py-3', status && 'border-t border-divider')}>
             <DescriptionList cols={2}>
               {allFields.map((f) => (
                 <DescriptionItem key={f.label} label={f.label}>

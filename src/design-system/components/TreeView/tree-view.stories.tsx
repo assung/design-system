@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasInteractiveStates trait — TreeView interactive states(hover / focus / selected / disabled)由 TreeItem 內部處理(spec.md state machine + anatomy StateBehavior story 已 cover),showcase 層 manual Disabled/States story retired per F migration(2026-05-15)— anatomy.stories.tsx auto-compile owns StateBehavior 6-canonical。AllSizes 同理 retired(SizeMatrix anatomy auto-compile owns)。
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import {
@@ -19,7 +20,7 @@ type Story = StoryObj
 // ── File Browser ────────────────────────────────────────────────────────
 
 export const FileBrowser: Story = {
-  name: 'File Browser',
+  name: '檔案瀏覽',
   render: () => (
     <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden py-2">
       <TreeView aria-label="檔案瀏覽" defaultExpandedIds={['src', 'components']}>
@@ -52,7 +53,7 @@ const StepActive = () => <Circle size={16} className="text-primary" />
 const StepPending = () => <Minus size={16} className="text-fg-muted" />
 
 export const Stepper: Story = {
-  name: 'Stepper',
+  name: '步驟引導',
   render: () => (
     <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden py-2">
       <TreeView
@@ -260,32 +261,7 @@ export const DragAndDrop: Story = {
   },
 }
 
-// ── Size Comparison ─────────────────────────────────────────────────────
-
-export const AllSizes: Story = {
-  name: 'Size 對比',
-  render: () => (
-    <div className="flex gap-8 items-start">
-      {(['sm', 'md', 'lg'] as const).map((sz) => (
-        <div key={sz} className="flex flex-col gap-2">
-          <span className="text-caption font-medium text-fg-muted">{sz}</span>
-          <div className="w-[220px] border border-divider rounded-lg bg-surface overflow-hidden py-2">
-            <TreeView size={sz} aria-label={`${sz} tree`} defaultExpandedIds={['docs']}>
-              <TreeItem id="docs" icon={Folder} label="Documents">
-                <TreeItem id="resume" icon={FileText} label="Resume.pdf" />
-                <TreeItem id="photos" icon={Folder} label="Photos">
-                  <TreeItem id="beach" icon={Image} label="beach.jpg" />
-                </TreeItem>
-              </TreeItem>
-              <TreeItem id="settings" icon={Settings} label="Settings" />
-            </TreeView>
-          </div>
-        </div>
-      ))}
-    </div>
-  ),
-}
-
+// @story-trait-rationale: AllSizes retired per F migration(2026-05-15)— anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
 // ── Indent 結構對齊驗證 ─────────────────────────────────────────────────
 
 export const IndentAlignment: Story = {

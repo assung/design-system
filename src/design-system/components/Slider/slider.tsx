@@ -141,11 +141,11 @@ Slider.displayName = 'Slider'
 export const sliderMeta = {
   component: 'Slider',
   family: 4,
-  variants: {
-
-  },
+  variants: {},
   sizes: {
-
+    sm: { px: 28, when: 'Toolbar / inline 編輯' },
+    md: { px: 36, when: '預設 — Form / cell inline edit' },
+    lg: { px: 44, when: 'Marketing / 高 touch 區' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

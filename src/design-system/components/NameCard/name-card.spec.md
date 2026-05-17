@@ -10,6 +10,8 @@ benchmark:
   - MUI Card: github.com/mui/material-ui/tree/master/packages/mui-material/src/Card
 ---
 
+<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+
 # NameCard 設計原則
 
 人員 HoverCard 的內容元件。提供統一的人員資訊展示格式，作為 HoverCard 的 content 消費者。
@@ -44,20 +46,22 @@ NameCard 是**三層 chrome 結構**(2026-04-23 canonical):
 ┌─────────────────────────────┐
 │ HEADER(固定,shrink-0)       │  ← Profile(Avatar + Name + Subtitle)+ Actions(選用)
 ├─────────────────────────────┤
-│ BODY(flex-1,可垂直捲動)      │  ← Status section + Status message + Info fields(選用)
-│ ↕ 空間不足時此區 ScrollArea   │    (三者皆無 → Body 不 render,header 直接貼 footer)
+│ BODY(flex-1,可垂直捲動)      │  ← Status section(v12 conditional)+ Info fields(always-render)
+│ ↕ 空間不足時此區 ScrollArea   │    Status undefined → 整 status block skip
 ├─────────────────────────────┤
 │ FOOTER(固定,shrink-0)       │  ← View more(hover context 必含,詳「View more canonical」)
 └─────────────────────────────┘
 ```
 
 - **Header 固定**:Profile + Actions 一體,**不捲動**(使用者的視覺 anchor:誰 + 可對他做什麼)
-- **Body 可捲動**:Status / Status message / Fields 三者中有任一時 render,以 `<ScrollArea>` 包(cross-OS overlay 捲軸)
+- **Body 可捲動**:Status section + Info fields。以 `<ScrollArea>` 包(cross-OS overlay 捲軸)
 - **Footer 固定**:View more **永遠可見**(hover preview 的 escape hatch 到完整 profile)
 
-**取消「精簡版」變體**:NameCard 只有**一種結構**,consumer 未傳的 section 自動不 render 但結構位置一致(無 `minimal` prop 或變體 split)。世界級對照:Slack / GitHub / LinkedIn hover-profile 皆單一結構(chrome pattern + conditional sections),不分「簡版/full 版」。
+**Status section v12 conditional rule(2026-05-14 user 拍板)**:`status` 在 production 一定會被設定(每個 user 都有 presence state)。如果 status undefined,**唯一可能性 = 資料還沒讀到(loading transient)**,**不**是「user 沒設定狀態」。所以 status undefined 期間 → **整 status block 隱藏**(等資料到才 render),**禁** render「Status not set」這種 placeholder 文字(語義錯,user presence 不會「沒設定」)。**此規則 NameCard-specific 不外推至 DS 其他元件**(FileItem / DescriptionList / DataTable cell 各自 placeholder 邏輯 unrelated)。
 
-**DS-wide 預設展示一致 canonical**:任何 PersonData 來源(table seller / picker member / dialog reviewer / 任何 person avatar)展示 NameCard 時,**`description` / `status` / `statusMessage` / `fields` 4 個 section 預設都應提供**,讓 hover 出 NameCard 時資訊量一致(不可某處精簡某處詳細)。Consumer sample / mock data 也須遵守 — sparse `{ name, avatarUrl }` 資料 = bug,違反一致呈現原則。實作上:DS 內所有 stories / sample 用 `PersonData[]` 完整定義(對齊 name-card.stories.tsx 的「Default」展示)。
+**取消「精簡版」變體**:NameCard 只有**一種結構**,consumer 未傳的 section 不另開 minimal variant。世界級對照:Slack / GitHub / LinkedIn hover-profile 皆單一結構,不分「簡版/full 版」。
+
+**DS-wide PersonData 預設展示一致 canonical**:任何 PersonData 來源展示 NameCard 時,`description` / `fields` 預設都應提供;`status` / `statusMessage` opt-in(僅 loading transient 或 consumer mock data 才會缺,production data 必有)。
 
 Section 之間用 `border-t border-divider` 分隔(見 `separator.spec.md`「元件固定結構 → CSS border-t/b」)。詳細 class / padding token 見 `name-card.tsx`。
 

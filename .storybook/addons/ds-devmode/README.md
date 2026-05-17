@@ -18,7 +18,7 @@
 |---|---|
 | **Click-to-pin / hover-live** | Toolbar toggle / `Alt+I` / Touch tap-to-pin |
 | **Source-first token display** | Author 寫 `padding: calc((var(--field-height-sm) - 16px) / 2)` → panel 完整顯 raw expression(token 高亮)→ resolved 值,**公式不丟** |
-| **Anatomy box(5-rect 完整 box model)** | Position(non-static)/ Margin / Border / Padding / Content,4 邊距離 label 完整(Chrome `MetricsSidebarPane.ts` 同源)|
+| **Anatomy box(5-rect 完整 box model)** | Position(non-static)/ Margin / Border / Padding / Content,4 邊距離 label 完整(**Inspired by** Chrome DevTools Box Model / MetricsSidebarPane idiom — 2026-05-13 verify Chromium source `metricsSidebarPane.css` 真是 `display:flex` 非 grid;本 addon 用 CSS Grid + `grid-template-areas` 結構性消除 Windows font fallback 依賴) |
 | **Redline overlay** | 紫 outline + 藍 padding 斜紋 + 紅距離(2px solid + halo + T-cap 端點 + dimension extension lines) |
 | **Sibling distance** | Pin 後 hover 其他元素 → edge-to-edge gap(Figma-style)|
 | **Auto-layout(flex/grid)** | Container 自動顯 gap / direction / justify / align |

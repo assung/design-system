@@ -162,23 +162,27 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 )
 Alert.displayName = 'Alert'
 
-// Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
-// Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
+// Story auto-compile metadata — Phase 2 fill(2026-05-15)
+// Variants = NoticeVariant 5 hues(prop name `variant`,cva 內僅 placement,色相由 SUBTLE_CONTAINER / SOLID_HUE_BG map 控)
+// Sizes = none(Alert 視覺尺寸繼承 Notice primitive,不隨 size 變;見 spec「為何無 SizeMatrix」)
 export const alertMeta = {
   component: 'Alert',
   family: null, // non-family composite / overlay / layout
   variants: {
-
+    neutral: { purpose: '中性提示(系統公告、非緊急說明);無情緒色' },
+    info: { purpose: '資訊性提示(版本更新、流程說明);藍色 hue' },
+    success: { purpose: '成功狀態的持久性宣告(綁定生效、付款完成需保留確認)' },
+    warning: { purpose: '警告但非阻斷(方案到期、需更新付款方式);最高頻' },
+    error: { purpose: '錯誤但非阻斷(系統錯誤可重試、API 失敗摘要);aria-live=assertive' },
   },
-  sizes: {
-
-  },
+  sizes: {},
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
     bg: ['bg-error', 'bg-error-subtle', 'bg-info', 'bg-info-subtle', 'bg-muted', 'bg-success', 'bg-success-subtle', 'bg-surface-raised', 'bg-warning', 'bg-warning-subtle'],
     fg: ['text-foreground'],
     ring: [],
   },
+  defaultVariant: 'neutral',
 } as const
 
 export { Alert, alertVariants }

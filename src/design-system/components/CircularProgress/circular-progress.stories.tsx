@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import type { Meta, StoryObj } from '@storybook/react'
 import { Search, Upload } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -41,7 +42,7 @@ export const Default: Story = {
 }
 
 export const ButtonLoading: Story = {
-  name: 'Button loading',
+  name: '按鈕載入中',
   render: () => (
     <div className="flex items-center gap-3">
       <Button variant="primary" loading>處理付款中</Button>
@@ -52,7 +53,7 @@ export const ButtonLoading: Story = {
 }
 
 export const InlineAction: Story = {
-  name: 'Inline action',
+  name: '行內操作',
   render: () => (
     <div className="flex flex-col gap-4 max-w-sm">
       <Input
@@ -128,7 +129,7 @@ export const FullScreenOverlay: Story = {
 }
 
 export const Determinate: Story = {
-  name: 'Determinate',
+  name: '確定進度',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-6">

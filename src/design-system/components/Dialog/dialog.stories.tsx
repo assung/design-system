@@ -90,20 +90,20 @@ export const Default = {
   render: () => (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>開啟 Modal</Button>
+        <Button>邀請成員加入專案</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Modal</DialogTitle>
+          <DialogTitle>邀請成員到「Q3 設計改版」</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <p className="text-body">Modal 內容區域</p>
+          <p className="text-body">輸入 Email 即可邀請。被邀請者會收到通知信並自動加入專案。</p>
         </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="tertiary">Cancel</Button>
+            <Button variant="tertiary">取消</Button>
           </DialogClose>
-          <Button>Next</Button>
+          <Button>寄出邀請</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

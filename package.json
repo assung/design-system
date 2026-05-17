@@ -15,6 +15,8 @@
     "icons:scan": "node scripts/scan-asymmetric-icons.mjs",
     "devmode:test": "node scripts/test-devmode-visual.mjs",
     "hooks:test": "bash .claude/hooks/tests/run-all.sh",
+    "size": "size-limit",
+    "size:why": "size-limit --why",
     "test:datatable-invariants": "node scripts/data-table-invariants.mjs",
     "sync-memory": "node scripts/sync-memory.mjs",
     "postinstall": "node scripts/ensure-playwright-browsers.mjs",
@@ -66,7 +68,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.2",
     "@openai/codex": "^0.128.0",
-    "@storybook/addon-a11y": "8.6.0",
+    "@size-limit/preset-small-lib": "^12.1.0",
+    "@storybook/addon-a11y": "^8.6.0",
     "@storybook/addon-docs": "8.6.0",
     "@storybook/addon-essentials": "8.6.0",
     "@storybook/addon-links": "^8.6.0",
@@ -84,6 +87,7 @@
     "pixelmatch": "^7.1.0",
     "playwright": "^1.59.1",
     "pngjs": "^7.0.0",
+    "size-limit": "^12.1.0",
     "storybook": "8.6.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"

@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react'
-import { User, Building2, Folder } from 'lucide-react'
+import { User, Building2 } from 'lucide-react'
 import { Avatar } from './avatar'
 import { MenuItem } from '@/design-system/components/Menu/menu-item'
 
@@ -127,70 +127,14 @@ export const Colors = {
   ),
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   4. 尺寸
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-const SIZES = [20, 24, 32, 40] as const
-
-export const AllSizes = {
-  name: '尺寸',
-  render: () => (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-h6 font-semibold text-foreground">尺寸</h3>
-        <p className="text-caption text-fg-muted max-w-[720px]">
-          size 接受任意 px 值。Icon 自動 = round_even(size × 0.6)，Text 字體 = round(size × 0.5)。
-        </p>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="border-collapse">
-          <thead>
-            <tr>
-              <th className="text-left p-2 border-b border-divider text-fg-muted font-medium text-caption">Size</th>
-              {SIZES.map((s) => (
-                <th key={s} className="text-center p-2 border-b border-divider text-fg-muted font-medium text-caption">{s}px</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="p-2 border-b border-divider text-caption">Image</td>
-              {SIZES.map((s) => (
-                <td key={s} className="p-2 border-b border-divider text-center">
-                  <div className="inline-block"><Avatar size={s} src={`https://i.pravatar.cc/${s * 2}?u=img`} alt="User" /></div>
-                </td>
-              ))}
-            </tr>
-            <tr>
-              <td className="p-2 border-b border-divider text-caption">Icon</td>
-              {SIZES.map((s) => (
-                <td key={s} className="p-2 border-b border-divider text-center">
-                  <div className="inline-block"><Avatar size={s} icon={Folder} color="blue" /></div>
-                </td>
-              ))}
-            </tr>
-            <tr>
-              <td className="p-2 border-b border-divider text-caption">Text</td>
-              {SIZES.map((s) => (
-                <td key={s} className="p-2 border-b border-divider text-center">
-                  <div className="inline-block"><Avatar size={s} alt="Alice" color="purple" /></div>
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  ),
-}
+/* @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。 */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    5. Fallback 行為
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Fallback = {
-  name: 'Fallback',
+  name: '備援顯示',
   render: () => (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -222,7 +166,7 @@ export const Fallback = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const InContext = {
-  name: 'In Context',
+  name: '情境用例',
   render: () => (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">

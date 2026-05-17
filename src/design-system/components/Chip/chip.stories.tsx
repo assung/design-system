@@ -1,7 +1,6 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Star, ChevronDown } from 'lucide-react'
 import { Chip, ChipGroup } from './chip'
 import { Badge } from '@/design-system/components/Badge/badge'
 
@@ -23,7 +22,7 @@ const LANGUAGES = [
 // ── Default ──────────────────────────────────────────────────────────────────
 
 export const Default: Story = {
-  name: 'Default',
+  name: '預設',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript'])
     return (
@@ -41,7 +40,7 @@ export const Default: Story = {
 // ── States ───────────────────────────────────────────────────────────────────
 
 export const States: Story = {
-  name: 'States',
+  name: '狀態',
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
@@ -56,43 +55,11 @@ export const States: Story = {
   ),
 }
 
-// ── With icon ────────────────────────────────────────────────────────────────
-// Manual story 拆分原則(.claude/rules/story-rules.md):startIcon / endIcon 同 slot rule
-// (LucideIcon prop slot,size 由元件控)→ 合併為 WithIcon 對照 grid。
-// 對齊 Polaris pattern(單一 `icon` prop + Controls 切方向)。
-
-export const WithIcon: Story = {
-  name: 'With Icon',
-  render: () => {
-    const [filter, setFilter] = useState<string[]>(['react'])
-    const [sort, setSort] = useState<string[]>([])
-    return (
-      <div className="flex flex-col gap-3">
-        <div>
-          <div className="text-caption text-fg-muted mb-2">startIcon — 主題分類 / 標記</div>
-          <ChipGroup type="multiple" value={filter} onValueChange={setFilter}>
-            <Chip value="react" startIcon={Star}>React</Chip>
-            <Chip value="vue" startIcon={Star}>Vue</Chip>
-            <Chip value="svelte" startIcon={Star}>Svelte</Chip>
-          </ChipGroup>
-        </div>
-        <div>
-          <div className="text-caption text-fg-muted mb-2">endIcon — 篩選器 / 下拉提示</div>
-          <ChipGroup type="multiple" value={sort} onValueChange={setSort}>
-            <Chip value="sort" endIcon={ChevronDown}>Sort</Chip>
-            <Chip value="filter" endIcon={ChevronDown}>Filter</Chip>
-            <Chip value="group" endIcon={ChevronDown}>Group</Chip>
-          </ChipGroup>
-        </div>
-      </div>
-    )
-  },
-}
-
+// @story-trait-rationale: WithIcon retired per F migration 2026-05-15 — anatomy.stories.tsx auto-compile owns icon slot showcase。
 // ── With badge ──────────────────────────────────────────────────────────────
 
 export const WithBadge: Story = {
-  name: 'With Badge',
+  name: '帶 Badge',
   render: () => {
     const [value, setValue] = useState<string[]>(['all'])
     return (
@@ -108,7 +75,7 @@ export const WithBadge: Story = {
 // ── Single type ─────────────────────────────────────────────────────────────
 
 export const SingleSelection: Story = {
-  name: 'Single Selection',
+  name: '單選',
   render: () => {
     const [value, setValue] = useState('typescript')
     return (
@@ -124,7 +91,7 @@ export const SingleSelection: Story = {
 // ── Layout: wrap (default) ──────────────────────────────────────────────────
 
 export const LayoutWrap: Story = {
-  name: 'Layout Wrap',
+  name: '版面換行',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript', 'Rust'])
     return (
@@ -143,7 +110,7 @@ export const LayoutWrap: Story = {
 // ── Layout: scroll ──────────────────────────────────────────────────────────
 
 export const LayoutScroll: Story = {
-  name: 'Layout Scroll',
+  name: '版面捲動',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript'])
     return (
@@ -170,7 +137,7 @@ export const LayoutScroll: Story = {
 // ── Layout: menu ────────────────────────────────────────────────────────────
 
 export const LayoutMenu: Story = {
-  name: 'Layout Menu',
+  name: '版面選單',
   render: () => {
     const [value, setValue] = useState<string[]>(['TypeScript', 'Rust'])
     return (

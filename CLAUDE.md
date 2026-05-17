@@ -7,7 +7,7 @@
 3. **改一處必看三處**——code / spec / story 三方聯動。改 cva `defaultVariants` / variant / token 前先 grep 該元件所有檔案,一次改完。
 4. **範例必真實業務場景**——Jira / Stripe / Notion / Figma 可辨識情境;禁 `Option A/B/C`、「按鈕一」、極端不現實、ASCII art。
 5. **猶豫就問**——無前例的決策:grep 既有 → 讀近親 spec → 仍不確定停下問。**禁止憑直覺造新 pattern**。
-6. **大原則吸收瑣碎**——同類 bug 反覆糾正 = meta 層沒抓住。見 `.claude/rules/meta-patterns.md` 28 條大原則(M1-M28)。**AI 不需 user 提醒才找 root invariant**——rule 震盪 → AI 自跑 M12 benchmark + invariant test。User 第 2 次問 → 必截圖 verify(M13)。對話結論 → AUTO 5-layer pipeline(M14)。Visual / behavior decision 前必先 WebFetch ≥ 3 source(M26)。Solo-work git ops 必先 grep canonical(M28)。使用者 tell me once 不該要 tell me twice。
+6. **大原則吸收瑣碎**——同類 bug 反覆糾正 = meta 層沒抓住。見 `.claude/rules/meta-patterns.md` 32 active M-rules(M1-M33,M27 retired 2026-05-15 → M23(c) child)。**AI 不需 user 提醒才找 root invariant**——rule 震盪 → AI 自跑 M12 benchmark + invariant test。User 第 2 次問 → 必截圖 verify(M13)。對話結論 → AUTO 5-layer pipeline(M14)。Visual / behavior decision 前必先 WebFetch ≥ 3 source(M26)。Solo-work git ops 必先 grep canonical(M28)。**視覺/結構 propose 前必 grep DS spec.md 找 owner SSOT(M29)— 出 3-column 表;否則提案不被接受**。使用者 tell me once 不該要 tell me twice。
 
 完整 M-rules 詳 `.claude/rules/meta-patterns.md`(always loads)。
 
@@ -32,7 +32,7 @@
 
 ## 行數預算(Anthropic 對齊)
 
-CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory ≤ 100。
+CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 30 hard**(SSOT = `session_start_governance_check.sh:174`,2026-05-15 升)。
 
 ## Anti-bloat L1-L3
 
@@ -67,25 +67,13 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 **Consistency 類稽核必 Phase 0 全掃再判**(避免單元件看漏系統 drift)。
 
-**Audit-vs-execute 分權**:動 canonical substantive meaning → STOP 提議;對齊 / 表達統一 / 補 pointer → AUTO。
+**Audit-vs-execute 分權**:動 canonical substantive meaning → STOP 提議;對齊 / 表達統一 / 清 duplicate / 補 pointer → AUTO(對齊 knowledge-prune SKILL Phase 2 P0+P1 scope)。
+
+**Scope classifier — Surgical visual bug**(2026-05-12 codex 抓 anti-pattern「surgical bug 升 architecture audit」)。user 列 N 個 visual defects + 無新 canonical / 無新 API contract / 無 cross-component semantic 改動 → **Surgical scope**:**no codex collab / no new M-rule / no audit report,batch fix + final pixel-quantified verify only**。對齊 Anthropic Best Practice 小修 skip plan + M32(c) batch fix + 對立面是「unscoped investigation infinite exploration」反 pattern。Substantive 改動(API / SSOT / cross-component)走 audit-vs-execute STOP 提議流程。
 
 # SSOT 消費 canonical
 
-寫視覺 code 前必查對照 — 沒列 = 自創(hook `check_ssot_consultation.sh` 攔)。完整對照 → `.claude/references/ssot-consultation.md`。
-
-| 決策 | 必查 SSOT |
-|------|----------|
-| 元件選擇 | `ls components/` + `ls patterns/` + 近親 spec |
-| Token / 值 | `tokens/{name}/spec.md` |
-| Padding / Icon size | `.claude/references/ui-dev-rules.md` |
-| Row / item 結構 | `patterns/element-anatomy/item-anatomy.spec.md` |
-| 連續 list gap / 容器 breathing | `patterns/element-anatomy/element-anatomy.spec.md` |
-| 按鈕排列 / Action bar | `patterns/action-bar/action-bar.spec.md` |
-| Chrome header 高度 | `tokens/uiSize/uiSize.spec.md` |
-| Overlay 結構 | `patterns/overlay-surface/overlay-surface.spec.md` |
-| Variant / prop 命名 | 既有 grep + `# 命名與語言一致性` |
-
-**強制 checklist**:新元件 tsx 開頭必含「── 消費的 SSOT ──」段。
+寫視覺 code 前必查對照 — 沒列 = 自創(hook `check_ssot_consultation.sh` 攔)。**完整對照表 + 強制 checklist** → `.claude/references/ssot-consultation.md`(SSOT owner;含 9 項決策對應 SSOT + 新元件 tsx 開頭「── 消費的 SSOT ──」段強制要求)。
 
 # 任務導航表
 
@@ -102,7 +90,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | **Tailwind 出怪事** | `.claude/rules/ui-development.md`「Tailwind 5 條核心」+ `# 失敗記憶索引` |
 | **Stakeholder 產出 / 稽核** | `# 稽核 canonical` |
 | **User 糾正後** | `# 治理 canonical`(home 判斷) |
-| **跟 codex 討論 / 多輪震盪 / 任何 codex 輸出** | `.claude/skills/codex-collab/SKILL.md`。**3-step discipline 鐵律(動 code 前必過)**:(1) Step 4.5 verify codex claim 真不真;(2) Step 4.6 regression / 連動 scan 自己 fix(grep callers / type contract / edge / cross-component / 跑 tsc + invariants);(3) Step 5 比稿 my own-version vs codex 取優棄劣。**禁** pass-through / 直覺 ship / 短 format。Queue SSOT → `.claude/memory/codex-brief-queue.jsonl`(每 session start 必讀,3 min 間隔 / 1 in-flight serial / 10 min auto-followup) |
+| **跟 codex 討論 / 多輪震盪 / 任何 codex 輸出** | `.claude/skills/codex-collab/SKILL.md`(M31 5-step canonical SSOT;含 transport / Step 0.05 user-verbatim relay / queue + interval / hook 機械強制)+ M31 anchor in meta-patterns.md |
 | **PR merge 後 / session start branch 健檢** | `# Git solo-work canonical` |
 
 **找不到** → 進 `# 遇不確定時的協議`,不自決定。
@@ -146,15 +134,33 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | 3 Pill | 單行互動 pill | `components/Button/button.spec.md`「Pill Layout」|
 | 4 Field control | 可編輯資料輸入 | `components/Field/field-controls.spec.md` |
 
+# 自主執行 canonical(Autonomy Default,2026-05-14 user SSOT directive)
+
+**Default = autonomous + complete + verify-to-perfection;省工 = anti-pattern(違 mindset #1)**。
+
+| 動作類別 | 預設 |
+|---------|-----|
+| **SSOT-affecting UI/UX**(增刪改 component / token / spec 視覺結構 / 跨元件 design language) | **ASK** — 中文具體人話講選項 + tradeoff,user 拍板才動。**Enforcement scope split**:production code(`src/**/*.{tsx,ts,css}`)由 `check_substantive_edit_approval_preflight.sh` PreToolUse 攔截;`*.spec.md` 視覺結構 / canonical / SSOT 段落 edit 由 `stop_self_audit.sh` 補位 post-action 攔截(避免 spec typo false-positive BLOCKER)|
+| Bug fix / clean / refactor / 命名一致 / test / audit / verify | **AUTO** — 整批做完 + 完整驗證 + 撤回機制(M33 反 defer) |
+| Governance / hook / skill / spec **內部**(typo / pointer / 結構 — 不動 canonical meaning)| **AUTO** — audit-vs-execute 分權 |
+| Perf / a11y / 漸進遷移(不動 SSOT)| **AUTO** — 整批 + verify |
+
+**自主執行同時優化 7 軸**:言簡意賅 / 效率 + 效能(M20 ≥ 80)/ SSOT 鐵律(M17/M23/M29/M30)/ 易懂維護擴充(M9/M21/M23(c))/ 世界級 + 一致設計語言(mindset #1 + M8/M22/M26)/ 完整 self-verify(M20/M31/M32)/ 自動 self-improve(M14/M20)。
+
+**反 pattern**(禁):「省工」/「下次再做」/「下個 session」(M33)/「OK 嗎?」過度 ASK / shortcut 避 verify / 不對齊 mindset #1。
+
+**Trigger phrase auto-pipeline**(M19 升級):「依原則自主」/「不需問」/「馬不停蹄」/「全部做完」/「自動」→ 進 autonomous mode,僅 SSOT-affecting UI/UX 停下 ASK。
+
 # 遇不確定時的協議
 
-無前例時 3 步,禁跳:**grep 既有**(30 秒)→ **讀近親 spec.md** → **仍不確定停下問** user。
+**無前例且影響 SSOT UI/UX 設計判斷**時 3 步,禁跳:**grep 既有**(30 秒)→ **讀近親 spec.md** → **仍不確定停下問** user。
+**非 SSOT-UI/UX**(refactor / test / perf / a11y / hook / skill / typo / 對齊既有 canonical)→ autonomous,無需問。
 禁:跳 grep 憑記憶 / 隨便挑 / 留 TODO。
 可跳:bug 修 / 機械勞動 / user 明確指示。
 
 # 失敗記憶索引(技術沉默陷阱 only)
 
-設計判斷類已被 M1-M27 吸收(見 `.claude/rules/meta-patterns.md`);具體歷史詳 `.claude/skills/design-system-audit/references/historical-bugs.md`。
+設計判斷類已被 M-rules 吸收(見 `.claude/rules/meta-patterns.md`);具體歷史詳 `.claude/skills/design-system-audit/references/historical-bugs.md`。
 
 | 技術陷阱 | 一行 anchor |
 |--------|-----------|
@@ -164,7 +170,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | 清 unused imports 後 runtime | tsc 不充分,需 storybook |
 | shadcn compat alias 回流 | dark mode 不聯動 |
 
-新 bug → 歸 Meta-Pattern OR 本表 1 行;> 10 條 = 漏寫,新增 M21。
+新 bug → 歸 Meta-Pattern OR 本表 1 行;> 10 條 = 漏寫,**評估 meta-merge 既有 M-rule 而非無腦新增**(meta-patterns velocity ≤ 3/quarter,單 M-rule 必吸收 ≥ 3 prior bugs)。
 
 # 專案 Stack
 
@@ -176,7 +182,7 @@ Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design 
 
 僅在相關檔案打開時載入,降低本檔 token 成本:
 
-- `.claude/rules/meta-patterns.md` — 27 M-rules(always loads,fundamental)
+- `.claude/rules/meta-patterns.md` — 32 active M-rules(M1-M33,M27 retired,always loads,fundamental)
 - `.claude/rules/spec-rules.md` — paths: `**/*.spec.md` + `src/design-system/**`
 - `.claude/rules/ui-development.md` — paths: `**/*.tsx` + `**/*.ts`(含 Tailwind / Token / Props 命名 / shadcn)
 - `.claude/rules/story-rules.md` — paths: `**/*.stories.tsx`(三層定位 + Title + 範例最高準則)

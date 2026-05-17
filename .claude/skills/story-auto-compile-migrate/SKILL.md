@@ -99,7 +99,7 @@ OR commit Phase 1 先(mechanical only)讓後續 session 漸進 fill?
 
 對每個 migrated 元件:
 - `variants[].when` — 從 spec 現有「variants」section 或近親元件同名 variant 抄
-- `variants[].world-class` — 跑 `/baseline-audit` scan 或讀 benchmarks/ 外部 snapshot
+- `variants[].world-class` — 讀 benchmarks/ 外部 snapshot,或 inline grep 既有 spec 對照
 - `sizes[].when` — 從 spec size table 抄
 - `related.近親` — grep SSOT reciprocal pointers
 

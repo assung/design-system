@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase(2026-05-15 F-migration)。
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Slider } from './slider'
@@ -112,7 +113,7 @@ export const Disabled: Story = {
 // ── With live value commit ──────────────────────────────────────────────
 
 export const OnCommit: Story = {
-  name: 'On Value Commit',
+  name: '提交數值回呼',
   render: () => {
     const [live, setLive] = React.useState([50])
     const [committed, setCommitted] = React.useState([50])

@@ -157,14 +157,35 @@ export const HeightBehavior: Story = {
           </DialogTrigger>
           <DialogContent maxWidth={560}>
             <DialogHeader>
-              <DialogTitle>系統設定</DialogTitle>
+              <DialogTitle>通知偏好設定</DialogTitle>
             </DialogHeader>
             <DialogBody>
               <FieldGroup>
-                {Array.from({ length: 20 }).map((_, i) => (
+                {[
+                  { label: '桌面通知音效', placeholder: 'Hero / 預設 / 安靜 / 關閉' },
+                  { label: '頻道訊息通知', placeholder: '所有訊息 / 僅關鍵字 / 關閉' },
+                  { label: '直接訊息通知', placeholder: '所有 DM / 僅未讀 / 關閉' },
+                  { label: '@提及推播', placeholder: '即時 / 5 分鐘批次 / 摘要' },
+                  { label: '@頻道全員推播', placeholder: '允許 / 僅追蹤頻道 / 關閉' },
+                  { label: '執行緒回覆通知', placeholder: '我參與的 / 全部 / 關閉' },
+                  { label: '關鍵字監控', placeholder: '輸入關鍵字,逗號分隔' },
+                  { label: '行動裝置推播', placeholder: '所有 / 僅 DM / 關閉' },
+                  { label: '推播延遲(秒)', placeholder: '0 / 30 / 60 / 120' },
+                  { label: '推播閒置觸發', placeholder: '5 分鐘 / 15 分鐘 / 永不' },
+                  { label: '訊息預覽顯示', placeholder: '顯示內容 / 僅標題 / 隱藏' },
+                  { label: '勿擾時段開始', placeholder: '22:00' },
+                  { label: '勿擾時段結束', placeholder: '08:00' },
+                  { label: '週末勿擾', placeholder: '六日全天 / 自訂 / 關閉' },
+                  { label: '假日勿擾', placeholder: '依國定假日 / 自訂' },
+                  { label: 'Email 摘要頻率', placeholder: '即時 / 每小時 / 每日 / 每週' },
+                  { label: 'Email 摘要時段', placeholder: '09:00 / 12:00 / 18:00' },
+                  { label: '未讀提醒週期', placeholder: '15 分鐘 / 30 分鐘 / 1 小時' },
+                  { label: '靜音指定頻道', placeholder: '#design / #engineering' },
+                  { label: '通知摘要訂閱', placeholder: '工作日摘要 / 週報' },
+                ].map((field, i) => (
                   <Field key={i}>
-                    <FieldLabel>設定項目 {i + 1}</FieldLabel>
-                    <Input placeholder={`設定值 ${i + 1}`} />
+                    <FieldLabel>{field.label}</FieldLabel>
+                    <Input placeholder={field.placeholder} />
                   </Field>
                 ))}
               </FieldGroup>

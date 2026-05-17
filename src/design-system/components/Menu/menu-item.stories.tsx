@@ -56,7 +56,7 @@ export const Default: Story = {
 // ── startIcon ──
 
 export const WithStartIcon: Story = {
-  name: 'Start Icon',
+  name: '前綴圖示',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem startIcon={Mail}>電子郵件</MenuItem>
@@ -82,7 +82,7 @@ export const WithDescription: Story = {
 // ── Avatar（無 description → inline 20/24px）──
 
 export const AvatarInline: Story = {
-  name: 'Avatar',
+  name: '頭像',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem avatar={{ alt: "Alice Chen", color: "indigo", hoverCard: personHover('Alice Chen') }}>Alice Chen</MenuItem>
@@ -161,14 +161,14 @@ export const Groups: Story = {
     <MenuContainer>
       <MenuGroup>
         <MenuItem header>最近使用</MenuItem>
-        <MenuItem startIcon={FileText}>文件 A</MenuItem>
-        <MenuItem startIcon={FileText}>文件 B</MenuItem>
+        <MenuItem startIcon={FileText}>Q3 產品路線圖.md</MenuItem>
+        <MenuItem startIcon={FileText}>客戶反饋整理</MenuItem>
       </MenuGroup>
       <MenuGroup>
         <MenuItem header>所有專案</MenuItem>
-        <MenuItem startIcon={Folder}>專案一</MenuItem>
-        <MenuItem startIcon={Folder}>專案二</MenuItem>
-        <MenuItem startIcon={BarChart3}>儀表板</MenuItem>
+        <MenuItem startIcon={Folder}>設計系統升級 v2</MenuItem>
+        <MenuItem startIcon={Folder}>行銷活動 2026</MenuItem>
+        <MenuItem startIcon={BarChart3}>業務儀表板</MenuItem>
       </MenuGroup>
     </MenuContainer>
   ),
@@ -177,7 +177,7 @@ export const Groups: Story = {
 // ── Creatable ──
 
 export const Creatable: Story = {
-  name: 'Creatable',
+  name: '可建立新項',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem startIcon={Plus}>直接使用「新標籤」</MenuItem>
@@ -185,28 +185,7 @@ export const Creatable: Story = {
   ),
 }
 
-// ── 尺寸比較 ──
-
-export const AllSizes: Story = {
-  name: '尺寸比較',
-  render: () => (
-    <div className="flex flex-col gap-6">
-      {(['sm', 'md', 'lg'] as const).map((sz) => (
-        <div key={sz} className="flex flex-col gap-1">
-          <span className="text-caption text-fg-muted font-mono">{sz}{sz === 'md' ? '（預設）' : ''}</span>
-          <MenuContainer width={360}>
-            <MenuGroup>
-              <MenuItem size={sz} startIcon={Mail} description="每日寄送摘要信件">電子郵件通知</MenuItem>
-              <MenuItem size={sz} avatar={{ alt: "Alice", color: "indigo" }}>Alice Chen</MenuItem>
-              <MenuItem size={sz} avatar={{ alt: "Bob", color: "magenta" }} description="工程部門">Bob Wang</MenuItem>
-            </MenuGroup>
-          </MenuContainer>
-        </div>
-      ))}
-    </div>
-  ),
-}
-
+// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
 // ── 完整範例 ──
 
 const FullExampleDemo = () => {

@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // same-row-mixed-allow: header chrome corner buttons(close)跟 row inline actions(trash)不在同 row
 // code-quality-allow: file-size — 2026-05-03 M21 retract:filter-value-picker.tsx(187 行 / 1 consumer)inline 回本檔。panel 從 505 → 687 行,進 transition zone 但未過 800 hard cap。等 inline filter UI 接入第 2 consumer 再考慮抽出。
 import * as React from 'react'
@@ -776,8 +777,8 @@ function GroupBlock({
       <div className="pt-2">
         <ConjunctionLabel index={index} conjunction={rootConjunction} onChange={onChangeRootConjunction} />
       </div>
-      {/* Group container 灰底 — 用 --color-neutral-1 對齊 token canonical(non-existent --surface-3 改 ✓) */}
-      <div className="flex-1 min-w-0 rounded-md bg-[var(--color-neutral-1)] p-2 flex flex-col gap-2">
+      {/* Group container 灰底 — `bg-muted`(`--muted` neutral-2,user 2026-05-09 拍板 Q3 A)。對齊 color.spec.md L651-654 「table header / tab / code block / skeleton」靜態低重要 surface semantic */}
+      <div className="flex-1 min-w-0 rounded-md bg-muted p-2 flex flex-col gap-2">
         {group.children.map((cond, cIdx) => (
           <FilterRow
             key={cond.id}

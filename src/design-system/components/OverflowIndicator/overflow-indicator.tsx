@@ -36,10 +36,17 @@ export interface OverflowIndicatorProps
 }
 
 function ShrinkWrapList({ children }: { children: React.ReactNode }) {
-  const ref = React.useCallback((container: HTMLDivElement | null) => {
-    if (!container) return
+  const containerRef = React.useRef<HTMLDivElement | null>(null)
 
-    requestAnimationFrame(() => {
+  // 2026-05-16 audit codex Round 6:rAF capture + cancel on unmount/re-run(defensive hygiene)。
+  // 原 callback ref `requestAnimationFrame(() => ...)` 沒 cancel,unmount-during-rAF 可能 fire 後
+  // mutate detached element.style — no-op but pattern hygiene 應對齊 DS-wide rAF cancel canonical。
+  React.useLayoutEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    let rafId = 0
+    rafId = requestAnimationFrame(() => {
+      rafId = 0
       const cs = getComputedStyle(container)
       const padL = parseFloat(cs.paddingLeft) || 0
       const padR = parseFloat(cs.paddingRight) || 0
@@ -67,10 +74,11 @@ function ShrinkWrapList({ children }: { children: React.ReactNode }) {
 
       container.style.maxWidth = `${Math.ceil(maxRow) + padL + padR + 1}px`
     })
+    return () => { if (rafId) cancelAnimationFrame(rafId) }
   }, [children])
 
   return (
-    <div ref={ref} className="flex flex-wrap gap-1 p-2 max-w-[280px]">
+    <div ref={containerRef} className="flex flex-wrap gap-1 p-2 max-w-[280px]">
       {children}
     </div>
   )
@@ -86,7 +94,7 @@ const OverflowIndicator = React.forwardRef<HTMLSpanElement, OverflowIndicatorPro
     const trigger = shape === 'tag' ? (
       <span
         ref={ref}
-        className={cn(tagVariants({ variant: 'neutral', size }), 'cursor-default', className)}
+        className={cn(tagVariants({ color: 'neutral', size }), 'cursor-default', className)}
         {...props}
       >
         <span className="px-1">+{count}</span>

@@ -100,6 +100,22 @@ function compileOne(componentName) {
   if (sMissing.length) errors.push(`sizes spec-only: ${sMissing.join(', ')}`)
   if (sExtra.length) errors.push(`sizes tsx-only: ${sExtra.join(', ')}`)
 
+  // 2026-05-15 anti-false-pass invariant(per /design-system-audit --deep Dim 45+46 audit
+  // finding,user verbatim「機械化產出應該有一套產出標準?驗證時應該也是要以該套標準來檢驗」):
+  // Empty-vs-empty `variants:{} sizes:{}` 兩邊都空 → 原 diff = 0 false-pass。
+  // 若 spec frontmatter `traits:` 包含 `hasSizes` / `hasVariants` → 必至少 1 key in
+  // (a) specMeta(spec frontmatter)+(b) tsxMeta(componentMeta export)。
+  // 違反 = M14 violation(canonical promised, not landed)。
+  const specTraits = Array.isArray(specMeta.traits) ? specMeta.traits : []
+  if (specTraits.includes('hasSizes')) {
+    if (specSizes.length === 0) errors.push(`hasSizes trait declared but spec.sizes empty(M14 violation: canonical promised, not landed)`)
+    if (tsxSizes.length === 0) errors.push(`hasSizes trait declared but tsx componentMeta.sizes empty(M14 violation)`)
+  }
+  if (specTraits.includes('hasVariants')) {
+    if (specVariants.length === 0) errors.push(`hasVariants trait declared but spec.variants empty(M14 violation: canonical promised, not landed)`)
+    if (tsxVariants.length === 0) errors.push(`hasVariants trait declared but tsx componentMeta.variants empty(M14 violation)`)
+  }
+
   if (errors.length) {
     return { component: componentName, drift: true, errors }
   }

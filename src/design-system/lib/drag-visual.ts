@@ -108,8 +108,6 @@ export const dropIndicatorInside = 'bg-primary-subtle' as const
 
 // ── Cursor classes ────────────────────────────────────────────────────────
 
-/** Draggable element hover 時的 cursor(grab)*/
-export const dragHandleCursor = 'cursor-grab' as const
 /** Draggable element 拖中時的 cursor(grabbing)*/
 export const dragActiveCursor = 'cursor-grabbing' as const
 /**

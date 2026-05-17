@@ -76,11 +76,13 @@ const ScrollBar = React.forwardRef<
     )}
     {...props}
   >
-    {/* Thumb 用 border/border-hover(neutral-5/-6)— 世界級 SaaS(Linear / Notion /
-         Figma / macOS)scrollbar thumb 慣例為「很淡、幾乎看不見,hover 略深」,
-         而非深色常駐塊。`--border` 在此作「UI chrome 淡灰 tier」重用,符合 subtle 視覺。 */}
+    {/* Thumb 用 scrollbar-thumb / -hover semantic alias(2026-05-09 抽 SSOT,跟 DataTable fake scrollbar
+         共享 token)。Token 值仍 = `--border` / `--border-hover`(neutral-5/-6)— 世界級 SaaS
+         (Linear / Notion / Figma / macOS)scrollbar thumb 慣例「很淡、幾乎看不見,hover 略深」。
+         前身直接 `bg-border` borrowing(2026-04 ship)→ semantic alias 收斂 SSOT(避免 thumb 視覺
+         未來演化時誤動 Field/Input/Checkbox border 視覺)。對齊 shadcn ScrollArea source `bg-border`。 */}
     <ScrollAreaPrimitive.ScrollAreaThumb
-      className={cn('relative flex-1 rounded-full bg-border hover:bg-border-hover transition-colors')}
+      className={cn('relative flex-1 rounded-full bg-[var(--scrollbar-thumb)] hover:bg-[var(--scrollbar-thumb-hover)] transition-colors')}
     />
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
 ))

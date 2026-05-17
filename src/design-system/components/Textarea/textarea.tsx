@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
@@ -76,7 +77,9 @@ const textareaVariants = cva(
       {
         mode: 'display',
         variant: 'default',
-        className: 'bg-transparent border border-transparent',
+        // 2026-05-13 Q3 Path Ⅰ:Textarea default display zero chrome,!px-0 !py-0 override base `px-3 py-2`
+        // (跟 Input 同 SSOT,per field-controls.spec.md (d))
+        className: 'bg-transparent border border-transparent !px-0 !py-0',
       },
       {
         mode: 'readonly',
@@ -131,9 +134,17 @@ const textareaVariants = cva(
           '!leading-[1.5]',
         ],
       },
+      // 2026-05-13 Q1 R4 verify(per codex Q1 verdict 補 Textarea nuance):
+      // Textarea naked display/readonly/disabled 用 `!h-full`,**不**對齊 Field wrapper 的 `!h-auto`。
+      // Why divergence:textarea 是 native form element 帶 intrinsic rows-based height,且 cell 內
+      // multi-line text 需要撐滿 cell 而非依 line-height intrinsic。`!h-full` 讓 textarea 填滿 cell
+      // 高度,文字 anchored to cell.top + cell padding(同視覺結果 Field wrapper autoRow !h-auto)。
+      // 此 divergence intentional + documented;非 SSOT violation。
       { mode: 'display', variant: 'naked', className: 'bg-transparent !rounded-none !h-full !resize-none !px-0 !py-0 border border-transparent !leading-[1.5]' },
       { mode: 'readonly', variant: 'naked', className: 'bg-transparent !rounded-none !h-full !resize-none !px-0 !py-0 border border-transparent !leading-[1.5]' },
-      { mode: 'disabled', variant: 'naked', className: 'bg-transparent !rounded-none cursor-not-allowed opacity-disabled text-fg-disabled !h-full !resize-none !px-0 !py-0 border border-transparent !leading-[1.5]' },
+      // 2026-05-13 codex V2 fix:移除 `opacity-disabled` blanket(對齊 field-wrapper.tsx naked R3 fix +
+      //   color.spec.md:729 逃生艙 rule)。Textarea 已用具體 `text-fg-disabled` token,不需要 wrapper opacity。
+      { mode: 'disabled', variant: 'naked', className: 'bg-transparent !rounded-none cursor-not-allowed text-fg-disabled !h-full !resize-none !px-0 !py-0 border border-transparent !leading-[1.5]' },
     ],
     defaultVariants: {
       mode: 'edit',
@@ -158,6 +169,7 @@ export interface TextareaProps
   error?: boolean
 }
 
+// code-quality-allow: long-function — Textarea forwardRef body 含 mode×size×variant×error 4 軸 prop + autoFocus + aria 完整覆蓋,拆 sub-fn 會把 useFieldContext / fieldWrapperStyles 跨檔 drilling
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {

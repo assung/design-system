@@ -72,36 +72,6 @@ function modeLabel(variant: NoticeVariant, pageTheme: 'light' | 'dark') {
   return 'dark'
 }
 
-export const AllVariants = {
-  name: '所有 Variant',
-  render: () => (
-    <div className="flex gap-16">
-      <div className="flex flex-col gap-4">
-        <span className="text-caption text-fg-muted font-medium">light mode</span>
-        <div className="flex flex-col gap-3 p-8 rounded-lg bg-canvas border border-divider">
-          {VARIANTS.map((v) => (
-            <div key={v} className="flex items-center gap-4">
-              <span className="text-caption text-fg-muted w-24 shrink-0">元素 {modeLabel(v, 'light')} mode</span>
-              <StaticToast variant={v} title={LABELS[v]} pageTheme="light" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex flex-col gap-4" data-theme="dark">
-        <span className="text-caption text-fg-muted font-medium">dark mode</span>
-        <div className="flex flex-col gap-3 p-8 rounded-lg bg-canvas border border-divider">
-          {VARIANTS.map((v) => (
-            <div key={v} className="flex items-center gap-4">
-              <span className="text-caption text-fg-muted w-24 shrink-0">元素 {modeLabel(v, 'dark')} mode</span>
-              <StaticToast variant={v} title={LABELS[v]} pageTheme="dark" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  ),
-}
-
 export const WithDescription = {
   name: '有 Title + Description',
   render: () => (

@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // same-row-mixed-allow: header chrome corner buttons(refresh/close)跟 row inline actions(drag/trash)不在同 row
 import * as React from 'react'
 import { Plus, Trash2, X as XIcon, RotateCcw, GripVertical } from 'lucide-react'

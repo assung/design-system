@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // @anatomy-rationale:
 //   SizeMatrix N/A — Chart 寬度由 ResponsiveContainer 自動填滿父層,高度由
 //     consumer className 決定(無離散 size tier)。資料密度由 categorical token

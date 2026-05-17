@@ -1,0 +1,22 @@
+{
+  "ts": "2026-05-16T17:21:53.504Z",
+  "filesCount": {
+    "total": 375,
+    "componentTsx": 77,
+    "storiesShowcase": 67,
+    "storiesAnatomy": 61,
+    "storiesPrinciples": 61,
+    "specMd": 77,
+    "tokens": 14
+  },
+  "principles": {
+    "mRules": 32,
+    "specTraits": 11,
+    "hookInvariants": 18,
+    "rules": 4,
+    "total": 61
+  },
+  "auditDims": 46,
+  "coverageGaps": 0,
+  "gaps": []
+}

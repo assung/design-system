@@ -36,11 +36,12 @@ BLOCKERS=""
 if [ -f CLAUDE.md ]; then
   LINES=$(wc -l < CLAUDE.md | tr -d ' ')
   # 2026-04-26 tightened thresholds(對應 M19 + user 質問「auto self-improve」要更主動):
-  # 400 hard target / 500 soft / 600 strong-warn / 800 transition-cap blocker
+  # SSOT alignment per CLAUDE.md L35: target ≤ 200 / transition ≤ 400 / hard cap 800
+  # Stratified soft warnings: 500 approaching / 600 strong / 800 hard-cap blocker
   if [ "$LINES" -gt 800 ]; then
-    BLOCKERS="${BLOCKERS}\n- CLAUDE.md is ${LINES} lines(transition cap 800 breached). /knowledge-prune REQUIRED FIRST ACTION this session."
+    BLOCKERS="${BLOCKERS}\n- CLAUDE.md is ${LINES} lines(hard cap 800 breached). /knowledge-prune REQUIRED FIRST ACTION this session."
   elif [ "$LINES" -gt 600 ]; then
-    REMINDERS="${REMINDERS}\n- CLAUDE.md is ${LINES} lines(50% over 400 hard target). /knowledge-prune strongly recommended this session."
+    REMINDERS="${REMINDERS}\n- CLAUDE.md is ${LINES} lines(50% over 400 transition cap). /knowledge-prune strongly recommended this session."
   elif [ "$LINES" -gt 500 ]; then
     REMINDERS="${REMINDERS}\n- CLAUDE.md is ${LINES} lines(approaching 600 strong-warn). Consider /knowledge-prune."
   fi
@@ -153,28 +154,42 @@ if [ -f "$FIRES_LOG" ] && [ -d "$TESTS_DIR" ]; then
 fi
 
 # Check 7: Hook count auto-trigger(soft 25 / hard 30 — Anthropic guideline ~15)
+# 2026-05-09 fix:tree-recursive count(含 lib/ helpers)。前身 -maxdepth 1 只 count root,
+# 漏 16 個 lib/ helpers → metric reports 19,reality 35 = system gaming own metric。
+# 2026-05-13 prune consolidation:`_*.sh` 約定 = internal helper(Unix convention)。
+# Lib helpers renamed `_<name>.sh` 並 fold under `post_edit_dispatcher.sh`(1 registered hook)。
+# Find rule 排除 `_*` 因 _ prefix 表「非 first-class hook,由 dispatcher orchestrate」—
+# 對齊 `_log-fire.sh` 既有 exclusion 原則。Settings.json 中 _* files 不可作 hook registration。
+# 排除:retired/ + tests/ + _* internal helpers.
 PRUNE_TRIGGERS=""
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
 HOOK_COUNT=0
 if [ -d "$HOOKS_DIR" ]; then
-  HOOK_COUNT=$(find "$HOOKS_DIR" -maxdepth 1 \( -name "*.sh" -o -name "*.py" \) -not -name "_log-fire*" 2>/dev/null | wc -l | tr -d ' ')
+  HOOK_COUNT=$(find "$HOOKS_DIR" \( -name "*.sh" -o -name "*.py" \) \
+    -not -path "*/retired/*" -not -path "*/tests/*" -not -name "_*" \
+    2>/dev/null | wc -l | tr -d ' ')
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
 if [ "$HOOK_COUNT" -gt 30 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 30 — Anthropic guideline ~15). /knowledge-prune REQUIRED FIRST ACTION 評估 retire / consolidate."
-elif [ "$HOOK_COUNT" -gt 25 ]; then
-  PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- Hook count ${HOOK_COUNT}(soft 25 trigger — Anthropic guideline ~15). /knowledge-prune 評估 retire / consolidate 候選."
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 30 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). /knowledge-prune REQUIRED FIRST ACTION 評估 retire / consolidate."
+elif [ "$HOOK_COUNT" -gt 26 ]; then
+  # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
+  # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution
+  # not bloat,per Task #19 closed analysis)。Re-raise to 27+ 需 audit re-justify。
+  PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- Hook count ${HOOK_COUNT}(soft 26 trigger,2026-05-15 升 — Anthropic guideline ~15;含 root + lib/). /knowledge-prune 評估 retire / consolidate 候選."
 fi
 
 # Check 8: Memory entries auto-trigger(soft 18 / hard 20)
-# Path resolution(2026-05-01):harness user-local 為 SSOT,fallback 到 repo `.claude/memory/`
-# 讓 cloud sandbox(claude.ai/code / Codespaces / Cursor cloud)mirror snapshot 仍 trigger 正確 prune signal
+# Path resolution(2026-05-08 fix):isolation-friendly precedence —
+#   1. PROJECT_DIR/.claude/memory(讓 test sandbox CLAUDE_PROJECT_DIR 隔離 work)
+#   2. harness user-local SSOT(實際 production 路徑)
+#   3. repo mirror fallback(cloud sandbox snapshot)
 HARNESS_MEMORY_DIR="$HOME/.claude/projects/-Users-chenqiren-Library-CloudStorage-GoogleDrive-qijenchen-gmail-com--------my-project/memory"
-REPO_MEMORY_DIR=".claude/memory"
-if [ -d "$HARNESS_MEMORY_DIR" ]; then
-  MEMORY_DIR="$HARNESS_MEMORY_DIR"
-elif [ -d "$REPO_MEMORY_DIR" ]; then
+REPO_MEMORY_DIR="$PROJECT_DIR/.claude/memory"
+if [ -d "$REPO_MEMORY_DIR" ]; then
   MEMORY_DIR="$REPO_MEMORY_DIR"
+elif [ -d "$HARNESS_MEMORY_DIR" ]; then
+  MEMORY_DIR="$HARNESS_MEMORY_DIR"
 else
   MEMORY_DIR=""
 fi
@@ -191,8 +206,8 @@ fi
 
 # Check 9: Branch sprawl(M28 — solo work = 1 chat = 1 branch / 0-1 active feature)
 # 開場掃 local + remote claude/* branch,> 1 active 或 local main divergent → warn。
-LOCAL_CLAUDE_BRANCHES=$(git -C "$PROJECT_DIR" branch 2>/dev/null | grep -c "claude/" || echo 0)
-REMOTE_CLAUDE_BRANCHES=$(git -C "$PROJECT_DIR" branch -r 2>/dev/null | grep -cE "origin/claude/" || echo 0)
+LOCAL_CLAUDE_BRANCHES=$(git -C "$PROJECT_DIR" branch 2>/dev/null | grep -c "claude/" || true)
+REMOTE_CLAUDE_BRANCHES=$(git -C "$PROJECT_DIR" branch -r 2>/dev/null | grep -cE "origin/claude/" || true)
 if [ "$LOCAL_CLAUDE_BRANCHES" -gt 1 ]; then
   PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- Local branch sprawl ${LOCAL_CLAUDE_BRANCHES} active claude/* branches(M28: 1 session = 1 branch). git branch -d <merged> 清掉,只留當前 active feature."
 fi

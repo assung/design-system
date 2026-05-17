@@ -9,7 +9,7 @@ import { Button } from '@/design-system/components/Button/button'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
 
 const meta: Meta = {
-  title: 'Design System/Components/NameCard/設計原則',
+  title: 'Design System/Internal/NameCard/設計原則',
   parameters: { layout: 'padded' },
 }
 export default meta
@@ -84,7 +84,7 @@ export const UsageGuidance: Story = {
     <div className="flex flex-col gap-12">
       {/* 何時用 — 原 WhenToUse */}
       <div className="prose prose-sm max-w-prose">
-      <p>適用情境見<LinkTo kind="Design System/Components/NameCard/展示" name="Default"><span className="text-primary hover:underline font-medium cursor-pointer">展示頁</span></LinkTo>的真實業務場景範例。</p>
+      <p>適用情境見<LinkTo kind="Design System/Internal/NameCard/展示" name="Default"><span className="text-primary hover:underline font-medium cursor-pointer">展示頁</span></LinkTo>的真實業務場景範例。</p>
       <p>判斷時對照 spec.md「何時用 / 何時不用」段落。</p>
     </div>
 

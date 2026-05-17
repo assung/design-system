@@ -22,7 +22,7 @@ const OPS = [
 
 /* Overview */
 export const Overview: Story = {
-  name: 'Overview',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-6 w-[520px]">
       <section>
@@ -48,7 +48,7 @@ export const Overview: Story = {
 
 /* SizeMatrix */
 export const SizeMatrix: Story = {
-  name: 'SizeMatrix',
+  name: '尺寸矩陣',
   render: () => (
     <div className="flex flex-col gap-6 w-[420px]">
       {(['sm', 'md', 'lg'] as const).map(size => (
@@ -66,7 +66,7 @@ export const SizeMatrix: Story = {
 
 /* StateBehavior */
 export const StateBehavior: Story = {
-  name: 'StateBehavior',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-6 w-[420px]">
       <div>
@@ -96,7 +96,7 @@ export const StateBehavior: Story = {
 
 /* Accessibility */
 export const Accessibility: Story = {
-  name: 'Accessibility',
+  name: '無障礙',
   render: () => (
     <div className="flex flex-col gap-3 w-[420px]">
       <p className="text-body">

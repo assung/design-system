@@ -103,8 +103,11 @@ export const WithExtendDatasetHint: Story = {
           }
         />
         )}
+        {/* 2026-05-13 fix(user 抓 Alert「已選 5370」但 BulkActionBar 顯「已選 50」):
+            allSelected 時 totalSelected={TOTAL} 同步 count = 5370,canonical extend-dataset pattern */}
         <BulkActionBar
           selection={selection}
+          totalSelected={allSelected ? TOTAL : undefined}
           onClear={() => { setSelection([]); setAllSelected(false) }}
           actions={
             <>

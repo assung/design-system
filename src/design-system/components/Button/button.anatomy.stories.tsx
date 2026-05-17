@@ -350,9 +350,9 @@ const InspectorInner = () => {
           <div className="px-10 py-8 rounded-lg bg-canvas border border-divider flex items-center justify-center">
             {iconOnly
               ? <Button variant={variant} danger={hasDanger} size={size} iconOnly
-                  startIcon={hasDanger ? Trash2 : Plus} disabled={state === 'disabled'} aria-label="Label" />
+                  startIcon={hasDanger ? Trash2 : Plus} disabled={state === 'disabled'} aria-label={hasDanger ? '刪除任務' : '新增任務'} />
               : <Button variant={variant} danger={hasDanger} size={size}
-                  startIcon={hasDanger ? Trash2 : Plus} disabled={state === 'disabled'}>Label</Button>
+                  startIcon={hasDanger ? Trash2 : Plus} disabled={state === 'disabled'}>{hasDanger ? '刪除任務' : '新增任務'}</Button>
             }
           </div>
 

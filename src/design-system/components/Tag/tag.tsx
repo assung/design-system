@@ -28,7 +28,7 @@ const tagVariants = cva(
   "inline-flex items-center rounded-md border border-transparent transition-colors cursor-text",
   {
     variants: {
-      variant: {
+      color: {
         // 直接引用 primitive（bg=step-1, text=step-7），不經過語義層
         // step-1 在 dark mode 用 alpha 公式，step-7 用 lighter 公式——兩個 mode 都正確
         neutral:   "bg-secondary text-foreground",
@@ -48,7 +48,7 @@ const tagVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "neutral",
+      color: "neutral",
       size: "md",
     },
   }
@@ -70,7 +70,7 @@ const SOLID_CLASSES: Record<string, string> = {
 }
 
 export interface TagProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'>,
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix' | 'color'>,
     VariantProps<typeof tagVariants> {
   /** 左側 icon（LucideIcon），由 Tag 統一 16px。與 avatar 互斥。 */
   icon?: LucideIcon
@@ -80,6 +80,14 @@ export interface TagProps
   onDismiss?: () => void
   /** 深底白字模式（step-6 背景 + 白色前景，warning 例外） */
   solid?: boolean
+  /**
+   * 2026-05-15 Q3 真 SSOT fix(per user verbatim「同空間兩判斷點」+「不要冰山一角」):
+   * Tag 寬度由 parent constrain,不套預設 max-w-40(160px)。用於 cell-as-input narrow cell
+   * (< 160px)時 Tag fit cell 寬度 + truncate ellipsis,而非 160px 後被 cell `overflow-hidden`
+   * 硬切。對齊「同 cell width → 同 overflow 判斷」SSOT。Default false 保 backward compat
+   * (wrap layout / pill rail 等仍受 160px 保護)。
+   */
+  unbounded?: boolean
 }
 
 // ── Solid dismiss hover/active bg ──
@@ -108,8 +116,8 @@ const SOLID_DISMISS_HOVER: Record<string, { hover: string; active: string }> = {
 // Subtle variant 落用 ItemInlineActionButton 預設 neutral-hover。
 // 圖標色繼承 Tag 文字色 → `text-current` 三態覆寫。
 
-function TagDismiss({ onDismiss, label, solid, variant }: { onDismiss: () => void; label: string; solid?: boolean; variant?: string }) {
-  const solidColors = solid && variant ? SOLID_DISMISS_HOVER[variant] : undefined
+function TagDismiss({ onDismiss, label, solid, color }: { onDismiss: () => void; label: string; solid?: boolean; color?: string }) {
+  const solidColors = solid && color ? SOLID_DISMISS_HOVER[color] : undefined
 
   return (
     <ItemInlineActionButton
@@ -130,10 +138,10 @@ function TagDismiss({ onDismiss, label, solid, variant }: { onDismiss: () => voi
 }
 
 function TagInner(
-  { className, variant, size, icon: Icon, avatar, onDismiss, solid, children, ...props }: TagProps,
+  { className, color, size, icon: Icon, avatar, onDismiss, solid, unbounded = false, children, ...props }: TagProps,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const solidClass = solid ? SOLID_CLASSES[variant ?? 'neutral'] : undefined
+  const solidClass = solid ? SOLID_CLASSES[color ?? 'neutral'] : undefined
   const ownRef = React.useRef<HTMLDivElement | null>(null)
   const [isTruncated, setIsTruncated] = React.useState(false)
 
@@ -168,13 +176,13 @@ function TagInner(
         if (typeof forwardedRef === 'function') forwardedRef(el)
         else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = el
       }}
-      className={cn(tagVariants({ variant, size }), solidClass, 'w-fit min-w-0 max-w-40 overflow-hidden', className)}
+      className={cn(tagVariants({ color, size }), solidClass, 'w-fit min-w-0 overflow-hidden', !unbounded && 'max-w-40', className)}
       {...props}
     >
       {Icon && <Icon size={16} aria-hidden />}
       {avatar && <span className="shrink-0 w-4 h-4 rounded-full overflow-hidden inline-grid place-content-center [&>*]:w-full [&>*]:h-full">{avatar}</span>}
       <span data-tag-text="" className="px-1 truncate min-w-0">{children}</span>
-      {onDismiss && <TagDismiss onDismiss={onDismiss} label={label} solid={solid} variant={variant ?? 'neutral'} />}
+      {onDismiss && <TagDismiss onDismiss={onDismiss} label={label} solid={solid} color={color ?? 'neutral'} />}
     </div>
   )
 

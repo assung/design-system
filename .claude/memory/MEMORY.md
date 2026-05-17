@@ -1,23 +1,30 @@
 # Memory Index
 
-- [feedback_solo_dev_workflow.md](feedback_solo_dev_workflow.md) — Solo dev workflow:push direct to main,no branch / no PR / no fix-forward PR / no split PR;Netlify auto-preview = review 介面;同 chat 連續不分 session
-- [feedback_no_binary_evaluation.md](feedback_no_binary_evaluation.md) — When user proposes solution, generate 3rd alternative via world-class benchmark; never binary-execute user's suggestion without evaluation
-- [feedback_concrete_not_vague.md](feedback_concrete_not_vague.md) — P2 / finding 必具體:file:line + 片段 + 具體問題;禁 topic-level generic 描述
-- [feedback_skill_trigger_precision.md](feedback_skill_trigger_precision.md) — Skill trigger 必精確 user vocabulary;loose 語句(「怎麼做世界級」)不 auto-invoke,clarify-first
-- [feedback_proactive_5layer_pipeline.md](feedback_proactive_5layer_pipeline.md) — 對話結論立刻自動 5-layer 落地(spec/hook/grep);user 不該需要兩次提醒同件事
-- [feedback_overlay_primitive_consumption.md](feedback_overlay_primitive_consumption.md) — 寫 Popover/Dialog/Sheet 內容前必 grep primitive exports + read overlay-surface.spec.md;禁自刻 px-loose border-(b/t) chrome
-- [feedback_inline_action_sizing.md](feedback_inline_action_sizing.md) — Panel list row icon action 必統一 ItemInlineActionButton(16+18);禁混 Button iconOnly 違 same-row consistency
-- [feedback_overlay_chrome_token_semantic.md](feedback_overlay_chrome_token_semantic.md) — Overlay chrome bg = bg-surface-raised(不是 canvas / surface);dark mode --surface 半透明洗白,canvas 是 page-level 語意錯
-- [feedback_layout_v6_canonical.md](feedback_layout_v6_canonical.md) — layoutSpace v6:region/element + bounded/unbounded + 親疏三級(同範疇 out/相關 tight/不相關 loose)+ Dialog-class 元件 spec own 分權
+## User context
 - [user_role.md](user_role.md) — Design-oriented frontend engineer with high standards for design correctness
-- [project_goal.md](project_goal.md) — The ultimate goal: world-class design system where CLAUDE.md + specs ensure AI faithfully executes design principles every time
-- [project_audit_progress.md](project_audit_progress.md) — Full design system audit progress: Button/Menu/Field done, tokens done, patterns done, stale refs cleaned
-- [project_form_controls_refactor.md](project_form_controls_refactor.md) — REJECTED 2026-04-18: 3-layer refactor is over-abstraction; current Input-with-mode matches Chakra/Ant/shadcn
-- [project_ds_devmode_addon_2026_04_24.md](project_ds_devmode_addon_2026_04_24.md) — DS Devmode Addon 規格索引 → 完整 spec 在 `.claude/planning/ds-devmode.md`(on-disk 冗餘)
-- [project_story_auto_compile_2026_04_24.md](project_story_auto_compile_2026_04_24.md) — Story auto-compile 系統索引(C)→ 完整 4-phase plan 在 `.claude/planning/story-auto-compile.md`
-- [project_audit_history_2026_04.md](project_audit_history_2026_04.md) — 2026-04-21~24 audit sessions 合輯(取代 8 個 per-session memories)— detail 見 commits
-- [project_story_canonical_2026_04_26.md](project_story_canonical_2026_04_26.md) — Storybook 三層(展示 trait v2 + anatomy + principles)5-layer pipeline 全落地索引(合併 typology + principles)
-- [project_datatable_l1_l7_roadmap.md](project_datatable_l1_l7_roadmap.md) — DataTable L1-L7 階段 roadmap(target = agGrid 級):L1 ✓ / L2 L5 設計已定實作待做 / L3 L4 L6 L7 待定。下次接續從 L2 實作或 L3/L4 設計起跳
-- [feedback_datatable_f3_row_drag_v1_limits.md](feedback_datatable_f3_row_drag_v1_limits.md) — F3 Row Drag v1 ship + 三項 v2 待修(virtualizer × transform / 3-panel mirror sync / cross-parent drop)+ getRowId 必填防呆 hook
-- [feedback_codex_dual_track_synthesizer.md](feedback_codex_dual_track_synthesizer.md) — Codex collab 永遠 dual-track 比稿(我跑一版 + codex 跑一版 → 比稿 final);**deep brief 不打折**(永久禁短 format / 限字 reply / 3-line 結論模板);**投遞成功率 invariant**(brief 間隔 ≥ 2-3 min 避 codex Cloud queue dedup,新 comment 不 edit,opener `@codex DISCUSS-ONLY`/`IMPLEMENT`);**brief queue 自主追蹤**(TodoWrite + auto-schedule next brief)。Trigger:「比稿 / 2nd opinion / dual-track / 不打折 / 不省工」
-- [project_cell_interactive_overlay_2026_05_07.md](project_cell_interactive_overlay_2026_05_07.md) — D 路徑 future plan 索引(短期 A 1px 已接受)→ 完整 spec 在 `.claude/planning/cell-interactive-overlay.md`(`<CellInteractiveOverlay>` primitive + dual-track 實作 + joint test case planning)。Trigger:「pixel-perfect / overlay primitive / cell-interactive layer / D 路徑」
+- [project_goal.md](project_goal.md) — World-class DS where CLAUDE.md + specs ensure AI faithfully executes design principles
+
+## Feedback (workflow / collaboration discipline)
+- [feedback_concrete_not_vague.md](feedback_concrete_not_vague.md) — P2 / finding 必含 file:line + 片段 + 具體問題;禁 topic-level generic
+- [feedback_skill_trigger_precision.md](feedback_skill_trigger_precision.md) — Skill trigger 必精確 user vocabulary;loose 語句 clarify-first
+- [feedback_codex_dual_track_synthesizer.md](feedback_codex_dual_track_synthesizer.md) — Codex collab 永遠 dual-track:Claude own + codex own + 比稿 synthesize
+- [feedback_solo_dev_workflow.md](feedback_solo_dev_workflow.md) — 1 chat = 1 working branch;Netlify preview = user gate;user 拍板才 push main(M28)
+- [feedback_tool_binary_preflight_sweep.md](feedback_tool_binary_preflight_sweep.md) — CLI binary 必跑 4-test discovery(which / npx / package.json / auth.json),禁短路「not installed」假警報(2026-05-15)
+- [feedback_ship_then_revert_anti_pattern.md](feedback_ship_then_revert_anti_pattern.md) — SSOT-UI/UX edit 必先 propose verbatim approval,違 = hook BLOCKER(2026-05-15)
+- [feedback_propose_in_plain_chinese.md](feedback_propose_in_plain_chinese.md) — 要 user 決策必用中文人話(發生什麼/影響/選項 outcome),禁 jargon,hook 機械強制(2026-05-15)
+- [feedback_audit_full_sweep_not_sample.md](feedback_audit_full_sweep_not_sample.md) — `/design-system-audit --deep` sub-agent 必 DS-wide 全盤,禁「sample top N」當理由縮 scope(2026-05-15)
+- [feedback_codex_local_transport_node_modules.md](feedback_codex_local_transport_node_modules.md) — 地端 codex 走 `node_modules/.bin/codex`(npm dep),不是全域 PATH;3-test discovery 順序固定(2026-05-17)
+
+## Feedback (DS canonical / 視覺判斷)
+> **2026-05-15 prune D3 retired 4 entries**(已完全被上游吸收,SSOT pointer):
+> - `feedback_spec_impl_sort_parallel_fix_reproduce` → M10/M12/M23/M29 + hooks `check_spec_impl_default_alignment.sh` / `check_data_table_sort_parallel.sh`
+> - `feedback_datatable_f3_row_drag_v1_limits` → `data-table.spec.md` 「L4 Row drag」段
+> - `feedback_overlay_primitive_consumption` → `patterns/overlay-surface/overlay-surface.spec.md` 「Consumer rule」+ hook `check_overlay_handcraft.sh`
+> - `feedback_overlay_chrome_token_semantic` → `semantic.css` token 註解 + DropdownMenuContent line 244 既有 canonical 先例
+
+## Project (active state)
+- [project_bug_h_windows_scrollbar_2026_05_08.md](project_bug_h_windows_scrollbar_2026_05_08.md) — Windows scrollbar interim landed;ScrollArea full migration deferred (post-v1 RFC)
+- [project_hover_overlay_decisions_2026_05_09.md](project_hover_overlay_decisions_2026_05_09.md) — Hover overlay Q1-Q7 已決 + cell picker D-path 已完成 + 路 B 拍板 spreadsheet target;Q3.6 send codex Q-A/Q-B/Q-C 比稿中
+
+## Reference
+- [reference_deploy_targets.md](reference_deploy_targets.md) — Storybook GitHub Pages + Netlify per-branch preview + main = production

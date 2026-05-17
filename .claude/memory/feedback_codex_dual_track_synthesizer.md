@@ -1,7 +1,49 @@
-# Feedback — Codex collab 永遠走 dual-track 比稿
+# Feedback — Codex collab 永遠走 dual-track 比稿(M31 universal 5-step)
 
-**Date**: 2026-05-07
+**Date**: 2026-05-07(updated 2026-05-10 — M31 universal 5-step codified)
 **Trigger**: User 反覆糾正我退化成 pass-through(直接列 codex 提的 A/B/C 給 user 拍板)
+
+## 2026-05-10 M31 升級 — universal 5-step canonical(不是 disagree-only)
+
+**Why**:user verbatim「你跟 codex 都要各自驗證過並視覺稽核過,最後你整合出完美完整的版本」+「你是可以跟 codex 辯論的,請你們彼此據理力爭,但要有依據,所以都要各自熟讀所有檔案」+「**這應該在 infra 要強迫你們整合彼此結論之前有此 mindset**,避免你完全被 codex 的錯誤解法牽著走」(2026-05-10)。
+
+實證(本 session):
+- **Issue 8 cell border**:codex 「Field edit border 透明」→ Claude pass-through ship → user 「白癡 被 codex 牽著走」→ 重做 cite battle 雙 owner。違反 Step 1-3-5。
+- **Issue 11 controller retire**:codex disagree cite RFC → Claude 完整 5-step(read RFC + Phase 7 commit + grep zero consumer + counter-cite)→ codex round 2 grep 確認 → ship。M31 正確 pattern 錨。
+
+**New invariant**(取代原 3-step 鐵律):**每次 codex collab 必走 5-step,不論最後 agree 或 disagree**:
+
+| Step | Claude action | Codex action | 共通 invariant |
+|---|---|---|---|
+| 1 各自熟讀 | grep / read spec.md / canonical / source 真讀 | `exec -s read-only` grep / git show | M29 anchor pre-grep / M23 既有 canonical |
+| 2 各自驗證 | `npx tsc -b` + invariant + audit | `exec` 跑 grep / git show / file inspect | M20 claim-verify gap |
+| 3 各自視覺稽核 | playwright screenshot + DOM + pixel audit | code-read + diff + grep visual path | user directive 強制 |
+| 4 各自 cite-based propose | 3-column:`spec.md path:line / 引文 / reasoning` | 同上獨立 | M22 cite mandate |
+| 5 整合完美版本 | agree → synthesize;disagree → cite battle | 同上 | **絕禁 pass-through** |
+
+**Hook 機械強制**:`check_codex_collab_5step.sh`(PreToolUse Bash git commit)— commit message 含 codex/Layer A/B keyword 必同含 (a) spec.md cite + (b) verify keyword + (c) verdict keyword。缺任一 stderr 警告(P1 soft)。Allow `@codex-collab-allow:` 緊急豁免。
+
+**SSOT propagation**(5-layer 升級):
+1. ✅ Rule:`.claude/rules/meta-patterns.md` M31 row 重寫成 universal 5-step
+2. ✅ Hook:`check_codex_collab_5step.sh` registered in settings.json PreToolUse Bash
+3. ✅ Skill:`.claude/skills/codex-collab/SKILL.md` 加 M31 5-step canonical 段 + 2 case 錨
+4. ✅ CLAUDE.md 任務導航表「跟 codex 討論」row 升級成 M31 universal mindset
+5. ✅ Memory:本文件 amend 加 M31 universal section
+
+## 2026-05-10 Self-improvement amendment — Codex-first for root-cause-elusive bug
+
+**Why**: User verbatim「真的他媽超誇張,每次問題丟給你你都解決半天還容易解決不了,然後丟給 codex 就一次到位,到底要怎麼自動改進你自己?」(2026-05-10)
+
+實證:scrollbar thumb hover bug — Claude 自查 2 turn 給「macOS overlay fade / token contrast 設計議題」cope-out;codex 1 reply 找到真根因(Chrome 121+ 標準 scrollbar-color override webkit pseudo)+ spec-defined fix。
+
+**新 invariant**:Bug root cause **第 1 turn 自查找不到**(non-trivial CSS / browser quirk / async timing / cross-component interaction)→ **立刻丟 codex deep-dive**,不再苦撐 N turn。
+
+**判斷 trigger**:
+- 我自查跑 grep + read code + 1 hypothesis → user 仍報「沒解 / 還是錯」 = **自查窮盡 signal**
+- 跨 browser / CSS spec / framework internal / native rendering / token cascade → **codex first**(他更精確 spec lookup)
+- 純 grep can find / file:line direct mismatch → 我自查 OK
+
+**禁止**:「我多查 1 round 看看」拖延 — user 已等過 1 turn = 立刻 escalate
 
 ## User 拍板 directive
 

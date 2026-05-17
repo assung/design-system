@@ -1,6 +1,6 @@
 #!/bin/bash
 set -u
-HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/check_hardcoded_strings.sh"
+HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/_hardcoded_strings.sh"
 [ -x "$HOOK" ] || { echo "FATAL"; exit 1; }
 PASS=0; FAIL=0
 run_hook() {

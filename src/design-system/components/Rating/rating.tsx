@@ -215,7 +215,7 @@ interface StarIconProps {
 }
 
 const FILL_FILLED = 'var(--warning)' // yellow-6 — 黃星 convention
-const FILL_EMPTY = 'var(--color-neutral-4)' // 灰色空星
+const FILL_EMPTY = 'var(--divider)' // 灰色空星(neutral-4 借 divider semantic alias,user 2026-05-09 拍板;對齊 Material rgba(0,0,0,0.26) muted-fill canonical)
 
 function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onClick }: StarIconProps) {
   // a11y(2026-04-25 axe nested-interactive fix):inner 點擊目標改 <span>(非 interactive

@@ -7,6 +7,8 @@
 
 ## 定位
 
+**Layout Family**:composite(cross-pattern;consumed by Toolbar / DataTable / FileViewer / Dialog 等 action region)。本 pattern 為 role system + overflow mechanics SSOT,非單一 layout family。
+
 操作列（Action Bar）是在有限空間內組合多個操作的排列模式，涵蓋 Toolbar、卡片操作列、對話框操作區等場景。
 
 本文件定義：操作的語意角色、視覺 pattern、Variant 選擇、分群與分隔線、溢出機制。
@@ -432,13 +434,8 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `bulk-action-bar.spec.md`
 - `calendar.spec.md`
 - `data-table.spec.md`
 - `file-viewer.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `bulk-action-bar.spec.md`
 - `popover.spec.md`

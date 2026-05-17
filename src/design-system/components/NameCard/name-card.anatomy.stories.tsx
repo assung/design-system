@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
 // @anatomy-rationale:
 //   SizeMatrix N/A — NameCard 是固定寬度(320px)hover content template,
@@ -23,7 +24,7 @@ type InspectorArgs = {
 }
 
 const meta: Meta = {
-  title: 'Design System/Components/NameCard/設計規格',
+  title: 'Design System/Internal/NameCard/設計規格',
   parameters: { layout: 'padded' },
 }
 export default meta

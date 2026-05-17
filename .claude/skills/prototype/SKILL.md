@@ -217,20 +217,6 @@ User / stakeholder 決定採用某 candidate 後:
 
 ---
 
-## Checkpoint 總表(MUST ASK 節點)
-
-| # | 時機 | 決策內容 |
-|---|------|---------|
-| 0 | Phase 0 後 | Problem framing 正確? |
-| 1 | Phase 1 後 | Research scope 足夠? |
-| 2 | Phase 2 後 | Shortlist 哪幾個進 Phase 3? |
-| 3 | Phase 3 中 | 新元件要進 Components/ 嗎?(若有) |
-| 4 | Phase 4 後 | 最終採用哪個 candidate? |
-
-**Checkpoint 不可略過**。Past failure mode:AI 自行 shortlist 後 user 發現方向錯要從頭開始 — 時間白花。
-
----
-
 ## Non-goals
 
 - 不在 explorations/ 階段做 detail pixel polish(focus 在 pattern 可行性 + 使用者反應)
@@ -249,10 +235,10 @@ User / stakeholder 決定採用某 candidate 後:
 
 ---
 
-## References
+## References(`references/`)
 
-- [references/benchmark-sources.md](references/benchmark-sources.md) — 世界級對標清單 + 研究步驟(含 OOUX 深層分析)
-- [references/ooux-template.md](references/ooux-template.md) — Object-Oriented UX(ORCA 流程 / Object Map / NOM / CTA Inventory / DS 元件映射)Sophia V. Prater 方法論
-- [references/evaluation-matrix.md](references/evaluation-matrix.md) — 4 軸評分表範本 + 決策規則
-- [references/proposal-template.md](references/proposal-template.md) — explorations/ folder + Storybook story 結構
-- [references/checkpoints.md](references/checkpoints.md) — 5 個 MUST ASK 時機的範本 + 歷史 failure mode
+- `benchmark-sources.md` 世界級對標 + OOUX
+- `ooux-template.md` ORCA / Object Map / NOM / CTA(Sophia V. Prater)
+- `evaluation-matrix.md` 4 軸評分 + 決策規則
+- `proposal-template.md` explorations/ + Storybook 結構
+- `checkpoints.md` 5 MUST ASK 範本 + 歷史 failure mode

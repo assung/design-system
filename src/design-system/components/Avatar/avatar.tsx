@@ -1,9 +1,11 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import { User } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
 import { Badge } from '@/design-system/components/Badge/badge'
+import { useFieldContext, useTableIsScrolling } from '@/design-system/components/Field/field-context'
 
 /**
  * Avatar — 頭像元件
@@ -139,10 +141,26 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
-const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
+// 2026-05-13 (a) perf fix part-2(per codex Layer C Roadmap rich-cell dominant + user 拍 Path (a)):
+// `React.memo` wrap forwardRef Avatar — Roadmap 13 columns 含 person/multiPerson,每 row 多 avatar
+// × HoverCard subtree + useDocumentTheme observer = 重渲染 hotspot。memo shallow-equal props,
+// HoverCard / themeRef stable across scroll 時 skip re-render。對齊 codex Profile Plan step 5
+// (filter Avatar/PeoplePicker/FieldSurfaceProvider remounts)。
+// code-quality-allow: long-function — size × shape × color × solid × status × badgeCount × hoverCard × img-fallback 多軸 prop 組合,拆 sub-fn 會跨 fn 傳 imgError state + isTableScrolling observer 結果
+const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ size = 32, shape = 'circle', src, alt, icon: Icon, color = 'neutral', solid = false, status, badgeCount, hoverCard, className, style, ...props }, ref) => {
     const [imgError, setImgError] = React.useState(false)
     const documentTheme = useDocumentTheme()
+    const isTableScrolling = useTableIsScrolling()
+    // 2026-05-13 R3.5(per codex Q3 verdict + user 拍「想盡辦法 auto-handle prereq」):
+    // Avatar self-dim when in disabled Field wrapper context(取代既有 wrapper opacity-disabled blanket
+    // 逃生艙 — color.spec.md:729 specific-disabled-color canonical)。
+    // Scope narrowest:`fieldCtx?.mode === 'disabled' && fieldCtx?.hasFieldWrapper === true`,標準 Field
+    // 家族 wrapper disabled 時才 dim;**沒包在 Field wrapper 內的 standalone Avatar**(NameCard / FileItem /
+    // HoverCard / Dialog 等 display 場景)**backward compat 不變**。對齊 avatar.spec.md「Avatar 在 disabled
+    // 元件內 host-controlled opacity」canonical — 升級成「Avatar self-managed via fieldCtx」。
+    const fieldCtx = useFieldContext()
+    const isDisabledInField = fieldCtx?.mode === 'disabled' && fieldCtx?.hasFieldWrapper === true
     const isFill = size === 'fill'
     // Fill 模式下 icon 用 60% 寬高、text 用 50cqi（container query inline-size）；
     // 數字模式下用既有 px 計算
@@ -172,6 +190,9 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         className={cn(
           'inline-flex items-center justify-center shrink-0 overflow-hidden select-none',
           isFill && 'w-full h-full',
+          // 2026-05-13 R3.5 self-dim:Avatar 在 disabled Field wrapper context 內自 dim
+          // (取代 field-wrapper.tsx default/bare/naked disabled blanket opacity-disabled 逃生艙)
+          isDisabledInField && 'opacity-disabled',
         )}
         style={{
           ...(isFill
@@ -267,7 +288,12 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         </div>
       )
 
-    if (!hoverCard) return baseEl
+    // 2026-05-13 (c) scroll-defer perf(per user 拍 Path (c) + codex Q3 verdict):
+    // DataTable scrolling 期間跳 HoverCard wrapper(Portal + useDocumentTheme observer 是
+    // Roadmap 重渲 hotspot,per codex Layer C 分析)。scroll 結束 → context flips false →
+    // re-render 接回完整 HoverCard tree(NameCard 仍可 hover 顯示)。
+    // 對齊 AG Grid `deferRender` for slow React cell components / MUI X DataGrid scroll-defer。
+    if (!hoverCard || isTableScrolling) return baseEl
 
     return (
       <HoverCard openDelay={300} closeDelay={200}>
@@ -294,7 +320,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     )
   }
 )
-Avatar.displayName = 'Avatar'
+AvatarInner.displayName = 'AvatarInner'
 
 // ── AvatarData ─────────────────────────────────────────────────────────────
 // 資料型別，讓 consumer 傳資料而非 ReactNode。
@@ -334,5 +360,8 @@ export const avatarMeta = {
     ring: ['ring-ring'],
   },
 } as const
+
+AvatarInner.displayName = 'Avatar'
+const Avatar = React.memo(AvatarInner)
 
 export { Avatar }

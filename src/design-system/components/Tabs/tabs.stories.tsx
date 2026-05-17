@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase; hasInteractiveStates 的 Disabled story 已在本檔覆蓋(2026-05-15 F-migration)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Users, Settings, Bell, ChevronDown } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
@@ -13,7 +14,7 @@ export default meta
 type Story = StoryObj<typeof Tabs>
 
 export const Default: Story = {
-  name: 'Default',
+  name: '預設',
   render: () => (
     <Tabs defaultValue="overview" className="w-[600px]">
       <TabsList>
@@ -30,29 +31,8 @@ export const Default: Story = {
   ),
 }
 
-export const AllSizes: Story = {
-  name: 'All Sizes',
-  render: () => (
-    <div className="flex flex-col gap-8 w-[600px]">
-      {(['sm', 'md', 'lg'] as const).map((size) => (
-        <div key={size}>
-          <div className="text-caption text-fg-muted mb-2">size = {size}</div>
-          <Tabs defaultValue="detail">
-            <TabsList size={size}>
-              <TabsTrigger value="detail">詳情</TabsTrigger>
-              <TabsTrigger value="comments">留言</TabsTrigger>
-              <TabsTrigger value="history">歷史紀錄</TabsTrigger>
-              <TabsTrigger value="attachments">附件</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      ))}
-    </div>
-  ),
-}
-
 export const WithSuffix: Story = {
-  name: 'With Suffix',
+  name: '帶後綴',
   render: () => (
     <Tabs defaultValue="notifications" className="w-[700px]">
       <TabsList>
@@ -77,7 +57,7 @@ const MANY_TABS = [
 ]
 
 export const OverflowScroll: Story = {
-  name: 'Overflow Scroll',
+  name: '溢位捲動',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="text-caption text-fg-muted max-w-xl">
@@ -102,7 +82,7 @@ export const OverflowScroll: Story = {
 }
 
 export const OverflowMenu: Story = {
-  name: 'Overflow Menu',
+  name: '溢位選單',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="text-caption text-fg-muted max-w-xl">
@@ -128,7 +108,7 @@ export const OverflowMenu: Story = {
 }
 
 export const Disabled: Story = {
-  name: 'Disabled',
+  name: '停用',
   render: () => (
     <Tabs defaultValue="a" className="w-[600px]">
       <TabsList>

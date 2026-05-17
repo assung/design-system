@@ -4,7 +4,7 @@ import * as React from 'react'
 import { X, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverAnchor, PopoverContent } from '@/design-system/components/Popover/popover'
 import { DateGrid } from '@/design-system/components/DateGrid/date-grid'
@@ -81,6 +81,56 @@ function isoToDate(iso: string | null | undefined): Date | undefined {
     date.setHours(time.hours, time.minutes, time.seconds)
   }
   return date
+}
+
+/**
+ * Issue 10 typed input parser(2026-05-10):接 user 自由輸入字串,parse 出 ISO date(YYYY-MM-DD)
+ * 或 ISO datetime(YYYY-MM-DDTHH:MM[:SS])。
+ *
+ * 支援 format(per Material X DatePicker / Ant DatePicker typed input idiom):
+ *   - `YYYY-MM-DD` / `YYYY/MM/DD` / `YYYY.MM.DD`(ISO + 慣例 separator)
+ *   - `MM/DD/YYYY` / `MM-DD-YYYY`(US locale)
+ *   - `DD/MM/YYYY` / `DD-MM-YYYY`(EU locale)
+ *   - `YYYY-MM-DD HH:MM[:SS]` / `YYYY-MM-DDTHH:MM[:SS]`(datetime,showTime 才接)
+ *   - native `Date.parse()` fallback(handle 'Mar 12 2025' 等英文 RFC)
+ *
+ * Return:`{ iso, valid }`。Invalid → `valid=false` + `iso=null`,UI 顯 aria-invalid。
+ * Partial input(打到一半)→ valid=false 但不顯 error UI(consumer 用 onBlur / Enter 才檢驗)。
+ *
+ * 對齊 Material X-DatePicker `formats` parser + Ant DatePicker `format` array + dayjs.parse。
+ */
+function parseDateInput(input: string, opts: { allowTime: boolean }): { iso: string | null; valid: boolean } {
+  const trimmed = input.trim()
+  if (trimmed === '') return { iso: null, valid: true }  // empty = no value, OK
+  // 1. ISO date YYYY-MM-DD or with separators / . /(可選 time YYYY-MM-DD[T| ]HH:MM[:SS])
+  const isoDateMatch = trimmed.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:[T\s](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/)
+  if (isoDateMatch) {
+    const [, y, m, d, hh, mm, ss] = isoDateMatch
+    const date = new Date(Number(y), Number(m) - 1, Number(d), Number(hh ?? 0), Number(mm ?? 0), Number(ss ?? 0))
+    if (isNaN(date.getTime()) || date.getMonth() !== Number(m) - 1) return { iso: null, valid: false }
+    const datePart = dateToIso(date)
+    if (hh != null && opts.allowTime) {
+      const h2 = String(Number(hh)).padStart(2, '0')
+      const m2 = String(Number(mm)).padStart(2, '0')
+      const s2 = String(Number(ss ?? 0)).padStart(2, '0')
+      return { iso: `${datePart}T${h2}:${m2}:${s2}`, valid: true }
+    }
+    return { iso: datePart, valid: true }
+  }
+  // 2. US / EU locale MM/DD/YYYY or DD/MM/YYYY — ambiguous;v1 fallback Date.parse 並接受結果
+  // 3. native Date.parse fallback(RFC-style 'Mar 12 2025')
+  const parsed = new Date(trimmed)
+  if (!isNaN(parsed.getTime())) {
+    const datePart = dateToIso(parsed)
+    if (opts.allowTime && (trimmed.includes(':') || trimmed.includes('T'))) {
+      const h2 = String(parsed.getHours()).padStart(2, '0')
+      const m2 = String(parsed.getMinutes()).padStart(2, '0')
+      const s2 = String(parsed.getSeconds()).padStart(2, '0')
+      return { iso: `${datePart}T${h2}:${m2}:${s2}`, valid: true }
+    }
+    return { iso: datePart, valid: true }
+  }
+  return { iso: null, valid: false }
 }
 
 function dateToIso(date: Date | undefined): string {
@@ -248,10 +298,42 @@ export interface DatePickerProps
    * — datetime picker user 習慣編完才 commit,避免 calendar 點到就關。
    */
   needConfirm?: boolean
+  /**
+   * Display 是否渲 Calendar icon + Field naked wrapper(D-path opt-in,2026-05-08)
+   * — DataTable cell display↔edit 像素級對齊用。預設 false(裸 span,backward compat)。
+   * 設 true 時 display 走 fieldWrapperStyles(naked variant)+ ItemSuffix CalendarIcon,
+   * 與 edit 同 DOM 結構,消除 Layer-B padding mismatch。
+   */
+  showDisplayEndIcon?: boolean
   /** Initial open state(uncontrolled)— DataTable cell-as-input 1-step open canonical */
   defaultOpen?: boolean
   /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
   onOpenChange?: (open: boolean) => void
+  /**
+   * Issue 10 typed input(2026-05-10):trigger 內渲 real `<input>` 接 user 鍵盤輸入,
+   * 同時保持 Calendar icon trigger 開啟 calendar 選擇(對齊 Material X DatePicker / Ant
+   * DatePicker / Notion typed-date idiom)。
+   *
+   * 預設 false(backward-compat)— trigger 仍是 `<div role="combobox">` + `<span>` 文字。
+   *
+   * Behavior(opt-in `typeable=true`):
+   *   - `<input>` 取代 `<span>` displayValue,user 可直接打字
+   *   - Partial input(打到一半,如 "2025-")allow,**不**即時驗證
+   *   - `Enter` / `Blur` → `parseDateInput` 解析 → 合法 commit `onChange`;不合法 set
+   *     aria-invalid + keep draft visible(user 可繼續修)
+   *   - `Esc` → reset draft 回 committed value
+   *   - IME composition 期間不觸發驗證(中日韓輸入法 onCompositionStart/End 攔截)
+   *   - Calendar pick → 同步 input draft + commit(走原 path)
+   *   - Calendar icon 仍 click 開 popover(Material/Ant idiom)
+   *
+   * **v1 limits**:
+   *   - format detection ISO YYYY-MM-DD / YYYY/MM/DD / Date.parse fallback(`parseDateInput`)
+   *   - US `MM/DD/YYYY` vs EU `DD/MM/YYYY` ambiguous → fallback native parser
+   *   - 未支援 locale-aware format prop(v2 加 `dateFormat?: string`)
+   *
+   * 對齊 Material X-DatePicker `format` prop / Ant DatePicker `format` array / Notion typed-input。
+   */
+  typeable?: boolean
 }
 
 // Trigger uses `<div role="combobox" tabIndex={...}>` instead of `<button>` —
@@ -278,8 +360,10 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       minuteStep = 1,
       secondStep = 1,
       needConfirm: needConfirmProp,
+      showDisplayEndIcon = false,
       defaultOpen = false,
       onOpenChange,
+      typeable = false,
       id: idProp,
       'aria-label': ariaLabelProp,
       'aria-labelledby': ariaLabelledByProp,
@@ -324,11 +408,58 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const displayCommitted = formatDateOrDateTime(value, showTime, showSeconds, { formatOptions, locale })
     const displayLive = formatDateOrDateTime(displayValue, showTime, showSeconds, { formatOptions, locale })
 
+    // Issue 10 typed input(2026-05-10):draft string + invalid flag + IME composition guard。
+    const [inputDraft, setInputDraft] = React.useState<string>(displayLive)
+    const [inputInvalid, setInputInvalid] = React.useState(false)
+    const composingRef = React.useRef(false)
+    // Sync input draft from committed displayLive(value change from outside)— 不要在 user
+    // 打字期間覆寫。透過 ref 比較:committed vs current draft 是否從相同 source。
+    const lastDisplayLiveRef = React.useRef(displayLive)
+    React.useEffect(() => {
+      if (lastDisplayLiveRef.current !== displayLive) {
+        setInputDraft(displayLive)
+        setInputInvalid(false)
+        lastDisplayLiveRef.current = displayLive
+      }
+    }, [displayLive])
+    const handleInputCommit = React.useCallback((raw: string) => {
+      const { iso, valid } = parseDateInput(raw, { allowTime: showTime })
+      if (!valid) { setInputInvalid(true); return }
+      setInputInvalid(false)
+      if (iso === null) {
+        // empty input = clear value
+        onChange?.('')
+        setDraft(null)
+      } else {
+        onChange?.(iso)
+        setDraft(iso)
+      }
+    }, [onChange, showTime])
+
     // mode='display'(Phase B2 2026-05-05):純內容輸出 — 對齊原 DatePickerDisplay sub-component(retired)。
-    //   無 Field wrapper chrome / 無 Calendar icon / 無 input affordance。
+    //   Default(showDisplayEndIcon=false):無 Field wrapper / 無 Calendar icon — backward compat 裸 span。
+    //   Opt-in(showDisplayEndIcon=true,2026-05-08 D-path):Field naked wrapper + ItemSuffix Calendar,
+    //   與 edit 同結構消除 cell display↔edit 像素偏移(Layer-B padding mismatch)。
     if (resolvedMode === 'display') {
-      if (!value) return <span className={cn('text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
-      return <span className={cn('truncate', className)}>{displayCommitted}</span>
+      if (!showDisplayEndIcon) {
+        // 2026-05-14 I2 fix(spec contract (e) display typography canonical):bare span 套
+        // `fieldDisplayTextClass(size)`(sm/md→text-body,lg→text-body-lg)— 對齊 Field family 統一。
+        if (!value) return <span className={cn(fieldDisplayTextClass(size), 'text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
+        return <span className={cn(fieldDisplayTextClass(size), 'truncate', className)}>{displayCommitted}</span>
+      }
+      return (
+        <div
+          className={cn(fieldWrapperStyles({ mode: 'display', variant, size }), className)}
+          data-field-mode="display"
+        >
+          <span className={cn(bareInputStyles, 'flex-1 min-w-0 truncate', !value && 'text-fg-muted')}>
+            {value ? displayCommitted : EMPTY_DISPLAY}
+          </span>
+          <ItemSuffix className="pointer-events-none">
+            <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
+          </ItemSuffix>
+        </div>
+      )
     }
 
     // readonly / disabled
@@ -397,9 +528,32 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
             )}
             {...props}
           >
-            <span className={cn(bareInputStyles, 'truncate', !displayValue && 'text-fg-muted')}>
-              {triggerText}
-            </span>
+            {typeable ? (
+              // Issue 10 typed input(2026-05-10):real `<input>` 接 user 鍵盤打字。
+              // Click 在 input 上不 propagate 給外層 popover trigger(避免每次打字都開 popover)。
+              // Calendar icon `<ItemSuffix>` 點才開 popover(Material/Ant typed-date idiom)。
+              <input
+                type="text"
+                className={cn(bareInputStyles, 'truncate', !inputDraft && 'placeholder:text-fg-muted')}
+                value={inputDraft}
+                placeholder={resolvedPlaceholder}
+                aria-invalid={inputInvalid || error || undefined}
+                onChange={(e) => { setInputDraft(e.target.value); setInputInvalid(false) }}
+                onCompositionStart={() => { composingRef.current = true }}
+                onCompositionEnd={() => { composingRef.current = false }}
+                onKeyDown={(e) => {
+                  if (composingRef.current) return
+                  if (e.key === 'Enter') { e.preventDefault(); handleInputCommit(inputDraft) }
+                  if (e.key === 'Escape') { setInputDraft(displayLive); setInputInvalid(false); e.preventDefault() }
+                }}
+                onBlur={() => { if (!composingRef.current) handleInputCommit(inputDraft) }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <span className={cn(bareInputStyles, 'truncate', !displayValue && 'text-fg-muted')}>
+                {triggerText}
+              </span>
+            )}
             {showClear && (
               <ItemInlineAction
                 size={size ?? 'md'}

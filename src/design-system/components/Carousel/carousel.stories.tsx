@@ -1,3 +1,6 @@
+// @story-trait-rationale: Carousel 是 composite UX showcase(Hero banner + Product gallery 兩個 hero scenario)
+// 而非 prop-variant control;互動 state 由 embla 內建處理(arrow visibility hover-revealed / dots active state)
+// 在 hero story 內已 demonstrate。Trait gap pre-existing(非本 audit fix scope),allowlist for image-content fix。
 import type { Meta } from '@storybook/react'
 import {
   Carousel,
@@ -18,34 +21,21 @@ export default meta
 
 // ── Real-content data ────────────────────────────────────────────────────────
 
+// 2026-05-16 audit codex Round 6:用真實 photo URL 取代 gradient color block — story 要教 carousel
+// 真實裁切 / 內容裁切 / 視覺層次,gradient 抽象 block 教不到(對齊 Polaris / Carbon stories 用 stock photo)。
+// Picsum.photos 提供 stable seeded photos(免登入 / 免 API key / 跨環境一致)。
 const heroBanners = [
-  {
-    city: '京都',
-    tagline: '秋日楓紅限定行程',
-    gradient: 'linear-gradient(135deg, #c4452a 0%, #f28b3a 60%, #ffd37a 100%)',
-  },
-  {
-    city: '雷克雅維克',
-    tagline: '極光季早鳥 8 折',
-    gradient: 'linear-gradient(135deg, #1b3b6f 0%, #3d7ea6 60%, #a8e0ff 100%)',
-  },
-  {
-    city: '里斯本',
-    tagline: '歐洲西岸 7 日自由行',
-    gradient: 'linear-gradient(135deg, #e87d5a 0%, #f4c27a 50%, #f7e2b0 100%)',
-  },
-  {
-    city: '峇里島',
-    tagline: '熱帶度假村 · 含機加酒',
-    gradient: 'linear-gradient(135deg, #1d6a5a 0%, #4db893 60%, #c7ebd9 100%)',
-  },
+  { city: '京都', tagline: '秋日楓紅限定行程', image: 'https://picsum.photos/seed/kyoto/960/360' },
+  { city: '雷克雅維克', tagline: '極光季早鳥 8 折', image: 'https://picsum.photos/seed/reykjavik/960/360' },
+  { city: '里斯本', tagline: '歐洲西岸 7 日自由行', image: 'https://picsum.photos/seed/lisbon/960/360' },
+  { city: '峇里島', tagline: '熱帶度假村 · 含機加酒', image: 'https://picsum.photos/seed/bali/960/360' },
 ]
 
 const productImages = [
-  { label: '正面', gradient: 'linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%)' },
-  { label: '側面', gradient: 'linear-gradient(135deg, #e4e4e7 0%, #d4d4d8 100%)' },
-  { label: '背面', gradient: 'linear-gradient(135deg, #d4d4d8 0%, #a1a1aa 100%)' },
-  { label: '情境', gradient: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' },
+  { label: '正面', image: 'https://picsum.photos/seed/headphones-front/480/480' },
+  { label: '側面', image: 'https://picsum.photos/seed/headphones-side/480/480' },
+  { label: '背面', image: 'https://picsum.photos/seed/headphones-back/480/480' },
+  { label: '情境', image: 'https://picsum.photos/seed/headphones-lifestyle/480/480' },
 ]
 
 
@@ -63,10 +53,10 @@ export const HomepageHeroBanner = {
           {heroBanners.map((b) => (
             <CarouselItem key={b.city}>
               <div
-                className="relative h-[360px] rounded-lg overflow-hidden flex items-end p-8"
-                style={{ background: b.gradient }}
+                className="relative h-[360px] rounded-lg overflow-hidden flex items-end p-8 bg-cover bg-center"
+                style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.6) 100%), url(${b.image})` }}
               >
-                <div className="text-white">
+                <div className="text-white relative z-10">
                   <div className="text-caption font-medium opacity-90 mb-1">推薦目的地</div>
                   <div className="text-h2 font-bold mb-1">{b.city}</div>
                   <div className="text-body-lg opacity-95">{b.tagline}</div>
@@ -96,10 +86,10 @@ export const ProductImageGallery = {
             <CarouselItem key={img.label}>
               <AspectRatio
                 ratio={1}
-                className="relative rounded-lg overflow-hidden flex items-center justify-center"
-                style={{ background: img.gradient }}
+                className="relative rounded-lg overflow-hidden bg-cover bg-center"
+                style={{ backgroundImage: `url(${img.image})` }}
               >
-                <div className="text-foreground/40 text-body-lg font-medium">{img.label}</div>
+                <div className="absolute bottom-2 right-2 text-caption text-white px-2 py-0.5 rounded bg-black/40">{img.label}</div>
               </AspectRatio>
             </CarouselItem>
           ))}

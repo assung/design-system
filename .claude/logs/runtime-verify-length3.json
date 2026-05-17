@@ -1,0 +1,34 @@
+[
+  {
+    "testId": "Bug3-180-len1",
+    "length": 1,
+    "narrowPx": 180,
+    "triggerWidth": 180,
+    "triggerAvatars": 1,
+    "overflowText": ""
+  },
+  {
+    "testId": "Bug3-180-len2",
+    "length": 2,
+    "narrowPx": 180,
+    "triggerWidth": 180,
+    "triggerAvatars": 2,
+    "overflowText": ""
+  },
+  {
+    "testId": "Bug3-180-len3",
+    "length": 3,
+    "narrowPx": 180,
+    "triggerWidth": 180,
+    "triggerAvatars": 3,
+    "overflowText": ""
+  },
+  {
+    "testId": "Bug3-180-len4",
+    "length": 4,
+    "narrowPx": 180,
+    "triggerWidth": 180,
+    "triggerAvatars": 4,
+    "overflowText": ""
+  }
+]

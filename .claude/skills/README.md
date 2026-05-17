@@ -8,15 +8,14 @@
 
 **核心特徵**:**只在 user invoke 時載入**(不佔每 session context);流程包含 checkpoint 讓 user 介入決策。
 
-## 當前居民(19 skills,2026-04-26)
+## 當前居民(22 skills,2026-05-14 update)
 
-**Audit / Quality(6)**:
+**Audit / Quality(5)**:
 | Skill | Invoke 時機 | Scope |
 |-------|-----------|-------|
-| `design-system-audit/` | user 要求 audit DS 本身 | DS 內部 spec/cva/SSOT 27 維度(Groups A–K) |
+| `design-system-audit/` | user 要求 audit DS 本身 | DS 內部 spec/cva/SSOT 33 維度(Phase 0 自建 baseline)|
 | `product-ui-audit/` | 「audit 這個 UI / 檢查 DS 用對嗎」| consumer UI 6 維檢核 |
 | `component-quality-gate/` | 元件 merge / ready / check | 45+ 項 checklist + Phase 4 Ship 6 項 |
-| `baseline-audit/` | 跨元件 matrix(design-system-audit P1 prerequisite)| scan-only,不決策 |
 | `visual-audit/` | 視覺對齊 / 排版問題 / gap 錯 | pixel-level Layer A + B |
 | `code-quality-audit/` | 量化 clean code(any / dead export / file-size / long fn / circular dep / magic number)| chained by /design-system-audit Dim 27 |
 

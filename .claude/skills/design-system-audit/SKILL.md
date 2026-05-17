@@ -1,9 +1,9 @@
 ---
 name: design-system-audit
-description: Systematic audit of this design system for world-class quality. Runs 27 audits covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
+description: Systematic audit of this design system for world-class quality. Runs 46 audit dimensions covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
 ---
 
-# Design System Audit (31 audits, Groups A–M, world-class)
+# Design System Audit (46 dimensions, Groups A–O + Future-proof preflight)
 
 Purpose: catch every bug class this project has shipped historically PLUS structural gaps relative to Polaris / Material / Atlassian / Ant / Carbon / Apple HIG. Each audit has a clear rubric tied to CLAUDE.md rules. The skill reports findings and **explicitly stops at checkpoints** for user decisions before large-scope fixes.
 
@@ -31,7 +31,7 @@ Purpose: catch every bug class this project has shipped historically PLUS struct
 
 ---
 
-## The 27 audits
+## The 46 audit dimensions
 
 Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
@@ -137,12 +137,38 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
 | # | Audit | What it catches |
 |---|-------|-----------------|
-| 34 | **Disabled state 顯著性 precedence**(M24)| DS-wide grep 所有 Field family + 任何含 `placeholder:text-fg-muted` / `<span className="text-fg-muted">{placeholder ?? ...}</span>` 的 tsx,反向確認:對應 disabled state 是否有 `disabled:placeholder:text-fg-disabled` / `group-data-[field-mode=disabled]/field:` group selector / `resolvedMode === 'disabled' ? 'text-fg-disabled' : ...` JSX 條件。違反 = disabled 元件內 placeholder 仍 muted color → user 看 disabled 內容比 element 對比強(視覺反而 emphasis)。Hook `check_disabled_placeholder_color.sh` write-time 攔,本 dim batch verify 既有元件 |
-| 35 | **Layered chain invariant — overlay scroll**(M25)| DS-wide grep `<PopoverContent\|<HoverCardContent\|<DialogContent\|<SheetContent` consumer,確認所有中間 wrapper 含 `<SurfaceBody>` 時,wrapper className 是否含 `flex flex-col h-full`。Chain 任何一層斷 → SurfaceBody flex-1 失效 → body 不 scroll(Filter / Sort panel 2026-05-04 真實 bug)。Hook `check_overlay_panel_scroll_chain.sh` write-time 攔,本 dim batch verify 既有 panels |
-| 36 | **Naked variant cell-as-input row-mode propagation**(M19,2026-05-05 新增)| DS-wide grep `variant.*naked` consumer 元件,確認**所有內部 wrapper**(`inline-flex items-center` / `flex items-center` 在 inline 容器中)有 import + apply `nakedCellRowModeAlign` SSOT(`field-wrapper.tsx` const)。違反 = autoRow 場景下視覺垂直置中,跟其他純文字 cell baseline 漂移。Hook `check_naked_row_mode_propagation.sh` write-time 攔,本 dim batch verify |
-| 37 | **Field state machine SSOT「focus dominates everything」**(M19,2026-05-06 v13.3 升級)| DS-wide grep:(a) per-control 不寫 `(open\|isOpen) && 'border-primary'` 或 `data-\[state=open\]:border-primary`(已 v13.3 全 retire — Combobox/Select/PeoplePicker)— 統一交給 Field default `data-[state=open]:border-border-hover`(灰深無 focus)+ `focus-within:!border-primary`(focus 強制勝)。(b) naked variant 不寫平行 outline state ring(`outline-{border\|primary}` / `shadow-[inset` — 已 v9 retire)。SSOT 在 `field-wrapper.tsx` 三 compoundVariant(default/bare/naked),改一處全 control + cell + variant 跟動。對齊 Material 3 + Polaris + Ant Design 5 共識(focus 永遠 win,Ant 風「選後藍 / 取消灰」自動達成 via Radix `onCloseAutoFocus`)。Hook `check_field_state_token_consume.sh` v13.5 升級(rule A: outline ring / rule B: per-control open=blue) write-time 攔。違反 = visual diverge across control types + Field token 改動不同步 |
-| 38 | **Inline-action gap canonical**(2026-05-05 v4 新增,user pushback codify)| DS-wide grep `<ItemInlineAction` / `<ItemInlineActionButton` consumer,確認 sibling gap = **`gap-2`(8px)**(對齊 `inline-action.spec.md:80` SSOT;同 fieldWrapperStyles 元素間距)。違反:寫 `gap-3`(12px,= `--table-cell-px`,**不是** inline-action gap)/ `gap-4` 等。Hook `check_inline_action_canonical_gap.sh` write-time 警 |
-| 39 | **Row-layout slot primitive consumption**(M1+M17,2026-05-05 v8 新增)| DS-wide grep `<span class="...h-\[1lh\].*shrink-0.*flex.*items-center...">` 自刻 slot wrapper 在非 SSOT host(item-anatomy.tsx / field-wrapper.tsx)。違反 = 平行 SSOT,該消費 `<ItemPrefix>` / `<ItemSuffix>` from `patterns/element-anatomy/item-anatomy.tsx`(永遠 `h-[1lh]`,單行視覺=items-center,多行 pin 第 1 行 — item-anatomy.spec.md:175+190 verbatim)。對應 retire `nakedCellPrefixSlot` / `nakedCellSuffixSlot`(已下架)。Hook `check_row_slot_handcraft.sh` write-time block;`hoverReveal` 跨 row primitive(menu/tree/row)走 `<ItemSuffix hoverReveal hoverGroup="...">` 參數化 API |
+| 34 | **Disabled state 顯著性 precedence**(M24)| Field family disabled mode → 內 placeholder/value/icon 全切 `text-fg-disabled`(非 muted)。Hook `check_disabled_placeholder_color.sh` |
+| 35 | **Layered chain invariant — overlay scroll**(M25)| Overlay primitive → SurfaceBody 中間 wrapper 必 `flex flex-col h-full`,斷一層 = body 不 scroll。Hook `check_overlay_panel_scroll_chain.sh` |
+| 36 | **Naked variant cell-as-input row-mode propagation**(M19)| `variant="naked"` consumer 內 wrapper 必 import + apply `nakedCellRowModeAlign` SSOT。Hook `check_naked_row_mode_propagation.sh` |
+| 37 | **Field state machine 「focus dominates everything」**(M19 v13.3)| 禁 per-control `(open\|isOpen) && 'border-primary'`(Field default 處理)+ naked variant 禁平行 outline ring。SSOT `field-wrapper.tsx` 三 compoundVariant。對齊 Material 3 / Polaris / Ant 共識。Hook `check_field_state_token_consume.sh` |
+| 38 | **Inline-action gap canonical**(2026-05-05)| `<ItemInlineAction>` sibling gap = `gap-2` (8px) per `inline-action.spec.md:80`。Hook `check_inline_action_canonical_gap.sh` |
+| 39 | **Row-layout slot primitive consumption**(M1+M17)| 禁自刻 `<span h-[1lh] shrink-0 flex items-center>` slot wrapper(item-anatomy / field-wrapper 外),必消費 `<ItemPrefix>` / `<ItemSuffix>`。Hook `check_row_slot_handcraft.sh` |
+
+### Group O — Storybook content quality(2026-05-15 user-mandated,gap 補)
+
+User 2026-05-15 verbatim 抓「DS 深度稽核漏 storybook content quality」+「title 是否夠有 title 的感覺」+「應該要全盤檢查並避免下次深層稽核又漏東漏西」。對應 `.claude/planning/storybook-governance-gap-2026-05-15.md` 完整 enumeration。
+
+| # | Audit | What it catches |
+|---|-------|-----------------|
+| 40 | **Title 命名 quality**(story-rules.md L18-22)| Per-story regex check:`Design System/{Tokens\|Patterns\|Components\|Internal}/{PascalCase Name}/{中文 subpage}` 結構;第一層英 / 子頁中文 / 子頁前**不**加元件名(❌ `MenuItem 展示` → ✓ `展示`)。違反 = title 漂移失「title 感」 |
+| 41 | **Story name jargon**(story-rules.md「禁 spec 內部代號」)| Grep story name 含 `L1-L7 \| canonical \| spec X \| phase Y \| stream [A-Z]` 等 spec 內部代號 = 違反讀者體感「人話」test。Hook `check_story_name_jargon` 既有,本 dim batch verify 既有 + lib stories |
+| 42 | **範例佔位符 / 抽象代號**(story-rules.md「禁佔位符」)| Grep `.stories.tsx` body 含 `Option A/B/C \| 按鈕一 \| Foo/Bar/Baz \| Lorem ipsum \| Hello World \| Test 1/2` 等抽象代號 = 違反「真實業務情境」原則(對齊 Polaris / Carbon stories 共識使用 Jira / Stripe / Notion 真情境)|
+| 43 | **Rule note 品質**(原則>結論 / 無中英夾雜)| AI judgement sample-based:讀 `.principles.stories.tsx` Rule notes,判 (a) 是否「告訴讀者原則為何」而非「只說結論」;(b) 是否無中英夾雜(技術術語例外)。對齊 `references/example-selection.md`「Rule note 品質」 |
+| 44 | **Internal vs Components 分類三 test**(story-rules.md L25)| Per-element folder verify 三 test:(a) 有預設視覺?(b) 直接 `<X>` 有視覺?(c) 所有 consumer 包 wrapper?三題傾向 Internal → 該住 `src/design-system/components/Internal/`。違反 = 元件分類漂移 user 認知混亂。**Exception:compound-component public API**(`Dialog.Root/Trigger/Content` / `Field + FieldLabel + FieldError + FieldDescription` 等 sub-component 給 consumer 拼的 documented composition pattern)豁免 — 它定義 sub-components 不是被 wrap 的零件,對齊 Radix Dialog / MUI FormControl + InputLabel / Mantine Input.Wrapper compound idiom。Sub-agent 跑此 dim 時必先檢查 component 是否 export ≥ 2 個 sub-component(Field/FieldLabel/FieldError 等)+ spec.md 有「composition pattern / compound API」 cite → 豁免 |
+| 45 | **Mechanical output structural validation**(2026-05-15 user-mandated)| 對每元件跑 `compile-stories.mjs <Name>` 取 generated rows;grep 確認(a) `AllSizes` 含所有 cva sizes (b) `AllVariants` / `ColorMatrix` 含所有 cva variants (c) `Accessibility` story 含 ARIA hint / keyboard map (d) `See also` cross-link 反指 spec.md 既有 link section。不只 drift,**output structure 對 spec/cva 完整覆蓋**。對應 SSOT:`scripts/compile-stories.mjs` 邏輯 + `references/anatomy-standard.md`。Future:加 `compile-stories.mjs --validate` mode 把 grep 移進腳本 |
+| 46 | **Manual vs Mechanical boundary**(2026-05-15 user-mandated)| Per-元件 grep `.stories.tsx`(非 anatomy/principles),若含 trait-derived `AllSizes` / `AllVariants` / `WithIcon` hand-written export 而非 import auto-compile 結果 = anti-pattern(該 migrate 進 auto-compile)。對應 SSOT:`category-templates.md` v2 trait-based。例外 allowlist:`// @manual-trait-allow: <reason>` 檔頭 |
+
+### Group P — World-class tier(2026-05-17 加,codex 共識)
+
+| # | Audit | What it catches |
+|---|-------|-----------------|
+| 47 | **Tailwind utility registry compliance**(對齊 Atlassian `@atlaskit/tokens` / Carbon / Ant / Polaris token-first)| `check_opacity_token_usage.sh` 升 `check_tailwind_token_registry.sh`,讀 `src/design-system/tokens/utility-registry.json` SSOT。檢 `leading-N` / `tracking-*` / `gap-px|0.5|1.5` / `w-fraction` / `text-(xs|sm|base|lg|xl|...)` / `font-(thin|light|semibold|black)` / `rounded-(xl|2xl|3xl)` 等繞 SSOT utility |
+| 48 | **Unused / orphan token detector**| 對 `tokens/**/*.spec.md` 定義的每個 token grep `src/design-system/**/*.{tsx,css}` consumer。0 consumer = 候選 retire(可能 token 設計超前但無人用 / 或 consumer 自創 token / 或 reserved 被誤用);spec.md「消費者」段宣稱的 consumer 真有用嗎 cross-verify |
+| 49 | **a11y axe-core 自動跑 + contrast ratio**(Storybook a11y addon + Carbon AVT + Atlassian linters)| Per `*.stories.tsx` 跑 axe-core via Storybook a11y addon;WCAG AA contrast ≥ 4.5:1(text)/ 3:1(large text / UI)。Carbon 每 PR 跑 AVT,Atlassian 季度 audit + linter integration。本 dim 缺 = a11y 漏在 spec.md 寫了但無自動驗 |
+| 50 | **Bundle size budget per component**(Material UI size-limit / Material Web public tracking / Ant tree-shake)| Per component gzip size 上限(eg. Button ≤ 5KB / DataTable ≤ 50KB);CI fail if regress > 10%。對齊 size-limit pkg + Carbon export audit。需建 `package.json` `size-limit` 段 + per-component manifest |
+| 51 | **Theme / density visual matrix**(Material 3 dynamic color / Apple HIG Dynamic Type)| Deep mode 每 core story 跑 light/dark/high-contrast/density-md/density-lg/RTL 6-cell matrix screenshot diff;baseline drift > Δ% → flag。對齊 Polaris visual regression / Carbon dark token matrix |
+
+**Heavy dim(`--deep` mode 各必獨立 sub-agent 跑,不可 batch)**:12 / 24 / 25 / 40 / 41 / 42 / 43 / 45 / 49 / 50 / 51。Sub-agent prompt 嚴禁含「SKIP」keyword(per Phase 1 NO-SKIP invariant)。
 
 ---
 
@@ -159,12 +185,27 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
    - `node scripts/audit-content-quality.mjs --check` — `✅ No content drift`(16 cat)
    - `node scripts/extract-canonical-rules.mjs` — `✅ All extracted rule keywords covered`
    - violation → 列 P0
-4. Build fail → 不跑 33 dims;報 user 決定先修 OR 繼續(broken code audit 多 dim 跑不動)
+4. Build fail → 不跑 46 dims;報 user 決定先修 OR 繼續(broken code audit 多 dim 跑不動)
 5. TaskList entries 建好
+
+### Phase 0.5 — Preflight 全面盤查(2026-05-15 user-mandated P0,NO-SAMPLE 前置)
+
+User verbatim:「你完整稽核之前應該會先全面盤查全部檔案和所有設計原則對吧?我記得之前我有命令你要在 infra 定義這件事」+「確保現在和未來都會自動涵蓋,當有新的準則就務必更新設計系統進階稽核的內容」。
+
+**強制 chain**:`/design-system-audit --deep` 跑時 Phase 1 前自動跑 `node scripts/audit-preflight.mjs`(對應 SSOT `.claude/memory/feedback_audit_preflight_全盤查.md`)
+
+**輸出 3 件**:
+1. **檔案 enumeration**:全 `src/design-system/**/*.{tsx,ts,css,md}` 計數 + per type bucket(component tsx / showcase stories / anatomy stories / principles stories / spec.md / tokens)
+2. **設計原則 enumeration**:M-rule(meta-patterns.md)+ spec trait(frontmatter)+ hook invariant + rules
+3. **Coverage matrix**:每原則 → audit dim 對應(N 對應 / NO COVER gap)— 存 `.claude/logs/audit-preflight-{date}.json`
+
+**Gap 處理**:有 gap → Phase 1 dispatch 前 user 拍板:補新 dim / 撤原則 / 接受 gap 紀錄 deferred。
+
+**Phase 1 sub-agent 必引 preflight log**:Coverage matrix 對應 dim → sub-agent 跑該 dim 時掃 file enumeration list(DS-wide ALL,不 sample,per NO-SAMPLE invariant)。
 
 ### Phase 1 — Parallel audit execution
 
-Launch all 27 audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
+Launch all audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
 
 **Every audit prompt declares three metadata lines at top**:
 - **Type**: `Absolute` or `Consistency` (per CLAUDE.md「Consistency Audit 原則」)
@@ -178,6 +219,38 @@ Each audit reports:
 - file:line for every finding
 - Suggested fix direction
 - Count + top offenders
+
+#### ⚠️ `--deep` mode NO-SKIP + NO-SAMPLE invariant(2026-05-15 user-mandated P0)
+
+User verbatim 2026-05-15:
+> 「請確保之前所有列過的關於 design system 深度稽核要做的事情在稽核時都肯定會做到」
+> 「都已經叫深度稽核到底怎麼還能疏漏?」
+> 「**稽核並非既往不咎,稽核要全盤稽核,不能只抽樣,要全盤**」
+
+**`/design-system-audit --deep` 跑時兩條 mechanical**:
+
+### NO-SKIP(原 2026-05-15)
+- Sub-agent prompt 禁含「SKIP / too heavy / DEFERRED per instruction / 跳過 dim」keyword
+- 每 dim 必跑,heavy dim(12/24/25/40-44)獨立 sub-agent,不擠 batch
+- Context 不夠 → 拆 2-stage(per-component scan → cross-component synthesis)
+
+### NO-SAMPLE(2026-05-15 補強)
+- Sub-agent prompt **禁含「sample top N / subset / pick top X / top hot / sampled components」**等 縮 scope keyword
+- 每 dim 必 **DS-wide ALL components**(60+ 元件全掃),不 sample subset
+- Context 不夠 → 拆 N stages(每 stage 10-15 元件 batch),**不 sample**
+- 對應 SSOT:`memory/feedback_audit_full_sweep_not_sample.md`
+- 違反 = 12% 覆蓋率假 PASS,user 抓「還是有很多 story 沒整理」
+
+**Sub-agent dispatch prompt template MUST 含**:
+```
+**Coverage requirement (NO-SAMPLE per audit-must-be-full-sweep canonical)**:
+DS-wide ALL components(grep / glob 全 src/design-system/components/*/),不挑樣本。
+若 context 不夠 → 拆 stage 分批,不可寫「sample top N」當理由縮 scope。
+```
+
+**Mechanical strength**:
+- `stop_self_audit.sh` 偵測「`--deep` + sub-agent prompt 含 SKIP keyword」雙條件 → BLOCKER inject(2026-05-15 加)
+- 本 SKILL.md Phase 1 dispatching MUST cite「NO-SKIP invariant verified, 全 dim 已 dispatch」 in commit message
 
 ### Phase 2 — Triage + CHECKPOINT 1 (MUST ASK)
 
@@ -220,9 +293,15 @@ Phase 1-3 覆蓋 D1+D2;D3-D6 chain 專門 skill。**模式**:高效(default)scop
 
 **跳過**:spec.md 純文字改 / 高效模式只跑 3.5a。
 
-### Phase 4.5 — Governance sprawl check(進階強制 chain `/knowledge-prune`)
+### Phase 4.5 — Governance sprawl check(2026-05-17 升:default 也 chain light)
 
-**Trigger**:CLAUDE.md > 800 / MEMORY > 20 / 動 Meta-Pattern / hook-fires 6 月 0 fire / corrections > 10 — 任一 chain `/knowledge-prune` scope=full;P2 STOP 等 user;prune 完回 Phase 4。**不 trigger**:高效模式 / 無 Meta + sizes OK + logs 無 dead。Phase 3-4 後跑因 governance 已最新狀態。
+**Default mode**:chain `/knowledge-prune` Phase 0(baseline)+ Phase 1 D1(duplicate)+ D4(contradiction)輕量 **report-only**(不修),~5 min。Codex Q5 verdict:contradiction 比 dup 更會破 SSOT,該優先,故 default 不只 D1。
+
+**Deep mode**(`--deep`):chain full Phase 0-5;P0/P1 auto-fix,P2 STOP 等 user。Trigger 條件(2026-05-17 加 4 條,共 9 條):CLAUDE.md > 800 / MEMORY > 20 / 動 Meta-Pattern / hook-fires 6 月 0 fire / corrections > 10 / **audit-prompts.md coverage < 100%** / **`@benchmark-unverified-blanket` count > 0** / **new audit dim added 本次** / **hooks count >= soft threshold(26)**。
+
+**機械化 trigger 點**(2026-05-17 加):post-audit final report validator hook(`check_audit_post_report_validator.sh`)— audit Phase 4 結束 emit 「prune-chain-trigger」signal → 下一 turn `inject_pending_self_audit.sh` 注入 `/knowledge-prune scope=full` directive。**不**靠記憶。
+
+**Findings → prune feed**(M14 mandate):Phase 1 finding 含「新 rule 提議」keyword → auto-queue `/knowledge-prune` Phase 1 D3 candidate(判 abstract 或 duplicate)。
 
 ### Phase 4 — Final report + memory + Self-improvement(強制)
 
@@ -243,6 +322,6 @@ Update `memory/project_audit_progress.md`(date / coverage / findings / deferred 
 
 ## References
 
-- [references/audit-prompts.md](references/audit-prompts.md) — Exact subagent prompts for all 27 audits
+- [references/audit-prompts.md](references/audit-prompts.md) — Subagent prompts for audit dimensions(部分覆蓋,Dim 24-28/31-46 待補 Fix 2 後續)
 - [references/historical-bugs.md](references/historical-bugs.md) — Bug classes indexed by audit
 - [references/checkpoints.md](references/checkpoints.md) — Detailed examples of each MUST-ASK scenario

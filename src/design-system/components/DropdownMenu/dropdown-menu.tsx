@@ -429,7 +429,7 @@ DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 // 作為 MenuItem children 的後綴,視覺為 fg-muted 小字。
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
-    className={cn('ml-auto text-footnote text-fg-muted tracking-widest', className)}
+    className={cn('ml-auto text-footnote text-fg-muted tracking-shortcut', className)}
     {...props}
   />
 )

@@ -281,6 +281,8 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
     const [draggingId, setDraggingId] = React.useState<string | null>(null)
     const [dropTarget, setDropTarget] = React.useState<{ id: string; position: DropPosition; depth: number } | null>(null)
     const autoExpandTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+    // 2026-05-16 audit codex Round 6:unmount cleanup(原 cleanup 只在 dragEnd/dragCancel,unmount-during-drag 漏 cancel)
+    React.useEffect(() => () => { if (autoExpandTimerRef.current) clearTimeout(autoExpandTimerRef.current) }, [])
     // Ref for toggleExpand — handleDragOver 定義在 toggleExpand 之前(hook 順序限制),
     // 用 ref 打斷 temporal dead zone。
     const toggleExpandRef = React.useRef<(id: string) => void>(() => {})

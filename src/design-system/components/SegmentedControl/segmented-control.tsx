@@ -274,16 +274,18 @@ const SegmentedControlItem = React.forwardRef<
 })
 SegmentedControlItem.displayName = 'SegmentedControlItem'
 
-// Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
-// Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
+// Story auto-compile metadata — Phase 2 fill(2026-05-15)
+// Sizes 真實 cva keys = xs/sm/md/lg(itemVariants.size),映射 field-height-* token tier
+// SegmentedControl 無語意 variant(選中 vs 未選 是 state 不是 variant)— 與 Button.variant 刻意不同(spec「與 Button 的血緣」段)
 export const segmentedControlMeta = {
   component: 'SegmentedControl',
   family: null, // non-family composite / overlay / layout
-  variants: {
-
-  },
+  variants: {},
   sizes: {
-
+    xs: { fieldHeight: 24, typography: 'caption', iconSize: 14, purpose: 'row-embedded inline action / DataTable inline filter' },
+    sm: { fieldHeight: 28, typography: 'body', iconSize: 16, purpose: 'compact chrome bar / dense toolbar' },
+    md: { fieldHeight: 32, typography: 'body', iconSize: 16, purpose: '預設 — form field 對齊' },
+    lg: { fieldHeight: 36, typography: 'body-lg', iconSize: 20, purpose: 'touch / prominent CTA' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
@@ -291,6 +293,7 @@ export const segmentedControlMeta = {
     fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground'],
     ring: ['ring-ring'],
   },
+  defaultSize: 'md',
 } as const
 
 export { SegmentedControl, SegmentedControlItem, segmentedControlVariants, itemVariants as segmentedControlItemVariants }

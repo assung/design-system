@@ -190,8 +190,29 @@ export const HeightBehaviorRule: Story = {
             </DialogHeader>
             <DialogBody>
               <div className="space-y-4">
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <Input key={i} placeholder={`設定項目 ${i + 1}`} />
+                {[
+                  '桌面通知音效',
+                  '頻道訊息通知',
+                  '直接訊息通知',
+                  '@提及推播',
+                  '@頻道全員推播',
+                  '執行緒回覆通知',
+                  '關鍵字監控',
+                  '行動裝置推播',
+                  '推播延遲(秒)',
+                  '推播閒置觸發',
+                  '訊息預覽顯示',
+                  '勿擾時段開始',
+                  '勿擾時段結束',
+                  '週末勿擾',
+                  '假日勿擾',
+                  'Email 摘要頻率',
+                  'Email 摘要時段',
+                  '未讀提醒週期',
+                  '靜音指定頻道',
+                  '通知摘要訂閱',
+                ].map((label, i) => (
+                  <Input key={i} placeholder={label} />
                 ))}
               </div>
             </DialogBody>

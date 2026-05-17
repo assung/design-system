@@ -1,6 +1,5 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Hash, Circle, Star } from 'lucide-react'
 import { Tag } from './tag'
 
 const meta: Meta<typeof Tag> = {
@@ -19,87 +18,17 @@ const meta: Meta<typeof Tag> = {
 export default meta
 type Story = StoryObj<typeof Tag>
 
-const variants = ['neutral', 'blue', 'red', 'green', 'yellow', 'turquoise', 'purple', 'magenta', 'indigo'] as const
-
-/* ── 全部 Variants ── */
-export const AllVariants: Story = {
-  name: '全部 Variants',
-  render: () => (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <p className="text-caption font-medium text-fg-secondary">subtle（預設）</p>
-        <div className="flex flex-wrap gap-2">
-          {variants.map(v => (
-            <Tag key={v} variant={v}>{v}</Tag>
-          ))}
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <p className="text-caption font-medium text-fg-secondary">solid</p>
-        <div className="flex flex-wrap gap-2">
-          {variants.map(v => (
-            <Tag key={v} variant={v} solid>{v}</Tag>
-          ))}
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <p className="text-caption text-fg-muted">建議用法</p>
-        <div className="flex flex-wrap gap-2">
-          <Tag variant="blue">進行中</Tag>
-          <Tag variant="green">已完成</Tag>
-          <Tag variant="red">已封鎖</Tag>
-          <Tag variant="yellow">待審核</Tag>
-          <Tag variant="neutral">草稿</Tag>
-          <Tag variant="purple">設計</Tag>
-          <Tag variant="turquoise">前端</Tag>
-          <Tag variant="magenta">行銷</Tag>
-          <Tag variant="indigo">研究</Tag>
-        </div>
-      </div>
-    </div>
-  ),
-}
-
-/* ── 尺寸 ── */
-export const AllSizes: Story = {
-  name: '尺寸',
-  render: () => (
-    <div className="flex flex-col gap-3">
-      {(['sm', 'md', 'lg'] as const).map(size => (
-        <div key={size} className="flex items-center gap-3">
-          <span className="text-caption text-fg-muted w-8">{size}</span>
-          <Tag size={size} variant="blue">Electronics</Tag>
-          <Tag size={size} variant="green">Approved</Tag>
-          <Tag size={size} variant="neutral">Draft</Tag>
-        </div>
-      ))}
-    </div>
-  ),
-}
-
-/* ── Icon ── */
-export const WithIcon: Story = {
-  name: 'Icon',
-  render: () => (
-    <div className="flex flex-wrap gap-2">
-      <Tag variant="blue" icon={Hash}>channel</Tag>
-      <Tag variant="purple" icon={Circle}>design</Tag>
-      <Tag variant="green" icon={Star}>featured</Tag>
-    </div>
-  ),
-}
-
 /* ── Avatar ── */
 export const WithAvatar: Story = {
-  name: 'Avatar',
+  name: '頭像',
   render: () => (
     <div className="flex flex-wrap gap-2">
-      <Tag variant="neutral" avatar={
+      <Tag color="neutral" avatar={
         <img src="https://i.pravatar.cc/32?u=alice" alt="" className="rounded-full object-cover" />
       }>
         Alice Chen
       </Tag>
-      <Tag variant="neutral" avatar={
+      <Tag color="neutral" avatar={
         <img src="https://i.pravatar.cc/32?u=bob" alt="" className="rounded-full object-cover" />
       }>
         Bob Lin
@@ -118,7 +47,7 @@ export const Dismissable: Story = {
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-1">
           {tags.map(t => (
-            <Tag key={t} variant="neutral" onDismiss={() => setTags(prev => prev.filter(x => x !== t))}>{t}</Tag>
+            <Tag key={t} color="neutral" onDismiss={() => setTags(prev => prev.filter(x => x !== t))}>{t}</Tag>
           ))}
         </div>
         {tags.length === 0 && <p className="text-caption text-fg-muted">全部移除了，重新整理頁面可恢復</p>}
@@ -132,8 +61,8 @@ export const Truncation: Story = {
   name: '截斷 + Tooltip',
   render: () => (
     <div className="flex flex-col gap-3" style={{ maxWidth: 300 }}>
-      <Tag variant="neutral">Short</Tag>
-      <Tag variant="blue">This is a very long tag label that should truncate</Tag>
+      <Tag color="neutral">Short</Tag>
+      <Tag color="blue">This is a very long tag label that should truncate</Tag>
       <p className="text-caption text-fg-muted">超過 160px 自動截斷，hover 顯示完整文字 tooltip</p>
     </div>
   ),

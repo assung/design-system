@@ -1,8 +1,26 @@
 ---
 component: Sidebar
 family: null
-variants: {}
-sizes: {}
+variants:
+  default:
+    when: "標準導覽 row — 參與 single-selection,fg-secondary → hover foreground / active neutral-selected"
+    world-class: ["Linear sidebar nav item", "Notion sidebar item", "VS Code Activity Bar primary item"]
+  meta:
+    when: "Section 底部命令 row(「Show more」「載入更多」「+ 新增專案」);font-normal + fg-muted,不參與 selection"
+    world-class: ["Linear 'Show N more'", "Notion 'Show N more'", "Slack 'Show more'", "Gmail Labels 'More'"]
+sizes:
+  sm:
+    px: 28
+    when: "次導覽 / 設定頁分類 / 緊湊空間;對齊 field-height-sm"
+    world-class: ["VS Code Settings sidebar(28)", "Atlassian secondary nav compact"]
+  md:
+    px: 32
+    when: "預設 — 應用程式主導覽 row;對齊 TreeView / MenuItem 同 size 視覺無縫"
+    world-class: ["Linear sidebar default", "Notion sidebar default", "Figma left panel"]
+  lg:
+    px: 36
+    when: "重要主導覽(高 touch 區、horizontal headroom 大)、icon-prominent workspace switcher"
+    world-class: ["Slack workspace sidebar large", "Discord server list large"]
 traits:
   - hasVariants
   - hasSizes
@@ -251,7 +269,7 @@ Modal header 用 **padding-based**（`py-3` + content），因為 modal 是 ephe
 | Discord | 16px semibold | 同 size 同 weight |
 | Figma | 13px regular | 同 size 同 weight |
 
-我們選 **`text-body-lg font-medium` 統一**,是世界級 chrome typography 的中庸做法——比 Linear 舒服、比 Slack 節制、對齊 Discord。
+我們選 **`text-body-lg font-medium` 統一**,是世界級 chrome typography 的中庸做法——比 Linear（14-15px medium）字級大 1px / weight 一致，比 Slack（15-18px bold）字級略小且 weight 較輕避免 navigation 過度搶 attention，對齊 Discord（16px semibold）。
 
 ---
 

@@ -91,11 +91,11 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 
 ---
 
-## Variant
+## Color
 
-以色名命名，語義由消費端決定。建議用法與色彩系統的語義定義對齊。
+以色名命名，語義由消費端決定。建議用法與色彩系統的語義定義對齊。Prop 命名 `color`（對齊 MUI Chip / Ant Tag / Atlaskit Tag world-class 多數派 idiom）。
 
-| Variant | 建議用法 |
+| Color | 建議用法 |
 |---------|----------|
 | `neutral`（預設） | 通用分類、草稿、無特定語義 |
 | `blue` | 進行中、資訊提示、active 狀態（對應 `--info`） |
@@ -242,7 +242,7 @@ Field 內包含 Tag 時，Field 的 padding 改為 `(field-height - tag-height) 
 - ❌ Tag 尺寸不引用 field-height token——兩者獨立
 - ❌ 不用 gap 處理 icon/dismiss 間距——text padding 已拉開
 - ❌ 不用 Tag 做 overlay 通知圓點——那是不同元件（Badge）
-- ❌ 不用 variant 名稱傳達語義（例：不靠 `red` = 錯誤）——variant 是顏色，語義由消費端的內容和上下文決定
+- ❌ 不用 color 名稱傳達語義（例：不靠 `red` = 錯誤）——color 是顏色，語義由消費端的內容和上下文決定
 - ❌ 不用 prefix/suffix 傳入 dismiss 按鈕——用 `onDismiss` callback，Tag 內部控制渲染
 
 ---

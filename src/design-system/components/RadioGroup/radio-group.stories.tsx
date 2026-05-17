@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase(2026-05-15 F-migration);Default scenario 由 WithLabel / HorizontalLayout 等真實 form 情境 story 覆蓋。
 import type { Meta, StoryObj } from '@storybook/react'
 import { RadioGroup, RadioGroupItem } from './radio-group'
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
@@ -111,7 +112,7 @@ export const Horizontal: Story = {
 
 /* ── Disabled ── */
 export const Disabled: Story = {
-  name: 'Disabled',
+  name: '停用',
   render: () => (
     <RadioGroup defaultValue="a" className="max-w-sm">
       <SelectionItem control={<RadioGroupItem value="a" id="dis-a" disabled />} label="已選取但不可更改" htmlFor="dis-a" disabled />

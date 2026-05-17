@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
 import { Copy, Pencil, Trash2, Monitor, ChevronDown, ChevronRight, Check, type LucideIcon } from 'lucide-react'

@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasInteractiveStates 由 anatomy.stories.tsx StateBehavior auto-compile owns(2026-05-15 F-migration);Default scenario 由 Rich / Compact / HoverSwap 等真實上傳情境 story 覆蓋,Disabled state 由 status="error" / "uploading" 真實 state 體現。
 import * as React from 'react'
 import type { Meta } from '@storybook/react'
 import { Trash2 } from 'lucide-react'
@@ -39,7 +40,7 @@ const deleteBtn = <Button size="xs" iconOnly variant="text" startIcon={Trash2} a
 const deleteBtnXs = deleteBtn
 
 export const Rich = {
-  name: 'Rich',
+  name: '豐富樣式',
   render: () => (
     // Type A upload manager:所有 item 都有 status + progress bar(含 completed 100%)
     // 也可傳 onClick/onDownload 讓整 row 點開(預設 FileViewer,consumer 決定)
@@ -58,7 +59,7 @@ export const Rich = {
 }
 
 export const Compact = {
-  name: 'Compact',
+  name: '緊湊樣式',
   render: () => (
     // Compact + status(永遠有 progress bar)= Type A upload manager
     // list wrapper `gap-1`(4px)簡化 canonical — compact list 統一 gap-1,不論純/混合(2026-04-23)
@@ -72,7 +73,7 @@ export const Compact = {
 }
 
 export const HoverSwap = {
-  name: 'Hover swap',
+  name: 'Hover 替換',
   render: () => (
     <div className="flex flex-col max-w-md gap-4">
       <div>

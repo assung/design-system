@@ -127,7 +127,7 @@ export const UsageGuidance: Story = {
 }
 
 export const DisabledOpacityRule: Story = {
-  name: 'Disabled 用 opacity(保留顏色)',
+  name: '停用用半透明保留顏色',
   render: () => (
     <div>
       <Rule

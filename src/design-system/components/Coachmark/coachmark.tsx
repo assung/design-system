@@ -49,8 +49,10 @@ interface CoachmarkStep {
 }
 
 export interface CoachmarkProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'title'> {
-  /** 控制顯示 */
+  /** 控制顯示(controlled mode)*/
   open?: boolean
+  /** 預設打開(uncontrolled initial state)— 2026-05-15 audit Dim 26 V1 fix per user verbatim「A:1」approval */
+  defaultOpen?: boolean
   onOpenChange?: (open: boolean) => void
   /** 觸發 anchor 元素。通常傳 trigger element;Coachmark 浮層會定位於此 */
   children: React.ReactNode
@@ -110,6 +112,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
   (
     {
       open,
+      defaultOpen,
       onOpenChange,
       children,
       image,
@@ -146,7 +149,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
         : kind
 
     return (
-      <Popover open={open} onOpenChange={onOpenChange}>
+      <Popover open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
         <PopoverTrigger asChild>{children}</PopoverTrigger>
         <PopoverContent
           ref={ref}

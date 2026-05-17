@@ -131,7 +131,7 @@ Tabs 有三種尺寸，**高度由 `--tab-height-*` token 控制**，隨 `data-d
 
 ### 為什麼 Tabs 不複用 `--field-height-*`
 
-Tabs 是 navigation container，不是 form control。field-height 的 scale（24–36）是為 input / button 設計，套在 tabs 上會壓得太擠、底線失去呼吸感。世界級設計系統（Atlassian 32 / Polaris 44 / Material 48）的 tabs 高度都在 32 起跳。
+Tabs 是 navigation container，不是 form control。field-height 的 scale（24–36）是為 input / button 設計，套在 tabs 上高度 < 32px 時底線距 baseline < 8px，違反 navigation breathing 最小值。世界級設計系統（Atlassian 32 / Polaris 44 / Material 48）的 tabs 高度都在 32 起跳。
 
 ### 為什麼獨立於 `--table-row-*`
 

@@ -47,6 +47,14 @@
 
   --font-caption-size:  12px;
   --font-footnote-size: 10px;
+
+  /* ─ Letter-spacing(role-specific only;raw tracking-* utility 禁用)─
+     `--tracking-shortcut`:鍵盤快捷鍵顯示專用(⌘K / Ctrl+S 等)。寬一階
+     letter-spacing 讓 glyph 之間呼吸感對齊鍵帽 visual idiom — 對齊
+     Material / GitHub Primer / Polaris KeyboardKey / Tailwind「wider tracking
+     for uppercase buttons + labels」canonical。0.1em 與 Tailwind tracking-widest
+     相同值但語義特定(不放任 raw utility 漏)。  */
+  --tracking-shortcut: 0.1em;
 }
 
 
@@ -101,3 +109,10 @@
 /* ── line-height override
    leading-normal (1.5) 已是 Tailwind 內建，只補 leading-compact ── */
 @utility leading-compact { line-height: 1.3; }
+
+
+/* ── Letter-spacing semantic utility(對齊 single semantic value per role 哲學)──
+   `tracking-shortcut`:鍵盤快捷鍵 hint(Command / DropdownMenuShortcut 等)。
+   禁 raw `tracking-(tight|wide|wider|widest|tighter)` per typography.spec.md L91-105
+   + utility-registry.json block list。新增 role 需新 token + 新 @utility。 */
+@utility tracking-shortcut { letter-spacing: var(--tracking-shortcut); }

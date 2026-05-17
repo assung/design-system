@@ -39,7 +39,7 @@ function TypeRow({ utility, meta, sample }: { utility: string; meta: string; sam
 // ── Stories ──────────────────────────────────────────────────────────────────
 
 export const TypeScale: Story = {
-  name: 'Type Scale',
+  name: '字型尺寸',
   parameters: {
     docs: {
       description: {
@@ -65,7 +65,7 @@ export const TypeScale: Story = {
 
 
 export const FontWeight: Story = {
-  name: 'Font Weight',
+  name: '字重',
   parameters: {
     docs: {
       description: {
@@ -98,7 +98,7 @@ export const FontWeight: Story = {
 
 
 export const LineHeight: Story = {
-  name: 'Line Height',
+  name: '行高',
   parameters: {
     docs: {
       description: {

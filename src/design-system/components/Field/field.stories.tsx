@@ -1,3 +1,4 @@
+// @story-trait-rationale: Field 是 compound component(FieldLabel / FieldError / FieldDescription / FieldGroup),hasSizes / Default 由 anatomy.stories.tsx SizeMatrix + Inspector auto-compile owns(2026-05-15 F-migration);showcase 展示 Vertical / Horizontal 兩種 orientation 真實 form 情境。
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import { Upload } from 'lucide-react'
@@ -22,7 +23,7 @@ type Story = StoryObj
 // ── Vertical（預設） ────────────────────────────────────────────────────
 
 export const Vertical: Story = {
-  name: 'Vertical',
+  name: '垂直',
   render: () => (
     <div className="max-w-sm">
       <FieldGroup>
@@ -56,7 +57,7 @@ export const Vertical: Story = {
 // ── Horizontal ──────────────────────────────────────────────────────────
 
 export const Horizontal: Story = {
-  name: 'Horizontal',
+  name: '水平',
   render: () => (
     <div className="max-w-2xl">
       <FieldGroup>
@@ -468,7 +469,7 @@ export const ButtonAsControl: Story = {
 // ── Label Width 變化 ────────────────────────────────────────────────────
 
 export const LabelWidth: Story = {
-  name: 'Label Width',
+  name: 'Label 寬度',
   render: () => (
     <div className="max-w-2xl flex flex-col gap-4">
       <p className="text-caption text-fg-muted">labelWidth 支援任何 CSS length 值</p>

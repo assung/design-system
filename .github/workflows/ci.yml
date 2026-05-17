@@ -5,6 +5,19 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # 允許手動 trigger,讓 working branch 也能在 merge 前跑 verify + scrollbar probe
+  workflow_dispatch:
+
+# GitHub Pages 部署所需 permission(只 main push 才用,PR 不影響)
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時間只允許 1 個 Pages deploy(避免 race)
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   verify:
@@ -66,6 +79,38 @@ jobs:
       - name: Storybook build
         run: npm run build-storybook 2>&1 | tail -20
 
+      - name: Windows-like scrollbar probe(Linux Chromium ≈ Windows persistent bar)
+        # 地端 macOS 是 OS-overlay scrollbar，看不到 Windows 17px persistent bar 的圓角溢出。
+        # CI Linux Chromium 預設 persistent native scrollbar，視覺接近 Win Chrome → 用來驗證
+        # data-table.css v15.13 interim CSS parity 是否有效。
+        # 跑完 upload artifact 給 user 看 corner-zoom 圖。
+        run: |
+          set -e
+          # 1) 起 static http server serving storybook-static/
+          python3 -m http.server 8000 --directory storybook-static > /tmp/sb-static.log 2>&1 &
+          SERVER_PID=$!
+          sleep 3
+          curl -sf http://localhost:8000/ > /dev/null && echo "✓ storybook-static served" || (echo "✗ static server failed"; cat /tmp/sb-static.log; exit 1)
+          # 2) 跑 probe
+          STORYBOOK_URL=http://localhost:8000 node scripts/probe-windows-scrollbar.mjs 2>&1 | tail -40
+          # 3) 收 server
+          kill $SERVER_PID 2>/dev/null || true
+          ls -la tmp/scrollbar-probe/ 2>&1 | tail -20
+
+      - name: Upload scrollbar probe artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrollbar-probe-linux
+          path: tmp/scrollbar-probe/
+          if-no-files-found: warn
+
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: storybook-static
+
       - name: Vite build
         run: npm run build 2>&1 | tail -10
 
@@ -91,3 +136,18 @@ jobs:
           done
           if [ "$fail" -eq 1 ]; then exit 1; fi
           echo "✅ all files under cap"
+
+  deploy-storybook:
+    # Storybook → GitHub Pages(`https://ajenchen.github.io/design-system/`)
+    # 只 push main 才 deploy(PR 不動 production Pages)
+    name: Deploy Storybook to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

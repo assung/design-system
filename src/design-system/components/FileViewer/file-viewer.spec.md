@@ -12,6 +12,8 @@ benchmark:
   - Polaris Image: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Image
 ---
 
+<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+
 # FileViewer 設計原則
 
 ## 定位
@@ -363,3 +365,9 @@ Radix DialogPrimitive 自動處理:
 - `../../patterns/horizontal-overflow/horizontal-overflow.spec.md` — Filmstrip 水平捲動 + fade mask
 - `../../patterns/action-bar/action-bar.spec.md` — Toolbar 按鈕順序 canonical
 - `../FileItem/file-item.spec.md` — 上傳清單列元件(與 FileViewer 不同用途,FileItem 是 list item,FileViewer 是 fullscreen preview)
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `layoutSpace.spec.md`

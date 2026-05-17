@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // M22 retrofit DONE 2026-05-03 v11(real source URLs added inline at lines 38 + 111)
 import * as React from 'react'
 import { DayPicker } from 'react-day-picker'
@@ -171,10 +172,12 @@ const DateGrid = React.forwardRef<HTMLDivElement, DateGridProps>(function DateGr
         // ⚠️ children: _ 必丟棄(RDP 把 <Chevron> 當 children 傳 → 跟 Button startIcon 重疊變 double chevron)
         PreviousMonthButton: ({ className, children: _children, ...props }) => (
           <Button variant="text" size="xs" iconOnly startIcon={ChevronLeft}
+            aria-label="上一個月"
             className={className} {...props} />
         ),
         NextMonthButton: ({ className, children: _children, ...props }) => (
           <Button variant="text" size="xs" iconOnly startIcon={ChevronRight}
+            aria-label="下一個月"
             className={className} {...props} />
         ),
       }}

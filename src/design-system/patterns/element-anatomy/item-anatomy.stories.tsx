@@ -540,7 +540,7 @@ const InspectorInner = () => {
                   startIcon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
                   avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const, hoverCard: personHover("Alice", "Design team lead") } : undefined}
                   description={hasDescription ? descText : undefined}
-                  tag={effectiveHasSuffix ? <Tag size={size} variant="blue">Pro</Tag> : undefined}
+                  tag={effectiveHasSuffix ? <Tag size={size} color="blue">Pro</Tag> : undefined}
                   labelMaxLines={propLabelClamp}
                   descMaxLines={propDescClamp}
                 >
@@ -980,10 +980,10 @@ export const AlignmentThreshold = {
 
           {/* Live example */}
           <MenuFrame width={360}>
-            <MenuItem size="md" startIcon={Mail} description="每日寄送摘要信件" tag={<Tag size="md" variant="blue">Pro</Tag>}>
+            <MenuItem size="md" startIcon={Mail} description="每日寄送摘要信件" tag={<Tag size="md" color="blue">Pro</Tag>}>
               電子郵件通知
             </MenuItem>
-            <MenuItem size="md" startIcon={Bell} description="瀏覽器推送即時通知" tag={<Tag size="md" variant="green">Free</Tag>}>
+            <MenuItem size="md" startIcon={Bell} description="瀏覽器推送即時通知" tag={<Tag size="md" color="green">Free</Tag>}>
               推送通知
             </MenuItem>
           </MenuFrame>

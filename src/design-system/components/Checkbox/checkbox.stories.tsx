@@ -109,7 +109,7 @@ export const Horizontal: Story = {
 
 /* ── Disabled ── */
 export const Disabled: Story = {
-  name: 'Disabled',
+  name: '停用',
   render: () => (
     <div className="grid max-w-sm">
       <SelectionItem control={<Checkbox id="dis-a" disabled defaultChecked />} label="已選取但不可更改" htmlFor="dis-a" disabled />

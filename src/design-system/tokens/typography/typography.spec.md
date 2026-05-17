@@ -102,7 +102,31 @@ Typography 由三個獨立維度組成，分開疊加：
 
 // ❌ 不要把 font-weight 寫死在外層容器（應在需要的元素上疊加）
 <section className="text-body font-medium">...</section>
+
+// ❌ 不要用 Tailwind 原始 tracking-* utility(letter-spacing 必 role-specific)
+<kbd className="tracking-widest">⌘K</kbd>
 ```
+
+
+## Letter-spacing(role-specific only)
+
+**哲學**:`letter-spacing` 跟 font-size / line-height 同層 — utility scale(`tracking-tight..widest`)是 raw scale 非 semantic role,每 consumer 自挑值 = 跨元件不一致。本 DS 採 **single semantic value per role**(對齊 Polaris / Material / Apple),每個需要 letter-spacing 變化的 role 必先 codify token。
+
+### 既定 role
+
+| Token | 值 | Tailwind utility | Role |
+|---|---|---|---|
+| `--tracking-shortcut` | `0.1em` | `tracking-shortcut` | 鍵盤快捷鍵 hint(`⌘K` / `Ctrl+S` 等),Command/CommandShortcut + DropdownMenuShortcut + 同類 kbd 顯示 consumed via `text-caption` 或 `text-footnote` |
+
+### 新增 role 流程
+
+1. typography.css `:root` 加 `--tracking-<role>: <value>;`
+2. typography.css 加 `@utility tracking-<role> { letter-spacing: var(--tracking-<role>); }`
+3. utility-registry.json `typography.allow` 加 `tracking-<role>`
+4. 本 spec.md 加 row 到上表 + 對應 role 對齊世界級 cite(M22)
+5. Consumer code 用新 utility
+
+**對齊**:Material 3「letter-spacing per type role」/ Polaris「single semantic letter-spacing per scale」/ GitHub Primer「kbd typography canonical」/ Tailwind「wider tracking for uppercase + labels」。
 
 
 ## 世界級對照

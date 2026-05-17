@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase(2026-05-15 F-migration);showcase 展示 Default / WithStartIcon / WithBadge / IconOnly / FullWidth / Disabled 等真實使用情境。
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { AlignLeft, AlignCenter, AlignRight, List, LayoutGrid, Calendar } from 'lucide-react'
@@ -14,7 +15,7 @@ export default meta
 type Story = StoryObj<typeof SegmentedControl>
 
 export const Default: Story = {
-  name: 'Default',
+  name: '預設',
   render: () => {
     const [value, setValue] = useState('list')
     return (
@@ -28,7 +29,7 @@ export const Default: Story = {
 }
 
 export const WithStartIcon: Story = {
-  name: 'With Start Icon',
+  name: '前綴圖示',
   render: () => {
     const [value, setValue] = useState('list')
     return (
@@ -42,7 +43,7 @@ export const WithStartIcon: Story = {
 }
 
 export const WithBadge: Story = {
-  name: 'With Badge',
+  name: '帶 Badge',
   render: () => {
     const [value, setValue] = useState('all')
     return (
@@ -56,7 +57,7 @@ export const WithBadge: Story = {
 }
 
 export const IconOnly: Story = {
-  name: 'Icon Only',
+  name: '純圖示',
   render: () => {
     const [value, setValue] = useState('left')
     return (
@@ -69,27 +70,8 @@ export const IconOnly: Story = {
   },
 }
 
-export const AllSizes: Story = {
-  name: 'All Sizes',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      {(['xs', 'sm', 'md', 'lg'] as const).map((size) => (
-        <div key={size}>
-          <div className="text-caption text-fg-muted mb-1">size = {size}</div>
-          <SegmentedControl size={size} defaultValue="a">
-            <SegmentedControlItem value="a">Label</SegmentedControlItem>
-            <SegmentedControlItem value="b">Label</SegmentedControlItem>
-            <SegmentedControlItem value="c">Label</SegmentedControlItem>
-            <SegmentedControlItem value="d">Label</SegmentedControlItem>
-          </SegmentedControl>
-        </div>
-      ))}
-    </div>
-  ),
-}
-
 export const FullWidth: Story = {
-  name: 'Full Width',
+  name: '全寬',
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
@@ -113,7 +95,7 @@ export const FullWidth: Story = {
 }
 
 export const Disabled: Story = {
-  name: 'Disabled',
+  name: '停用',
   render: () => (
     <div className="flex flex-col gap-4">
       <SegmentedControl defaultValue="a" disabled>

@@ -1,6 +1,6 @@
 ---
 name: propose-options
-description: Auto-invoke when about to list options / 建議 / 候選方案 to user. Forces inline 4-Q principle check(M8 world-class benchmark / M17 SSOT / Rule-of-3 / M10 下游 subsumption)per option BEFORE listing. Options that fail any Q are filtered out OR labeled with the failure;passing options listed with evidence inline. Closes the gap where Claude proposes options based on intuition without verifying the design principles, leading to user having to challenge proposals (this conv: c hook + d M18-inner-area both proposed wrong, user pushed back, retracted). After repeated correction(M13 trigger), this skill codifies "verify before propose" as runtime discipline.
+description: Auto-invoke when listing options / 建議 / 候選方案. Forces inline 4-Q principle check(M8 benchmark / M17 SSOT / Rule-of-3 / M10 subsumption)per option BEFORE listing. Failures filtered or labeled. Codifies「verify before propose」runtime discipline.
 ---
 
 # /propose-options — Propose-time 4-Q Gate

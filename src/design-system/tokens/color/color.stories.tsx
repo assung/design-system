@@ -80,7 +80,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 // ── 1. Primitives ────────────────────────────────────────────────────────────
 
 export const Primitives: Story = {
-  name: 'Primitives',
+  name: '原始色票',
   parameters: {
     docs: {
       description: {
@@ -152,7 +152,7 @@ export const Primitives: Story = {
 // ── 2. Surface ───────────────────────────────────────────────────────────────
 
 export const Surface: Story = {
-  name: 'Surface',
+  name: '表面層',
   parameters: {
     docs: {
       description: {
@@ -191,7 +191,7 @@ export const Surface: Story = {
 // ── 3. Text ──────────────────────────────────────────────────────────────────
 
 export const Text: Story = {
-  name: 'Text',
+  name: '文字色',
   parameters: {
     docs: {
       description: {
@@ -218,7 +218,7 @@ export const Text: Story = {
 // ── 4. Semantic ──────────────────────────────────────────────────────────────
 
 export const Semantic: Story = {
-  name: 'Semantic',
+  name: '語義色',
   parameters: {
     docs: {
       description: {
@@ -296,7 +296,7 @@ export const Semantic: Story = {
 // ── 5. Interactive ───────────────────────────────────────────────────────────
 
 export const Interactive: Story = {
-  name: 'Interactive',
+  name: '互動色',
   parameters: {
     docs: {
       description: {

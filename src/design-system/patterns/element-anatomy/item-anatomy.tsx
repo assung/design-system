@@ -514,6 +514,7 @@ export interface ItemAvatarProps extends Omit<AvatarProps, "size"> {
  * asChild consumer 的標準用法——不需知道 size,不需 import AVATAR_SIZE,
  * 不可能硬寫錯誤尺寸。
  */
+// code-quality-allow: long-function — forwardRef body 含 size×color×hoverCard 三正交 prop 渲染分流,拆出 sub-fn 反增 prop drilling
 export const ItemAvatar = React.forwardRef<HTMLDivElement, ItemAvatarProps>(
   ({ mode = "inline", ...props }, ref) => {
     const size = useRowSize()

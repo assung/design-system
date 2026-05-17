@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase(2026-05-15 F-migration)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Textarea } from './textarea'
 import { Field, FieldLabel, FieldDescription, FieldError } from '@/design-system/components/Field/field'
@@ -44,7 +45,7 @@ export const Modes: Story = {
 }
 
 export const WithError: Story = {
-  name: 'With Error',
+  name: '錯誤狀態',
   render: () => (
     <div className="max-w-md">
       <Textarea error defaultValue="格式不正確的內容" />
@@ -52,21 +53,7 @@ export const WithError: Story = {
   ),
 }
 
-export const AllSizes: Story = {
-  render: () => (
-    <div className="max-w-md flex flex-col gap-4">
-      <div>
-        <p className="text-caption text-fg-muted mb-1">sm / md（14px）</p>
-        <Textarea size="md" defaultValue="text-body" />
-      </div>
-      <div>
-        <p className="text-caption text-fg-muted mb-1">lg（16px）</p>
-        <Textarea size="lg" defaultValue="text-body-lg" />
-      </div>
-    </div>
-  ),
-}
-
+// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
 export const InField: Story = {
   name: '在 Field 內',
   render: () => (

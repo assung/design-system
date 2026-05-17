@@ -139,42 +139,7 @@ export const Default: Story = {
   },
 }
 
-// ── Sizes ────────────────────────────────────────────────────────────────
-
-export const AllSizes: Story = {
-  name: '尺寸',
-  render: () => (
-    <div className="flex gap-12">
-      {(['sm', 'md', 'lg'] as const).map(size => (
-        <div key={size} className="w-[240px]">
-          <div className="text-caption text-fg-muted mb-4">size = {size}</div>
-          <Steps
-            defaultValue="step-2"
-            completedValues={['step-1']}
-            size={size}
-          >
-            <StepItem value="step-1">
-              <StepLabel>基本資料</StepLabel>
-              <StepDescription>已填寫</StepDescription>
-            </StepItem>
-            <StepItem value="step-2">
-              <StepLabel>帳號設定</StepLabel>
-              <StepDescription>進行中</StepDescription>
-            </StepItem>
-            <StepItem value="step-3">
-              <StepLabel>確認資料</StepLabel>
-              <StepDescription>待處理</StepDescription>
-            </StepItem>
-            <StepItem value="step-4">
-              <StepLabel>完成</StepLabel>
-            </StepItem>
-          </Steps>
-        </div>
-      ))}
-    </div>
-  ),
-}
-
+// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
 // ── All content states ──────────────────────────────────────────────────
 
 export const AllStates: Story = {
@@ -191,21 +156,21 @@ export const AllStates: Story = {
             size={size}
             linear={false}
           >
-            <StepItem value="s-upcoming">
-              <StepLabel>Upcoming</StepLabel>
-              <StepDescription>還沒走到</StepDescription>
+            <StepItem value="s-completed">
+              <StepLabel>已寄送</StepLabel>
+              <StepDescription>UPS 國際快遞 5/12 18:32</StepDescription>
             </StepItem>
             <StepItem value="s-current">
-              <StepLabel>Current</StepLabel>
-              <StepDescription>當前 focused(有 ring)</StepDescription>
+              <StepLabel>處理中</StepLabel>
+              <StepDescription>東京物流中心轉運</StepDescription>
             </StepItem>
-            <StepItem value="s-completed">
-              <StepLabel>Completed</StepLabel>
-              <StepDescription>已完成</StepDescription>
+            <StepItem value="s-upcoming">
+              <StepLabel>送達</StepLabel>
+              <StepDescription>預計 5/16 14:00 前送達</StepDescription>
             </StepItem>
             <StepItem value="s-error">
-              <StepLabel>Error</StepLabel>
-              <StepDescription>失敗,需要重做</StepDescription>
+              <StepLabel>地址確認失敗</StepLabel>
+              <StepDescription>請補收件人電話 / 重試</StepDescription>
             </StepItem>
           </Steps>
         </div>

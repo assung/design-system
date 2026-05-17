@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import { X, Clock } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -7,6 +8,7 @@ import {
   fieldWrapperStyles,
   bareInputStyles,
   EMPTY_DISPLAY,
+  fieldDisplayTextClass,
 } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
@@ -121,6 +123,13 @@ export interface TimePickerProps
    * (對齊 DatePicker calendar / Material endAdornment)。預設 Clock,傳 null 可關閉。
    */
   endIcon?: LucideIcon | null
+  /**
+   * Display 是否渲 endIcon + Field naked wrapper(D-path opt-in,2026-05-08)
+   * — DataTable cell display↔edit 像素級對齊用。預設 false(裸 span,backward compat)。
+   * 設 true 時 display 也走 fieldWrapperStyles(naked variant)+ ItemSuffix Clock,
+   * 與 edit 同 DOM 結構,消除 Layer-B padding mismatch。
+   */
+  showDisplayEndIcon?: boolean
   /** Initial open state(uncontrolled)— DataTable cell-as-input 1-step open canonical */
   defaultOpen?: boolean
   /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
@@ -146,6 +155,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
       secondStep = 1,
       disabledTime,
       endIcon,
+      showDisplayEndIcon = false,
       formatOptions,
       locale,
       defaultOpen = false,
@@ -217,10 +227,31 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
     }
 
     // mode='display'(Phase B2 2026-05-05):純內容輸出 — 對齊原 TimePickerDisplay sub-component(retired)。
-    //   無 Field wrapper / 無 Clock icon / 無 input affordance。
+    //   Default(showDisplayEndIcon=false):無 Field wrapper / 無 Clock icon — backward compat 裸 span。
+    //   Opt-in(showDisplayEndIcon=true,2026-05-08 D-path):Field naked wrapper + ItemSuffix Clock,
+    //   與 edit 同結構消除 cell display↔edit 像素偏移(Layer-B padding mismatch)。
     if (resolvedMode === 'display') {
-      if (!value) return <span className={cn('text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
-      return <span className={cn('truncate', className)}>{formatTime(value, { formatOptions, locale })}</span>
+      if (!showDisplayEndIcon) {
+        // 2026-05-14 I2 fix(spec contract (e) display typography canonical):bare span 套
+        // `fieldDisplayTextClass(size)`(sm/md→text-body,lg→text-body-lg)— 對齊 Field family 統一。
+        if (!value) return <span className={cn(fieldDisplayTextClass(size), 'text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
+        return <span className={cn(fieldDisplayTextClass(size), 'truncate', className)}>{formatTime(value, { formatOptions, locale })}</span>
+      }
+      return (
+        <div
+          className={cn(fieldWrapperStyles({ mode: 'display', variant, size }), className)}
+          data-field-mode="display"
+        >
+          <span className={cn(bareInputStyles, 'flex-1 min-w-0 truncate', !value && 'text-fg-muted')}>
+            {value ? formatTime(value, { formatOptions, locale }) : EMPTY_DISPLAY}
+          </span>
+          {EndIconCmp && (
+            <ItemSuffix className="pointer-events-none">
+              <EndIconCmp size={iconSize} className="text-fg-muted" aria-hidden />
+            </ItemSuffix>
+          )}
+        </div>
+      )
     }
 
     // readonly / disabled
@@ -383,4 +414,4 @@ export const timePickerMeta = {
   },
 } as const
 
-export { TimePicker, formatTime }
+export { TimePicker }

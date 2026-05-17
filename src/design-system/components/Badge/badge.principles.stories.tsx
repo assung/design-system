@@ -138,7 +138,7 @@ export const UsageGuidance: Story = {
 }
 
 export const DefaultLowRule: Story = {
-  name: 'Default LOW，escalate with reason',
+  name: '預設低強度,有理由才升級',
   render: () => (
     <div>
       <Rule

@@ -1,0 +1,106 @@
+{
+  "ts": "2026-05-15T11:45:05.826Z",
+  "results": [
+    {
+      "testId": "Bug1-multi-length1-default",
+      "description": "Multi PeoplePicker length=1 default story",
+      "storyId": "design-system-components-peoplepicker-展示--multi",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "testId": "Bug2-single-default",
+      "description": "Single PeoplePicker default story",
+      "storyId": "design-system-components-peoplepicker-展示--single",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "inputPresent": true,
+      "inputPlaceholder": "",
+      "inputValue": "",
+      "overlayPresent": true,
+      "overlayText": "Alice Chen",
+      "overlayScrollWidth": 270,
+      "overlayClientWidth": 270,
+      "ellipsisActive": false
+    },
+    {
+      "testId": "Bug3-datatable-default",
+      "description": "DataTable InlineEdit multiPerson visible count",
+      "storyId": "design-system-components-datatable-展示--inline-edit",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "cellData": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "cellHeight": 39,
+          "personAvatarCount": 2,
+          "roundedFullCount": 2,
+          "hasOverflowChip": false,
+          "overflowText": "",
+          "innerHTML_sample": "<span class=\"flex-1 min-w-0 self-stretch flex items-center\"><div class=\"group/field inline-flex items-center w-full min-w-0 rounded-md text-foreground font-normal transition-colors duration-150 text-body h-field-md px-3 gap-2 bg-transparent !rounded-none !px-0 !py-0 !h-auto border border-transparent"
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "cellHeight": 39,
+          "personAvatarCount": 1,
+          "roundedFullCount": 1,
+          "hasOverflowChip": false,
+          "overflowText": "",
+          "innerHTML_sample": "<span class=\"flex-1 min-w-0 self-stretch flex items-center\"><div class=\"group/field inline-flex items-center w-full min-w-0 rounded-md text-foreground font-normal transition-colors duration-150 text-body h-field-md px-3 gap-2 bg-transparent !rounded-none !px-0 !py-0 !h-auto border border-transparent"
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "cellHeight": 39,
+          "personAvatarCount": 2,
+          "roundedFullCount": 2,
+          "hasOverflowChip": false,
+          "overflowText": "",
+          "innerHTML_sample": "<span class=\"flex-1 min-w-0 self-stretch flex items-center\"><div class=\"group/field inline-flex items-center w-full min-w-0 rounded-md text-foreground font-normal transition-colors duration-150 text-body h-field-md px-3 gap-2 bg-transparent !rounded-none !px-0 !py-0 !h-auto border border-transparent"
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "cellHeight": 40,
+          "personAvatarCount": 1,
+          "roundedFullCount": 1,
+          "hasOverflowChip": false,
+          "overflowText": "",
+          "innerHTML_sample": "<span class=\"flex-1 min-w-0 self-stretch flex items-center\"><div class=\"group/field inline-flex items-center w-full min-w-0 rounded-md text-foreground font-normal transition-colors duration-150 text-body h-field-md px-3 gap-2 bg-transparent !rounded-none !px-0 !py-0 !h-auto border border-transparent"
+        }
+      ]
+    },
+    {
+      "testId": "Bug1-anatomy-multi",
+      "description": "Multi PeoplePicker anatomy story (ModeMatrix)",
+      "storyId": "design-system-components-peoplepicker-設計規格--mode-matrix",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "triggers": [
+        {
+          "triggerIdx": 0,
+          "triggerWidth": 448,
+          "truncSpans": [
+            {
+              "text": "Ada Chen",
+              "scrollW": 366,
+              "clientW": 366,
+              "truncated": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "totalProbes": 4
+}

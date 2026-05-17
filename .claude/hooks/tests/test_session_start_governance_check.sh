@@ -18,7 +18,9 @@ PASS=0; FAIL=0; FAILED=""
 
 setup_proj() {
   TMP_PROJ=$(mktemp -d)
-  mkdir -p "$TMP_PROJ/.claude/logs" "$TMP_PROJ/.claude/hooks/tests"
+  # 2026-05-08 fix:test isolation — empty memory dir 強制 hook 走 PROJECT_DIR scope,
+  # 不退回 $HOME harness SSOT(避免測試環境讀真實 user memory count 觸發 false blocker)
+  mkdir -p "$TMP_PROJ/.claude/logs" "$TMP_PROJ/.claude/hooks/tests" "$TMP_PROJ/.claude/memory"
   # NOTE: deliberately NOT creating benchmarks dir(absent dir = no warning,
   # creating an empty one = "never fetched" warning fires)
   echo 'log_hook_fire() { :; }' > "$TMP_PROJ/.claude/hooks/_log-fire.sh"

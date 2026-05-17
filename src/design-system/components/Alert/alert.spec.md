@@ -4,7 +4,22 @@ family: null
 traits:
   - hasVariants
   - hasInteractiveStates
-variants: {}
+variants:
+  neutral:
+    when: "中性提示(系統公告、非緊急說明);無情緒色"
+    world-class: ["Ant Alert type=info(neutral)", "Polaris Banner default"]
+  info:
+    when: "資訊性提示(版本更新、流程說明);藍色 hue"
+    world-class: ["Ant Alert type=info", "Material Alert severity=info", "Carbon InlineNotification kind=info"]
+  success:
+    when: "成功狀態的持久性宣告(綁定生效、付款完成需保留確認)"
+    world-class: ["Ant Alert type=success", "Polaris Banner status=success"]
+  warning:
+    when: "警告但非阻斷(方案即將到期、需更新付款方式);最高頻使用"
+    world-class: ["Ant Alert type=warning", "Polaris Banner status=warning", "Material Alert severity=warning"]
+  error:
+    when: "錯誤但非阻斷(系統錯誤但可重試、API 失敗摘要);搭配 aria-live=assertive"
+    world-class: ["Ant Alert type=error", "Polaris Banner status=critical", "Carbon InlineNotification kind=error"]
 sizes: {}
 benchmark:
   - Ant Design Alert: github.com/ant-design/ant-design/tree/master/components/alert

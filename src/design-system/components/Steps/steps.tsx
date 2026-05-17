@@ -833,11 +833,11 @@ StepContent.displayName = 'StepContent'
 export const stepsMeta = {
   component: 'Steps',
   family: 2,
-  variants: {
-
-  },
+  variants: {},
   sizes: {
-
+    sm: { px: 12, when: 'Sidebar / 緊湊 onboarding' },
+    md: { px: 16, when: '預設 — wizard / checkout / 註冊主流程' },
+    lg: { px: 20, when: 'Marketing 流程展示 / 重要 onboarding' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

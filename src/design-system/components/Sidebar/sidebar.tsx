@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // code-quality-allow: file-size — foundational composite(SidebarProvider / Sidebar / SidebarMenu / SidebarGroup / SidebarMenuButton 等 10+ primitives 共享 context + 20+ sidebar-specific features;已是 foundational SSOT spec cap 800)
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
@@ -1149,10 +1150,13 @@ export const sidebarMeta = {
   component: 'Sidebar',
   family: null, // non-family composite / overlay / layout
   variants: {
-
+    default: { when: '標準導覽 row,參與 single-selection' },
+    meta: { when: 'Section 底部命令 row(Show more / 新增),不參與 selection' },
   },
   sizes: {
-
+    sm: { px: 28, when: '次導覽 / 設定頁 / 緊湊空間' },
+    md: { px: 32, when: '預設 — 應用程式主導覽' },
+    lg: { px: 36, when: '重要主導覽 / icon-prominent workspace switcher' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

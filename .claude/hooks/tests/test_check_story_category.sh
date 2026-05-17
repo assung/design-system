@@ -5,7 +5,9 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../lib/check_story_category.sh"
+# Cluster A merge(2026-05-10):check_story_category.sh fold 進
+# check_story_invariants.sh dispatcher R3。Test 走 dispatcher。
+HOOK="$SCRIPT_DIR/../check_story_invariants.sh"
 [ -x "$HOOK" ] || { echo "FATAL: hook not executable"; exit 1; }
 
 PASS=0; FAIL=0; FAILED=""

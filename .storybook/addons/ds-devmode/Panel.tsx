@@ -398,81 +398,134 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
   // 跟 Storybook addon-measure(扣 border)對不上;修正使我們 = Chrome = addon-measure 三方一致。
   const iw = Math.max(0, w - padding.left - padding.right - border.left - border.right)
   const ih = Math.max(0, h - padding.top - padding.bottom - border.top - border.bottom)
-  // Margin layer container — Chrome 4-rect box model:margin → border → padding → content
-  // (+ position outer layer 對齊 Chrome `MetricsSidebarPane.ts` 5-layer model:position →
-  //   margin → border → padding → content,non-static element 才顯 position 層)
-  const marginOuter: React.CSSProperties = {
-    position: 'relative',
-    border: '1px dashed rgba(155, 99, 0, 0.45)',
-    padding: 14,
-    background: 'repeating-linear-gradient(45deg, rgba(247, 142, 30, 0.08) 0 3px, transparent 3px 6px)',
-    marginTop: isPositioned ? 14 : 4,
+  // 2026-05-13 R5 rewrite(per codex Q1 verdict + user 拍「想盡辦法 auto-handle prereq」):
+  // **Inspired by** Chrome DevTools Box Model / MetricsSidebarPane idiom(降級從「同源」claim;
+  // 真 Chrome 是 `display:flex` 不是 grid,per Chromium source verify)。
+  // 改 CSS Grid + grid-template-areas + clamp font-size + tabular-nums + ellipsis overflow,
+  // 結構性消除 `position:absolute; top:-9` magic number 對 font fallback 的脆弱依賴。
+  // 每層(margin / border / padding)用 3×3 grid:corners 空、edges 顯示 4 邊 px 值、center 為下一層,
+  // 各層 label tag 用 `grid-row:1; align-self:start; justify-self:start` 放在 top-left 而非 absolute。
+  // Font:`clamp(10px, 0.72rem, 11px)` + `font-variant-numeric:tabular-nums` 兼容 Windows fallback。
+  const layerLabelStyle: React.CSSProperties = {
+    fontSize: 'clamp(10px, 0.72rem, 11px)',
+    lineHeight: 1.2,
+    fontVariantNumeric: 'tabular-nums',
+    padding: '1px 4px',
+    background: 'var(--sb-bg, #fff)',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    minWidth: 0,
   }
-  const positionOuter: React.CSSProperties = {
-    position: 'relative',
-    border: '1px dotted rgba(123, 68, 196, 0.5)',
-    padding: 14,
-    background: 'rgba(123, 68, 196, 0.04)',
-    marginTop: 4,
+  // 2026-05-14 AnatomyBox hybrid rewrite(per codex M31 verdict + user verbatim「就只能超越不能比
+  // figma 還爛」+ Layer A 共識「revert CSS Grid 3×3 scatter,Figma/Chrome nested rect canonical」):
+  // 保 Layer factory abstraction(maintainable)+ visual 走 Figma/Chrome 風格 position-relative nested
+  // rects + edge values 浮在 band 中間(非 grid cell scatter)。對齊 Chrome DevTools box-model
+  // diagram(MDN canonical) + Figma DevMode Inspect Panel layout/spacing canonical。
+  const edgeValueStyle: React.CSSProperties = {
+    position: 'absolute',
+    fontSize: 11,
+    lineHeight: 1,
+    fontVariantNumeric: 'tabular-nums',
+    color: 'var(--dm-fg-muted, #65727F)',
+    textAlign: 'center',
+    padding: '1px 4px',
+    background: 'var(--sb-bg, #fff)',
+    pointerEvents: 'none',
+    whiteSpace: 'nowrap',
   }
-  const positionFmt = (v: string) => v === 'auto' || v === '' ? '—' : v
-  const anatomy = (
-    <div style={marginOuter}>
-      <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#A36100' }}>
-        Margin {margin.top}/{margin.right}/{margin.bottom}/{margin.left}
-      </span>
-      <div style={styles.anatomy}>
-        {distancesToParent && (
-          <>
-            <div style={{ ...styles.distance, top: 6, left: '50%', transform: 'translateX(-50%)' }}>
-              {distancesToParent.top}
-            </div>
-            <div style={{ ...styles.distance, bottom: 6, left: '50%', transform: 'translateX(-50%)' }}>
-              {distancesToParent.bottom}
-            </div>
-            <div style={{ ...styles.distance, left: 6, top: '50%', transform: 'translateY(-50%)' }}>
-              {distancesToParent.left}
-            </div>
-            <div style={{ ...styles.distance, right: 6, top: '50%', transform: 'translateY(-50%)' }}>
-              {distancesToParent.right}
-            </div>
-          </>
-        )}
-        <div style={styles.borderBox}>
-          <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px' }}>
-            Border {border.top}/{border.right}/{border.bottom}/{border.left}
-          </span>
-          <span style={{ ...styles.edgeLabel, color: '#558B2F' }}>{padding.left}</span>
-          <div style={styles.paddingBox}>
-            <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#558B2F' }}>
-              Padding
-            </span>
-            {/* Padding top — center 上方(對齊 Chrome devtools-frontend Box Model 4 邊全顯示
-                 idiom;canvas 不畫 per-side padding 數字,Panel 必須是 canonical) */}
-            <span style={{ ...styles.edgeLabel, position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)', color: '#558B2F' }}>
-              {padding.top}
-            </span>
-            <span style={{ color: 'var(--dm-fg, #1F2532)', fontWeight: 500 }}>{`${iw} × ${ih}`}</span>
-            {/* Padding bottom — center 下方 */}
-            <span style={{ ...styles.edgeLabel, position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)', color: '#558B2F' }}>
-              {padding.bottom}
-            </span>
-          </div>
-          <span style={{ ...styles.edgeLabel, color: '#558B2F' }}>{padding.right}</span>
-        </div>
-        <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: 10, color: 'var(--dm-fg-muted, #65727F)' }}>
-          border-box
-        </div>
-      </div>
+  const Layer: React.FC<{
+    label: string
+    edges: { top: number | string; right: number | string; bottom: number | string; left: number | string }
+    color: string
+    bgPattern?: string
+    borderStyle?: 'solid' | 'dashed' | 'dotted'
+    children: React.ReactNode
+  }> = ({ label, edges, color, bgPattern, borderStyle = 'dashed', children }) => (
+    <div
+      style={{
+        position: 'relative',
+        border: `1px ${borderStyle} ${color}`,
+        background: bgPattern,
+        padding: 18,  // breathing band for edge values + nested layer
+      }}
+    >
+      {/* Layer label — 左上角浮在 border 上(Chrome DevTools canonical) */}
+      <span style={{ ...layerLabelStyle, position: 'absolute', top: 0, left: 8, transform: 'translateY(-50%)', color, padding: '0 4px' }}>{label}</span>
+      {/* Edge values 浮在 band 中間(Figma-style nested rect)*/}
+      <span style={{ ...edgeValueStyle, top: 3, left: '50%', transform: 'translateX(-50%)', color }}>{edges.top}</span>
+      <span style={{ ...edgeValueStyle, bottom: 3, left: '50%', transform: 'translateX(-50%)', color }}>{edges.bottom}</span>
+      <span style={{ ...edgeValueStyle, left: 3, top: '50%', transform: 'translateY(-50%)', color }}>{edges.left}</span>
+      <span style={{ ...edgeValueStyle, right: 3, top: '50%', transform: 'translateY(-50%)', color }}>{edges.right}</span>
+      {children}
     </div>
   )
-  if (!isPositioned) return anatomy
+  const positionFmt = (v: string) => v === 'auto' || v === '' ? '—' : v
+  const content = (
+    <div style={{ position: 'relative', minWidth: 100, padding: '8px 12px', textAlign: 'center', color: 'var(--dm-fg, #1F2532)', fontWeight: 500, fontSize: 'clamp(11px, 0.78rem, 12px)', fontVariantNumeric: 'tabular-nums' }}>
+      {/* Content size — clear "Size W × H" label avoid mystery numeric */}
+      Size {iw} × {ih}
+    </div>
+  )
+  // 2026-05-14 distance badges 修(per user「padding 被蓋」報告):distance badges 從 content
+  // div 拉到最外圍,放在 Margin/Position Layer **外側**(translateY -100% / 100%),不再跟
+  // inner padding edge labels collision。distance = 此元素距 parent content edge 的 px,
+  // 視覺上歸 outer Margin 外側才合理(對齊 Figma DevMode auto-layout spacing badge idiom)。
+  const distanceBadges = distancesToParent && (
+    <>
+      {distancesToParent.top !== undefined && <span style={{ ...styles.distance, position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%) translateY(-100%)' }}>{distancesToParent.top}</span>}
+      {distancesToParent.bottom !== undefined && <span style={{ ...styles.distance, position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%) translateY(100%)' }}>{distancesToParent.bottom}</span>}
+      {distancesToParent.left !== undefined && <span style={{ ...styles.distance, position: 'absolute', left: 0, top: '50%', transform: 'translateX(-100%) translateY(-50%)' }}>{distancesToParent.left}</span>}
+      {distancesToParent.right !== undefined && <span style={{ ...styles.distance, position: 'absolute', right: 0, top: '50%', transform: 'translateX(100%) translateY(-50%)' }}>{distancesToParent.right}</span>}
+    </>
+  )
+  const paddingLayer = (
+    <Layer
+      label="Padding"
+      edges={{ top: padding.top, right: padding.right, bottom: padding.bottom, left: padding.left }}
+      color="#558B2F"
+      bgPattern="repeating-linear-gradient(-45deg, rgba(147,196,125,0.18) 0 3px, transparent 3px 6px)"
+    >
+      {content}
+    </Layer>
+  )
+  const borderLayer = (
+    <Layer
+      label={`Border ${border.top}/${border.right}/${border.bottom}/${border.left}`}
+      edges={{ top: border.top, right: border.right, bottom: border.bottom, left: border.left }}
+      color="rgba(184, 152, 0, 0.9)"
+    >
+      {paddingLayer}
+    </Layer>
+  )
+  const marginLayer = (
+    <Layer
+      label="Margin"
+      edges={{ top: margin.top, right: margin.right, bottom: margin.bottom, left: margin.left }}
+      color="#A36100"
+      bgPattern="repeating-linear-gradient(45deg, rgba(247, 142, 30, 0.08) 0 3px, transparent 3px 6px)"
+    >
+      {borderLayer}
+    </Layer>
+  )
+  if (!isPositioned) return (
+    <div style={{ position: 'relative', marginTop: 4 }}>
+      {marginLayer}
+      {distanceBadges}
+    </div>
+  )
   return (
-    <div style={positionOuter}>
-      <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#7B44C4' }}>
-        Position {position!.type} · {positionFmt(position!.top)}/{positionFmt(position!.right)}/{positionFmt(position!.bottom)}/{positionFmt(position!.left)}
-      </span>
-      {anatomy}
+    <div style={{ position: 'relative' }}>
+      <Layer
+        label={`Position ${position!.type} · ${positionFmt(position!.top)}/${positionFmt(position!.right)}/${positionFmt(position!.bottom)}/${positionFmt(position!.left)}`}
+        edges={{ top: positionFmt(position!.top), right: positionFmt(position!.right), bottom: positionFmt(position!.bottom), left: positionFmt(position!.left) }}
+        color="#7B44C4"
+        bgPattern="rgba(123, 68, 196, 0.04)"
+        borderStyle="dotted"
+      >
+        {marginLayer}
+      </Layer>
+      {distanceBadges}
     </div>
   )
 }
@@ -660,9 +713,10 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
             </button>
           </div>
 
-          {/* Force pseudo-class state(Chrome 「:hov」force state idiom) */}
+          {/* Force pseudo-class state(Chrome 「:hov」force state idiom) — 2026-05-13 R6 v1:
+              Visible warning badge 顯示 fallback 機制限制(per codex V2 verdict)。 */}
           {mode === 'pin' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 10, color: 'var(--dm-fg-muted, #65727F)' }}>:state</span>
               <div style={styles.toggle} role="group" aria-label="Force pseudo-class state">
                 <button style={styles.toggleBtn(forceState === 'none')} onClick={() => setForceStateAndBroadcast('none')}>none</button>
@@ -670,6 +724,14 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
                 <button style={styles.toggleBtn(forceState === 'focus')} onClick={() => setForceStateAndBroadcast('focus')}>:focus</button>
                 <button style={styles.toggleBtn(forceState === 'active')} onClick={() => setForceStateAndBroadcast('active')}>:active</button>
               </div>
+              {forceState !== 'none' && (
+                <span
+                  style={{ fontSize: 10, color: '#A36100', background: 'rgba(247, 142, 30, 0.12)', padding: '2px 6px', borderRadius: 3, fontFamily: 'ui-monospace, monospace' }}
+                  title="本 addon 用 stylesheet rewriter fallback(注入 [data-ds-devmode-force=...] selector),非 Chrome 真實 CDP forcePseudoState 機制。:has() / :is() / :not(:hover) 等 logical selector 不準確。"
+                >
+                  ⚠ fallback simulation
+                </span>
+              )}
             </div>
           )}
 
@@ -696,6 +758,76 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
           )}
 
           {payload.autoLayout && <AutoLayoutSection autoLayout={payload.autoLayout} />}
+
+          {/* 2026-05-13 R6 v3 hot map UI(user「沒理由不做」拍板):
+              Input token name → click button emit `HOTMAP_HIGHLIGHT` event → preview paint outline overlays
+              on matching elements。配對 utils/token-drift-detector.ts `findElementsUsingToken`。 */}
+          <details style={{ marginTop: 12, fontSize: 11 }}>
+            <summary style={{ cursor: 'pointer', color: 'var(--dm-fg-muted, #65727F)', fontWeight: 500 }}>
+              🔍 Token hot map(highlight elements using a token)
+            </summary>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+              <input
+                type="text"
+                placeholder="e.g. --space-2"
+                style={{ flex: 1, fontSize: 11, padding: '3px 6px', border: '1px solid rgba(128,128,128,0.3)', borderRadius: 3, fontFamily: 'ui-monospace, monospace' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const v = (e.target as HTMLInputElement).value.trim()
+                    if (v) emit(EVENTS.HOTMAP_HIGHLIGHT, v)
+                  }
+                }}
+              />
+              <button
+                style={{ ...styles.toggleBtn(false), padding: '3px 8px' }}
+                onClick={(e) => {
+                  const input = (e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement)
+                  const v = input?.value.trim()
+                  if (v) emit(EVENTS.HOTMAP_HIGHLIGHT, v)
+                }}
+              >Highlight</button>
+              <button
+                style={{ ...styles.toggleBtn(false), padding: '3px 8px' }}
+                onClick={() => emit(EVENTS.HOTMAP_CLEAR)}
+              >Clear</button>
+            </div>
+            <span style={{ fontSize: 10, color: 'var(--dm-fg-muted, #65727F)', display: 'block', marginTop: 4 }}>
+              Hot map outlines elements where any computed CSS property equals the token's resolved value(青色 outline)。掃描 scope:`#storybook-root` subtree,500 element cap(per codex V3 perf canonical)。
+            </span>
+          </details>
+
+          {/* 2026-05-13 R6 v3 — Token drift detector UI section(per codex V3 verdict + user 拍板「做完」)。
+              Detect author CSS 寫 raw value(如 `8px`)而剛好等於 DS token(如 `--space-2: 8px`)的 drift。
+              利用 token-reverse-lookup.ts 既有 source extraction + token-drift-detector.ts allowlist。 */}
+          {(() => {
+            // Map author decl → raw value(non-resolved,from token-reverse-lookup extractSourceVars output 對應的 raw field)
+            const authorDecls = new Map<string, string>()
+            payload.tokenUsage.forEach(t => {
+              if (t.raw && !t.raw.includes('var(')) authorDecls.set(t.property, t.raw)
+            })
+            const drifts = typeof window.__ds_devmode_drift === 'function' && payload && document.querySelector('[data-ds-devmode-pinned]')
+              ? window.__ds_devmode_drift(document.querySelector('[data-ds-devmode-pinned]') as Element, authorDecls)
+              : []
+            if (drifts.length === 0) return null
+            return (
+              <div style={{ marginTop: 12, padding: '8px 10px', borderRadius: 4, background: 'rgba(247, 142, 30, 0.08)', border: '1px solid rgba(247, 142, 30, 0.25)' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#A36100', marginBottom: 4 }}>
+                  ⚠ Token drift detected({drifts.length})
+                </div>
+                <div style={{ fontSize: 10, color: '#A36100', lineHeight: 1.6 }}>
+                  {drifts.map((d, i) => (
+                    <div key={i}>
+                      <code>{d.property}: {d.rawValue}</code>{' '}
+                      <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>
+                        → 建議用 {d.matchedTokens.slice(0, 3).map(t => `var(${t})`).join(' / ')}
+                      </span>
+                      {d.severity === 'medium' && <span style={{ marginLeft: 4, opacity: 0.7 }}>(多 token 同值,ambiguous)</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14 }}>
             <div style={styles.toggle} role="group" aria-label="View">

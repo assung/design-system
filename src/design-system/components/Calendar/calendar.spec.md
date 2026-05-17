@@ -10,6 +10,8 @@ benchmark:
   - MUI X Date Pickers: github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
+<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+
 # Calendar 設計原則
 
 ## 定位

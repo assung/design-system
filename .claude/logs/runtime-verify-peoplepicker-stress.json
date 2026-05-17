@@ -1,0 +1,215 @@
+{
+  "ts": "2026-05-15T11:46:47.985Z",
+  "results": [
+    {
+      "testId": "state-0-default",
+      "description": "Default story state",
+      "cellInfo": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        }
+      ]
+    },
+    {
+      "testId": "state-1-row1-cell-opened",
+      "description": "Row 1 reviewer cell opened (popup visible)",
+      "cellInfo": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        }
+      ]
+    },
+    {
+      "testId": "state-2-row1-2-selected",
+      "description": "Row 1 after add: clicked Alice ChenDesign",
+      "cellInfo": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "personImgs": 0,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        }
+      ]
+    },
+    {
+      "testId": "state-3-row1-3-selected",
+      "description": "Row 1 after 3rd add: Alice ChenDesign",
+      "cellInfo": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        }
+      ]
+    },
+    {
+      "testId": "state-4-row1-4-selected",
+      "description": "Row 1 after 4th add: Alice ChenDesign",
+      "cellInfo": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "personImgs": 0,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        }
+      ]
+    },
+    {
+      "testId": "state-5-row1-5-selected",
+      "description": "Row 1 after 5th add: Alice ChenDesign",
+      "cellInfo": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        }
+      ]
+    },
+    {
+      "testId": "state-6-row1-closed-5-selected",
+      "description": "Row 1 closed state after 5 selected",
+      "cellInfo": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "personImgs": 2,
+          "overflowText": ""
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "personImgs": 1,
+          "overflowText": ""
+        }
+      ]
+    }
+  ]
+}

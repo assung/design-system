@@ -62,7 +62,7 @@ export const UsageGuidance: Story = {
         >
           <div className="relative inline-flex">
             <button className="px-4 py-2 border rounded-md">通知</button>
-            <Tag variant="red" className="absolute -top-2 -right-2">3</Tag>
+            <Tag color="red" className="absolute -top-2 -right-2">3</Tag>
           </div>
           <Label warn>↑ Tag 太大,疊在 button 角落違和 → 用 Badge</Label>
         </Rule>
@@ -82,10 +82,10 @@ export const UsageGuidance: Story = {
           note="承載語意(類別 / 狀態),通常有 variant 色彩區分。較大、可含 icon / dismiss button、適合放語意內容"
         >
           <div className="flex items-center gap-2 flex-wrap">
-            <Tag variant="blue">進行中</Tag>
-            <Tag variant="green">已完成</Tag>
-            <Tag variant="yellow">待審核</Tag>
-            <Tag variant="red">已封鎖</Tag>
+            <Tag color="blue">進行中</Tag>
+            <Tag color="green">已完成</Tag>
+            <Tag color="yellow">待審核</Tag>
+            <Tag color="red">已封鎖</Tag>
           </div>
           <Label>↑ 訂單狀態 / 專案狀態 — variant 色彩加速掃視</Label>
         </Rule>
@@ -115,13 +115,13 @@ export const VariantNotSemanticRule: Story = {
         note="red 不一定代表「錯誤」,green 不一定代表「成功」。語意由消費端的內容和上下文決定。世界級 DS(Atlassian/Polaris)都採這個架構——避免強綁語意後 categorical color 不夠用的困境"
       >
         <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="red">紅色標籤</Tag>
-          <Tag variant="green">綠色分類</Tag>
-          <Tag variant="blue">藍色狀態</Tag>
-          <Tag variant="turquoise">青色</Tag>
-          <Tag variant="purple">紫色</Tag>
-          <Tag variant="magenta">洋紅</Tag>
-          <Tag variant="indigo">靛藍</Tag>
+          <Tag color="red">紅色標籤</Tag>
+          <Tag color="green">綠色分類</Tag>
+          <Tag color="blue">藍色狀態</Tag>
+          <Tag color="turquoise">青色</Tag>
+          <Tag color="purple">紫色</Tag>
+          <Tag color="magenta">洋紅</Tag>
+          <Tag color="indigo">靛藍</Tag>
         </div>
         <Label>↑ 9 種 variant,色彩意義由 consumer 上下文決定</Label>
       </Rule>
@@ -131,9 +131,9 @@ export const VariantNotSemanticRule: Story = {
         note="「這個 Tag 是紅色 → 錯誤」這種單靠顏色的語意對 color-blind 使用者失效。必須用 label 文字明確傳達"
       >
         <div className="flex items-center gap-2">
-          <Tag variant="red" />
-          <Tag variant="green" />
-          <Tag variant="yellow" />
+          <Tag color="red" />
+          <Tag color="green" />
+          <Tag color="yellow" />
         </div>
         <Label warn>↑ 沒 label 的純色 Tag → color-blind 看不出差異。必須寫文字「已封鎖 / 已完成 / 待審核」</Label>
       </Rule>
@@ -150,10 +150,10 @@ export const SubtleVsSolidRule: Story = {
         note="視覺重量較輕,不搶頁面焦點。99% 場景用 subtle"
       >
         <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="blue">Draft</Tag>
-          <Tag variant="green">Published</Tag>
-          <Tag variant="yellow">Under Review</Tag>
-          <Tag variant="neutral">Archived</Tag>
+          <Tag color="blue">Draft</Tag>
+          <Tag color="green">Published</Tag>
+          <Tag color="yellow">Under Review</Tag>
+          <Tag color="neutral">Archived</Tag>
         </div>
         <Label>↑ 部落格文章狀態,subtle 不干擾文章清單主內容</Label>
       </Rule>
@@ -163,9 +163,9 @@ export const SubtleVsSolidRule: Story = {
         note="重點標籤、重要狀態標記。視覺重量較高,一頁內不該多個 solid(會互相搶戲)"
       >
         <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="red" solid>緊急</Tag>
-          <Tag variant="blue" solid>VIP</Tag>
-          <Tag variant="yellow" solid>精選</Tag>
+          <Tag color="red" solid>緊急</Tag>
+          <Tag color="blue" solid>VIP</Tag>
+          <Tag color="yellow" solid>精選</Tag>
         </div>
         <Label>↑ 需要在清單裡跳出的「緊急」/「VIP」標記</Label>
       </Rule>
@@ -175,11 +175,11 @@ export const SubtleVsSolidRule: Story = {
         note="視覺重量太高,使用者無法分辨哪個真的重要。subtle 是基礎,solid 是強調——多數應該是 subtle"
       >
         <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="blue" solid>電子產品</Tag>
-          <Tag variant="green" solid>服飾</Tag>
-          <Tag variant="red" solid>食品</Tag>
-          <Tag variant="yellow" solid>書籍</Tag>
-          <Tag variant="purple" solid>家具</Tag>
+          <Tag color="blue" solid>電子產品</Tag>
+          <Tag color="green" solid>服飾</Tag>
+          <Tag color="red" solid>食品</Tag>
+          <Tag color="yellow" solid>書籍</Tag>
+          <Tag color="purple" solid>家具</Tag>
         </div>
         <Label warn>↑ 所有 Tag solid → 互相爭奪注意力 → 都不重要</Label>
       </Rule>
@@ -199,7 +199,7 @@ export const DismissRule: Story = {
         >
           <div className="flex items-center gap-2 flex-wrap">
             {tags.map(t => (
-              <Tag key={t} variant="blue" onDismiss={() => setTags(tags.filter(x => x !== t))}>
+              <Tag key={t} color="blue" onDismiss={() => setTags(tags.filter(x => x !== t))}>
                 {t}
               </Tag>
             ))}
@@ -212,10 +212,10 @@ export const DismissRule: Story = {
           note="不同於一般 inline action 的 fg-muted——Tag 有色變體時 dismiss 跟 Tag 文字同色,視覺一體"
         >
           <div className="flex items-center gap-2 flex-wrap">
-            <Tag variant="blue" onDismiss={() => {}}>React</Tag>
-            <Tag variant="green" onDismiss={() => {}}>TypeScript</Tag>
-            <Tag variant="red" onDismiss={() => {}}>Storybook</Tag>
-            <Tag variant="neutral" onDismiss={() => {}}>Design System</Tag>
+            <Tag color="blue" onDismiss={() => {}}>React</Tag>
+            <Tag color="green" onDismiss={() => {}}>TypeScript</Tag>
+            <Tag color="red" onDismiss={() => {}}>Storybook</Tag>
+            <Tag color="neutral" onDismiss={() => {}}>Design System</Tag>
           </div>
           <Label>↑ X icon 跟 Tag 文字同色,融入 Tag 視覺</Label>
         </Rule>
@@ -240,8 +240,8 @@ export const IconRule: Story = {
         note="用 LucideIcon,Tag 統一 16px。icon 顏色繼承 Tag 文字色(有色時跟色)"
       >
         <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="blue" icon={TagIcon}>Feature</Tag>
-          <Tag variant="green" icon={TagIcon}>Bug Fix</Tag>
+          <Tag color="blue" icon={TagIcon}>Feature</Tag>
+          <Tag color="green" icon={TagIcon}>Bug Fix</Tag>
         </div>
       </Rule>
 
@@ -250,10 +250,10 @@ export const IconRule: Story = {
         note="多選 Combobox 的已選成員用 avatar + name 組合"
       >
         <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="neutral" avatar={<img src="https://i.pravatar.cc/40?img=1" className="w-4 h-4 rounded-full" />}>
+          <Tag color="neutral" avatar={<img src="https://i.pravatar.cc/40?img=1" className="w-4 h-4 rounded-full" />}>
             Ada Chen
           </Tag>
-          <Tag variant="neutral" avatar={<img src="https://i.pravatar.cc/40?img=2" className="w-4 h-4 rounded-full" />}>
+          <Tag color="neutral" avatar={<img src="https://i.pravatar.cc/40?img=2" className="w-4 h-4 rounded-full" />}>
             Alice
           </Tag>
         </div>

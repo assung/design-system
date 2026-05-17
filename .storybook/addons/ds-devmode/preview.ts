@@ -17,65 +17,127 @@ let hoverEl: Element | null = null
 let siblingHoverEl: Element | null = null
 
 /**
- * Pseudo-class force-state(2026-04-25):對齊 Chrome / Firefox / Safari Inspector
- * 「force element state」idiom。實作 trick:對 pinned element 加 inline style
- * 直接 mimic 該 state(無法真 force browser pseudo-class,但 visual approximation 足)。
- * 限制:只 mimic 可被 JS 讀取的 state class declarations(:hover / :focus / :active
- * 在 stylesheet 中的 visible properties)。
+ * Pseudo-class force-state(2026-04-25):**Inspired by** Chrome DevTools「Toggle Element State」UX。
+ *
+ * **真實機制 vs 本 addon 實作**(2026-05-13 codex R6 V2 verify):
+ * - Chrome DevTools 用 CDP `CSS.forcePseudoState`(Chromium source `CSSModel.ts forcePseudoState`)
+ *   經 backend `invoke_forcePseudoState` 真 force browser pseudo-class,所有 selector(`:has()` /
+ *   `:is()` / descendant)都精準 trigger
+ * - 本 addon 因 storybook iframe 無 CDP 訪問權,改用 fallback:walk `document.styleSheets`,
+ *   找 selector 含 `:hover/:focus/:active` 的 rules,把 declarations inline-apply 到 pinned element
+ *
+ * **Known limitations**(consumer 看 Panel warning badge):
+ * 1. **`:has()`/`:is()`/`:not()` descendant chain 不準** — 例如 `.card:has(:hover)` 語意是「descendant
+ *    hovered」,inline-apply 不能 trigger ancestor effect
+ * 2. **Descendant selector child rules 不會傳遞** — 例如 `.btn:hover .icon` 的 `.icon` declarations
+ *    無法被 child 收到(本 fallback 只 apply 到 pinned el 自己)
+ * 3. **Specificity 不等於真實 cascade** — inline style 永遠 win 過 stylesheet rules,可能蓋掉本不該蓋的
+ *
+ * **真機制 R6 future work(2026-05-13 codex propose)**:parser-aware selector rewrite —
+ * inject `<style>` 把 `.btn:hover` → `.btn[data-ds-devmode-force~="hover"]` preserve full structure,
+ * 配合 `data-ds-devmode-force` attribute 模擬。但這需 CSS selector parser(`postcss-selector-parser`
+ * or 手刻 FSM),且仍不能 handle `:has()` 真語意。**目前接受 inline fallback + Panel warning badge**。
  */
 let forceState: ForceState = 'none'
 
-const findStateRules = (el: Element, state: 'hover' | 'focus' | 'active'): string => {
-  // 走 matched stylesheet rules,找 selector 含 :hover / :focus / :active 的 rules
-  // 把 pseudo-class 從 selector 拿掉檢查 base selector 是否 match,然後 collect declarations
-  const collected: string[] = []
+// 2026-05-13 R6 v1 actual mechanism(per codex V2 verdict + user「省工不是理由」拍板):
+// 改用 stylesheet selector rewriter,**preserve full selector structure**(per codex「正確 rewrite 是
+// 保留原 selector 結構,把 pseudo-class token 替換成 attribute」):
+//   `.btn:hover` → `.btn[data-ds-devmode-force~="hover"]`
+//   `.btn:hover .icon` → `.btn[data-ds-devmode-force~="hover"] .icon`(descendant 保留)
+// 配合 pinned element `setAttribute('data-ds-devmode-force', 'hover')` activate。
+// 取代前 inline-style mutate(只 apply pinned el 自己,descendant 不會收;且 specificity inline always win)。
+//
+// **Unsupported**(per codex limitation):`:has()` / `:is(:hover)` / `:not(:hover)` — semantic 不能簡單 token replace。
+// Skip 含此 patterns 的 rule + console.warn。
+
+const PSEUDO_STATE_STYLESHEET_ID = '__ds_devmode_pseudo_stylesheet__'
+const PSEUDO_STATE_ATTR = 'data-ds-devmode-force'
+
+const ensurePseudoStylesheet = (): HTMLStyleElement => {
+  let style = document.getElementById(PSEUDO_STATE_STYLESHEET_ID) as HTMLStyleElement | null
+  if (style) return style
+  style = document.createElement('style')
+  style.id = PSEUDO_STATE_STYLESHEET_ID
+  document.head.appendChild(style)
+  return style
+}
+
+let pseudoStylesheetBuilt = false
+
+const rewriteSelectorForState = (sel: string, state: 'hover' | 'focus' | 'active'): string | null => {
   const pseudo = `:${state}`
-  function walk(rules: CSSRuleList | undefined) {
+  // Skip unsupported logical selectors(per codex V2 verdict)
+  if (sel.includes(`:has(`) || sel.includes(`:is(`)) return null
+  if (sel.includes(`:not(`) && sel.includes(pseudo)) {
+    // 簡化:若 :not() 含 pseudo,skip(語意是 NOT hovered,rewrite 會反語意)
+    if (new RegExp(`:not\\([^)]*${pseudo}`).test(sel)) return null
+  }
+  if (!sel.includes(pseudo)) return null
+  // Word boundary 避免誤 match(CSS pseudo 後接 ` `, `.`, `>`, `:`, `,`, `[`, end)。
+  // 2026-05-13 codex Q4 round 2 fix:擴 ident-continuation guard 含 non-ASCII(U+00A0-U+FFFF)。
+  // CSS Selectors L4 grammar 允許 identifiers 含 non-ASCII + escaped characters。
+  // 原 `(?![\\-a-zA-Z0-9_])` 漏 non-ASCII;`(?![-_a-zA-Z0-9\\u00A0-\\uFFFF])` 涵蓋大部分 ident-continuation。
+  // Note:仍非 perfect parser(漏 CSS-escape sequences `\\xx`),production-grade rewrite 需 postcss-selector-parser。
+  const regex = new RegExp(`${pseudo}(?![-_a-zA-Z0-9\\u00A0-\\uFFFF])`, 'g')
+  return sel.replace(regex, `[${PSEUDO_STATE_ATTR}~="${state}"]`)
+}
+
+const buildPseudoStylesheet = (): void => {
+  const style = ensurePseudoStylesheet()
+  const out: string[] = []
+  const states: Array<'hover' | 'focus' | 'active'> = ['hover', 'focus', 'active']
+  let skippedUnsupported = 0
+  const walk = (rules: CSSRuleList | undefined, mediaWrap: string | null) => {
     if (!rules) return
     for (const rule of Array.from(rules)) {
-      const nested = (rule as { cssRules?: CSSRuleList }).cssRules
-      if (nested) walk(nested)
+      // @media / @supports / @container — preserve grouping wrapper(per codex V2 verdict)
+      if (rule instanceof CSSMediaRule || rule instanceof CSSSupportsRule || (typeof CSSContainerRule !== 'undefined' && rule instanceof CSSContainerRule)) {
+        const wrap = `@${rule.constructor.name.replace('CSS', '').replace('Rule', '').toLowerCase()} ${('conditionText' in rule ? rule.conditionText : '')}`
+        walk(rule.cssRules, wrap)
+        continue
+      }
       if (!(rule instanceof CSSStyleRule)) continue
       const sel = rule.selectorText
-      if (!sel?.includes(pseudo)) continue
-      // 把 :hover 拿掉檢查 base selector 是否 match el
-      const baseSelector = sel.replaceAll(pseudo, '').replaceAll(`:not(${pseudo})`, '').trim()
-      if (!baseSelector) continue
-      try {
-        if (el.matches(baseSelector)) {
-          for (let i = 0; i < rule.style.length; i++) {
-            const prop = rule.style.item(i)
-            const val = rule.style.getPropertyValue(prop)
-            collected.push(`${prop}: ${val}${rule.style.getPropertyPriority(prop) ? ' !important' : ''}`)
-          }
+      if (!sel) continue
+      for (const state of states) {
+        const rewritten = rewriteSelectorForState(sel, state)
+        if (rewritten == null) {
+          if (sel.includes(`:${state}`)) skippedUnsupported++
+          continue
         }
-      } catch {
-        // invalid selector after pseudo strip, skip
+        const body = rule.style.cssText
+        if (!body) continue
+        const ruleText = `${rewritten} { ${body} }`
+        out.push(mediaWrap ? `${mediaWrap} { ${ruleText} }` : ruleText)
       }
     }
   }
   for (const sheet of Array.from(document.styleSheets)) {
-    try { walk(sheet.cssRules) } catch { /* CORS */ }
+    try { walk(sheet.cssRules, null) } catch { /* CORS-blocked stylesheet */ }
   }
-  return collected.join('; ')
+  style.textContent = out.join('\n')
+  pseudoStylesheetBuilt = true
+  if (skippedUnsupported > 0) {
+    // eslint-disable-next-line no-console
+    console.warn(`[ds-devmode] R6 v1 pseudo-state stylesheet:跳過 ${skippedUnsupported} 個含 :has()/:is()/:not() 的不支援 rule。Chrome DevTools 用 CDP forcePseudoState 才能精準 — 本 addon 為 inspired fallback。`)
+  }
 }
 
 const applyForceState = (state: ForceState) => {
   if (!pinnedEl || !(pinnedEl instanceof HTMLElement)) return
-  // Clear previous force-state inline styles
+  // Cleanup legacy inline-style approach(backward compat)
+  if (pinnedEl.dataset.dsDevmodePrevStyle !== undefined) {
+    pinnedEl.style.cssText = pinnedEl.dataset.dsDevmodePrevStyle
+    delete pinnedEl.dataset.dsDevmodePrevStyle
+  }
   pinnedEl.removeAttribute('data-ds-devmode-forced')
   if (state === 'none') {
-    pinnedEl.style.cssText = pinnedEl.dataset.dsDevmodePrevStyle ?? ''
-    delete pinnedEl.dataset.dsDevmodePrevStyle
+    pinnedEl.removeAttribute(PSEUDO_STATE_ATTR)
     return
   }
-  // Backup original inline style first time
-  if (!('dsDevmodePrevStyle' in pinnedEl.dataset)) {
-    pinnedEl.dataset.dsDevmodePrevStyle = pinnedEl.style.cssText || ''
-  }
-  const rules = findStateRules(pinnedEl, state)
-  pinnedEl.style.cssText = (pinnedEl.dataset.dsDevmodePrevStyle ?? '') + ';' + rules
-  pinnedEl.setAttribute('data-ds-devmode-forced', state)
+  if (!pseudoStylesheetBuilt) buildPseudoStylesheet()
+  pinnedEl.setAttribute(PSEUDO_STATE_ATTR, state)
 }
 
 /**
@@ -395,6 +457,71 @@ channel.on(EVENTS.FORCE_STATE, (state: ForceState) => {
   applyForceState(state)
   if (pinnedEl) emit(pinnedEl, siblingHoverEl)  // re-emit to reflect new computed
 })
+
+// R6 v3 hot map(2026-05-13,user「沒理由不做」+「人話真原因 = 我 conservative defer」拍板做完):
+// Panel emit `HOTMAP_HIGHLIGHT` token name → preview 用 `findElementsUsingToken` 找 + paint outline。
+// 共用 overlay root pattern(fixed inset:0 viewport overlay)。`HOTMAP_CLEAR` 清掉。
+const HOTMAP_OUTLINE_CLASS = '__ds_devmode_hotmap_outline'
+const clearHotmap = () => {
+  document.querySelectorAll(`.${HOTMAP_OUTLINE_CLASS}`).forEach(el => el.remove())
+}
+channel.on(EVENTS.HOTMAP_HIGHLIGHT, (tokenName: string) => {
+  clearHotmap()
+  if (typeof window.__ds_devmode_hotmap !== 'function') return
+  const elements = window.__ds_devmode_hotmap(tokenName)
+  if (elements.length === 0) return
+  let overlayRoot = document.getElementById('__ds_devmode_overlay__')
+  if (!overlayRoot) {
+    overlayRoot = document.createElement('div')
+    overlayRoot.id = '__ds_devmode_overlay__'
+    overlayRoot.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483647'
+    document.body.appendChild(overlayRoot)
+  }
+  for (const el of elements) {
+    const rect = el.getBoundingClientRect()
+    const outline = document.createElement('div')
+    outline.className = HOTMAP_OUTLINE_CLASS
+    outline.style.cssText = `position:absolute;left:${rect.left - 1}px;top:${rect.top - 1}px;width:${rect.width}px;height:${rect.height}px;border:2px solid #00A8B3;background:rgba(0,168,179,0.08);pointer-events:none;box-sizing:content-box`
+    overlayRoot.appendChild(outline)
+  }
+})
+channel.on(EVENTS.HOTMAP_CLEAR, () => { clearHotmap() })
+
+// Storybook addon Top 3 #1(2026-05-12 codex Q1 verdict):暴露 geometry diagnostic 全域
+// 給 Playwright DPR matrix test 抓 — `window.__ds_devmode_diagnostic(selector?)`。
+import { installGeometryDiagnosticGlobal } from './utils/geometry-diagnostic'
+import { installDriftGlobal } from './utils/token-drift-detector'
+installGeometryDiagnosticGlobal()
+// R6 v3(2026-05-13):token drift detector + hot map global helpers,給 Panel UI + Playwright runtime test 抓。
+installDriftGlobal()
+
+// R6 v1 test helper(2026-05-13,per user (b) 拍板「繼續 debug 1-2 hr」):
+// Expose internal `applyForceState` + `pinnedEl` setter for Playwright runtime verify
+// (cross-frame addon channel + onClick capture-phase listener 在 headless / synthetic mouse 下
+// 不穩定觸發,直接 setter 跳過 onClick + test mechanism core flow:stylesheet build + attr apply)。
+declare global {
+  interface Window {
+    __ds_devmode_test_apply_force_state?: (selector: string, state: 'none' | 'hover' | 'focus' | 'active') => boolean
+  }
+}
+// 2026-05-13 codex Q6 fix:gate test helper behind localStorage flag 避免 production preview unconditional expose
+// Playwright test 跑前 set `localStorage.__ds_devmode_test_mode = 'on'`;production user 不 set → helper noop。
+if (typeof window !== 'undefined') {
+  window.__ds_devmode_test_apply_force_state = (selector: string, state) => {
+    try {
+      if (window.localStorage.getItem('__ds_devmode_test_mode') !== 'on') {
+        // eslint-disable-next-line no-console
+        console.warn('[ds-devmode] test helper requires localStorage.__ds_devmode_test_mode = "on"')
+        return false
+      }
+    } catch { return false }
+    const el = document.querySelector(selector)
+    if (!(el instanceof HTMLElement)) return false
+    pinnedEl = el  // module-scope variable直接 set
+    applyForceState(state)
+    return true
+  }
+}
 
 // Keep overlay accurate on scroll / resize(含 sibling distance 同步)
 window.addEventListener('scroll', () => {

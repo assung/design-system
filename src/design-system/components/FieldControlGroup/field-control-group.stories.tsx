@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Phone, Search } from 'lucide-react'
@@ -157,20 +158,4 @@ export const FilterRow_RealUsage: Story = {
   },
 }
 
-/* ── 三尺寸對照 ── */
-export const AllSizes: Story = {
-  name: '尺寸',
-  render: () => (
-    <div className="flex flex-col gap-4 w-[400px]">
-      {(['sm', 'md', 'lg'] as const).map(size => (
-        <div key={size}>
-          <p className="text-caption text-fg-muted mb-2">size="{size}"</p>
-          <FieldControlGroup block>
-            <Select size={size} className="!w-[100px] flex-shrink-0" options={CURRENCIES} value="TWD" onChange={() => {}} />
-            <Input size={size} className="!flex-1 !min-w-0" defaultValue="1,200" />
-          </FieldControlGroup>
-        </div>
-      ))}
-    </div>
-  ),
-}
+/* @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。 */

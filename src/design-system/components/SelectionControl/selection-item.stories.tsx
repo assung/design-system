@@ -1,3 +1,4 @@
+// @story-trait-rationale: SelectionControl 是 isInternal primitive,被 Checkbox / RadioGroup 消費;hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase(2026-05-15 F-migration);Default 由 NotificationPreferences / PlanPicker 等真實 consumer 情境覆蓋。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Mail, Bell, Folder, Shield } from 'lucide-react'
 import { SelectionItem } from './selection-item'
@@ -65,7 +66,7 @@ export const PlanPicker: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const WithPrefixIcon: Story = {
-  name: 'Prefix icon',
+  name: '前綴圖示',
   render: () => (
     <div className="flex flex-col gap-2 max-w-md">
       <p className="text-caption text-fg-muted mb-2">
@@ -104,7 +105,7 @@ export const WithPrefixIcon: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const WithPrefixAvatarBlock: Story = {
-  name: 'Prefix avatar',
+  name: '前綴頭像',
   render: () => (
     <div className="flex flex-col gap-2 max-w-md">
       <p className="text-caption text-fg-muted mb-2">
@@ -133,28 +134,4 @@ export const WithPrefixAvatarBlock: Story = {
   ),
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Story 5:Sizes 對照(sm / md / lg)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-export const AllSizes: Story = {
-  name: '尺寸對照',
-  render: () => (
-    <div className="flex flex-col gap-6 max-w-md">
-      <p className="text-caption text-fg-muted">
-        三個 size 的 padding 自動對齊同 size 的 Input 高度(
-        <code className="font-mono">py = (field-height - 1lh) / 2</code>
-        )。
-      </p>
-      {(['sm', 'md', 'lg'] as const).map((size) => (
-        <div key={size} className="flex flex-col gap-1">
-          <span className="text-caption text-fg-muted font-mono">{size}</span>
-          <div className="flex flex-col gap-1 border border-divider rounded-md">
-            <Checkbox size={size} defaultChecked label="啟用 dark mode" />
-            <Checkbox size={size} label="使用 monospace 編輯器字體" description="僅在 code editor 顯示" />
-          </div>
-        </div>
-      ))}
-    </div>
-  ),
-}
+/* @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。 */

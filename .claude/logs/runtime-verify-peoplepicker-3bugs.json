@@ -1,0 +1,40 @@
+{
+  "ts": "2026-05-15T11:24:06.488Z",
+  "results": [
+    {
+      "testId": "Bug3-determinism",
+      "description": "Reviewers cell:same width across rows → visible count deterministic",
+      "rowDetails": [
+        {
+          "rowIdx": 0,
+          "cellWidth": 180,
+          "avatarCount": 4,
+          "hasOverflow": false,
+          "overflowText": null
+        },
+        {
+          "rowIdx": 1,
+          "cellWidth": 180,
+          "avatarCount": 2,
+          "hasOverflow": false,
+          "overflowText": null
+        },
+        {
+          "rowIdx": 2,
+          "cellWidth": 180,
+          "avatarCount": 4,
+          "hasOverflow": false,
+          "overflowText": null
+        },
+        {
+          "rowIdx": 3,
+          "cellWidth": 180,
+          "avatarCount": 2,
+          "hasOverflow": false,
+          "overflowText": null
+        }
+      ]
+    }
+  ],
+  "totalProbes": 1
+}

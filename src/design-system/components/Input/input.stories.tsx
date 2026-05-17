@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Search, Mail, Eye, EyeOff, X } from 'lucide-react'
+import { Search, Eye, EyeOff, X } from 'lucide-react'
 import { Input } from './input'
 import { Button } from '@/design-system/components/Button/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
@@ -66,20 +66,10 @@ export const SizeAlignment: Story = {
   ),
 }
 
-/* ── Icon slot ── */
-export const WithIcon: Story = {
-  name: 'With Icon',
-  render: () => (
-    <div className="flex flex-col gap-4 max-w-sm">
-      <Input startIcon={Search} placeholder="搜尋商品..." />
-      <Input startIcon={Mail} defaultValue="alice@example.com" />
-    </div>
-  ),
-}
-
+/* @story-trait-rationale: WithIcon retired per F migration 2026-05-15 — anatomy.stories.tsx auto-compile owns icon slot showcase。 */
 /* ── endAction（Inline Action 宣告式 API） ── */
 export const EndAction: Story = {
-  name: 'End Action',
+  name: '尾端操作',
   render: () => {
     const [showPwd, setShowPwd] = React.useState(false)
     const [query, setQuery] = React.useState('Bluetooth')
@@ -125,7 +115,7 @@ export const EndAction: Story = {
 
 /* ── Error ── */
 export const ErrorState: Story = {
-  name: 'Error',
+  name: '錯誤狀態',
   render: () => (
     <div className="flex flex-col gap-4 max-w-sm">
       <p className="text-caption text-fg-muted">Error 以紅色邊框表示。錯誤訊息由 Form help text 提供，不在 input 內放狀態 icon</p>

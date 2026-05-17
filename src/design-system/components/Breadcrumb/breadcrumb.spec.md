@@ -114,25 +114,82 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 
 ---
 
-## Overflow / 長路徑處理
+## Single-line + Overflow / 長路徑處理(2026-05-10 升級)
 
-當路徑層級太深（> 4–5 層）且容器寬度有限時，world-class 作法是**中段折疊**：
+**Single-line canonical**:BreadcrumbList 預設 `flex-nowrap`,**不 wrap 到下一行**。對齊 Material UI / GitHub / Notion / Linear / Atlassian 共識(WebFetch verified Material UI source `Breadcrumbs.js renderItemsBeforeAndAfter`)。路徑過長走中段折疊,非 multi-line wrap。
+
+當路徑層級太深(> 4–5 層)且容器寬度有限,world-class 作法是**中段折疊**:
 
 ```
 首頁 › ⋯ › 成員管理 › 權限設定
 ```
 
-具體：
-- **保留第一個** 和 **最後 1–2 個** items
-- **中間用 `BreadcrumbEllipsis`（⋯）折疊**
-- `BreadcrumbEllipsis` 預設是 display-only icon；consumer 想要「點 ⋯ 展開折疊的項目」可以把它包在 `DropdownMenu` trigger 裡（v1 不內建這行為）
+**v1 現況**(consumer 手動):
+- 保留第一個 + 最後 1–2 items;中間用 `<BreadcrumbEllipsis>` 折疊
+- `<BreadcrumbEllipsis>` 消費 `ItemInlineActionButton` primitive(per inline-action.spec.md predicate + M1 SSOT 消費),`overlayTrigger=true` 內建 DropdownMenu open 視覺鎖
+- 包 `<DropdownMenuTrigger asChild>` 提供點 ⋯ 展開互動
 
-**決定折疊策略是 consumer 的事**，Breadcrumb 元件只提供元件家族和視覺，不內建自動偵測 overflow 的邏輯（比 Tabs / Chip 的 overflow 簡單，因為 breadcrumb 路徑是靜態的）。
+**v2 shipped Phase B**(2026-05-10):declarative `items` prop + `maxItems`(**default 4**,user-tuned;Material UI source 預設 8)+ `itemsBeforeCollapse`(default 1)+ `itemsAfterCollapse`(default 1)auto-collapse mode。對齊 Material UI source `Breadcrumbs.js renderItemsBeforeAndAfter` mechanism(2026-05-10 WebFetch verified)。
 
-世界級對照：
-- **Material**：支援點擊 ⋯ 展開
-- **Polaris**：同
-- **Atlassian**：直接顯示完整路徑，consumer 自己決定 truncation
+```tsx
+<BreadcrumbList
+  items={[
+    { label: '組織', href: '/org' },
+    { label: '產品團隊', href: '/team' },
+    { label: '成員管理', href: '/members' },
+    { label: '權限', href: '/permissions' },
+    { label: '編輯角色' },  // 無 href → 自動 BreadcrumbPage(末位)
+  ]}
+  // maxItems={4}              // default
+  // itemsBeforeCollapse={1}   // default
+  // itemsAfterCollapse={1}    // default
+/>
+```
+
+**Per-item width canonical(Phase B)— flex-shrink hierarchy**:
+
+| Role(`data-bc-role`)| `flex-shrink` | 行為 |
+|---|---|---|
+| `root`(首位)| **3** | 縮最積極(root context 可弱化)|
+| `middle`(中段)| **2** | 次積極 |
+| `current`(末位 / BreadcrumbPage)| **1** | 最後縮(a11y current page anchor)|
+| `ellipsis`(BreadcrumbEllipsis 包裝)| **0** | 永遠完整顯示 ⋯ |
+| `BreadcrumbSeparator` | **0** | 永遠完整(否則 path 視覺斷裂)|
+
+**為何 flex-shrink hierarchy 不用 fixed max-width**:
+- 容器寬 / items 少 → 各 item 自然寬度,**不浪費剩餘空間**(回應 user 質疑)
+- 容器窄 / items 多 → 按 priority 縮(root 先 → middle → current 最後)
+- 都縮到 `min-w-0` 後 CSS `truncate` 開啟 + Tooltip 補完整文字
+- Root **也會** truncate(shrink:3 縮最積極)— 不是 `shrink-0`(回應 user 質疑)
+
+**Truncate-on-overflow + tooltip canonical**(per `tooltip.principles.stories.tsx:190`):
+- 每 BreadcrumbLink / BreadcrumbPage 內部 wrap `<TruncatedLabel>`(同 `data-table.tsx:339 TruncateCell` + `tag.tsx:138 isTruncated` SSOT pattern)
+- Shared ResizeObserver 偵測 `scrollWidth > clientWidth` → `<Tooltip>` wrap
+- 只在實際 truncate 時才顯 Tooltip(per tooltip canonical)— 沒被截斷不顯
+- **TODO**(Rule-of-3):breadcrumb / data-table / tag 三處同 idiom,future 抽 `patterns/element-anatomy/truncated-text.tsx` 共用 SSOT
+
+世界級對照:
+- **Material UI**:`maxItems=8` declarative auto-collapse(source verified,**no per-item width rule**)
+- Notion / Linear / GitHub / Atlassian per-item width 策略:**unverified**(WebFetch + web search 無法取得 source / docs)。本 DS 設計基於 DS internal SSOT(`TruncateCell` + `Tag truncate` + `Tooltip canonical`)+ first-principles flex-shrink hierarchy 回應 user 兩 challenges(root 也 truncate / 不浪費空間)。
+
+世界級對照:
+- **Material UI**:`maxItems=8` + auto-collapse(declarative)
+- **Polaris**:點 ⋯ DropdownMenu 展開
+- **Atlassian**:中段 ⋯ + dropdown
+- **GitHub / Notion / Linear / Apple Finder**:auto truncate 中段
+
+## Title-breadcrumb-end 同步 canonical(2026-05-10 新增)
+
+**Breadcrumb 末位 `<BreadcrumbPage>` 文字 = page title `<h2>` / `<h3>` / `<h4>` 內容**。對齊 GitHub / Notion / Linear / Atlassian / Material UI examples 共識。
+
+具體 pairing(per BreadcrumbList size):
+- `size="sm"` + 末位 `<BreadcrumbPage>X</BreadcrumbPage>` + `<h4>X</h4>` 同字
+- `size="md"`(default)+ 末位 `<BreadcrumbPage>X</BreadcrumbPage>` + `<h3>X</h3>` 同字
+- `size="lg"` + 末位 `<BreadcrumbPage>X</BreadcrumbPage>` + `<h2>X</h2>` 同字
+
+**為何同字重複**:breadcrumb 末位是 a11y 階層 navigation 階梯末端(`aria-current="page"`);title h2/h3/h4 是同字**視覺大字 emphasis**。兩者各司其職:小字 breadcrumb 提供路徑 context,大字 title 提供 page identity。同 SSOT 兩 view。
+
+**禁止**:breadcrumb 末位用 `BreadcrumbLink`(parent path)+ title 才顯示 current page = breadcrumb 末位 ≠ title 內容 = 違反 spec.md L142「最後一項必 BreadcrumbPage」+ 違反 world-class consensus。
 
 ---
 

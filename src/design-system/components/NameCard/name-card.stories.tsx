@@ -3,7 +3,7 @@ import { NameCard, NameCardDefaultActions } from './name-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
-  title: 'Design System/Components/NameCard/展示',
+  title: 'Design System/Internal/NameCard/展示',
   parameters: { layout: 'padded' },
 }
 export default meta

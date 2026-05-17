@@ -110,8 +110,8 @@ export const UsageGuidance: Story = {
           note="Chip 是 control(選擇 / 未選),Tag 是 label(資訊標記)。商品卡上「新品 / 熱銷」是 Tag 不是 Chip"
         >
           <div className="flex items-center gap-2">
-            <Tag variant="red">熱銷</Tag>
-            <Tag variant="blue">新品</Tag>
+            <Tag color="red">熱銷</Tag>
+            <Tag color="blue">新品</Tag>
           </div>
           <Label>↑ 純顯示用 Tag,不要誤用 Chip</Label>
         </Rule>

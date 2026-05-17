@@ -26,7 +26,7 @@ type Story = StoryObj<typeof Accordion>
 // ── Default — 最 minimal 結構展示 ─────────
 
 export const Default: Story = {
-  name: 'Default',
+  name: '預設',
   render: () => (
     <div className="max-w-[480px]">
       <Accordion type="single" collapsible defaultValue="item-1">
@@ -46,21 +46,21 @@ export const Default: Story = {
 // ── States — closed / open / disabled 並列 ─────────
 
 export const States: Story = {
-  name: 'States',
+  name: '狀態',
   render: () => (
     <div className="max-w-[480px]">
-      <Accordion type="multiple" defaultValue={['open']}>
-        <AccordionItem value="closed">
-          <AccordionTrigger>Closed item</AccordionTrigger>
-          <AccordionContent>(預設 closed)</AccordionContent>
+      <Accordion type="multiple" defaultValue={['shipping']}>
+        <AccordionItem value="account">
+          <AccordionTrigger>付款方式如何更新?</AccordionTrigger>
+          <AccordionContent>帳戶設定 → 付款 → 新增信用卡。支援 Visa / Mastercard / JCB。</AccordionContent>
         </AccordionItem>
-        <AccordionItem value="open">
-          <AccordionTrigger>Open item</AccordionTrigger>
-          <AccordionContent>(預設 open,展開內容區)</AccordionContent>
+        <AccordionItem value="shipping">
+          <AccordionTrigger>國際運費如何計算?</AccordionTrigger>
+          <AccordionContent>依目的地、重量、體積三項計算。亞太區一律免運(滿 NTD 2,000),其他地區依物流商報價。</AccordionContent>
         </AccordionItem>
-        <AccordionItem value="disabled" disabled>
-          <AccordionTrigger>Disabled item</AccordionTrigger>
-          <AccordionContent>(disabled,不可開啟)</AccordionContent>
+        <AccordionItem value="enterprise" disabled>
+          <AccordionTrigger>企業方案客製化(僅企業帳戶可用)</AccordionTrigger>
+          <AccordionContent>升級企業方案後解鎖。請聯絡業務:enterprise@example.com</AccordionContent>
         </AccordionItem>
       </Accordion>
     </div>

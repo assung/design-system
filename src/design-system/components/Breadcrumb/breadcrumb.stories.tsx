@@ -1,4 +1,5 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
+// @story-trait-rationale: Breadcrumb 是純結構導覽元件,disabled/states 由 BreadcrumbLink 內部 :focus-visible / :hover / :active 處理(spec.md 互動狀態段已 cover),無 element-level disabled mode(spec.md L107「通常 breadcrumb link 不會 disabled」)。互動行為示範由 InteractiveEllipsis story + anatomy StateBehavior 完整覆蓋。AllSizes retired per F migration 2026-05-15(anatomy auto-compile SizeMatrix owns size showcase)。
 import type { Meta, StoryObj } from '@storybook/react'
 import {
   Breadcrumb,
@@ -28,7 +29,7 @@ type Story = StoryObj<typeof Breadcrumb>
 // ── Default ──────────────────────────────────────────────────────────────────
 
 export const Default: Story = {
-  name: 'Default',
+  name: '預設',
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
@@ -51,7 +52,7 @@ export const Default: Story = {
 // ── Interactive ellipsis (折疊路徑 → DropdownMenu) ─────────────────────────
 
 export const InteractiveEllipsis: Story = {
-  name: 'Interactive ellipsis',
+  name: '可互動省略',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="text-caption text-fg-muted max-w-xl">
@@ -98,64 +99,102 @@ export const InteractiveEllipsis: Story = {
   ),
 }
 
-// ── Sizes (配對 page title) ────────────────────────────────────────────────
+// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
+// ── Declarative items + auto-collapse(Phase B,2026-05-10)──────────────────
+//
+// @story-trait-rationale: 此 story 展示 Phase B declarative `items` API + auto-collapse
+// (maxItems=4)+ flex-shrink hierarchy + truncate-on-overflow + tooltip canonical(per
+// `tooltip.principles.stories.tsx:190`)。Disabled / States 仍由 BreadcrumbLink 內部 :hover /
+// :focus-visible / :active 處理(spec.md L107 無 element-level disabled)。
 
-export const AllSizes: Story = {
-  name: 'Sizes',
+export const DeclarativeAutoCollapse: Story = {
+  name: 'Declarative + Auto-collapse',
   render: () => (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-6 max-w-2xl">
       <div>
-        <div className="text-caption text-fg-muted mb-2">
-          <strong>sm</strong> — text-body(14) 配 text-h4(20),Dialog / panel / drawer 內的小 header
-        </div>
+        <h3 className="text-body font-bold text-foreground mb-2">
+          ≤ maxItems(4)— 全顯
+        </h3>
+        <p className="text-caption text-fg-muted mb-3">
+          3 items 不超 maxItems=4,所有 item 自然 render。
+        </p>
         <Breadcrumb>
-          <BreadcrumbList size="sm">
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Workspace</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/settings">Settings</BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
+          <BreadcrumbList
+            items={[
+              { label: '首頁', href: '/' },
+              { label: '專案', href: '/projects' },
+              { label: '我的新專案' },  // 無 href → 自動 BreadcrumbPage(末位)
+            ]}
+          />
         </Breadcrumb>
-        <h4 className="text-h4 font-medium text-foreground mt-0.5">一般設定</h4>
       </div>
 
       <div>
-        <div className="text-caption text-fg-muted mb-2">
-          <strong>md</strong>(預設)— text-body(14) 配 text-h3(24),一般頁面 header
-        </div>
+        <h3 className="text-body font-bold text-foreground mb-2">
+          5 items 超 maxItems(4)— auto-collapse 中段
+        </h3>
+        <p className="text-caption text-fg-muted mb-3">
+          itemsBeforeCollapse=1 + itemsAfterCollapse=1 → 首 + ⋯ + 末。
+          中段 [專案, Q1, 行銷活動] 全進 DropdownMenu(點 ⋯ 看)。
+        </p>
         <Breadcrumb>
-          <BreadcrumbList size="md">
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">首頁</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/projects">專案</BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
+          <BreadcrumbList
+            items={[
+              { label: '首頁', href: '/' },
+              { label: '專案', href: '/projects' },
+              { label: 'Q1', href: '/projects/q1' },
+              { label: '行銷活動', href: '/projects/q1/marketing' },
+              { label: '電子報設計' },
+            ]}
+          />
         </Breadcrumb>
-        <h3 className="text-h3 font-medium text-foreground mt-0.5">我的新專案</h3>
       </div>
 
       <div>
-        <div className="text-caption text-fg-muted mb-2">
-          <strong>lg</strong> — text-body-lg(16) 配 text-h2(32),Detail page hero / landing
-        </div>
+        <h3 className="text-body font-bold text-foreground mb-2">
+          自訂 maxItems / itemsAfterCollapse
+        </h3>
+        <p className="text-caption text-fg-muted mb-3">
+          maxItems=6 + itemsAfterCollapse=2 → 首 1 + ⋯ + 末 2(parent + current)。
+        </p>
         <Breadcrumb>
-          <BreadcrumbList size="lg">
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">首頁</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/products">產品</BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
+          <BreadcrumbList
+            maxItems={6}
+            itemsAfterCollapse={2}
+            items={[
+              { label: '組織', href: '/org' },
+              { label: '產品團隊', href: '/org/team' },
+              { label: '成員', href: '/org/team/members' },
+              { label: 'Alice', href: '/org/team/members/alice' },
+              { label: '權限', href: '/.../permissions' },
+              { label: '角色', href: '/.../roles' },
+              { label: '編輯' },
+            ]}
+          />
         </Breadcrumb>
-        <h2 className="text-h2 font-medium text-foreground mt-0.5">產品 X 旗艦版</h2>
+      </div>
+
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">
+          窄容器 + 長 label — flex-shrink hierarchy + truncate + tooltip
+        </h3>
+        <p className="text-caption text-fg-muted mb-3">
+          容器寬 320px,item label 過長。Root shrink:3(最先縮)→ middle shrink:2 → current
+          shrink:1。各 item 內 `truncate` + ResizeObserver 偵測 → hover tooltip 顯完整文字
+          (對齊 `tooltip.principles.stories.tsx:190` canonical)。
+        </p>
+        {/* @story-trait-rationale: 2026-05-14 per user 拍板「拿掉 fixed 320px 讓 resize window 測 RWD」— Breadcrumb 是純結構導覽,disabled/states 由 BreadcrumbLink :focus-visible/:hover/:active 處理(spec.md L107),trait check 沿用 file header rationale */}
+        <div className="border border-dashed border-divider rounded-md p-2">
+          <Breadcrumb>
+            <BreadcrumbList
+              items={[
+                { label: 'Long Organization Name', href: '/org' },
+                { label: 'Product Engineering Team', href: '/team' },
+                { label: 'Design System Component Refactor Sprint 23' },
+              ]}
+            />
+          </Breadcrumb>
+        </div>
       </div>
     </div>
   ),
@@ -164,7 +203,7 @@ export const AllSizes: Story = {
 // ── Deep hierarchy (不折疊, 完整顯示) ──────────────────────────────────────
 
 export const Deep: Story = {
-  name: 'Deep',
+  name: '深層巢狀',
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
@@ -195,7 +234,7 @@ export const Deep: Story = {
 // ── Two levels (最小合理深度) ─────────────────────────────────────────────
 
 export const TwoLevels: Story = {
-  name: 'Two Levels',
+  name: '兩層巢狀',
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>

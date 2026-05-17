@@ -2,6 +2,8 @@
 
 # Horizontal Overflow 設計原則
 
+**Layout Family**:non-family(utility primitives module,本身不渲染 layout — 由消費端 family 1/3 提供 outer geometry)。
+
 **水平 overflow 的 canonical primitives + helper**——給任何「一排水平 items 可能塞不下容器」的元件(Tabs、ChipGroup、未來的 Steps horizontal、SegmentedControl overflow 等)共用。
 
 這是底層工具 module,**不是 UI 元件**。消費者組裝自己的 outer wrapper(border、gap、背景等元件特有樣式),但 overflow affordance(scroll arrows、menu trigger、fade mask)全部從本 module 取用。
@@ -157,8 +159,10 @@ return (
 
 - `components/Tabs/tabs.tsx` — `overflow="scroll" | "menu"`
 - `components/Chip/chip.tsx` — `layout="scroll" | "menu"`
-- 未來:`components/Steps/steps.tsx`(horizontal 模式的 overflow)
-- 未來:`components/SegmentedControl/*`(若出現 overflow 需求)
+
+**Non-consumers**(2026-05-10 retire from「未來」清單 — prior prediction stale,spec 已明文不消費):
+- ~~`components/Steps/steps.tsx`~~ — `steps.spec.md:326`「水平空間不夠塞 content 區,強塞會破壞 stepper 的掃視節奏」+ L337「步驟 ≤ 5、水平空間充足」→ 設計上不 overflow
+- ~~`components/SegmentedControl/*`~~ — `segmented-control.spec.md:223`「**不支援 overflow / scroll**——若選項可能超出容器寬度,代表選錯元件了」+ L162「最多 5 個 item」→ 設計上拒絕 overflow
 
 新消費者必須加到這個清單,並且**只從本 module import** overflow 相關的 primitive,不允許自己複製。
 

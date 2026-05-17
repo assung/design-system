@@ -163,6 +163,19 @@ Row actions 欄本質上是 frozen right column，左邊界也使用 full-height
 
 **不變條件(invariants,L2 test + hook 守)**:(1) cell width = column width(跟 padding/state/mode 無關)(2) display↔edit cell width 0 delta (3) display↔edit cell height 0 delta(textarea `field-sizing:content`)(4) Field 填滿 cell 高度(1px 容差於 cell.border-r)(5) No-resize column ≥ meta.width。對應 `scripts/data-table-invariants.mjs`。改 `columnSizeStyle` / 切 layout 必跑 invariant test 才 commit。
 
+### 六之三、Runtime perf budget canonical(2026-05-14 codex+Layer A)
+
+`scripts/runtime-perf-datatable.mjs`(Playwright,cooldown 60-90s)+ 60fps 16.67ms canonical(web.dev / MDN long-task >50ms)。**4 test cases**:
+
+| Case | Story | Avg / p95 / long-task | Gate |
+|---|---|---|---|
+| A Plain virt | `VirtualScroll` | ≤16.67/≤33/0 | hard |
+| B Rich budget | `RoadmapPerfBudget`(500×13 rich+inline-edit,fixed 600px) | ≤50/≤80/≤1 | hard |
+| C Row drag | `RowDragVirtualization` | ≤33/≤50/longest<100 | soft(DnD thermal) |
+| D Edit isolation | `<Profiler>` TBD | skip ≥ visible−active | hard |
+
+**Anti-pattern**:`RoadmapAllInOne`(全 features stack)≈117ms 不達 B,因 SortableRowProvider/column reorder/resize/selection/overlay 同時開。Consumer:13+ cols rich-cell → 拆 detail drawer / column visibility 預設 hide,不該期 60fps + 全 feature stack。Cite + Phase 1/2 history → `cell-registry.tsx:480-499` JSDoc + commits log。
+
 ### 七、Column Type
 
 **Column type 是資料行為的預設合約。** 指定 type 自動獲得對齊 / 渲染 / 排序 / 篩選行為,可在 column 層級覆寫。Header 對齊永遠跟該欄 body cell 一致。
@@ -221,24 +234,11 @@ Cell 已 `flex items-center`,consumer render 直接 inline-flex + gap-2。Icon s
 
 固定行高下 cell 單行,空間不足:純文字 `text-overflow: ellipsis`;Tag 文字內部 truncate(Tag bg 跟縮);multiSelect 動態 `+N`;Person avatar 不縮 name truncate;Link truncate。每個 Display 元件自管 truncation,Cell `overflow-hidden` 僅 safety net。截斷必顯 `...`(禁硬裁無 ellipsis)。截斷 hover 顯 tooltip。autoRowHeight wrap 模式不適用(可換行撐 row 高)。
 
-### 十二、Inline Edit 視覺差異(全表 `inlineEdit` 模式)
+### 十二、可推導值用 `calc()` 表達(不硬寫結果)— 上游動,下游自動跟著算
 
-固定行高(不 autoRowHeight)、body cells 之間垂直分隔線、select / date / person 右側 ChevronDown / Calendar 指示器、外框自動加。詳互動 canonical 見下方「L4 Inline Edit」段。
+### 十三、狀態處理職責邊界
 
-### 十三、可推導值用 `calc()` 表達(不硬寫結果)— 上游動,下游自動跟著算
-
-### 十四、狀態處理職責邊界
-
-DataTable 只管「確定有 column + 有 / 沒 data」,不管生命週期:
-
-| 狀態 | 誰處理 | 做法 |
-|------|-------|------|
-| Empty | DataTable 內建 | 自動渲 `Empty` primitive |
-| Loading | Consumer | 外層 CircularProgress / Skeleton |
-| Error | Consumer | 外層 Alert |
-| Disabled(整表)| N/A | Cell-level 由 Field Controls 管 |
-
-判斷法:「我知道 data 是什麼嗎?」知道 → 傳;還在載 → 外面 Skeleton;失敗 → 外面 Alert。Dark mode / density:semantic token 自動切換。
+DataTable 只管「column + data」;Loading / Error / Disabled-整表由 consumer 外層處理。Empty 自動渲 `Empty`。Dark mode / density 走 token。**Loading**(無資料 → 外層 `Skeleton × N rows`;有資料 refresh → 容器疊 `<CircularProgress/>` 24px center + table `opacity-disabled` reuse,**禁**:內建 loading prop / Empty 套 loading / 自定義 opacity)。對齊 Ant Table Spin center / MUI X `noRowsVariant=skeleton`。
 
 ---
 
@@ -415,13 +415,13 @@ ValueShape ↔ DS picker 對照(canonical 2026-05-02):
 
 | ColumnType | Trigger | Edit mode |
 |--|--|--|
-| string / url | click cell | `<Input>` autoFocus |
+| string | click cell | `<Input>` autoFocus |
 | number / currency | click cell | `<NumberInput>` |
 | date | click cell | `<DatePicker>` |
 | select / multiSelect | click cell | `<Select>` / `<Combobox>` |
 | person / multiPerson | click cell | `<Input>` v1 fallback |
 | **boolean** | direct toggle | `<Checkbox>` 無 mode 切換 |
-| **url** | **hover cell → Pencil 按鈕(xs iconOnly tertiary)→ click** | `<Input>`(read 永遠是連結)|
+| **url** | **hover cell → Pencil 按鈕(xs iconOnly tertiary)→ click** | `<Input>`(read 永遠是連結;cell click 走 anchor 開連結,**不**進 edit)|
 
 ### Nested rows — forward TanStack
 
@@ -443,15 +443,17 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 `enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/sortable + @dnd-kit/core。**必填 `getRowId`**(否則 dnd 用 row.index reorder 後錯位)。
 
-- **Handle 視覺**:`<Button variant="tertiary" iconOnly size="xs" startIcon={GripVertical} />`(24px elevated chip:`bg-surface` + `border-divider` + `text-foreground` icon)。**absolute** `left-1 top-1/2 -translate-y-1/2` 浮在 row 左緣 4px inset,**不佔 column 空間**。對齊 Jira backlog row drag idiom(@benchmark-unverified,M22)。不用 `ItemInlineActionButton` 因透明背景在 row 邊界會撞 table border line — tertiary chip 自帶 surface + border 才是 elevated handle 視覺
-- **Hover-reveal** `opacity-0 group-hover/row:opacity-100`(Notion / Airtable 共識)
-- **Sort × Drag 互斥**:sort.length > 0 → handle disabled + Tooltip(對齊 Notion / Airtable)
-- **Top-level only**:nested sub-rows(`row.depth > 0`)不顯示 handle;同 parent level 才能 reorder
-- **Position 計算**:active vs over 視覺位置 → `'after'`(往下)/ `'before'`(往上),對齊 `arrayMove` 慣例
-- **Consumer-managed mutation**:onRowReorder 收 (sourceId, targetId, position),consumer 自管 splice + setState(Notion / Airtable / Linear pattern,DS 不持有 row order)
-- **Virtualization 整合**(v3 fix 2026-05-05):enableRowDrag 自動 `overscan ≥ 10`(避免 source row unmount 導致 useSortable stale)+ drag 期間 freeze `measureElement`(避免 transform 競爭)+ DndContext `modifiers={[restrictToVerticalAxis]}` inline 鎖 Y 軸(避免 X 抖動 loop)
-- **3-panel mirror sync**:每 region row 各 mount `useSortable`(共享同 SortableContext.items)自然取得相同 transform;handle 只 render 在 primary region(left 優先,fallback center)避免雙觸發
-- **Cross-parent drop 禁止**(已知限制):nested rows 只能同 top-level scope 內重排,子層不能跨 parent;collisionDetection 過濾 same-parent siblings,跨 parent 顯示 invalid drop signal(設計保守,對齊 Notion)
+- **Handle**:`<Button variant="tertiary" iconOnly size="xs" startIcon={GripVertical} />` 24px elevated chip(`bg-surface` + `border-divider`),`absolute left-1 top-1/2 -translate-y-1/2` 4px inset 不佔 column 空間;**hover-reveal** `opacity-0 group-hover/row:opacity-100`。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
+- **Sort × Drag 互斥**:sort.length>0 → handle disabled+Tooltip。**Top-level only**(`row.depth>0` 不顯 handle)。**Position**:active vs over 視覺位置 → `'after'`/`'before'` 對齊 `arrayMove`。**Consumer-managed mutation**:`onRowReorder(sourceId, targetId, position)`,DS 不持 row order(Notion/Airtable/Linear)。
+- **Virtualization 整合**(v3 2026-05-05):enableRowDrag 自動 `overscan≥10` + drag 期 freeze `measureElement` + `modifiers={[restrictToVerticalAxis]}` 鎖 Y 軸。**3-panel mirror sync**:各 region 共享 SortableContext.items 自然同 transform;handle 只 render primary region(left 優先 → center)避雙觸發。**Cross-parent drop 禁止**(已知 limit):nested 只同 top-level 重排,collisionDetection 過濾,顯 invalid signal。
+
+---
+
+## Overlay + cell error SSOT(Phase 9)
+
+**Overlay**:viewport `position:fixed inset:0` layer。`getCellRect()` 從 `getBoundingClientRect()` 取 float coords no rounding。Paint:hover/selected/range outer ring `outline outline-offset:-1px` in-place;active editor host portal opaque `<div>` z 3(cell 保持 display)。**Viewport clip**(Issue 6):body panel 加 `data-datatable-panel="left|center|right"`;`getCellGeometry()` return cell+panel rect;`<ClipMask>` panel rect `overflow:hidden`,內部 `toRelRect()` 轉 mask-relative。Range outer ring 按 panel 分組(避 bbox 跨 pin boundary)。Active editor host **不 clip**。對齊 AG Grid `cellsForRangeSet` / Glide / Notion sticky-cell mask。
+
+**Cell errors**(Issue 9):`cellErrors?: Record<string, string|string[]>` prop key `${rowId}:${colId}`。Cell display 渲 error 14px `text-error` 下方 gap-1;array→`<ul><li>`;single→`<span>`。`aria-describedby` + `aria-invalid` + `<span role="alert">`。`overflow:visible` 當有 error(搭 `autoRowHeight`)。**Per-row state SSOT** cell-render wrapper(`items-X` 等)必 consume `effectiveAutoRowForCell`,禁 global `autoRowHeight`(audit `audit-data-table-row-mode-ssot.mjs` 強制)。**Edit-clears-own-cell** 自動清視覺,consumer onCellCommit validate 後回填。**a11y caveat**:≥ 5 同時 `role="alert"` 第一次 paint AT 噪音 → consumer 可考 `role="status"` fallback。對齊 AG Grid `cellClassRules='ag-cell-error'` + Material X errorMessage + Airtable validation。
 
 ---
 
@@ -459,7 +461,7 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 - ❌ 不使用斑馬紋——hover / selected 已足夠區分行，斑馬紋增加狀態組合的視覺複雜度
 - ❌ 無隱藏內容、無 frozen column、非 inline edit 的表格不加外框
-- ❌ Body cell 之間不加垂直分隔線——靠 header 建立的欄位邊界引導即可
+- ❌ 非 inlineEdit table 的 body cell 之間不加垂直分隔線——靠 header 建立的欄位邊界引導即可。inlineEdit table 的 body cells **4 邊均有 1px divider**(grid editing surface canonical;對齊 AG Grid / Material X cellEditable)
 - ❌ Toolbar 不內建在 DataTable 裡——toolbar 是外部組合，職責分離
 - ❌ 截斷文字不無條件顯示 tooltip——只有實際被截斷時才顯示
 - ❌ Tag 不可被外層 overflow-hidden 裁掉邊框——Tag 自身 shrink + 內部文字 truncate

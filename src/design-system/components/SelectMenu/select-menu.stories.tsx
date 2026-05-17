@@ -1,8 +1,8 @@
+// @story-trait-rationale: isInputLike trait — SelectMenu(internal,Select/Combobox 觸發)的 error state 由 Select.stories.tsx + Combobox.stories.tsx WithError 覆蓋(SelectMenu 是 internal popover surface,不直接 own input state)。AllSizes 同理 retired(anatomy auto-compile SizeMatrix owns)per F migration 2026-05-15。
 import type { Meta, StoryObj } from '@storybook/react'
 import React, { useState } from 'react'
 import { Select } from '@/design-system/components/Select/select'
 import { Combobox } from '@/design-system/components/Combobox/combobox'
-import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
   title: 'Design System/Internal/SelectMenu/展示',
@@ -117,35 +117,7 @@ export const Clearable: StoryObj = {
   render: () => <ClearableDemo />,
 }
 
-// ── 尺寸 ──
-
-const SizesDemo = () => {
-  const [sm, setSm] = useState<string>('in_stock')
-  const [md, setMd] = useState<string>('in_stock')
-  const [lg, setLg] = useState<string>('in_stock')
-
-  return (
-    <div className="flex flex-col gap-4">
-      {([
-        { size: 'sm' as const, value: sm, set: setSm },
-        { size: 'md' as const, value: md, set: setMd },
-        { size: 'lg' as const, value: lg, set: setLg },
-      ]).map(({ size, value, set }) => (
-        <div key={size} className="flex items-center gap-3">
-          <span className="text-caption text-fg-muted font-mono w-8">{size}</span>
-          <Select options={statusOptions} value={value} onChange={set} size={size} className="max-w-xs" />
-          <Button size={size}>送出</Button>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-export const AllSizes: StoryObj = {
-  name: '尺寸',
-  render: () => <SizesDemo />,
-}
-
+// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
 // ── 狀態 ──
 
 export const States: StoryObj = {

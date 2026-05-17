@@ -9,7 +9,10 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../lib/check_story_anatomy.sh"
+# Cluster A merge(2026-05-10):check_story_anatomy.sh 已 fold 進
+# check_story_invariants.sh dispatcher R1。本 test 改 call dispatcher,
+# dispatcher 會跑 5 rule(R1 anatomy + R2-R5),anatomy 違反時 R1 fire 攔截。
+HOOK="$SCRIPT_DIR/../check_story_invariants.sh"
 
 if [ ! -x "$HOOK" ]; then
   echo "FATAL: hook not executable: $HOOK"

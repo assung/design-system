@@ -96,17 +96,19 @@ for (const [targetBase, sources] of gapsByTarget.entries()) {
     '',
   ].join('\n')
 
-  // If section already exists, replace; otherwise append
+  // Idempotent regenerate(2026-05-10 v2 bug fix):
+  // 1. Remove ALL existing reciprocal sections with global flag(handles dup case
+  //    accumulated from previous buggy runs)
+  // 2. Append fresh section once
+  // Original bug:'m' flag + lookahead `$` lazy-stopped at first newline,causing
+  // dup section accumulation across runs。7 specs corrupted before discovery
+  // (button/notice/action-bar/element-anatomy/overlay-surface/layoutSpace/uiSize)。
   const sectionRe = new RegExp(
-    `\\n${SECTION_HEADER.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}[\\s\\S]*?(?=\\n## |$)`,
-    'm',
+    `\\n*${SECTION_HEADER.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}[\\s\\S]*?(?=\\n## |$)`,
+    'g',  // global flag = remove ALL existing(handles dup)
   )
-  let newContent
-  if (sectionRe.test(content)) {
-    newContent = content.replace(sectionRe, newSection)
-  } else {
-    newContent = content.trimEnd() + '\n' + newSection
-  }
+  const cleaned = content.replace(sectionRe, '').trimEnd()
+  const newContent = cleaned + '\n' + newSection
 
   if (newContent !== content) {
     fs.writeFileSync(targetPath, newContent)

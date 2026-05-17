@@ -2,6 +2,8 @@
 
 # Inline Action 設計規格(SSOT)
 
+**Layout Family**:non-family(hosted inline element,無 own layout — 由宿主 family 1/4 提供)。
+
 **定位**:嵌入在其他元件內部的互動觸發點(Tag dismiss / Field endAction / Row suffix action)。不是獨立 Button,由宿主元件渲染 + 控制。
 
 **本 spec 是 Inline Action 的獨立 SSOT**(2026-04-24 從 `item-anatomy.spec.md` 抽出,避免單一 spec 過長)。Row primitive 結構走 `item-anatomy.spec.md`;本 spec 含「確定用 Inline Action」後的完整視覺 / API / predicate / same-row consistency 規格。
@@ -156,6 +158,7 @@ Q3. Row 多大?
 | **DataTable header cell internal**(sort indicator / ⌄ menu / filter funnel / pin)| Header cell host internal | **Inline Action**(`ItemInlineActionButton` asChild for DropdownMenu)| Embedded inline,跟 label 一體 |
 | **DataTable body cell internal**(display endAction / clear / edit indicator)| Cell content host internal | **Inline Action**(自動繼承 Field family endAction)| Field display 元件已對齊 |
 | **DataTable row dedicated action column**(編輯 / 刪除 / 更多 ⋯)| Row dedicated column | Button xs iconOnly(24 固定)| ≤ 24 cap;有獨立 column divider 視覺分離 |
+| **Breadcrumb 中段折疊 ⋯**(`BreadcrumbEllipsis`)| BreadcrumbList row inline flow(host 內)| **Inline Action**(`ItemInlineActionButton` `size="md"` + `overlayTrigger` + asChild for DropdownMenuTrigger)| Embedded inline,跟 BreadcrumbLink 同 row;14-16px text row(compact tier);click 展開 DropdownMenu(2026-05-10 重寫,自刻 button retired)|
 | **Dialog / Sheet / Popover / Alert corner close** | Chrome corner | Button iconOnly `dismiss`(size sm)| Action group region |
 | **Toolbar commands**(FileViewer zoom / editor bold)| Toolbar | Button iconOnly(md 常見)| Action group region |
 | FileViewer / rich text editor formatting group | Toolbar action group | Button iconOnly 同 size + Separator | Action group 完整範例 |
@@ -302,3 +305,9 @@ hook `check_story_anatomy.sh` 規則 B 已在 stories 層攔 label Button 作 di
 - `data-table.spec.md`
 - `field-controls.spec.md`
 - `popover.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `breadcrumb.spec.md`

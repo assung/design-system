@@ -1,3 +1,4 @@
+// @story-trait-rationale: isOverlay OpenSnapshot / hasInteractiveStates Disabled 由 anatomy.stories.tsx StateBehavior + Inspector auto-compile owns(2026-05-15 F-migration);showcase 展示真實多選 / 角色切換 / Checkbox 整合情境。
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { Mail, Settings, User, LogOut, Plus, Trash2, Copy, Pencil, ExternalLink, Moon, Sun, Monitor, ChevronDown, FileText } from 'lucide-react'
@@ -170,7 +171,7 @@ const CheckboxDemo = () => {
 }
 
 export const CheckboxItems: StoryObj = {
-  name: 'Checkbox',
+  name: '勾選項',
   render: () => <CheckboxDemo />,
 }
 
@@ -288,31 +289,4 @@ export const ItemHover: StoryObj = {
   },
 }
 
-// ── 尺寸 ──
-
-export const AllSizes: StoryObj = {
-  name: '尺寸',
-  render: () => (
-    <div className="flex items-center gap-4">
-      {(['sm', 'md', 'lg'] as const).map((sz) => (
-        <DropdownMenu key={sz}>
-          <DropdownMenuTrigger asChild>
-            <Button variant="tertiary" size={sz} endIcon={ChevronDown}>{sz}</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent size={sz}>
-            <DropdownMenuItem startIcon={Copy}>
-              複製
-            </DropdownMenuItem>
-            <DropdownMenuItem startIcon={Pencil}>
-              編輯
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem startIcon={Trash2} className="text-error">
-              刪除
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ))}
-    </div>
-  ),
-}
+// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。

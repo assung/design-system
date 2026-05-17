@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasInteractiveStates 的 Disabled / States 由 anatomy.stories.tsx StateBehavior auto-compile owns(2026-05-15 F-migration);showcase 層展示真實上傳 / 自訂內容情境。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Image as ImageIcon, X } from 'lucide-react'
@@ -116,7 +117,7 @@ export const WithFileList = {
 
 // children 覆寫:Figma 匯入資產客製文案 / 品牌 logo
 export const CustomChildren = {
-  name: 'Custom children',
+  name: '自訂內容',
   render: () => (
     <div className="max-w-lg">
       <FileUpload accept="image/*,.svg,.fig" multiple onUpload={noop}>

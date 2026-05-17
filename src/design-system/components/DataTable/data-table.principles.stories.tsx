@@ -162,41 +162,9 @@ export const ColumnTypeRule: Story = {
   },
 }
 
-export const AlignmentRule: Story = {
-  name: '對齊由 column type 決定(跨產業共識)',
-  render: () => {
-    const col = createColumnHelper<Product>()
-    const columns = [
-      col.accessor('name', { header: 'Product(text → 左)', size: 200, meta: { type: 'string' } }),
-      col.accessor('price', { header: 'Price(currency → 右)', size: 160, meta: { type: 'currency', prefix: '$' } }),
-      col.accessor('available', { header: 'Available(boolean → 中)', size: 140, meta: { type: 'boolean' } }),
-    ]
-    return (
-      <div>
-        <Rule
-          title="Column type 自動決定對齊,consumer 不手動設"
-          note="跨產業共識(Excel / 會計軟體 / 財務系統 / airtable 都這樣):數字靠右方便縱向比較位數(小數點縱向對齊一致)、文字靠左方便閱讀、boolean symbol 居中(✓ / — 視覺不偏向)"
-        >
-          <DataTable columns={columns} data={SAMPLE_DATA} height="auto" />
-        </Rule>
-
-        <Rule
-          title="❌ 在 column 層級混用對齊策略"
-          note="強制把 price 改左對齊、把 name 改中對齊 → 破壞使用者掃視節奏。使用者的眼睛適應了「數字在右邊」後,變換對齊讓每一 row 都要重新定位"
-        >
-          <Label warn>Align 是 column type 的 output,不是 consumer 的 preference。改對齊改 column type,不手動 override</Label>
-        </Rule>
-
-        <Rule
-          title="對齊對照"
-          note="text / select / person / date / link → left | number / currency → right | boolean(✓/—)→ center | row actions → right(動線尾端)"
-        >
-          <Label>對齊選擇有明確語意,不是美學選擇</Label>
-        </Rule>
-      </div>
-    )
-  },
-}
+// Retired 2026-05-16 audit Dim 24:`AlignmentRule` 跟 anatomy.stories.tsx:250 重複(同 column-type 對齊規則 + ❌ anti-pattern + 對照 table)。
+// Anatomy 是「視覺結構規則」 canonical home(per story-rules.md 三層分工);principles 該住 WhenToUse / WhenNotToUse / Vs近親,
+// 對齊規則屬結構 rule 不該重複出現。Retire principles 版,anatomy 版保留。
 
 export const VirtualScrollRule: Story = {
   name: '虛擬捲動時機',

@@ -1007,3 +1007,187 @@ deviation ✓: {component} 在 spec.md 邊界案例 scope 標 N/A,因 {rationale
 ```
 
 End: `N components scanned, K P0 (exports<2 OR no core), J P1 (deprecated naming), I retire candidates`. Under 400 words. Don't fix.
+
+---
+
+# Compact prompts(Dim 24-28 + 31-51,2026-05-17 補完)
+
+## 24. Story 範例重複性(Manual stories cross-3-file 不該 scenario 重疊)
+
+**Type**: Consistency / **Canonical**: SKILL.md Group I + Dim 24 rationale / **Home**: spec.md「邊界案例」rationale
+
+For each DS component, grep 3 stories files。列每 manual story 的 scenario(variant × size × state × 業務情境)。**Rule**:同 scenario 同元件不該在 ≥ 2 file 重複 = noise。Earn-existence test 第 1 條「教別 story 沒教的事」應命中。Report retire candidate per duplicate cluster。Under 300 words. 不修。
+
+## 25. Story 必要性 grounding(manual story 補足模糊原則的具象化)
+
+**Type**: AI-judgement / **Canonical**: SKILL.md Dim 25 / **Home**: spec.md 對應抽象原則段
+
+每 manual story 過 2 test:(a) tied 到 spec 某條抽象原則 + 讓「人」透過範例看懂?(b) 移除後 spec 理解 degrade?兩題皆 NO → retire candidate。**核心 philosophy**:「manual 範例補充模糊原則讓其具象化」非「秀肌肉湊數」。Report per-story:`✅ earn / ❌ retire(reason)/ ⚠️ borderline`。
+
+## 26. Controlled / Uncontrolled dual-mode coherence
+
+**Type**: Absolute / **Canonical**: SKILL.md Group J Dim 26 / **Home**: spec.md「Dual-mode rationale」段
+
+對 form-like + overlay-like 元件 grep dual-mode prop pair:`value/defaultValue + onChange` / `open/defaultOpen + onOpenChange`。**4 違反 case**:V1 missing uncontrolled / V2 missing controlled / V3 no callback / V4 internal state shadows prop。Radix wrapper 必 forward 3 個 prop。**例外**:刻意 single mode 必 spec.md rationale。Report per-component pair status。
+
+## 27. Clean code 量化(auto-chain `/code-quality-audit`)
+
+**Type**: Absolute / **Canonical**: scripts/code-quality-audit.mjs / **Home**: 無
+
+Chain `node scripts/code-quality-audit.mjs --scope=all`(`--deep`)or `--scope=changed`(default)。檢 `any` 使用 / dead export / tsx > 500 行(cap 800)/ function > 80 行 / circular dep / magic number。Report top offenders per rule。
+
+## 28. Manual story 拆分原則 alignment(對齊 Polaris/Carbon/Storybook)
+
+**Type**: Absolute / **Canonical**: `.claude/rules/story-rules.md`「拆分原則」 / **Home**: 檔首 `// @story-split-rationale: <reason>`
+
+Per-component grep `*.stories.tsx`(非 anatomy/principles)反 pattern:
+- `WithStartIcon` + `WithEndIcon` 拆兩 story → 該 `WithIcon` 對照 grid
+- `Default` + `AllVariants` 同檔 → 冗餘
+- ≥ 2 個 variant 拆細 → 該合 `AllVariants`
+
+對齊 Hook `check_story_invariants.sh` R2(write-time)+ 本 dim batch verify 既有元件。
+
+## 31. Overlay body 無 stripped-padding boolean variant
+
+**Type**: Absolute / **Canonical**: `overlay-surface.spec.md`「List-as-region in overlay body」+ memory `feedback_layout_v6_canonical.md` / **Home**: 檔頭 `// overlay-body-stripped-variant-allow:`(必含 ≥ 3 家世界級對照 + multi-row hold)
+
+Per-overlay grep `components/(Dialog|Sheet|Popover)/*.tsx`(非 stories)反 pattern:`(flush|naked|bare|stripped|unpadded|noPadding|paddingless)\?:\s*boolean` 在 body component。對齊 Material/Atlassian/Mantine/shadcn 主流。違反 = list-as-region 該 consumer override(`!px-0 !pt-0`)+ 自管 list outer wrapper。Hook `check_overlay_handcraft.sh` Check 6 同源。
+
+## 32. Filter operator registry SSOT consumption
+
+**Type**: Absolute / **Canonical**: `DataTable/filter-operators.ts` SSOT / **Home**: 檔頭 `// filter-op-inline-allow:`
+
+Per-consumer grep:反 pattern(a)hardcode op 字串 array 不 import `OPERATOR_REGISTRY`;(b)inline switch on op derive ValueShape(該走 `getValueShape`)。對齊 ClickUp/Airtable/Notion filter API + M17 SSOT。
+
+## 33. Component classification + abstraction discipline(5 子維)
+
+**Type**: Consistency / **Canonical**: M21 + M22 + M23 / **Home**: spec.md「abstraction rationale」/「benchmark cite」
+
+Per-component verify:
+- (a) Internal vs Components 一致性(對齊 Dim 44)
+- (b) Premature abstraction:`<Existing>+suffix` 需 3-test 過(prop variant 不行嗎 / ≥ 3 家 world-class 分離 / value 結構真不同),否則退 prop(M21)
+- (c) Sub-component 5-file 結構過度
+- (d) Benchmark claim 缺 source(M22 inline cite)
+- (e) DS internal canonical 優先(M23):visual decision 未先 grep DS token / variant / pattern 命中 → flag
+
+Sub-agent 對每 benchmark cite 反查 DS 內既有 codified canonical;有 → cite 應為輔證非主導。違反 = M23 自開新 tier。
+
+## 34. Disabled state 顯著性 precedence(M24)
+
+**Type**: Absolute / **Canonical**: M24 + `field-controls.spec.md` disabled state machine / **Home**: spec.md「state precedence」
+
+Per-element grep disabled mode → 內 placeholder / value / icon 全切 `text-fg-disabled`(neutral-6)非 `text-fg-muted`(neutral-7)。state > emphasis。Hook `check_disabled_placeholder_color.sh` 同源,本 dim DS-wide batch。
+
+## 35. Layered chain invariant — overlay scroll(M25)
+
+**Type**: Absolute / **Canonical**: M25 + `overlay-surface.spec.md` / **Home**: spec.md SSOT
+
+Overlay primitive → SurfaceBody 中間 wrapper 必 `flex flex-col h-full`,斷一層 = body 不 scroll。Hook `check_overlay_panel_scroll_chain.sh` 同源,本 dim DS-wide batch verify integrity。
+
+## 36. Naked variant cell-as-input row-mode propagation(M19)
+
+**Type**: Absolute / **Canonical**: `nakedCellRowModeAlign` SSOT / **Home**: spec.md
+
+`variant="naked"` consumer 內 wrapper 必 import + apply `nakedCellRowModeAlign` SSOT。Hook `check_naked_row_mode_propagation.sh` 同源。
+
+## 37. Field state machine「focus dominates everything」(M19 v13.3)
+
+**Type**: Absolute / **Canonical**: `field-wrapper.tsx` 三 compoundVariant SSOT / **Home**: spec.md state machine 段
+
+禁 per-control `(open|isOpen) && 'border-primary'`(Field default 處理)+ naked variant 禁平行 outline ring。對齊 Material 3 / Polaris / Ant 共識。Hook `check_field_state_token_consume.sh` 同源,本 dim batch verify Field family + outliers。
+
+## 38. Inline-action gap canonical
+
+**Type**: Absolute / **Canonical**: `inline-action.spec.md:80` / **Home**: spec.md
+
+`<ItemInlineAction>` sibling gap = `gap-2`(8px)。Hook `check_inline_action_canonical_gap.sh` 同源,本 dim batch verify consumer。
+
+## 39. Row-layout slot primitive consumption(M1+M17)
+
+**Type**: Absolute / **Canonical**: `ItemPrefix` / `ItemSuffix` primitive / **Home**: `item-anatomy.spec.md`
+
+禁自刻 `<span h-[1lh] shrink-0 flex items-center>` slot wrapper(item-anatomy / field-wrapper 外),必消費 `<ItemPrefix>` / `<ItemSuffix>`。Hook `check_row_slot_handcraft.sh` 同源。
+
+## 40. Title 命名 quality(story-rules.md L18-22)
+
+**Type**: Absolute / **Canonical**: `.claude/rules/story-rules.md`「Title 命名」 / **Home**: 無 escape
+
+Per-story regex check:`Design System/{Tokens|Patterns|Components|Internal}/{PascalCase Name}/{中文 subpage}` 結構;第一層英 / 子頁中文 / 子頁前**不**加元件名(❌ `MenuItem 展示` → ✓ `展示`)。Tokens/Patterns single-file 3-part exempt(per story-rules canonical)。
+
+## 41. Story name jargon(spec 內部代號)
+
+**Type**: Absolute / **Canonical**: story-rules.md「禁 spec 內部代號」 / **Home**: 無 escape
+
+Grep story `name:` field 含 `L1-L7 | canonical | spec X | phase Y | stream [A-Z]` 等。Hook `check_story_invariants.sh` R5(post-write)同源。本 dim DS-wide batch verify。
+
+## 42. 範例佔位符 / 抽象代號
+
+**Type**: Absolute / **Canonical**: story-rules.md「禁佔位符」 / **Home**: 無 escape(用真實業務情境替代)
+
+Grep `.stories.tsx` body 含 `Option A/B/C` / `按鈕一` / `Foo/Bar/Baz` / `Lorem ipsum` / `Hello World` / `Test 1/2` 等。對齊 Polaris/Carbon 共識用 Jira/Stripe/Notion 真情境。
+
+## 43. Rule note 品質(原則 > 結論 / 無中英夾雜)
+
+**Type**: AI-judgement(NO-SAMPLE per audit-full-sweep canonical:DS-wide ALL principles stories,不 sample)/ **Canonical**: `references/example-selection.md` / **Home**: spec.md rationale
+
+Per-element 讀 `.principles.stories.tsx` Rule notes,判 (a) 是否「告訴讀者原則為何」而非「只說結論」;(b) 是否無中英夾雜(技術術語例外)。
+
+## 44. Internal vs Components 分類三 test
+
+**Type**: Consistency / **Canonical**: story-rules.md L25 / **Home**: spec.md「compound-component API」段(豁免 source)
+
+Per-element folder verify 三 test:(a) 有預設視覺?(b) 直接 `<X>` 有視覺?(c) 所有 consumer 包 wrapper?三題傾向 Internal → 該住 `src/design-system/components/Internal/`。**例外:compound-component public API**(`Dialog.Root/Trigger/Content` / `Field + FieldLabel + FieldError` 等)豁免。Sub-agent 必先檢 component 是否 export ≥ 2 sub-component + spec.md 有「composition pattern / compound API」 cite → 豁免。
+
+## 45. Mechanical output structural validation
+
+**Type**: Absolute / **Canonical**: `scripts/compile-stories.mjs` + `references/anatomy-standard.md` / **Home**: 無
+
+對每元件跑 `compile-stories.mjs <Name>` 取 generated rows;grep 確認:
+- `AllSizes` 含所有 cva sizes
+- `AllVariants` / `ColorMatrix` 含所有 cva variants
+- `Accessibility` story 含 ARIA hint / keyboard map
+- `See also` cross-link 反指 spec.md 既有 link section
+
+## 46. Manual vs Mechanical boundary
+
+**Type**: Absolute / **Canonical**: `category-templates.md` v2 trait-based / **Home**: 檔頭 `// @manual-trait-allow: <reason>`
+
+Per-元件 grep `.stories.tsx`(非 anatomy/principles),若含 trait-derived `AllSizes` / `AllVariants` / `WithIcon` hand-written export 而非 import auto-compile = anti-pattern(該 migrate 進 auto-compile)。
+
+## 47. Tailwind utility registry compliance(2026-05-17 新增,codex Q2 verdict)
+
+**Type**: Absolute / **Canonical**: `src/design-system/tokens/utility-registry.json` SSOT / **Home**: spec.md「禁止事項」(對應 registry block 列)
+
+Per-file grep `src/design-system/**/*.{tsx,css}` + consumer code,對 `utility-registry.json` 每個 block list 跑反 pattern:
+- typography:`text-(xs|sm|base|lg|xl|...)` / `font-(thin|light|semibold|black)` / `leading-N` / `tracking-*`
+- radius:`rounded-(xl|2xl|3xl)` / `rounded`(無 size)/ `rounded-[Npx]`
+- opacity:`opacity-(5|10|...|95)`(numeric tier;只 0/100/disabled allowed)
+- elevation:`shadow-(sm|md|lg|xl|2xl|inner)`
+- shadcn alias:`bg-popover` / `text-muted-foreground` 等
+- primitive class:`bg-neutral-1` / `text-blue-6` 等
+
+對齊 Atlassian `@atlaskit/tokens` + Carbon `@carbon/themes` + Ant ConfigProvider + Polaris `polaris-tokens` registry + lint enforcement。Hook `check_tailwind_token_registry.sh`(由 `check_opacity_token_usage.sh` 升級)同源,本 dim DS-wide batch。
+
+## 48. Unused / orphan token detector(2026-05-17 新增,codex Q5 verdict)
+
+**Type**: Absolute / **Canonical**: `tokens/**/*.spec.md`「消費者」段 cross-verify / **Home**: spec.md「消費者」段
+
+對每個 token 定義(`--<token-name>` in `tokens/*.css`)grep `src/design-system/**/*.{tsx,css}` consumer。0 consumer = retire 候選。同時驗 spec.md「消費者」段宣稱真有用。對齊 Polaris quarterly token audit + Material `theme-cleanup`。
+
+## 49. a11y axe-core 自動跑 + WCAG contrast ratio(2026-05-17 新增,codex Q5 verdict)
+
+**Type**: Absolute / **Canonical**: WCAG AA(4.5:1 text / 3:1 UI)/ **Home**: spec.md「a11y 預設」段(escape rationale)
+
+Per `*.stories.tsx` 跑 axe-core via Storybook a11y addon;contrast ≥ 4.5:1(text)/ 3:1(large text / UI element)。對齊 Carbon AVT 每 PR + Storybook a11y addon + Atlassian linter integration。需 install `@storybook/addon-a11y` + CI integration。
+
+## 50. Bundle size budget per component(2026-05-17 新增,codex Q5 verdict)
+
+**Type**: Absolute / **Canonical**: `package.json` `size-limit` 段 + per-component manifest / **Home**: spec.md「bundle impact」段
+
+Per component gzip size 上限(eg. Button ≤ 5KB / DataTable ≤ 50KB);CI fail if regress > 10%。對齊 Material UI `size-limit` + Material Web 公開 tracking + Ant tree-shake article + Polaris bundle audit。需 `size-limit` pkg integration。
+
+## 51. Theme / density visual matrix(2026-05-17 新增,codex Q5 verdict)
+
+**Type**: Absolute(deep mode only)/ **Canonical**: visual-audit Layer B + baseline snapshot / **Home**: spec.md「邊界案例」段
+
+Deep mode 每 core story 跑 light/dark/high-contrast/density-md/density-lg/RTL 6-cell matrix screenshot diff;baseline drift > 5% pixel-diff → flag。對齊 Polaris visual regression + Carbon dark token matrix + Material 3 dynamic color + Apple HIG Dynamic Type。Chain `/visual-audit --scope=all --matrix=theme-density-rtl`。

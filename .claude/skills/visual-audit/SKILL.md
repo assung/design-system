@@ -7,7 +7,7 @@ description: Pixel-level visual audit for design-system components based on user
 
 ## 存在意義
 
-現有 `/design-system-audit`(20 dim)+ `/baseline-audit`(14 面向)+ `/product-ui-audit`(6 dim)**全部在 code / spec 層**。code 對、spec 對,**視覺仍可能錯**——這類 bug 在專案歷史反覆出現:
+現有 `/design-system-audit`(33 dim)+ `/product-ui-audit`(6 dim)**全部在 code / spec 層**。code 對、spec 對,**視覺仍可能錯**——這類 bug 在專案歷史反覆出現:
 
 - **DatePicker** 四邊邊距不對稱(左右不等 12px)、箭頭按鈕到容器頂距離 ≠ 最後一排日期到容器底距離
 - **Badge** 疊 Button 距離離譜(overlay offset 寫死 px 非 token)
@@ -28,14 +28,13 @@ description: Pixel-level visual audit for design-system components based on user
 ## Skill 生態位
 
 ```
-/baseline-audit         scan-only,建 14 面向 matrix(code/spec 層)
-/design-system-audit    20 dim 深度 audit(code/spec 層)
+/design-system-audit    33 dim 深度 audit(code/spec 層,Phase 0 自建 baseline)
 /product-ui-audit       consumer UI 對 DS 消費的 6 dim audit(code 層)
 /visual-audit           pixel-level 視覺 audit(本 skill,需 screenshot)
 /component-quality-gate  合入 DS 前的 45 項 checklist(Ship phase 可 chain 本 skill)
 ```
 
-**關鍵切分**:visual-audit 只看 pixel,**不讀 code / 不改 code**。code / spec / cva 的事全部歸前三 skill;視覺幾何對齊 / overlay 定位 / baseline / typography vertical rhythm 等「眼睛看得到、mechanical 量得出」的事才是本 skill scope。
+**關鍵切分**:visual-audit 只看 pixel,**不讀 code / 不改 code**。code / spec / cva 的事全部歸前兩 skill;視覺幾何對齊 / overlay 定位 / baseline / typography vertical rhythm 等「眼睛看得到、mechanical 量得出」的事才是本 skill scope。
 
 ## When to invoke
 
@@ -214,7 +213,7 @@ FAIL 項摘要:
 
 ## Non-goals(關鍵 — 混到這些就是職責混亂)
 
-- **不 audit code / spec**(code 層走 `/design-system-audit` / `/baseline-audit` / `/product-ui-audit`)
+- **不 audit code / spec**(code 層走 `/design-system-audit` / `/product-ui-audit`)
 - **不取代 pixel-diff 自動化**(Chromatic / Storybook screenshot-diff 是 tech debt,本 skill 過渡方案)
 - **不在沒有 screenshot 下跑 audit**(拒跑,見 Preconditions)
 - **不做主觀審美**(「看起來比較漂亮」不是 audit 結論)
@@ -238,8 +237,7 @@ FAIL 項摘要:
 
 ## 相關
 
-- `.claude/skills/design-system-audit/SKILL.md` — 20 dim code/spec audit;本 skill 是其 pixel-level 補位
-- `.claude/skills/baseline-audit/SKILL.md` — 14 面向 scan-only matrix;面向 14「視覺對齊」明文寫「需 /visual-audit」
+- `.claude/skills/design-system-audit/SKILL.md` — 33 dim code/spec audit;本 skill 是其 pixel-level 補位
 - `.claude/skills/product-ui-audit/SKILL.md` — consumer UI 對 DS 消費 audit(code 層),不處理視覺
 - `.claude/skills/component-quality-gate/SKILL.md` — 元件合入 DS 前的 45 項 checklist;Ship phase 可 chain 本 skill
 - CLAUDE.md `# 同 flex 列的互動 slot 幾何鐵律` — 本 skill checklist #3 的主要 canonical 來源

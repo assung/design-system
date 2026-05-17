@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { DatePicker } from './date-picker'
@@ -28,6 +29,42 @@ export const Default: Story = {
       <div className="flex flex-col gap-4 max-w-xs">
         <DatePicker value={value} onChange={setValue} />
         <p className="text-caption text-fg-muted">目前值：{value || '(empty)'}</p>
+      </div>
+    )
+  },
+}
+
+/**
+ * Issue 10 typed input(2026-05-10):trigger 內渲 `<input>` 接 user 自由輸入,Enter / Blur
+ * 解析 commit;不合法 input 顯 aria-invalid。Calendar icon 仍開 popover 選日期。
+ * 對齊 Material X-DatePicker / Ant DatePicker / Notion typed-date idiom。
+ */
+export const TypedInput: Story = {
+  name: '可直接輸入日期',
+  render: () => {
+    const [value, setValue] = React.useState('2026-04-02')
+    const [showTimeValue, setShowTimeValue] = React.useState('2026-04-02T14:30:00')
+    return (
+      <div className="flex flex-col gap-6 max-w-md">
+        <div>
+          <h3 className="text-body font-bold text-foreground mb-2">Date typed input</h3>
+          <p className="text-caption text-fg-muted mb-3">
+            支援:<code>YYYY-MM-DD</code> / <code>YYYY/MM/DD</code> / <code>YYYY.MM.DD</code> /
+            native <code>Date.parse</code>(eg. <code>Mar 12 2026</code>)。Enter / Blur commit;
+            Esc reset。Invalid → <code>aria-invalid</code>。Calendar icon 仍開 popover。
+          </p>
+          <DatePicker typeable value={value} onChange={setValue} />
+          <p className="text-caption text-fg-muted mt-2">value: <code>{value || '(empty)'}</code></p>
+        </div>
+        <div>
+          <h3 className="text-body font-bold text-foreground mb-2">DateTime typed input</h3>
+          <p className="text-caption text-fg-muted mb-3">
+            支援:<code>YYYY-MM-DD HH:MM[:SS]</code> / <code>YYYY-MM-DDTHH:MM</code>。
+            Calendar + Time panel 仍可用。
+          </p>
+          <DatePicker typeable showTime value={showTimeValue} onChange={setShowTimeValue} />
+          <p className="text-caption text-fg-muted mt-2">value: <code>{showTimeValue || '(empty)'}</code></p>
+        </div>
       </div>
     )
   },
@@ -292,7 +329,7 @@ export const ShowTimeRange: Story = {
 
 /* ── Display（DataTable cell 用）── */
 export const Display: Story = {
-  name: 'Display',
+  name: '展示樣式',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">

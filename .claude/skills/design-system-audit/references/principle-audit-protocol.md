@@ -51,9 +51,9 @@
 3. 這是 baseline 的 concept matrix,**沒建完不能進 Phase 1 判決**
 ```
 
-### Phase 0 可以 chain `/baseline-audit`
+### Phase 0 自建 inventory(scan-only)
 
-`/baseline-audit` skill 本就是 scan-only full inventory builder。D6b / D6c 跑前可直接 chain 此 skill 取 matrix,不重複造輪。
+D6b / D6c 跑前 inline grep 建 concept matrix(本檔上方 Phase 0 已展開步驟),scan-only,不判決。
 
 **為什麼 Phase 0 非走不可**:沒 inventory 就判 consistency = 盲人摸象。典型漏抓 case:
 - 只看 Tag spec 不看 item-anatomy.spec → 漏 Inline Action icon SSOT 矛盾(2026-04-21 實例)

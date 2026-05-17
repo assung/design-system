@@ -1,8 +1,7 @@
 ---
 component: Separator
 family: null
-traits:
-  - isInternal
+traits: []
 variants: {}
 sizes: {}
 benchmark:

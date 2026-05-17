@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import { X } from 'lucide-react'
 import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
@@ -5,6 +6,13 @@ import { Tag } from '@/design-system/components/Tag/tag'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { useTableIsScrolling } from '@/design-system/components/Field/field-context'
+import { ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import {
+  getAvatarStackVisibleCount,
+  AVATAR_STACK_AVATAR_PX,
+  AVATAR_STACK_OVERFLOW_CHIP_PX,
+} from './avatar-stack-overflow'
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -17,10 +25,13 @@ export interface PersonData {
   avatarUrl?: string
   /** 角色 / 部門 / ID 等 meta 單行(NameCard subtitle) */
   description?: string
-  /** Presence 狀態(對齊 Avatar presence canonical)。NameCard 永遠 render status section,
-   *  缺則顯「Status not set」placeholder */
+  /** Presence 狀態(對齊 Avatar presence canonical)。**2026-05-14 v12 update**(per user 拍板):
+   *  production 每 user 一定有 presence state,**undefined = loading transient(資料還沒讀到)**,
+   *  不是「user 沒設定」。NameCard 在 undefined 期間隱藏整 status block,**禁** render「Status not set」
+   *  placeholder 文字。 */
   status?: 'online' | 'away' | 'busy' | 'offline'
-  /** Status 訊息(NameCard status section)。缺則顯 `—` */
+  /** Status 訊息(NameCard status section)。只在 status defined 時 render,缺則顯 `—` placeholder。
+   *  Status undefined 整 block skip(無 statusMessage 也跟著 skip)。 */
   statusMessage?: React.ReactNode
   /** **2026-05-07 v15.7 user directive**:NameCard default 只 render `id` + `employeeNumber`,
    *  其他 description 一律 opt-in by consumer 透過 `fields` array prop。對齊
@@ -82,6 +93,13 @@ const AVATAR_PX: Record<'sm' | 'md' | 'lg', number> = { sm: 20, md: 24, lg: 24 }
 // - 所有 person avatar 經過 DS Avatar primitive(size 對應 uiSize family,fallback / icon / badge 集中管理)
 // - 人員資訊 → NameCard(subtitle = description,actions = NameCardDefaultActions)
 
+// 2026-05-13 (a) perf fix(per codex Layer C HoverCard subtree dominant):
+// useMemo `buildPersonNameCard` per-person stable ref。原 every render call → new JSX ref →
+// Avatar.memo bails → HoverCard subtree 重建。Stable ref → memo skip → big win on scroll。
+//
+// (c) push-up scroll-defer:當 DataTable virtualizer.isScrolling=true,**完全不 build NameCard**
+// (Avatar 收 undefined → 跳 HoverCard wrapper)。原 (c) v1 在 Avatar 層 skip wrapper 但 NameCard
+// JSX subtree 仍在此處 build → 浪費 React reconciliation work。push 到此處才真省。
 function PersonAvatar({
   person,
   size = 'md',
@@ -93,6 +111,11 @@ function PersonAvatar({
   className?: string
   style?: React.CSSProperties
 }) {
+  const isTableScrolling = useTableIsScrolling()
+  const nameCard = React.useMemo(
+    () => (isTableScrolling ? undefined : buildPersonNameCard(person)),
+    [person, isTableScrolling]
+  )
   return (
     <Avatar
       src={person.avatarUrl}
@@ -100,22 +123,31 @@ function PersonAvatar({
       size={AVATAR_PX[size]}
       className={className}
       style={style}
-      hoverCard={buildPersonNameCard(person)}
+      hoverCard={nameCard}
     />
   )
 }
 
 // ── Single Person Display ───────────────────────────────────────────────────
 
+// 2026-05-14 item-anatomy SSOT fix(per codex+Layer A 共識 path (a) + user 拍板「全部做完」):
+// outer 改 items-start + Avatar 外包 ItemPrefix primitive consumption。單行視覺 = items-center 等效;
+// 多行(autoRowHeight cell)避免 avatar+name center 整 row 不對齊 first-line text top。M1 消費既有
+// 對齊 TreeView / MenuItem / SelectionItem 共用 ItemPrefix wrap chevron/icon/avatar canonical。
 function PersonDisplay({ value, size = 'md' }: { value?: PersonValue | null; size?: 'sm' | 'md' | 'lg' }) {
   if (!value) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
 
   const person = resolvePerson(value)
 
+  // 2026-05-14 I1 fix(per codex addendum verdict):outer `inline-flex` → `flex w-full`
+  // 完成 truncate 寬度約束鏈。原 inline-flex content-width parent constrain 不到 name span
+  // → cell overflow-hidden 硬裁 → ellipsis dots 不可見。改 flex(block-level full width)
+  // + inner name span `flex-1 min-w-0 truncate` 真實 truncate-with-ellipsis 顯示。
+  // 對齊 GitHub Primer ActionList / Slack users_select / Atlassian UserPicker truncation canonical。
   return (
-    <span className="inline-flex items-center gap-2 min-w-0">
-      <PersonAvatar person={person} size={size} />
-      <span className="truncate">{person.name}</span>
+    <span className="flex items-start gap-2 min-w-0 w-full">
+      <ItemPrefix><PersonAvatar person={person} size={size} /></ItemPrefix>
+      <span className="truncate flex-1 min-w-0">{person.name}</span>
     </span>
   )
 }
@@ -130,18 +162,52 @@ function MultiPersonDisplay({
   value,
   size = 'md',
   max,
+  measured = false,
   onRemove,
 }: {
   value?: PersonValue[] | null
   size?: 'sm' | 'md' | 'lg'
-  /** 最多顯示幾個 avatar(不含 +N),預設 3 */
+  /** 最多顯示幾個 avatar(不含 +N),預設 3。`measured=true` 時忽略此 prop(改 container width 算)*/
   max?: number
+  /**
+   * 2026-05-15 codex Round 5 C+ SSOT fix:`measured=true` 啟動 container-width 量測(取代 hardcode `max ?? 3`)
+   * → display + edit stack 同 algorithm(同 cell width → 同 overflow 判斷),不再 display 用固定 3 vs edit
+   * 用 useOverflowCount。對齊 field-controls.spec.md:286 「4-mode 共享 renderer」contract + user round 3
+   * verbatim「同空間兩判斷點」SSOT directive。Default false 保 backward compat(non-cell context 仍 max ?? 3)。
+   */
+  measured?: boolean
   /** 傳入時啟用 dismiss(edit mode),callback 接收被移除的 person */
   onRemove?: (person: PersonValue) => void
 }) {
   if (!value || value.length === 0) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
 
-  const resolvedMax = max ?? 3
+  // 2026-05-15 Bug 3 fix(Claude+Codex Step 5 比稿 consensus):消費 shared `avatar-stack-overflow`
+  // primitive。原 inline canvas-based formula 是 dual-implementation 違反 user SSOT「同 cell width 同
+  // overflow 判斷」(edit path 用 Combobox useOverflowCount DOM offsetWidth / display path 用 inline
+  // canvas)。**抽 primitive 統一**:display + edit 共用 `getAvatarStackVisibleCount` formula。
+  // SSOT in `./avatar-stack-overflow.ts`,M14 mechanical guard 防 future drift。
+  const containerRef = React.useRef<HTMLSpanElement>(null)
+  const [measuredCount, setMeasuredCount] = React.useState<number | null>(null)
+  React.useLayoutEffect(() => {
+    if (!measured) return
+    const el = containerRef.current
+    if (!el) return
+    const calc = () => {
+      const visible = getAvatarStackVisibleCount({
+        availablePx: el.clientWidth,
+        total: value.length,
+        avatarPx: AVATAR_STACK_AVATAR_PX[size],
+        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+      })
+      setMeasuredCount(visible)
+    }
+    calc()
+    const ro = new ResizeObserver(calc)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [measured, size, value])
+
+  const resolvedMax = measured && measuredCount !== null ? measuredCount : (max ?? 3)
   const people = value.map(resolvePerson)
   const visible = people.slice(0, resolvedMax)
   const hidden = people.slice(resolvedMax)
@@ -152,8 +218,11 @@ function MultiPersonDisplay({
     return <PersonDisplay value={value[0]} size={size} />
   }
 
+  // 2026-05-14 item-anatomy SSOT fix(per codex+Layer A 共識):outer items-start + avatar stack
+  // 鎖 first-line baseline(整 stack 是 prefix slot,h-[1lh] 對齊 first line)。
   return (
-    <span className="inline-flex items-center min-w-0">
+    <span ref={containerRef} className="inline-flex items-start min-w-0">
+      <ItemPrefix className="!justify-start"><span className="inline-flex items-center min-w-0">
       {visible.map((person, i) => {
         // **2026-05-07 v15.11 Bug D 升級 SSOT**:visible avatar 也支援 inline dismiss
         // (對齊 user directive「avatar = tag」)。Dismiss overlay 走 `AvatarDismissOverlay`
@@ -180,7 +249,7 @@ function MultiPersonDisplay({
           {hidden.map((person, i) => (
             <Tag
               key={person.name + i}
-              variant="neutral"
+              color="neutral"
               size="sm"
               // Tag.avatar 是 ReactNode(非 AvatarData object)——傳 <Avatar> 元素。
               // Tag 內部用 `w-4 h-4 rounded-full` 容器 slot,Avatar 填滿 object-cover。
@@ -201,6 +270,7 @@ function MultiPersonDisplay({
           ))}
         </OverflowIndicator>
       )}
+      </span></ItemPrefix>
     </span>
   )
 }
@@ -251,7 +321,7 @@ function AvatarDismissOverlay({ onRemove, label }: { onRemove: () => void; label
         // keyboard 可達。Hover / focus-within / focus-visible 三條件之一觸發。
         'opacity-0 group-hover/avatar:opacity-100 group-focus-within/avatar:opacity-100 focus-visible:opacity-100',
         'transition-opacity duration-150',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
       ].join(' ')}
     >
       <X size={12} strokeWidth={3.5} aria-hidden />
@@ -285,4 +355,4 @@ function PersonAvatarTag({
 }
 PersonAvatarTag.displayName = 'PersonAvatarTag'
 
-export { PersonDisplay, MultiPersonDisplay, PersonAvatar, PersonAvatarTag, buildPersonNameCard, resolvePerson }
+export { PersonDisplay, MultiPersonDisplay, PersonAvatarTag, buildPersonNameCard, resolvePerson }

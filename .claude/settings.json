@@ -118,7 +118,6 @@
       "WebFetch(domain:ant.design)",
       "WebFetch(domain:netlify.com)",
       "WebFetch(domain:docs.netlify.com)",
-      "Skill(update-config)",
       "Skill(knowledge-prune)",
       "Skill(design-system-audit)",
       "Skill(ensure-canonical)",
@@ -131,13 +130,11 @@
       "Skill(performance-audit)",
       "Skill(code-quality-audit)",
       "Skill(governance-health)",
-      "Skill(gov-status)",
       "Skill(story-auto-compile-migrate)",
       "Skill(prototype)",
       "Skill(delivery-handoff)",
       "Skill(product-ui-audit)",
-      "Skill(new-component)",
-      "Skill(baseline-audit)"
+      "Skill(new-component)"
     ]
   },
   "hooks": {
@@ -148,6 +145,10 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_solo_workflow.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_codex_collab_5step.sh\""
           }
         ]
       },
@@ -174,35 +175,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_anatomy.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_invariants.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_slot_split.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_canonical_propagation.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_category.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_pattern_invariants.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_principles_canonical.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_l3_primitive_import.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_primitive_wrapper_padding.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_internal_namespace_consistency.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_premature_abstraction.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_naming_and_abstraction.sh\""
           },
           {
             "type": "command",
@@ -210,55 +195,23 @@
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_title_canonical.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_wrapper_primitive_schema_drift.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_spec_impl_default_alignment.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_field_family_invariants.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_field_control_group_direct_child.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_disabled_placeholder_color.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_naked_row_mode_propagation.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_field_state_token_consume.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_inline_action_canonical_gap.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_row_slot_handcraft.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_overlay_panel_scroll_chain.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_primitive_color_var_in_tsx.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_data_table_row_drag_get_row_id.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_data_table_size_num_to_meta_width.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_datatable_invariants.sh\""
           },
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_opacity_token_usage.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_substantive_edit_approval_preflight.sh\""
           }
         ]
       }
@@ -270,10 +223,6 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/block_prototype_imports.py\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_data_table_sort_parallel.sh\""
           }
         ]
       },
@@ -282,49 +231,31 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_token_hygiene.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post_edit_dispatcher.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_hardcoded_strings.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_invariants.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_code_quality.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_pixel_quantified_audit.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_layout_space_canonical.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_field_controls_contracts.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_name_jargon.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_peoplepicker_ssot_drift.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_person_data_richness.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_select_all_canonical.sh\""
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_overlay_handcraft.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_cva_default_sync.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/check_story_compile_drift.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_audit_post_report_validator.sh\""
           }
         ]
       },
@@ -352,11 +283,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_tsc_sanity.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_governance_drift_check.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_passive_logging.sh\""
           },
           {
             "type": "command",
@@ -364,23 +291,15 @@
           },
           {
             "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_propose_plain_chinese.sh\""
+          },
+          {
+            "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/scripts/audit-content-quality.mjs\" --check 2>&1 | grep -E '\\[P[01]\\]|✅|⚠️' | head -10 || true"
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_meta_self_audit.sh\""
-          },
-          {
-            "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/scripts/extract-canonical-rules.mjs\" 2>&1 | grep -E 'GAPS|✅|keywords missing' | head -8 || true"
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_harvest_corrections.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/lib/stop_capture_metrics.sh\""
           }
         ]
       }

@@ -3,7 +3,22 @@ component: Toast
 family: null
 traits:
   - hasVariants
-variants: {}
+variants:
+  neutral:
+    when: "非狀態通知;一般 announcement / tip(『已複製到剪貼簿』『偏好已儲存』)"
+    world-class: ["Polaris Toast default", "Sonner default", "Linear toast neutral"]
+  info:
+    when: "資訊性提示(『新版本可用』『同步完成』);非錯誤、非成功"
+    world-class: ["Material Snackbar info", "Ant notification info"]
+  success:
+    when: "成功確認(『訂單已寄送』『付款完成』『5 筆資料已匯入』)"
+    world-class: ["Polaris Toast success", "Linear toast success", "Stripe payment success"]
+  warning:
+    when: "可恢復警告(『有未儲存變更』『連線不穩』『token 將過期』)"
+    world-class: ["Ant notification warning", "Carbon Notification warning"]
+  error:
+    when: "錯誤(『匯入失敗』『權限不足』『網路斷線』);action prop 可加重試"
+    world-class: ["Polaris Toast error", "Material Snackbar error", "Linear toast error"]
 sizes: {}
 benchmark:
   - Radix Toast primitive: github.com/radix-ui/primitives/tree/main/packages/react/toast

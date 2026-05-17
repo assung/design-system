@@ -668,7 +668,7 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 
 | Token | 語意 | 典型場景 |
 |-------|------|---------|
-| `bg-muted`（neutral-2） | **存在但不可互動 / 退化** — 元素處於 placeholder、locked、或 disabled-like 狀態 | Skeleton 載入佔位、disabled 背景、Linear-style upcoming（鎖住的未來任務） |
+| `bg-muted`（neutral-2） | **靜態非互動 surface** — 退化 / placeholder / locked 視覺 | Skeleton 載入佔位、table header、tab 容器、code block、Linear-style upcoming（鎖住的未來任務）、DataTable filter-panel inner group container。**注意**:component-level disabled state（Button / Input / Checkbox 等元件 disabled bg）走 `--bg-disabled` semantic 不是 `--muted`(同值 neutral-2 但不同 owner — `--bg-disabled` 是 component-state token,`--muted` 是 surface-non-interactive token,per L169「同值不同語意拆 token」rule)|
 | `bg-secondary`（neutral-3） | **存在且微淡可辨** — 元素是正常狀態，但需要退後一級 | Tag neutral、Slider track rest、FileItem progress track、非線性 upcoming 圓圈、Badge low |
 
 **判斷法**：「這個元素是『還沒準備好 / 不可操作』嗎？」

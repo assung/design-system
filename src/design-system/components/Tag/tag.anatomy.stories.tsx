@@ -1,3 +1,4 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // @anatomy-rationale:
 //   StateBehavior covered by ColorMatrix「Dismiss 按鈕色彩」段(default /
 //     hover / active × subtle / solid 兩模式)。Tag 本身是非互動展示元件
@@ -220,7 +221,7 @@ export const Overview = {
         <div className="flex flex-col gap-2">
           {VARIANTS.map((v) => (
             <div key={v} className="flex items-center gap-4">
-              <div className="w-28 shrink-0"><Tag variant={v}>Label</Tag></div>
+              <div className="w-28 shrink-0"><Tag color={v}>Design</Tag></div>
               <span className="text-caption text-fg-secondary">{VARIANT_DESC[v]}</span>
             </div>
           ))}
@@ -311,7 +312,7 @@ const InspectorInner = () => {
         <div className="flex flex-col gap-5 min-w-[340px]">
           <div className="px-10 py-8 rounded-lg bg-canvas border border-divider flex items-center justify-center">
             <Tag
-              variant={variant}
+              color={variant}
               size={size}
               icon={withIcon ? Hash : undefined}
               onDismiss={withDismiss ? () => {} : undefined}
@@ -453,7 +454,7 @@ export const ColorMatrix = {
                   <tr key={v}>
                     <td className="p-3 border-b border-divider font-mono text-caption font-medium align-middle">{v}</td>
                     <td className="p-3 border-b border-divider align-middle">
-                      <Tag variant={v} icon={Hash}>Label</Tag>
+                      <Tag color={v} icon={Hash}>Frontend</Tag>
                     </td>
                     <td className="p-3 border-b border-divider align-middle">
                       <span className="inline-flex items-center gap-1.5 text-[11px]">
@@ -495,7 +496,7 @@ export const ColorMatrix = {
                   <tr key={v}>
                     <td className="p-3 border-b border-divider font-mono text-caption font-medium align-middle">{v}</td>
                     <td className="p-3 border-b border-divider align-middle">
-                      <Tag variant={v} icon={Hash} solid>Label</Tag>
+                      <Tag color={v} icon={Hash} solid>Bug</Tag>
                     </td>
                     <td className="p-3 border-b border-divider align-middle">
                       <span className="inline-flex items-center gap-1.5 text-[11px]">
@@ -624,13 +625,13 @@ export const SizeMatrix = {
                 <tr key={v}>
                   <Td mono>{v}</Td>
                   {SIZES.map((sz) => (
-                    <Td key={sz}><Tag variant={v} size={sz}>Label</Tag></Td>
+                    <Td key={sz}><Tag color={v} size={sz}>Done</Tag></Td>
                   ))}
                   {SIZES.map((sz) => (
-                    <Td key={`icon-${sz}`}><Tag variant={v} size={sz} icon={Hash}>Label</Tag></Td>
+                    <Td key={`icon-${sz}`}><Tag color={v} size={sz} icon={Hash}>API</Tag></Td>
                   ))}
                   {SIZES.map((sz) => (
-                    <Td key={`dismiss-${sz}`}><Tag variant={v} size={sz} onDismiss={() => {}}>Label</Tag></Td>
+                    <Td key={`dismiss-${sz}`}><Tag color={v} size={sz} onDismiss={() => {}}>Review</Tag></Td>
                   ))}
                 </tr>
               ))}

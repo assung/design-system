@@ -2,7 +2,23 @@
 component: SegmentedControl
 family: null
 variants: {}
-sizes: {}
+sizes:
+  xs:
+    px: 24
+    when: "row-embedded inline action(DataTable row inline action / Toolbar 內塞 segmented filter);text-caption"
+    world-class: ["Ant Segmented size=small(28)", "Atlassian Toggle compact"]
+  sm:
+    px: 28
+    when: "form field-height 28 / compact chrome bar(Filter bar / dense Toolbar)"
+    world-class: ["Ant Segmented size=small", "Material ToggleButtonGroup size=small"]
+  md:
+    px: 32
+    when: "預設 — 跟 Button / Input / 所有 field-height 系列一致;通用 form 內 toggle"
+    world-class: ["Ant Segmented default", "Material ToggleButtonGroup default", "Carbon ContentSwitcher default"]
+  lg:
+    px: 36
+    when: "touch / prominent 切換(landing 主視覺切 chart 維度、marketing form);text-body-lg"
+    world-class: ["Ant Segmented size=large", "Material ToggleButtonGroup size=large"]
 traits:
   - hasSizes
   - hasInteractiveStates
@@ -262,3 +278,9 @@ Items 之間 `-ml-px`（除了第一個）讓相鄰 border 重疊、視覺上只
 - `radio-group.spec.md`
 - `select.spec.md`
 - `slider.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `horizontal-overflow.spec.md`

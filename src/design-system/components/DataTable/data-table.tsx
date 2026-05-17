@@ -15,8 +15,9 @@ import {
   type Column,
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { TableScrollProvider } from '@/design-system/components/Field/field-context'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { ChevronDown, Calendar, Clock, ArrowUp, ArrowDown, ArrowUpDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
+import { ChevronDown, ArrowUp, ArrowDown, ArrowUpDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
 // **v15.0 Path B**(對齊 user 「source 留原位 / indicator 為 drop preview / 不 auto-shift」directive):
 // 砍 useSortable + SortableContext 用 useDraggable + useDroppable 分離 hooks(對齊 DS 內 TreeView SSOT)。
 import { DndContext, DragOverlay, useDraggable, useDroppable, useDndContext, pointerWithin, rectIntersection, useSensor, useSensors, PointerSensor, KeyboardSensor, MeasuringStrategy, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
@@ -25,9 +26,10 @@ import { dragSourceStyle, dropIndicatorRow, dropIndicatorColumn, dragActiveCurso
 import { nakedCellEditableDisplayHover } from '@/design-system/components/Field/field-wrapper'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
-import { ItemInlineActionButton, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { columnTypeDefaults, type ColumnType } from './column-types'
 import { resolveCellComponent } from './cell-registry'
+import { DataTableInteractionLayer } from './data-table-interaction-layer'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
@@ -64,10 +66,58 @@ export interface DataTableProps<TData>
   estimateRowHeight?: number
   tableOptions?: Partial<Omit<TableOptions<TData>, 'data' | 'columns' | 'getCoreRowModel'>>
   rowActions?: (row: TData) => React.ReactNode
+  /**
+   * Issue 9 cell error system(2026-05-10)。
+   *
+   * Map of `${rowId}:${colId}` → error message(string | string[])。Cell display mode 在 content
+   * 下方渲 `text-body text-error` 訊息,gap-1 spacing。Multi-error 用 array → ul / li 分行渲。
+   *
+   * **使用建議**:
+   *   - 搭配 `autoRowHeight` prop:cell error 訊息 wrap → row 自動拉高吸收。fixed 高 row 模式
+   *     error 訊息會被裁切(consumer 應 set autoRowHeight=true 給有 error 的 use case)。
+   *   - Edit cell 自動 clear 自己的 error(展開 portal Field 時消失,新值 commit 由 consumer
+   *     onCellCommit 驗證後決定 set / clear)。
+   *   - aria-describedby:cell wrapper 接 error message id,AT 讀 cell 內容後讀 error。
+   *
+   * 對齊 AG Grid `cellClassRules='ag-cell-error'` + Material X-DataGrid `errorMessage` cell prop +
+   * Airtable record validation idiom。
+   */
+  cellErrors?: Record<string, string | string[]>
   pinnedLeftColumns?: string[]
   pinnedRightColumns?: string[]
   /** Inline edit 視覺模式：body cell 間加垂直分隔線，select 類欄位顯示指示器 */
   inlineEdit?: boolean
+  /**
+   * Slice D Step 1B(2026-05-10):啟用 spreadsheet-grade interaction overlay。
+   * Default false(backward-compat)。Enable 後 hover/editor/selected/range 由
+   * `DataTableInteractionLayer` overlay 統一畫,per `.claude/planning/datatable-spreadsheet-rfc.md`。
+   * 漸進切換階段,當前 v1 minimal:hover overlay 1 layer。
+   */
+  experimentalSpreadsheetOverlay?: boolean
+  /**
+   * Slice D Step 3.2(2026-05-10):啟用 ActiveEditorController portal Field。
+   * Default false(backward-compat)。
+   * Enable 後 active edit cell 不 render Field inline,改 portal 進 overlay layer
+   * (per RFC Contract 8 「one geometry, two paint owners」)。
+   * 當前 scaffold:prop 已收,functional portal logic Step 3.3 實作。
+   * Per codex Q-7 string-first canary:string cell first,picker types 漸進。
+   */
+  experimentalActiveEditorController?: boolean
+  /**
+   * Slice D Step 4(spreadsheet semantics,2026-05-10 user 拍板 + codex Layer B Q2.1 confirm):
+   * Excel-like cell selection:click 1=select / click 2=edit / Shift+click=range。
+   * Default false opt-in(per codex「DataTable is not a spreadsheet」既有原則 +
+   * data-table.principles.stories.tsx L283-292)。
+   * Enable 後 inlineEdit cell click 行為:
+   *   - Plain click → setSelectedCellId,**不**進 edit mode
+   *   - Click on already-selected → enter edit
+   *   - Shift+click → extend range from anchor
+   *   - Double-click / Enter / F2 / printable(deferred) → enter edit on selected
+   *   - Click empty area → clear selection
+   * 視覺:Layer 渲 SelectionRect(solid `--primary` 2px border)+ RangeRect
+   *   (`--primary-subtle` bg fill)— per user「不要 dash 直接實的就好」+ codex Q2.2 token。
+   */
+  spreadsheetMode?: boolean
 
   // ── L2 Selection(see data-table.spec.md「L2 選取」)──
   /** 已選 row IDs(controlled) */
@@ -522,6 +572,7 @@ function DraggableHeaderCell({
  *  - Button variant="tertiary" iconOnly size="xs"(24px chip)
  *  - 任何 row drag 進行時(activeDragId != null)整體隱藏 — 對齊 user directive:
  *    drag 期間「INDICATOR + GHOST」就夠了,所有 row 不顯 hover bg / drag button */
+// code-quality-allow: long-function — Portal escape + cross-region hover delegation + MutationObserver + scroll-tracking 4 mechanism 結合在 RowDragHandle 內;每 mechanism 獨立 hook 會破壞 row context coupling
 function RowDragHandle({ disabled, anyDragActive }: { disabled: boolean; anyDragActive: boolean }) {
   const ctx = React.useContext(SortableRowCtx)
   const [rowEl, setRowEl] = React.useState<HTMLDivElement | null>(null)
@@ -566,12 +617,23 @@ function RowDragHandle({ disabled, anyDragActive }: { disabled: boolean; anyDrag
     observer.observe(rowEl, { attributes: true, attributeFilter: ['data-hovered'] })
 
     // Update on scroll(capture phase 抓所有 scroll container)+ resize
-    const onScroll = () => requestAnimationFrame(update)
+    // 2026-05-16 Round 5 codex audit fix:capture rAF ID + cancel on cleanup(原 uncancelled
+    // rAF 在 unmount 後可能 fire `update` → setPos on stale ref。Same race-pattern class as
+    // useOverflowCount fix `combobox.tsx:130`)。
+    let scrollRafId = 0
+    const onScroll = () => {
+      if (scrollRafId) cancelAnimationFrame(scrollRafId)
+      scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = 0
+        update()
+      })
+    }
     window.addEventListener('scroll', onScroll, true)
     window.addEventListener('resize', onScroll)
 
     return () => {
       observer.disconnect()
+      if (scrollRafId) cancelAnimationFrame(scrollRafId)
       window.removeEventListener('scroll', onScroll, true)
       window.removeEventListener('resize', onScroll)
     }
@@ -601,12 +663,15 @@ function RowDragHandle({ disabled, anyDragActive }: { disabled: boolean; anyDrag
   //                  其他 row 的 button 隱藏(由 anyDragActive guard)
   const visible = ctx.isDragging || (!anyDragActive && (pos.rowHovered || buttonHovered))
 
+  // 2026-05-12 fix(user 抓 image 1):
+  //   (a) tooltip 偶爾不出 — root cause:`disabled={!canDrag}` HTML attribute 阻 pointer events
+  //       → Radix Tooltip pointerenter 不 fire → tooltip 不 trigger。Fix:改 `aria-disabled`
+  //       only(Button cva 已 handle disabled visual via aria-disabled),pointer events 仍 fire,
+  //       Tooltip stable trigger。
+  //   (b) drag button bg 透明蓋不住 row content — 加 `bg-surface-raised` overlay。
+  //   (c) source row drag button 在 drag 中應 dimmed visual — `isDragging` 加 `opacity-disabled`。
   const handle = (
     <Button
-      // **v15.6 button-only drag activator**:
-      //   ref → setActivatorNodeRef(button DOM = 24×24 portal'd)
-      //   listeners + attributes → spread(button 是 drag activator)
-      //   pointer-events: visible=auto → 接 pointer events 觸發 drag
       ref={canDrag ? ctx.handleSetActivatorNodeRef : undefined}
       variant="tertiary"
       iconOnly
@@ -615,7 +680,8 @@ function RowDragHandle({ disabled, anyDragActive }: { disabled: boolean; anyDrag
       aria-label={canDrag ? '拖曳重排此列' : '排序中無法拖曳'}
       aria-disabled={!canDrag || undefined}
       tabIndex={canDrag ? 0 : -1}
-      disabled={!canDrag}
+      // 2026-05-12 fix(a):移除 disabled HTML attr(改 aria-disabled);pointer events 必 fire 才能
+      // 接 Tooltip pointerenter。Button cva 已 handle aria-disabled visual styling。
       onMouseEnter={() => setButtonHovered(true)}
       onMouseLeave={() => setButtonHovered(false)}
       style={{
@@ -624,18 +690,31 @@ function RowDragHandle({ disabled, anyDragActive }: { disabled: boolean; anyDrag
         left: pos.left,
         transform: 'translate(-50%, -50%)',
         zIndex: 50,
-        opacity: visible ? 1 : 0,
-        // visible=true → auto(接 pointer events 觸發 drag activator);invisible → none(避免 click 落空)
+        // 2026-05-12 fix v2(user 抓「drag column sort 啟用時 button 不是 disable 視覺」):
+        // 前 Round 4.5 加 `aria-disabled:opacity-[var(--opacity-disabled)]` 在 Button cva
+        // 沒生效 — 因為 inline style `opacity` 永遠 win over Tailwind class。Fix:把 disabled
+        // state opacity 也 compute 進 inline style。priority order:invisible 0 → drag 0.5 →
+        // canDrag=false(sort active)disabled visual var(--opacity-disabled) 0.45 → idle 1。
+        opacity: visible
+          ? (ctx.isDragging ? 0.5 : (canDrag ? 1 : 'var(--opacity-disabled)' as unknown as number))
+          : 0,
         pointerEvents: visible ? 'auto' : 'none',
         transition: 'opacity 150ms ease',
       }}
       className={cn(
-        // **v15.7 cursor canonical**(對齊 user directive「拖動時 cursor 不要變 grabbing」):
-        // 只 hover 時 cursor-grab 提示「可拖」,drag 期間維持 cursor-grab 不變 grabbing
-        // (對齊 Material / Carbon / Polaris canonical:drag affordance 由 visible button 提供,
-        // cursor 變化反而干擾 indicator+ghost 視覺焦點)。
+        // 2026-05-12 debug fix(user 抓「hover 還是透明」)— Round 4.5 我未授權加
+        // `border / shadow / hover:bg-neutral-hover` = over-design + hover override 讓
+        // drag button hover bg 變 neutral-hover 跟 row hover bg 同色 → 視覺融入 row = 透明。
+        // 撤回:**只保 bg-surface-raised(idle + hover + 所有 state 都同 bg)**,
+        // border / shadow / hover override 全 retire(user verbatim「我有叫你加 elevation 嗎」)。
+        // 對所有 state(idle / hover / aria-disabled / data-state)套同 bg-surface-raised — 跟
+        // row 任何 state 視覺都有 token-level 對比(在 token 差異存在的 mode;light mode --surface-raised
+        // 等於 --surface 是 design token semantic,非本 fix scope)。
+        'bg-surface-raised hover:bg-surface-raised aria-disabled:bg-surface-raised',
         canDrag && !showInvalid && 'cursor-grab',
         canDrag && showInvalid && 'cursor-not-allowed !text-error !border-error',
+        // drag 進行中 source button cursor(opacity 0.5 via style;aria-disabled visual 由 Button cva 接管)
+        ctx.isDragging && 'cursor-grabbing',
       )}
       {...(canDrag ? ctx.handleListeners ?? {} : {})}
       {...(canDrag ? ctx.handleAttributes ?? {} : {})}
@@ -678,7 +757,7 @@ function DataTableInner<TData>(
   {
     columns, data, size = 'md', autoRowHeight = false, height = '400px',
     overscan = 5, emptyState, enableHover = true, bordered,
-    estimateRowHeight, tableOptions, rowActions,
+    estimateRowHeight, tableOptions, rowActions, cellErrors,
     pinnedLeftColumns, pinnedRightColumns, inlineEdit = false,
     selection: selectionProp, defaultSelection, onSelectionChange,
     selectable = false, isRowSelectable, getRowId, getRowAriaLabel,
@@ -693,6 +772,9 @@ function DataTableInner<TData>(
     onColumnResize,
     enableColumnReorder = false,
     onColumnReorder,
+    experimentalSpreadsheetOverlay = false,
+    experimentalActiveEditorController = false,
+    spreadsheetMode = false,
     className, ...props
   }: DataTableProps<TData>,
   ref: React.ForwardedRef<HTMLDivElement>
@@ -700,11 +782,48 @@ function DataTableInner<TData>(
   // ── L4 Inline edit state ──
   // editingCellId: `${rowId}__${columnId}` 標識當前進 edit mode 的 cell;null = 無
   const [editingCellId, setEditingCellId] = React.useState<string | null>(null)
-  const exitEdit = React.useCallback(() => setEditingCellId(null), [])
+  // Phase 7 D.3 portal Field virtualizer unmount preserve draft(2026-05-10 per codex Q-B4 verdict):
+  // Lifted draft state in DataTable — Cell DOM unmount(virtualizer scroll out)時 draft 不丟,
+  // mount-back 時 portal Field value=draft 而非 row.value,user 編輯中字保留。
+  // editingCellId 變時 useEffect reset draft 到新 cell row.value(全新 edit session)。
+  const [editingDraft, setEditingDraft] = React.useState<unknown>(undefined)
+  const exitEdit = React.useCallback(() => {
+    setEditingCellId(null)
+    setEditingDraft(undefined)
+  }, [])
+
+  // ── Slice D Step 4 spreadsheet semantics state(2026-05-10) ──
+  // selectedCellId:`${rowId}:${colId}` Excel-like 選取(click 1)
+  // rangeAnchor / rangeFocus:Shift+click range 起點 / 終點(rectangle from anchor↔focus)
+  const [selectedCellId, setSelectedCellId] = React.useState<string | null>(null)
+  const [rangeAnchor, setRangeAnchor] = React.useState<string | null>(null)
+  const [rangeFocus, setRangeFocus] = React.useState<string | null>(null)
+  // tableRef declared below (line 967) — click-outside effect 在 tableRef ready 後 wire,
+  // 為避免 ordering 問題用 forwarded ref query via DOM `[data-data-table-outer]`。
+  // 2026-05-12 click-outside canonical(user 抓「選完 range 後點任何地方該清掉 / 選 cell 後點別處該取消」):
+  // 對齊 Excel / Google Sheets / Notion / Airtable cell-selection canonical — pointerdown 落在
+  // table outer 外 → clear selection + range。內 cell click 由 onClick 自處理(不衝突)。
+  React.useEffect(() => {
+    if (!spreadsheetMode) return
+    if (selectedCellId == null && rangeAnchor == null) return
+    const handler = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null
+      if (!target) return
+      // 點 table outer 外 → clear all selection
+      if (!target.closest('[data-data-table-outer]')) {
+        setSelectedCellId(null)
+        setRangeAnchor(null)
+        setRangeFocus(null)
+      }
+    }
+    document.addEventListener('pointerdown', handler, true)
+    return () => document.removeEventListener('pointerdown', handler, true)
+  }, [spreadsheetMode, selectedCellId, rangeAnchor])
   const commitCell = React.useCallback(
     (rowId: string, colId: string, next: unknown) => {
       onCellCommit?.(rowId, colId, next)
       setEditingCellId(null)
+      setEditingDraft(undefined)  // Phase 7:commit 後清 draft
     },
     [onCellCommit],
   )
@@ -718,6 +837,29 @@ function DataTableInner<TData>(
       return e === true
     },
     [],
+  )
+  // 2026-05-13 Stream C Cluster B Q3 ship(per codex Q3 verdict + user 拍板「全部馬不停蹄做完」):
+  // Mirror isCellEditable pattern。`column.meta.disabled` 接 bool 或 (row) => boolean fn。
+  // cell disabled → (a) TD 加 `bg-disabled cursor-not-allowed` + 抑制 hover, (b) inner Field
+  // 透過 isDisabled prop 走 mode='disabled'(各 Field type 內部具體 disabled token,非 wrapper blanket opacity),
+  // (c) edit entry condition: `cellEditable && !cellDisabled`。
+  const isCellDisabled = React.useCallback(
+    // any-allow: free-form consumer meta — same rationale as L143 renderTypedValue
+    (meta: Record<string, any> | undefined, row: unknown): boolean => {
+      const d = meta?.disabled
+      if (typeof d === 'function') return d(row) === true
+      return d === true
+    },
+    [],
+  )
+  // 2026-05-13:canEditCell helper consolidation(per codex V4 follow-up + user「沒理由不做」拍板)
+  // 抽 4-site repeated `editable && !disabled` pattern。3 path sites(keyboard / Tab / InteractionLayer)
+  // call canEditCell;另 2 sites(renderCellContent + onEditableCellClick)用 already-computed `editable`/
+  // `disabled` 變數(因為 disabled 還要單獨給 isDisabled prop + bg-disabled class),不 collapse to helper。
+  const canEditCell = React.useCallback(
+    (meta: Record<string, unknown> | undefined, row: unknown): boolean =>
+      isCellEditable(meta, row) && !isCellDisabled(meta, row),
+    [isCellEditable, isCellDisabled],
   )
   const [sorting, setSorting] = React.useState<SortingState>(tableOptions?.state?.sorting as SortingState ?? [])
 
@@ -898,6 +1040,11 @@ function DataTableInner<TData>(
     getScrollElement: () => centerBodyRef.current,
     estimateSize: () => resolvedEstimate,
     overscan: effectiveOverscan, enabled: useVirtual,
+    // 2026-05-14 P3 perf tune(per codex+Layer A 共識,user 拍板「全部做完」+
+    // CPU-throttle-reproducible verify infra):150ms → 250ms 減少 scroll
+    // start/end flip 次數 → TableScrollContext 重 cascade visible rich cell
+    // tree 機會降低。對齊 TanStack Virtual `isScrollingResetDelay` API。
+    isScrollingResetDelay: 250,
   })
 
   // ── isFillHeight body maxHeight JS 計算(2026-04-30)──
@@ -914,19 +1061,53 @@ function DataTableInner<TData>(
   const [bodyMaxHeight, setBodyMaxHeight] = React.useState<number | null>(null)
   React.useLayoutEffect(() => {
     if (!isFillHeight) { setBodyMaxHeight(null); return }
+    // **R4 真根因 fix(2026-05-09 v2 — codex Q3.6 root cause + Q3.9 reproduce verified)**:
+    //
+    // Bug:isFillHeight 時 outer 用 `style={{ maxHeight: height }}`(L1819-1824)沒 explicit height
+    // → outer.getBoundingClientRect().height 受 children 反向影響(因 outer = children intrinsic,
+    // children 又被 bodyMaxHeight 限制)→ **circular dependency**。
+    //
+    // 表現:viewport / layout 變化時 parent 變(392→672)但 outer 永遠卡(282)→ body 永遠 240,
+    // 不跟 parent 變大時填滿。Initial mount 過程則看起來像 stepping(parent 從 0 慢慢長,outer 跟著
+    // 一階一階長)。
+    //
+    // 真 fix:**改量 parent slot,不量 outer**。Parent 是 definite height 限制因子,不被 child 反向影響。
+    //   - rAF coalesce:RO callback 多次觸發 → 1 frame 內只 compute 1 次(降頻,防 RO 連續 fire redundant)
+    //   - diff guard:< 1px 不 setState(防 micro-step)
+    //   - **observe parent 而非 self**(打破 circular)
+    //
+    // Codex root cause cite:circular feedback `tableRef.height ↔ bodyMaxHeight ↔ body layout ↔ tableRef.height`
+    // Reproduce verified:viewport 1280→1920→900,parentH 392/672/292 變化,但 a524e03 fix 下 bodyRectH 永遠 240。
+    let rafId: number | null = null
+    let lastValue: number | null = null
     const compute = () => {
       if (!tableRef.current) return
-      const outerH = tableRef.current.getBoundingClientRect().height
+      // ⭐ 量 parent slot(definite height,不受 child 反向影響),fallback 用 outer
+      const parentEl = tableRef.current.parentElement
+      const slotH = parentEl?.getBoundingClientRect().height
+                ?? tableRef.current.getBoundingClientRect().height
       const headerEl = tableRef.current.firstElementChild as HTMLElement | null
       const headerH = headerEl?.getBoundingClientRect().height ?? 0
-      setBodyMaxHeight(Math.max(0, outerH - headerH))
+      const next = Math.max(0, slotH - headerH)
+      if (lastValue != null && Math.abs(next - lastValue) < 1) return
+      lastValue = next
+      setBodyMaxHeight(next)
     }
-    compute()
-    const obs = new ResizeObserver(compute)
-    if (tableRef.current) obs.observe(tableRef.current)
-    // outer 也跟 parent 大小變化(parent flex-1 縮)
+    const scheduleCompute = () => {
+      if (rafId != null) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        compute()
+      })
+    }
+    compute() // initial sync(cap 帶值,避 first paint blank)
+    // ⭐ 只 observe parent,不 observe tableRef(打破 circular)
+    const obs = new ResizeObserver(scheduleCompute)
     if (tableRef.current?.parentElement) obs.observe(tableRef.current.parentElement)
-    return () => obs.disconnect()
+    return () => {
+      obs.disconnect()
+      if (rafId != null) cancelAnimationFrame(rafId)
+    }
   }, [isFillHeight])
 
   // JS scroll sync(AR44 user-reported UX fix):
@@ -943,6 +1124,43 @@ function DataTableInner<TData>(
     if (leftBodyRef.current) leftBodyRef.current.scrollTop = cb.scrollTop
     if (rightBodyRef.current) rightBodyRef.current.scrollTop = cb.scrollTop
   }, [])
+
+  // ── Phase 9 Issue 1 fix(2026-05-10):range cells lifted compute + Set ────
+  // 計算 spreadsheet range cell IDs(Shift+click rectangle from anchor↔focus),
+  // 提供:
+  //   1. `rangeCellIds` array → pass to layer for outer ring 4 line div boundary
+  //   2. `rangeCellIdSet` Set → cell wrapper data-range-cell attr for cell-bg fill
+  //      (per codex Q1 verdict:bg fill 移到 cell bg layer 不在 overlay,內容才不被蓋)
+  const rangeCellIds = React.useMemo<string[] | undefined>(() => {
+    if (!spreadsheetMode || !rangeAnchor || !rangeFocus || rangeAnchor === rangeFocus) return undefined
+    const parseCell = (id: string) => {
+      const lastColon = id.lastIndexOf(':')
+      return { rowId: id.slice(0, lastColon), colId: id.slice(lastColon + 1) }
+    }
+    const a = parseCell(rangeAnchor)
+    const f = parseCell(rangeFocus)
+    const allRows = table.getRowModel().rows.map((r) => r.id)
+    const allCols = table.getVisibleLeafColumns().map((c) => c.id).filter((id) => id !== SELECT_COL_ID)
+    const aRowIdx = allRows.indexOf(a.rowId)
+    const fRowIdx = allRows.indexOf(f.rowId)
+    const aColIdx = allCols.indexOf(a.colId)
+    const fColIdx = allCols.indexOf(f.colId)
+    if (aRowIdx < 0 || fRowIdx < 0 || aColIdx < 0 || fColIdx < 0) return undefined
+    const rowStart = Math.min(aRowIdx, fRowIdx)
+    const rowEnd = Math.max(aRowIdx, fRowIdx)
+    const colStart = Math.min(aColIdx, fColIdx)
+    const colEnd = Math.max(aColIdx, fColIdx)
+    const ids: string[] = []
+    for (let r = rowStart; r <= rowEnd; r++) {
+      for (let c = colStart; c <= colEnd; c++) {
+        ids.push(`${allRows[r]}:${allCols[c]}`)
+      }
+    }
+    return ids
+    // any-allow: react-table runtime lookup
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spreadsheetMode, rangeAnchor, rangeFocus, table])
+  const rangeCellIdSet = React.useMemo(() => new Set(rangeCellIds || []), [rangeCellIds])
 
   // 三區域欄位
   const leftCols = table.getLeftVisibleLeafColumns()
@@ -1017,17 +1235,27 @@ function DataTableInner<TData>(
     const wrap = autoRowHeight && meta?.wrap === true
     // 已知 compound 欄位(Tag / PersonDisplay / LinkInput 等自帶 layout)直接 bypass TruncateCell,
     // 因為 `truncate` 的 inline baseline context 會破壞自訂 layout 的垂直對齊。
-    const isKnownCompound = colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson' || colType === 'url'
+    // 2026-05-09 D-path:date / time 加入(showDisplayEndIcon → Field naked-display 需 full width 才能
+    //   右對齊 ItemSuffix。TruncateCell 的 `<span truncate min-w-0>` block-display 會 collapse Field
+    //   to content size,讓 Calendar / Clock icon 緊貼 value text 而非右邊緣)。
+    const isKnownCompound = colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson' || colType === 'url' || colType === 'date' || colType === 'time'
     const rowId = cell.row.id
     const colId = cell.column.id
     const editable = isCellEditable(meta, cell.row.original)
+    const disabled = isCellDisabled(meta, cell.row.original)
     const isEditingThisCell = editingCellId === cellEditId(rowId, colId)
 
     let content: React.ReactNode
     if (colType) {
       const Cell = resolveCellComponent(colType)
-      // boolean 不分 mode(editable 時 Checkbox 直接可 toggle);其他 type 由 isEditingThisCell 切 mode
-      const cellMode: 'edit' | 'display' = isEditingThisCell ? 'edit' : 'display'
+      // 2026-05-10 Slice D Step 5(D.3 portal Field):當 portal flag 啟 + cell 編輯中 →
+      // cell 保持 display mode(SSOT preserved per codex Q6.2),portal layer 渲 edit Field 在上。
+      // 預設 inline-edit:isEditingThisCell ? edit : display。
+      // 2026-05-13 Q3 cell-disabled:disabled cell 永遠 display lifecycle(state overlay,不進 edit)。
+      const cellMode: 'edit' | 'display' =
+        (experimentalActiveEditorController && isEditingThisCell)
+          ? 'display'
+          : (isEditingThisCell && !disabled) ? 'edit' : 'display'
       content = (
         <Cell
           value={cell.getValue()}
@@ -1036,10 +1264,11 @@ function DataTableInner<TData>(
           size={size}
           autoRowHeight={autoRowHeight}
           isEditable={editable}
+          isDisabled={disabled}
           onCommit={(next) => commitCell(rowId, colId, next)}
           onCommitLive={(next) => onCellCommit?.(rowId, colId, next)}
           onCancel={exitEdit}
-          onRequestEdit={() => setEditingCellId(cellEditId(rowId, colId))}
+          onRequestEdit={() => !disabled && setEditingCellId(cellEditId(rowId, colId))}
         />
       )
     } else {
@@ -1061,30 +1290,13 @@ function DataTableInner<TData>(
 
   const iconSize = size === 'lg' ? 20 : 16
 
-  // Inline edit 指示器 — 永遠顯示 canonical(2026-05-05 user explicit:不要 hover-reveal):
-  //   editable cell 永遠顯示對應 type 的指示型 icon(chevron / Calendar / Clock),提示「可編輯」。
-  //   只在 cellEditable=true 才 render(由 caller `cellEl` gating);non-editable cell 無 indicator。
-  //   editing 時 hide(避免跟 Field control 自帶 trigger icon 衝突 → 雙 icon)。
-  //   對齊 Airtable / Notion editable cell hint canonical — 永遠顯示維持互動可發現性。
-  // Display-mode editable cell indicator(對齊 Notion / Airtable / Linear common idiom):
-  //   editable cell display 永遠顯示「點擊觸發浮層」icon(chevron / calendar / clock),用戶
-  //   一眼識別「這 cell 可編」。**包 `<ItemSuffix>` 消費 row-layout L1 SSOT**(永遠 h-[1lh],
-  //   單行視覺 = items-center,autoRow 多行 pin first-line) — 解 v8 前 chevron 齊頂 bug。
-  //   URL column 屬 hover-pencil 例外(URL 本身 click=導航,需保留;edit 走 hover affordance)。
-  const getEditIndicator = (colType?: ColumnType) => {
-    if (!inlineEdit) return null
-    const Icon =
-      (colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson') ? ChevronDown
-      : colType === 'date' ? Calendar
-      : colType === 'time' ? Clock
-      : null
-    if (!Icon) return null
-    return (
-      <ItemSuffix className="text-fg-muted">
-        <Icon size={iconSize} aria-hidden />
-      </ItemSuffix>
-    )
-  }
+  // 2026-05-09 D-path retired:`getEditIndicator(colType)` parallel system 移除。
+  // Indicator authority 從 DataTable cellEl 移交 **Field naked-display branch via `showDisplayEndIcon` opt-in**
+  //   — Select / TimePicker / DatePicker / Combobox / PeoplePicker 5 picker 的 display mode 內建
+  //   `<ItemSuffix>` 渲對應 trigger icon(同 edit DOM 結構)。LinkInput URL anchor 例外(無 suffix)。
+  // SSOT chain:cell-registry.tsx(opt-in props)→ Field component(intrinsic icon + ItemSuffix DOM)→
+  //   item-anatomy ItemPrefix/ItemSuffix layout SSOT。詳 `.claude/planning/cell-indicator-ssot-rfc.md`。
+  // 不再有 DataTable-level cell indicator code path — 跨元件 SSOT 對齊 Field family。
 
   // L4 row drag:sort active 時 drag handle disabled(對齊 Notion / Airtable 共識)
   const dragDisabled = sorting.length > 0
@@ -1114,11 +1326,12 @@ function DataTableInner<TData>(
     if (enableRowDrag && useVirtual) virtualizer.measure()
   }, [activeDragId, enableRowDrag, useVirtual, virtualizer])
   const [invalidDropActive, setInvalidDropActive] = React.useState(false)
+  // code-quality-allow: long-function — audit 誤偵測 invalidRef 為 function;真實 long-function = 下方 cellEl(L1334+,已標 markers per L1336)。type-shadow,不需 refactor
   const invalidRef = React.useRef(false)
   invalidRef.current = invalidDropActive
 
   // code-quality-allow: long-function — cell render 含 selection / pinned / type-aware formatter 三邏輯,拆會增 prop drilling
-  const cellEl = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number], isLastInRow = false) => {
+  const cellEl = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number], _isLastInRow = false) => {
     // L2 selection:__select__ 欄自訂 render
     // multi 模式 → Checkbox(可多選)
     // single 模式 → Radio(單選 visual,對齊 Material DataGrid / Polaris IndexTable canonical)
@@ -1139,6 +1352,11 @@ function DataTableInner<TData>(
         <div
           key={cell.id}
           role="cell"
+          // data-column-id 給 CSS scope:`[data-column-id="__select__"]` 在 data-table.css 加
+          // border-right divider,視覺把 system selection col 跟 data col 切開(Notion / Airtable
+          // / Linear idiom)。**只有 inlineEdit + selectable 模式且 select 不在 leftBody 邊界時** style
+          // 才生效(避免雙線)— CSS 用 `:not(:last-child)` selector 處理。
+          data-column-id={SELECT_COL_ID}
           className={cn('flex items-center justify-center shrink-0', !isDisabled && 'cursor-pointer')}
           style={{ ...columnSizeStyle(cell.column, { resize: enableColumnResize, isSystemCol: isSystemColumn(cell.column.id) }), ...cellPadding }}
           onClick={onCellClick}
@@ -1182,16 +1400,49 @@ function DataTableInner<TData>(
     const cellRowId = cell.row.id
     const cellColId = cell.column.id
     const cellEditable = isCellEditable(meta, cell.row.original)
+    const cellDisabled = isCellDisabled(meta, cell.row.original)
     const isEditingThisCell = editingCellId === cellEditId(cellRowId, cellColId)
-    // Indicator canonical(2026-05-05):
-    //   - 永遠顯示(user explicit:不要 hover-reveal)— 對齊 Airtable / Notion editable cell 永遠 hint 可編輯性
-    //   - 只在 cellEditable 才顯示(non-editable cell 無 indicator)— user explicit
-    //   - editing 時 hide(避免跟 Field control 自帶 trigger icon 衝突 → 雙 icon)
-    //   - SSOT 在 DataTable cellEl,Field component 不渲染 indicator(不重複定義)
-    const indicator = (cellEditable && !isEditingThisCell) ? getEditIndicator(colType) : null
+    // Indicator canonical(2026-05-09 D-path retire):**Field naked-display branch own** via
+    //   `showDisplayEndIcon` opt-in(per-picker `<ItemSuffix>` 渲 ChevronDown/Calendar/Clock)。
+    //   DataTable cellEl 不再 render parallel indicator — SSOT 對齊 Field family。
+    //   詳 `.claude/planning/cell-indicator-ssot-rfc.md` Step 9。
     // Cell click → 進 edit mode(boolean 不需 — 自己 toggle;url 不需 — 走內部 Pencil button,Phase C 由 UrlCell 內處理)
-    const onEditableCellClick = cellEditable && colType !== 'boolean' && colType !== 'url' && !isEditingThisCell
-      ? () => setEditingCellId(cellEditId(cellRowId, cellColId))
+    const cellSpreadsheetId = `${cellRowId}:${cellColId}`
+    const isSelectedCell = spreadsheetMode && selectedCellId === cellSpreadsheetId
+    // 2026-05-13 Q3:cellDisabled → 抑制 editable click(對齊 `editable && !disabled` invariant)
+    const onEditableCellClick = cellEditable && !cellDisabled && colType !== 'boolean' && colType !== 'url' && !isEditingThisCell
+      ? (e: React.MouseEvent) => {
+        if (spreadsheetMode) {
+          // Slice D Step 4 spreadsheet semantics(2026-05-10 user 拍板,2026-05-12 v2 fix):
+          //   Shift+click → extend range(set focus,**anchor 保持 selectedCellId**)
+          //   Click on already-selected → enter edit
+          //   Plain click → select(no edit)+ reset range to single cell
+          // 2026-05-12 fix(user 抓「世界級設計藍邊框留在第一個選的 cell」):前 v1 setSelectedCellId
+          // 到 focus(終點)→ 藍框跑去終點。Fix:selectedCellId 維持 anchor(起點)— 對齊
+          // Excel / Google Sheets / Notion / Airtable shift-extend canonical(anchor 永遠 own
+          // active-cell border,range 用 fill 視覺)。
+          if (e.shiftKey && rangeAnchor != null) {
+            setRangeFocus(cellSpreadsheetId)
+            // selectedCellId stays at anchor (起點 keep active border canonical)
+            return
+          }
+          if (isSelectedCell) {
+            // 2nd click on already-selected → enter edit(Excel-like)
+            setEditingCellId(cellEditId(cellRowId, cellColId))
+            setSelectedCellId(null)
+            setRangeAnchor(null)
+            setRangeFocus(null)
+            return
+          }
+          // 1st click → select only,no edit
+          setSelectedCellId(cellSpreadsheetId)
+          setRangeAnchor(cellSpreadsheetId)
+          setRangeFocus(null)
+          return
+        }
+        // Default(non-spreadsheet)inline-edit behavior:click → enter edit
+        setEditingCellId(cellEditId(cellRowId, cellColId))
+      }
       : undefined
 
     // L4 nested rows:該 cell 是否是 row 第 1 個非 select content cell(注入 chevron + indent)
@@ -1204,6 +1455,25 @@ function DataTableInner<TData>(
     const isExpanded = cell.row.getIsExpanded?.() ?? false
     const toggleExpand = cell.row.getToggleExpandedHandler?.()
     const showNestedPrefix = isFirstContent && (depth > 0 || canExpand)
+    // Issue 9 cell error(2026-05-10):lookup `${rowId}:${colId}` in cellErrors map
+    // editing cell 自動 clear visual error(per spec 「edit-clears-own-cell」)— consumer 走
+    // onCellCommit 驗證後決定回填新 error(由 consumer 端控制 cellErrors map state)。
+    const rawCellError = cellErrors?.[`${cellRowId}:${cellColId}`]
+    const cellErrorMessages: string[] | null = (() => {
+      if (isEditingThisCell) return null  // edit-clears-own-cell visual
+      if (rawCellError == null) return null
+      return Array.isArray(rawCellError) ? rawCellError : [rawCellError]
+    })()
+    const hasCellError = cellErrorMessages != null && cellErrorMessages.length > 0
+    const cellErrorId = hasCellError ? `cell-err-${cellRowId}-${cellColId}` : undefined
+    // H1 fix(2026-05-10):per-row autoRowHeight when this row has any cell error。
+    // cell-level recompute(O(1) per cell map lookup)— cell-row coupling 透過 row.getVisibleCells()。
+    // Field naked items-X 等 group-data-[row-mode=...] CSS propagation 跟著走。
+    const rowHasAnyError = !!cellErrors && cell.row.getVisibleCells().some((c) => {
+      const v = cellErrors[`${cell.row.id}:${c.column.id}`]
+      return v != null && (Array.isArray(v) ? v.length > 0 : true)
+    })
+    const effectiveAutoRowForCell = autoRowHeight || rowHasAnyError
     return (
       <div
         key={cell.id}
@@ -1211,8 +1481,20 @@ function DataTableInner<TData>(
         // group/cell + data-row-mode:讓 Field naked 用 `group-data-[row-mode=...]/cell:items-X`
         // 從 cell 取 alignment(autoRowHeight=auto 頂對齊 / fixed=fixed 置中)。CSS propagation,
         // Field API 不變;每個 mode 內 display↔edit 同 alignment(同 Field, 同 group → 同 items)。
-        data-row-mode={autoRowHeight ? 'auto' : 'fixed'}
+        // H1(2026-05-10):per-row error → effectiveAutoRowForCell 同 row.tsx effectiveAutoRow
+        data-row-mode={effectiveAutoRowForCell ? 'auto' : 'fixed'}
         data-column-id={cell.column.id}
+        // Slice D Step 1B(2026-05-10):composite cell-id `${rowId}:${colId}` 給 Interaction Layer
+        // getCellRect 用,per RFC §Overlay Geometry。
+        data-cell-id={`${cell.row.id}:${cell.column.id}`}
+        // Phase 9 Issue 1 fix(2026-05-10):range cell bg fill via CSS [data-range-cell],
+        // 不在 overlay layer(避免 layer fixed-position bg 蓋 cell content)。
+        data-range-cell={spreadsheetMode && rangeCellIdSet.has(`${cell.row.id}:${cell.column.id}`) ? '' : undefined}
+        // 2026-05-13 V1.6:data-cell-disabled attribute 給 CSS `:not([data-cell-disabled])` 過濾,disabled cell 不被 range fill 蓋
+        data-cell-disabled={cellDisabled ? 'true' : undefined}
+        // Issue 9 cell error(2026-05-10):aria-describedby 接 error message id 給 AT 讀
+        aria-describedby={cellErrorId}
+        aria-invalid={hasCellError || undefined}
         className={cn(
           // Cell box(2026-05-05 v6 — A4 canonical: Field frame seamlessly replaces cell border):
           //   - `self-stretch`: cell 永遠填 row 高
@@ -1224,61 +1506,127 @@ function DataTableInner<TData>(
           //     「框框跟 cell 一樣大並取代 cell 的框且與 table 隔線無縫接軌」(2026-05-05)。
           //   - **沒有** cell 自己 box-shadow ring — focus / hover / open ring 由 Field naked 自帶
           //     state machine 提供(對齊 user「狀態樣式取決於原輸入框」reminder)
-          'group/cell flex text-foreground text-body font-normal shrink-0 relative self-stretch overflow-hidden',
-          autoRowHeight ? 'items-start' : 'items-center',
+          'group/cell flex text-foreground text-body font-normal shrink-0 relative self-stretch',
+          // Issue 9(2026-05-10):有 cell error → unset overflow-hidden 讓 error message
+          // wrap 撐 row 高。**H1(2026-05-10)升級**:overflow-visible 條件改 `rowHasAnyError` —
+          // row 內任一 cell 有 error 整 row 全 cells 都 overflow-visible(error 訊息可能多行
+          // 撐高 row,row 高同步 effectiveAutoRow auto)。
+          rowHasAnyError ? 'overflow-visible' : 'overflow-hidden',
+          effectiveAutoRowForCell ? 'items-start' : 'items-center',
           align === 'right' && 'justify-end text-right',
           align === 'center' && 'justify-center text-center',
-          // 2026-05-06 v14:revert v12 absolute(autoRowHeight 不相容)→ Field 留 layout flow,
-          // 視覺接受 cell border-r grid + Field border 2px 雙線。永遠 keep border-r divider
-          // (user 確認 cell 右邊 border 不必移除)。
-          inlineEdit && !isLastInRow && 'border-r border-divider',
-          indicator && 'gap-2',
+          // Phase 9 Issue 8 fix(2026-05-10 user 撞 + codex 重比稿 verdict ADOPT):
+          // 之前 `border-r border-divider` 只 right edge → hover overlay outline:-1px 只 right
+          // 邊壓 cell border,上左下 sub-pixel 不一致(user 抓「右 1px / 上左下 2px」bug)。
+          // 改 `dtCellGrid` (data-table.css:96-110)用 `box-shadow: inset` 4 邊 1px divider,
+          // 不佔 layout(per user verbatim「在 cell 內容起始位置不變」前提)→ 4 邊一致 grid line
+          // → overlay outline:-1px 4 邊都剛好壓 cell border line。
+          // Field naked edit border 仍 own(per Field SSOT)— 編輯時 Field 自帶 border 1px,
+          // 跟 cell 4 邊 inset divider 視覺相疊(同 pixel)= 1 line visual,不雙線。
+          inlineEdit && 'dtCellGrid',
           onEditableCellClick && ['cursor-pointer', nakedCellEditableDisplayHover],  // editable cell display hover affordance(對齊 Notion / Airtable hover-cell-shows-border canonical)
-          isEditingThisCell && 'z-10',
+          // 2026-05-13 Q3 cell disabled SSOT(per codex Q3 verdict + user 拍板「全部馬不停蹄做完」):
+          // bg `--bg-disabled` component-state token(color.spec.md:671 owner)+ cursor 抑制 click affordance。
+          cellDisabled && 'bg-disabled cursor-not-allowed',
+          // z-10 raise inline-edit cell;portal mode 不需(layer z-3 already on top)。
+          isEditingThisCell && !experimentalActiveEditorController && 'z-10',
         )}
         style={{
           ...columnSizeStyle(cell.column, { resize: enableColumnResize, isSystemCol: isSystemColumn(cell.column.id) }),
-          ...(isEditingThisCell ? {} : cellPadding),
+          // Padding override 只在 inline-edit cell(naked Field 撐滿 cell);portal mode cell 走正常 display padding
+          ...(isEditingThisCell && !experimentalActiveEditorController ? {} : cellPadding),
+          // Slice D Step 2(2026-05-10):flag 開時 set CSS variable 抑制 Field naked hover outline,
+          // 讓 overlay layer 接管 hover ring paint(per RFC Contract 8 「one geometry owner, two paint owners」)。
+          // Backward-compat:flag 關時 unset → field-wrapper default `var(--border-hover)`(既有行為)。
+          ...(experimentalSpreadsheetOverlay && { '--cell-hover-outline-color': 'transparent' } as React.CSSProperties),
         }}
         onClick={onEditableCellClick}
       >
-        {/* L4 nested rows prefix:depth indent + chevron(僅 first content cell + 有 nested 結構)
-            indent = depth * --tree-indent(對齊 TreeView SSOT)
-            chevron click != row select(stopPropagation)— 對齊 TreeView design language */}
-        {showNestedPrefix && (
-          <span
-            className="flex items-center shrink-0"
-            style={{ paddingLeft: depth > 0 ? `calc(${depth} * var(--tree-indent-${size}, var(--tree-indent-md)))` : 0 }}
-          >
-            {canExpand ? (
-              <button
-                type="button"
-                aria-label={isExpanded ? '收合' : '展開'}
-                aria-expanded={isExpanded}
-                className="inline-flex items-center justify-center shrink-0 w-4 h-4 mr-2 text-fg-muted hover:text-foreground rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring transition-transform"
-                style={{ transform: isExpanded ? 'rotate(90deg)' : undefined }}
-                onClick={(e) => { e.stopPropagation(); toggleExpand?.() }}
-              >
-                <ChevronDown size={iconSize} aria-hidden style={{ transform: 'rotate(-90deg)' }} />
-              </button>
-            ) : (
-              <span aria-hidden className="shrink-0 w-4 h-4 mr-2" />
-            )}
+        {/* Issue 9 cell error(2026-05-10):有 error → cell 內外結構切 flex-col,
+            上 row 渲既有 nested + content,下 row 渲 error message 14px text-error。
+            無 error 時走原 flex-row(backward-compat 0 layout shift)。 */}
+        {hasCellError ? (
+          <span className="flex flex-col self-stretch w-full min-w-0 gap-1">
+            <span className="flex flex-1 min-w-0">
+              {showNestedPrefix && (
+                <span
+                  className="flex items-center shrink-0"
+                  style={{ paddingLeft: depth > 0 ? `calc(${depth} * var(--tree-indent-${size}, var(--tree-indent-md)))` : 0 }}
+                >
+                  {canExpand ? (
+                    <button
+                      type="button"
+                      aria-label={isExpanded ? '收合' : '展開'}
+                      aria-expanded={isExpanded}
+                      className="inline-flex items-center justify-center shrink-0 w-4 h-4 mr-2 text-fg-muted hover:text-foreground rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-transform"
+                      style={{ transform: isExpanded ? 'rotate(90deg)' : undefined }}
+                      onClick={(e) => { e.stopPropagation(); toggleExpand?.() }}
+                    >
+                      <ChevronDown size={iconSize} aria-hidden style={{ transform: 'rotate(-90deg)' }} />
+                    </button>
+                  ) : (
+                    <span aria-hidden className="shrink-0 w-4 h-4 mr-2" />
+                  )}
+                </span>
+              )}
+              <span className={cn(
+                'flex-1 min-w-0 flex',
+                // 2026-05-12 Round 4.5 fix(codex M31 Layer C 抓漏)— error-cell branch 也用 per-row state
+                // (`effectiveAutoRowForCell`)非 global `autoRowHeight`,跟 line 1559 non-error wrapper 同 SSOT。
+                // 前 Round 4 漏修此 branch → error 那格 row 內視覺仍走 global mode mismatch。
+                effectiveAutoRowForCell ? 'items-start' : 'items-center',
+                align === 'right' && 'justify-end',
+              )}>
+                {renderCellContent(cell)}
+              </span>
+            </span>
+            <span id={cellErrorId} className="text-body text-error break-words" role="alert">
+              {cellErrorMessages!.length === 1 ? (
+                cellErrorMessages![0]
+              ) : (
+                <ul className="list-disc list-inside flex flex-col gap-1">
+                  {cellErrorMessages!.map((m, i) => <li key={i}>{m}</li>)}
+                </ul>
+              )}
+            </span>
           </span>
+        ) : (
+          <>
+            {/* L4 nested rows prefix(同上,無 error 時走 flex-row 原 path) */}
+            {showNestedPrefix && (
+              <span
+                className="flex items-center shrink-0"
+                style={{ paddingLeft: depth > 0 ? `calc(${depth} * var(--tree-indent-${size}, var(--tree-indent-md)))` : 0 }}
+              >
+                {canExpand ? (
+                  <button
+                    type="button"
+                    aria-label={isExpanded ? '收合' : '展開'}
+                    aria-expanded={isExpanded}
+                    className="inline-flex items-center justify-center shrink-0 w-4 h-4 mr-2 text-fg-muted hover:text-foreground rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-transform"
+                    style={{ transform: isExpanded ? 'rotate(90deg)' : undefined }}
+                    onClick={(e) => { e.stopPropagation(); toggleExpand?.() }}
+                  >
+                    <ChevronDown size={iconSize} aria-hidden style={{ transform: 'rotate(-90deg)' }} />
+                  </button>
+                ) : (
+                  <span aria-hidden className="shrink-0 w-4 h-4 mr-2" />
+                )}
+              </span>
+            )}
+            <span className={cn(
+              'flex-1 min-w-0 self-stretch flex',
+              // 2026-05-12 fix root invariant(M32 b):用 `effectiveAutoRowForCell` 而非 global
+              // `autoRowHeight` — per-row error 時 row 是 auto-height,該 row 內所有 cell 都該
+              // top-align(非僅 error cell)。前 v1 用 global autoRowHeight → 非 error cells in
+              // error row 走 items-center → 視覺垂直置中於 tall row(user 抓 image 3 bug)。
+              effectiveAutoRowForCell ? 'items-start' : 'items-center',
+              align === 'right' && 'justify-end',
+            )}>
+              {renderCellContent(cell)}
+            </span>
+          </>
         )}
-        {/* `self-stretch`:span 強制填 cell 全高,Field naked `!h-full` 才有 definite parent height。
-            inner span items-X **mirror cell**(autoRow → start / fixed → center)— 確保非 Field
-            content(Checkbox / inline 內容)在兩 mode 視覺位置正確,Field naked content 也跟著走
-            cell row-mode(透過 group-data SSOT 進一步傳遞到 Field 內部 wrapper,M19 ensure-canonical)。
-            indicator 是 sibling 跟 cell items-X 走(fixed=center / autoRow=start per spec)。 */}
-        <span className={cn(
-          'flex-1 min-w-0 self-stretch flex',
-          autoRowHeight ? 'items-start' : 'items-center',
-          align === 'right' && 'justify-end',
-        )}>
-          {renderCellContent(cell)}
-        </span>
-        {indicator}
       </div>
     )
   }
@@ -1370,10 +1718,67 @@ function DataTableInner<TData>(
     anchorRowIdRef.current = rowId
   }, [isRowSelectable, mode, selectionSet, rows, visibleIdToRow, setSelection])
 
-  // ── Cmd+A / Esc 鍵盤 handler(table-level)──
+  // ── Cmd+A / Esc / Arrow keys 鍵盤 handler(table-level)──
   // code-quality-allow: long-function — single keyboard dispatch covering Cmd+A / Esc / Arrow / Space + selection state mutations,拆 sub-handler 會切散 keyboard mode coherence
   const tableKeyboardHandler = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
+      // ── Spreadsheet mode keyboard nav(Phase B1+B2,2026-05-10 per codex Q-B verdict)──
+      // ActiveCellId 由 mouse click(spreadsheet click 1)+ keyboard arrow 共用 SSOT。
+      // ↑↓←→ 移動 / Enter / F2 進 edit / Esc exit edit OR clear active。
+      // Codex Q-B1:不分 mouse selected vs keyboard focused,共用 selectedCellId state。
+      // Phase B3 IME guard(2026-05-10 per codex Q-B3):中文輸入法組字中 ignore 所有 nav keys。
+      // 2026-05-16 Round 5 audit Dim 27 fix:`keyCode` deprecated but still in KeyboardEvent type — no cast needed。
+      if (e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) return
+      if (spreadsheetMode && selectedCellId != null && editingCellId == null) {
+        const navKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'F2', 'Escape']
+        if (!navKeys.includes(e.key)) return
+        const lastColon = selectedCellId.lastIndexOf(':')
+        const curRowId = selectedCellId.slice(0, lastColon)
+        const curColId = selectedCellId.slice(lastColon + 1)
+        const allRows = table.getRowModel().rows.map((r) => r.id)
+        const allCols = table.getVisibleLeafColumns().map((c) => c.id).filter((id) => id !== SELECT_COL_ID)
+        const curRowIdx = allRows.indexOf(curRowId)
+        const curColIdx = allCols.indexOf(curColId)
+        if (curRowIdx < 0 || curColIdx < 0) return
+        let nextRowIdx = curRowIdx
+        let nextColIdx = curColIdx
+        if (e.key === 'ArrowUp' && curRowIdx > 0) { nextRowIdx = curRowIdx - 1 }
+        else if (e.key === 'ArrowDown' && curRowIdx < allRows.length - 1) { nextRowIdx = curRowIdx + 1 }
+        else if (e.key === 'ArrowLeft' && curColIdx > 0) { nextColIdx = curColIdx - 1 }
+        else if (e.key === 'ArrowRight' && curColIdx < allCols.length - 1) { nextColIdx = curColIdx + 1 }
+        else if (e.key === 'Enter' || e.key === 'F2') {
+          // Enter / F2 → 進 edit(若 cell editable + 非 boolean / url + 非 disabled)
+          // 2026-05-13 codex V1 fix:加 `!isCellDisabled(meta, row)` gate(對齊 mouse click invariant)
+          const row = table.getRowModel().rowsById[curRowId]
+          const colDef = table.getAllLeafColumns().find((c) => c.id === curColId)
+          // any-allow: column meta free-form
+          const meta = (colDef?.columnDef as any)?.meta as Record<string, any> | undefined
+          if (meta?.type && meta.type !== 'boolean' && meta.type !== 'url' && row && canEditCell(meta, row.original)) {
+            e.preventDefault()
+            setEditingCellId(cellEditId(curRowId, curColId))
+            setSelectedCellId(null)
+            setRangeAnchor(null)
+            setRangeFocus(null)
+          }
+          return
+        }
+        else if (e.key === 'Escape') {
+          e.preventDefault()
+          setSelectedCellId(null)
+          setRangeAnchor(null)
+          setRangeFocus(null)
+          return
+        }
+        if (nextRowIdx !== curRowIdx || nextColIdx !== curColIdx) {
+          e.preventDefault()
+          const nextCellId = `${allRows[nextRowIdx]}:${allCols[nextColIdx]}`
+          setSelectedCellId(nextCellId)
+          setRangeAnchor(nextCellId)
+          setRangeFocus(null)
+        }
+        return
+      }
+      // ── Row selection mode keyboard handler(下方既有)──
       if (!enabled) return
       // Cmd/Ctrl+A:選全可見(扣 disabled)— 對齊 Mail / GitHub / Linear 慣例
       if ((e.metaKey || e.ctrlKey) && e.key === 'a' && mode === 'multi') {
@@ -1389,7 +1794,8 @@ function DataTableInner<TData>(
         return
       }
     },
-    [enabled, mode, selection.length, selectableVisibleIds, setSelection]
+    [enabled, mode, selection.length, selectableVisibleIds, setSelection,
+     spreadsheetMode, selectedCellId, editingCellId, table, isCellEditable]
   )
 
   // ── Header cell ──
@@ -1462,7 +1868,7 @@ function DataTableInner<TData>(
           className={cn(
             'flex items-center min-w-0 flex-1 gap-1 outline-none',
             canSort && 'cursor-pointer hover:text-foreground transition-colors',
-            canSort && 'focus-visible:ring-2 focus-visible:ring-focus-ring rounded-sm',
+            canSort && 'focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
           )}
         >
           <TruncateCell className={cn('min-w-0', align === 'right' && 'text-right', align === 'center' && 'text-center')}>
@@ -1533,22 +1939,28 @@ function DataTableInner<TData>(
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        {/* Header divider — 同時擔任 column resize handle(2026-05-06 v11):
-            - 視覺:1px line `bg-divider` 永遠 visible(顯示 grid line)
-            - Hot zone:absolute padding 4px 兩側,讓 mouse 容易 hit(invisible)
-            - Hover:`bg-border-hover` 顏色加深(對齊 DS 一致語言「hover 永遠是顏色變化不加粗」)
-            - Active(drag 中):`bg-primary` 信號 user 正在 resize
-            - cursor: col-resize(可 resize 時)/ default(system column 或 enableColumnResize=false)
-            - System columns 不啟動 resize listener(永遠 fixed)
-            - role="separator" + aria-orientation="vertical" 對齊 WAI-ARIA */}
-        {showDivider && (() => {
+        {/* Header divider + resize handle(2026-05-06 v11,**2026-05-10 H2+H3 重構**):
+            - **2026-05-10 split**(per user 抓「pinned 欄位右邊分隔線無法 resize」):
+              `showDivider` 只 gate **視覺 1px line**(panel boundary col 由 panel border-r 接,
+              不重複);**resize hot zone** 改 gate by `isResizable` 獨立,panel boundary col
+              仍可拖 resize(hot zone 視覺 invisible,跟 panel border-r 不衝突)。
+            - **2026-05-10 H3**:per-column `meta.resizable === false` opt-out — consumer 可標
+              「此 col 寬度由內容決定不允許 resize」(對齊 AG Grid `colDef.resizable` /
+              Material X-DataGrid 同 API)。System cols(__select__ / __drag__ / __actions__
+              row-actions)自動 false(永遠固定寬)。
+            - 視覺:1px line `bg-divider` 在 showDivider 時 paint
+            - Hot zone:absolute 7px 兩側,讓 mouse 容易 hit(在 isResizable 時 render)
+            - Hover/Active:`bg-border-hover` / `bg-primary`(hot zone 內 1px line 變色)
+            - role="separator" + aria-orientation="vertical" 對齊 WAI-ARIA(isResizable 時)*/}
+        {(() => {
           const colId = header.column.id
-          const isResizable = enableColumnResize && !isSystemColumn(colId)
+          const colMeta = header.column.columnDef.meta as { resizable?: boolean } | undefined
+          // H3: meta.resizable === false 顯式 opt-out(default true)
+          const colOptIn = colMeta?.resizable !== false
+          const isResizable = enableColumnResize && !isSystemColumn(colId) && colOptIn
           const isResizing = header.column.getIsResizing?.()
-          // v13.2 visual fix:hot zone 7px straddle cell.right(invisible 易 hit),內 1px 線
-          // **絕對定位 right-[3px]**(從 outer span 右側 3px,即 cell.right - 1)→ 視覺 1px 在 cell 內側右邊,
-          // 對齊既有 grid divider 位置。前 v11 用 `flex justify-end` 把 1px 線放在 outer span 右端 →
-          // cell.right + 2 px 處 → 被 cell.overflow-hidden 切掉 → user 看不到分隔線。
+          // H2: 不論 showDivider,只要 isResizable 就 render hot zone(panel boundary col 仍可拖)
+          if (!showDivider && !isResizable) return null
           return (
             <span
               role={isResizable ? 'separator' : undefined}
@@ -1558,9 +1970,23 @@ function DataTableInner<TData>(
                 'group/resize absolute top-0 bottom-0 right-0 -mr-[3px] w-[7px]',
                 isResizable && 'cursor-col-resize select-none',
               )}
-              onMouseDown={isResizable ? header.getResizeHandler?.() : undefined}
-              onTouchStart={isResizable ? header.getResizeHandler?.() : undefined}
+              // 2026-05-12 fix v2(user 抓 R3 stopPropagation 沒生效):dnd-kit PointerSensor
+              // 監聽 `pointerdown`,我前一輪只 stop `onMouseDown` → pointerdown 仍冒泡 →
+              // drag activate。改用 `onPointerDownCapture` capture-phase 一次性吃 pointerdown
+              // event,**先** dnd-kit listener 拿到 → drag 不啟動;接著 emit synthesized
+              // mousedown 給 TanStack resize handler。對齊 AG Grid / Material X-Grid pinned-column
+              // resize idiom(resize handle 永遠 own pointer event,drag listener 不競爭)。
+              onPointerDownCapture={isResizable ? (e: React.PointerEvent<HTMLSpanElement>) => {
+                e.stopPropagation()
+                header.getResizeHandler?.()(e.nativeEvent)
+              } : undefined}
+              onTouchStart={isResizable ? (e: React.TouchEvent<HTMLSpanElement>) => {
+                e.stopPropagation()
+                header.getResizeHandler?.()(e.nativeEvent)
+              } : undefined}
             >
+              {/* H2: 視覺 1px line 只在 showDivider 時 paint(panel boundary col by panel-r 接管,不重) */}
+              {showDivider && (
               <span
                 aria-hidden
                 className={cn(
@@ -1573,6 +1999,7 @@ function DataTableInner<TData>(
                 )}
                 style={{ top: 'var(--table-cell-py)', bottom: 'var(--table-cell-py)' }}
               />
+              )}
             </span>
           )
         })()}
@@ -1649,6 +2076,7 @@ function DataTableInner<TData>(
   }
 
   // ── Render body rows for a region ──
+  // code-quality-allow: long-function — virtualizer × sticky region × empty state × per-row drag 四正交 render path 集中,拆 sub-fn 會將 virtualItems / rows / colVirtualizer 三 closure 跨 fn 傳
   const renderBodyRows = (cols: Column<TData, unknown>[], isCenter: boolean, isRight: boolean, regionWidth?: number) => {
     if (isEmpty && isCenter) {
       // 有框容器 → 垂直置中(design principle)
@@ -1666,15 +2094,29 @@ function DataTableInner<TData>(
     //      都不接 drag listeners,純視覺鎖。
     // 改 center-only listeners → ghost activator = center row → cursor 跟 ghost 維持初始
     // 相對位置(SSOT 對齊 user directive)。
+    // code-quality-allow: long-function — audit 誤偵測 isPrimaryRegion 為 function(實為 const);真實 long body = 下方 rowEl render closure(virtualizer × sticky × drag listeners × hover delegation),拆會破壞 closure capture
     const isPrimaryRegion = isCenter
     const regionRole: 'primary' | 'mirror' = isPrimaryRegion ? 'primary' : 'mirror'
 
+    // code-quality-allow: long-function — virtualizer × sticky panel × drag listeners × hover delegation × per-row state 多 closure capture;拆會破壞 SortableContext / dnd-kit hooks 跟 row idx 的 stable binding
     const rowEl = (row: typeof rows[number], idx: number, opts?: { virtual?: boolean; start?: number; isLast?: boolean }) => {
       const showBorder = bordered !== false ? !opts?.isLast : true
       // L4 row drag v2:nested rows 也 sortable(配合 cross-parent collisionDetection 過濾)
       // sub-rows: depth>0 仍進 SortableContext,但 collisionDetection 只接受 same-parent over
       const isThisRowDragging = enableRowDrag && activeDragId === row.id
       const useSortableWrap = enableRowDrag
+
+      // H1 fix(2026-05-10,per user 確認):per-row autoRowHeight when any cell in this row has
+      // error。Fixed-height row 模式下,該 row 的任一 cell 有 error msg → THAT row 自動 auto-height
+      // 撐 message;error 全清 → 回 fixed。Other rows 不受影響(global autoRowHeight prop 不變)。
+      // Per Material X-DataGrid `getRowHeight` per-row dynamic + AG Grid `rowHeight: 'auto'`
+      // per-row idiom。Compute by scanning row's visible cells for cellErrors map hit。
+      const rowHasError = !!cellErrors && row.getVisibleCells().some((c) => {
+        const key = `${row.id}:${c.column.id}`
+        const v = cellErrors[key]
+        return v != null && (Array.isArray(v) ? v.length > 0 : true)
+      })
+      const effectiveAutoRow = autoRowHeight || rowHasError
 
       // L4 row drag:handle absolute 貼齊 row 左 border(Jira canonical),不佔 column 空間。
       // 只在 primary region(left 若有,否則 center)+ depth===0 render — RowDragHandle
@@ -1683,6 +2125,7 @@ function DataTableInner<TData>(
       // v15.2 SSOT 對齊 TreeView:drag 期間 suppress 全表 hover state
       // (user directive「drag 時 row 不應 hover / drag button 不應出現」)
       const anyDragActive = activeDragId != null
+      // code-quality-allow: long-function — baseRowDiv 含 row drag listeners / sticky panel / hover delegation / cell render loop / divider drawing 多 closure;拆 sub-fn 會破壞 dnd-kit hooks + row.id stable binding
       const baseRowDiv = (extra?: { ref?: (el: HTMLElement | null) => void; style?: React.CSSProperties; isDragging?: boolean; listeners?: Record<string, unknown>; attributes?: Record<string, unknown> }) => (
         <div
           key={row.id}
@@ -1718,9 +2161,11 @@ function DataTableInner<TData>(
           aria-rowindex={idx + 2}
           className={cn(
             'group/row flex relative',
-            autoRowHeight ? 'items-start' : 'items-center',
-            !autoRowHeight && rowHeight,
-            !autoRowHeight && 'overflow-hidden',
+            // H1 fix(2026-05-10):effectiveAutoRow 覆 global autoRowHeight,per-row 若有 cell error
+            // 自動 auto-height(撐 message)。Error 清 → 回 fixed。Other rows 不受影響。
+            effectiveAutoRow ? 'items-start' : 'items-center',
+            !effectiveAutoRow && rowHeight,
+            !effectiveAutoRow && 'overflow-hidden',
             opts?.virtual && 'absolute w-full',
             showBorder && 'border-b border-divider',
             // v15.3 hover bg canonical:hover class 永遠生效,但 onMouseOver delegate
@@ -1759,6 +2204,7 @@ function DataTableInner<TData>(
 
       if (useSortableWrap) {
         // invalidDrop 只對「正在被拖」的 row 顯示 — handle 在 active row 上,UI 警示只需該 row
+        // code-quality-allow: long-function — 此 const 之下的整個 if-block 含 useSortable hooks + SortableRowProvider + baseRowDiv composition;audit 把 const 誤認為 function entry,實 long body 在 closure 內 dnd-kit + per-row state 多 capture,拆會破壞 hook order invariant
         const rowInvalidDrop = isThisRowDragging && invalidDropActive
         return (
           <SortableRowProvider key={row.id} id={row.id} disabled={dragDisabled} role={regionRole} invalidDrop={rowInvalidDrop}>
@@ -1789,10 +2235,17 @@ function DataTableInner<TData>(
     const containerWidth = regionWidth || colsWidth
 
     if (useVirtual) {
+      // 2026-05-13 (c) scroll-defer perf(per user 拍 Path (c) Roadmap >50ms 後 escalate):
+      // wrap virtual body with `<TableScrollProvider isScrolling={virtualizer.isScrolling}>` →
+      // 重 cell subtree(Avatar HoverCard / future Tag / etc.)讀 useTableIsScrolling() 跳
+      // expensive paths during scroll,scroll end 自動接回完整 affordance。
+      // 對齊 AG Grid deferRender / MUI X DataGrid scroll-defer canonical。
       return (
-        <div style={{ height: virtualizer.getTotalSize(), position: 'relative', minWidth: containerWidth }}>
-          {virtualizer.getVirtualItems().map(vr => rowEl(rows[vr.index], vr.index, { virtual: true, start: vr.start, isLast: vr.index === rows.length - 1 }))}
-        </div>
+        <TableScrollProvider isScrolling={virtualizer.isScrolling}>
+          <div style={{ height: virtualizer.getTotalSize(), position: 'relative', minWidth: containerWidth }}>
+            {virtualizer.getVirtualItems().map(vr => rowEl(rows[vr.index], vr.index, { virtual: true, start: vr.start, isLast: vr.index === rows.length - 1 }))}
+          </div>
+        </TableScrollProvider>
       )
     }
     return (
@@ -1809,15 +2262,26 @@ function DataTableInner<TData>(
       ref={(el) => { tableRef.current = el; if (typeof ref === 'function') ref(el); else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el }}
       data-table-size={size}
       data-data-table-outer  // anchor for RowDragHandle Portal getBoundingClientRect (M25 invariant: outer 一定存在)
-      className={cn(dataTableVariants({ bordered }), isFillHeight && 'flex flex-col', className)}
+      data-active-editor-controller={experimentalActiveEditorController ? 'enabled' : undefined}  // Slice D Step 3.2 scaffold marker
+      // 2026-05-12 fix(user 抓「為什麼按 shift 那麼容易會在 table 外圈出現一層藍色邊框」):
+      // table outer tabIndex=0(spreadsheet keyboard nav needs)→ click 取得 focus →
+      // browser default `:focus-visible` 來自 globals.css L63「outline: 2px solid var(--ring)」
+      // → 整 table 藍框。Fix:`outline-none` 抑制 outer focus visual,cell selection rect
+      // (SelectionRect z 2)IS the visual focus indicator per spreadsheet canonical
+      // (對齊 Excel / Google Sheets / Notion / Airtable — focused cell own active border,
+      // table 容器無 focus ring)。
+      className={cn(dataTableVariants({ bordered }), isFillHeight && 'flex flex-col', 'outline-none focus:outline-none focus-visible:outline-none', className)}
       // isFillHeight:`maxHeight: 100%`(不是 height:100%)— content 小 → outer = intrinsic
       // (hug rows);content 大或 window 縮 < content → outer cap 到 100% of parent。
       // 行為:**永遠 hug rows**,只在被約束時才 cap + body shrink + V scroll。
       // 簡單需求:有約束 → rows 沒超就 hug;超就 cap+scroll;RWD 同理。
       style={isFillHeight ? { maxHeight: height } : undefined}
       role="table" aria-rowcount={rows.length + 1}
-      tabIndex={enabled ? 0 : undefined}
-      onKeyDown={enabled ? tableKeyboardHandler : undefined}
+      // Phase 9 Issue 12 fix(2026-05-10 codex 抓):**single tabIndex prop**,合併 selection
+      // 跟 spreadsheet 兩 path。React 在 dup props 只 keep last 是 silent regression risk。
+      tabIndex={enabled || spreadsheetMode ? 0 : undefined}
+      // 2026-05-10:`enabled || spreadsheetMode` — spreadsheet keyboard nav 跨 row-selection-disabled 場景也要 fire
+      onKeyDown={enabled || spreadsheetMode ? tableKeyboardHandler : undefined}
       onMouseOver={enterLeaveHandlers.onMouseOver}
       onMouseOut={enterLeaveHandlers.onMouseOut}
       {...props}
@@ -1825,7 +2289,7 @@ function DataTableInner<TData>(
       {/* ══ HEADER（固定頂部，不在 scroll 內）══ */}
       <div role="rowgroup" className="flex">
         {hasLeft && (
-          <div ref={leftHeaderRef} className="shrink-0 overflow-hidden border-r border-divider">
+          <div ref={leftHeaderRef} data-datatable-header-panel="left" className="shrink-0 overflow-hidden dtPanelBoundaryRight">
             {renderHeaderRow(leftCols, false)}
           </div>
         )}
@@ -1837,6 +2301,7 @@ function DataTableInner<TData>(
             注意:header 的 `scrollbar-gutter` 無效(因為 overflow-hidden),刻意不設 */}
         <div
           ref={centerHeaderRef}
+          data-datatable-header-panel="center"
           className="flex-1 min-w-0 overflow-hidden"
         >
           {/* 2026-05-06 v13.1:retire `w-max min-w-full` — 改 `style={{minWidth: centerColsWidth}}`
@@ -1848,7 +2313,7 @@ function DataTableInner<TData>(
           </div>
         </div>
         {hasRight && (
-          <div ref={rightHeaderRef} className="shrink-0 overflow-hidden border-l border-divider">
+          <div ref={rightHeaderRef} data-datatable-header-panel="right" className="shrink-0 overflow-hidden dtPanelBoundaryLeft">
             {renderHeaderRow(rightCols, true)}
           </div>
         )}
@@ -1867,7 +2332,8 @@ function DataTableInner<TData>(
         {hasLeft && (
           <div
             ref={leftBodyRef}
-            className="shrink-0 overflow-hidden border-r border-divider"
+            data-datatable-panel="left"
+            className="shrink-0 overflow-hidden dtPanelBoundaryRight"
             style={{
               width: leftWidth || undefined,
               // isFillHeight 用 JS 算的 px;固定 px(300px 等)直接套
@@ -1883,6 +2349,7 @@ function DataTableInner<TData>(
           // `scrollbar-gutter: stable` 永遠預留 V scrollbar 寬度(~15-17px),避免 body 出現 V
           // scrollbar 時右端被縮,跟 header 右端產生 gap(Windows/Linux native scrollbar 吃寬)
           data-datatable-hscroll
+          data-datatable-panel="center"
           // overflow-x/y: auto — 沒 overflow 就不顯 bar。wrapper minWidth 仍 trigger H 真 overflow。
           // **不**用 scrollbar-gutter: stable — 那會永遠保留 V 軸 15px 空間,
           // content fit 時看起來像「永遠有 V 捲軸」(Image #5 bug)。
@@ -1910,7 +2377,8 @@ function DataTableInner<TData>(
         {hasRight && (
           <div
             ref={rightBodyRef}
-            className="shrink-0 overflow-hidden border-l border-divider"
+            data-datatable-panel="right"
+            className="shrink-0 overflow-hidden dtPanelBoundaryLeft"
             style={{
               width: rightWidth || undefined,
               ...(isFillHeight && bodyMaxHeight != null ? { maxHeight: bodyMaxHeight } : hasHeightConstraint ? { maxHeight: height } : {}),
@@ -1920,6 +2388,148 @@ function DataTableInner<TData>(
           </div>
         )}
       </div>
+      {/* Slice D Step 1B(2026-05-10):Interaction Layer singleton(`.claude/planning/datatable-spreadsheet-rfc.md`)。
+          Default disabled — backward-compat。Enable 後 hover/editor/selected/range 由 layer 統一畫,
+          per Contract 8 「one geometry owner, two paint owners」。
+          Step 1C-fix(2026-05-10):wire Contract 15 cellClickEntersEdit predicate 過濾 readonly /
+          boolean / url cells(per RFC + user 拍板 USER #15「checkbox/url no-hover」)。
+          Step 4(2026-05-10):wire spreadsheetMode select / range cells。 */}
+      <DataTableInteractionLayer
+        enabled={experimentalSpreadsheetOverlay || spreadsheetMode}
+        containerRef={tableRef}
+        // Slice D Step 3 wire(2026-05-10):pass editingCellId so layer renders
+        // ActiveEditorHost rect at active cell。Composite cell-id format:
+        // `${rowId}:${colId}` matches data-cell-id attribute(per Step 1B)。
+        // Note:editingCellId 內部用 `__` separator,需轉 `:`。
+        activeEditorCellId={editingCellId ? editingCellId.replace('__', ':') : null}
+        // 2026-05-10 bug fix(user 圖1):dashed scaffold rect 改 gate 給
+        // experimentalActiveEditorController 而非 experimentalSpreadsheetOverlay,
+        // 避免 hover overlay 開啟時 cell 進 edit mode → dashed leak 出來跟 hover solid 並存。
+        activeEditorEnabled={experimentalActiveEditorController}
+        // Slice D Step 5(D.3 portal Field,2026-05-10):real portal Field render callback。
+        // Layer 在 ActiveEditorHost(z 3 float rect)render `<Cell mode="edit" />` 同 registry。
+        // Cell wrapper 保持 mode="display"(SSOT preserved per codex Q6.2)。
+        activeEditorRender={experimentalActiveEditorController ? (cellId) => {
+          const lastColon = cellId.lastIndexOf(':')
+          if (lastColon < 0) return null
+          const rowId = cellId.slice(0, lastColon)
+          const colId = cellId.slice(lastColon + 1)
+          const colDef = table.getAllLeafColumns().find((c) => c.id === colId)
+          // any-allow: free-form column meta bag
+          const meta = (colDef?.columnDef as any)?.meta as Record<string, any> | undefined
+          if (!meta?.type) return null
+          const colType = meta.type as ColumnType
+          const Cell = resolveCellComponent(colType)
+          const row = table.getRowModel().rowsById[rowId]
+          if (!row) return null
+          const cellEditable = isCellEditable(meta, row.original)
+          // Phase 7 virtualizer unmount preserve draft:portal Field value 從 lifted editingDraft 取
+          // (若 user 編輯中字 → draft 持有);未編輯時 fallback row.value(全新 edit session 顯示原值)
+          // 2026-05-16 Round 5 audit Dim 27 fix:narrow type 取代 `as any`
+          const rowValue = (row.original as Record<string, unknown>)[colId]
+          const value = editingDraft !== undefined ? editingDraft : rowValue
+          // Per codex Q6.2 invariant test:nested popovers register inside editor;
+          // outside-click excludes them(future ActiveEditorController 接管 lifecycle scope)。
+          // 當前 MVP:reuse cell-registry Cell mode="edit" + bound onCommit/onCancel。
+          //
+          // Phase B2 completion(2026-05-10 per codex Q-B2):Tab → commit + next editable + auto-edit。
+          //   wrap Cell in div with onKeyDownCapture intercept Tab/Shift+Tab(capture mode 先抓
+          //   不被 Field 內部 keydown 攔)。direction:Tab=next / Shift+Tab=prev。
+          //   findNext skip readonly / boolean / url(non-editable click types per Contract 15)。
+          // Phase B3(2026-05-10 per codex Q-B3):IME composition guard。中文輸入法組字期間
+          //   compositionstart event fire,組字結束後 compositionend fire。期間 keydown 的
+          //   Enter / Tab / Esc 不該觸發 commit/exit/next 行為(因 user 還在組字)。
+          const handleEditTab = (e: React.KeyboardEvent) => {
+            // IME guard:組字中 ignore Tab(per codex Q-B3 verdict 在 controller 層,
+            // 此處 portal wrapper 是最近 controller 等價層;Field 內部 input 自帶 isComposing 但
+            // wrapper-level Tab handler 必須也 guard,避免 onKeyDownCapture 早於 Field input)
+            // 2026-05-16 Round 5 audit Dim 27 fix:`keyCode` deprecated but still in KeyboardEvent type — no cast needed
+            if (e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) return
+            if (e.key !== 'Tab') return
+            e.preventDefault()
+            e.stopPropagation()
+            const direction: 'next' | 'prev' = e.shiftKey ? 'prev' : 'next'
+            const allRows = table.getRowModel().rows.map((r) => r.id)
+            const allCols = table.getVisibleLeafColumns().map((c) => c.id).filter((id) => id !== SELECT_COL_ID)
+            const curRowIdx = allRows.indexOf(rowId)
+            const curColIdx = allCols.indexOf(colId)
+            if (curRowIdx < 0 || curColIdx < 0) return
+            // Step row-by-row,each step check editable + non-boolean/url
+            const NON_EDIT_TYPES = ['boolean', 'url']
+            let nextRowIdx = curRowIdx
+            let nextColIdx = curColIdx
+            const totalCells = allRows.length * allCols.length
+            let safety = 0
+            while (safety < totalCells) {
+              safety++
+              if (direction === 'next') {
+                nextColIdx++
+                if (nextColIdx >= allCols.length) { nextColIdx = 0; nextRowIdx++ }
+                if (nextRowIdx >= allRows.length) return  // 末尾,不 wrap
+              } else {
+                nextColIdx--
+                if (nextColIdx < 0) { nextColIdx = allCols.length - 1; nextRowIdx-- }
+                if (nextRowIdx < 0) return  // 首端,不 wrap
+              }
+              const nextRow = table.getRowModel().rowsById[allRows[nextRowIdx]]
+              const nextColDef = table.getAllLeafColumns().find((c) => c.id === allCols[nextColIdx])
+              // any-allow: column meta free-form
+              const nextMeta = (nextColDef?.columnDef as any)?.meta as Record<string, any> | undefined
+              if (!nextMeta?.type || NON_EDIT_TYPES.includes(nextMeta.type)) continue
+              // 2026-05-13:canEditCell helper(per V4 consolidation,合 editable + !disabled invariant)
+              if (!nextRow || !canEditCell(nextMeta, nextRow.original)) continue
+              // 找到 next editable cell → commit current + start next edit
+              setEditingCellId(cellEditId(allRows[nextRowIdx], allCols[nextColIdx]))
+              return
+            }
+          }
+          return (
+            <div onKeyDownCapture={handleEditTab} style={{ width: '100%', height: '100%' }}>
+              <Cell
+                value={value}
+                meta={meta}
+                mode="edit"
+                size={size}
+                autoRowHeight={false}  // portal MVP 單行;auto-row defer 到 Phase 5
+                isEditable={cellEditable}
+                onCommit={(next) => commitCell(rowId, colId, next)}
+                onCommitLive={(next) => onCellCommit?.(rowId, colId, next)}
+                onCancel={exitEdit}
+                onDraft={setEditingDraft}  // Phase 7:每 keystroke 寫 draft → preserve across virtualizer unmount
+              />
+            </div>
+          )
+        } : undefined}
+        // Slice D Step 4 spreadsheet semantics(2026-05-10):
+        //   selectedCellId(click 1)= solid border SelectionRect z 2
+        //   rangeCellIds(Shift+click rectangle from anchor↔focus)= cell-bg fill via
+        //     CSS `[data-range-cell]`(per Issue 1 codex verdict;layer 不畫 fill,只畫
+        //     RangeOuterRing 4 line div boundary)
+        selectedCellId={spreadsheetMode ? selectedCellId : null}
+        rangeCellIds={rangeCellIds}
+        cellClickEntersEdit={(cellId) => {
+          // 2026-05-10 codex review red light fix(per dual-track verify):
+          //   1. cellId parse 用 lastIndexOf(':')(row id 可含 colon)
+          //   2. type allowlist(未知 type default false,non-editable types blocked)
+          //   3. row-level editable(row) function 支援(per isCellEditable canonical)
+          const lastColonIdx = cellId.lastIndexOf(':')
+          if (lastColonIdx < 0) return false
+          const rowId = cellId.slice(0, lastColonIdx)
+          const colId = cellId.slice(lastColonIdx + 1)
+          const colDef = table.getAllLeafColumns().find(c => c.id === colId)
+          // any-allow: column meta 是 free-form bag
+          const meta = (colDef?.columnDef as any)?.meta as Record<string, any> | undefined
+          if (!meta) return false
+          // Allowlist editable types(per Contract 15;未知 / boolean / url / readonly default false)
+          const EDITABLE_CLICK_TYPES = ['string', 'number', 'currency', 'date', 'time', 'select', 'multiSelect', 'person', 'multiPerson', 'combobox']
+          if (!EDITABLE_CLICK_TYPES.includes(meta.type)) return false
+          // Row-level editable(row) function support(canonical per `isCellEditable` L720)
+          // 2026-05-13:canEditCell helper consolidation(per V4)
+          const row = table.getRowModel().rowsById[rowId]
+          if (!row) return false
+          return canEditCell(meta, row.original)
+        }}
+      />
     </div>
   )
 
@@ -2153,9 +2763,23 @@ function DataTableInner<TData>(
       const newIdx = reorderableColumnIds.indexOf(targetId)
       if (oldIdx === -1 || newIdx === -1) return
       const position: 'before' | 'after' = oldIdx < newIdx ? 'after' : 'before'
-      // **v15.3 noop guard SSOT**(共用 isReorderNoop helper,跟 handleDragOver 同邏輯,
-      // 確保 indicator-suppress + commit-suppress 不漂移)
+      // **v15.3 noop guard SSOT**(共用 isReorderNoop helper)
       if (isReorderNoop(oldIdx, newIdx, position)) return
+      // 2026-05-12 Q1 fix(user 抓「column 一拉起來就一定要換位置」)— Material X / AG Grid
+      // column reorder canonical:cursor 必須過 next column **50% midpoint** 才換,沒過 → snap back。
+      // dnd-kit 預設 over=column-under-pointer 一拉到鄰格就 reorder。加 midpoint threshold 對齊
+      // 世界級 column reorder UX。對齊 row drag noop SSOT(`isReorderNoop`)+ Material X
+      // `columnReorder` midpoint canonical(https://mui.com/x/react-data-grid/column-ordering/)。
+      const activeRect = active.rect.current.translated ?? active.rect.current.initial
+      const overRect = over.rect
+      if (activeRect && overRect) {
+        const ghostCenter = activeRect.left + activeRect.width / 2
+        const targetCenter = overRect.left + overRect.width / 2
+        // Moving right(oldIdx < newIdx):ghost 必過 target center 才換
+        if (oldIdx < newIdx && ghostCenter < targetCenter) return
+        // Moving left(oldIdx > newIdx):ghost 必過 target center(從右側)才換
+        if (oldIdx > newIdx && ghostCenter > targetCenter) return
+      }
       onColumnReorder?.(sourceId, targetId, position)
       return
     }

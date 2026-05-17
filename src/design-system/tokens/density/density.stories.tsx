@@ -82,7 +82,7 @@ function TokenRow({
 // ── 1. Overview ──────────────────────────────────────────────────────────────
 
 export const Overview: Story = {
-  name: 'Overview',
+  name: '總覽',
   parameters: {
     docs: {
       description: {
@@ -139,7 +139,7 @@ export const Overview: Story = {
 // ── 2. UI Size ───────────────────────────────────────────────────────────────
 
 export const UISize: Story = {
-  name: 'UI Size',
+  name: 'UI 尺寸',
   parameters: {
     docs: {
       description: {
@@ -174,7 +174,7 @@ export const UISize: Story = {
 const LS_COLS = '220px 1fr 80px 1fr 80px'
 
 export const LayoutSpace: Story = {
-  name: 'Layout Space',
+  name: '版面間距',
   parameters: {
     docs: {
       description: {
@@ -196,7 +196,7 @@ export const LayoutSpace: Story = {
 // ── 4. Page Layout ───────────────────────────────────────────────────────────
 
 export const PageLayout: Story = {
-  name: 'Page Layout',
+  name: '頁面版型',
   parameters: {
     layout: 'fullscreen',
     docs: {

@@ -125,6 +125,20 @@ Popover（浮動容器，handle 展開 / 定位）
 
 ---
 
+## Loading（2026-05-15 audit B fix, codify 2026-05-16 audit Dim 7+8）
+
+非同步載入選項時，consumer 透過 `loading={true}` 控制：
+
+- **Trigger 不變**：dropdown 隨時可開（user 看 chevron 不會被 disable）
+- **Dropdown 開啟時**：options 替換為 panel-center `<Empty icon={<CircularProgress size={48}/>} description={loadingText}/>` compose 視覺
+- **CircularProgress 預設 24px**，但在 Empty wrapper 內 48px（取代 Empty 的 48px Avatar icon slot）
+
+對齊 MUI Autocomplete `loadingText` dropdown-body + Ant Select loading idiom + DS `empty.spec.md:182`「全頁 loading = Empty + CircularProgress compose」SSOT。
+
+**消費**：Select / Combobox / PeoplePicker forward `loading` prop 到 SelectMenu，本元件不需 consumer 直接知道 Empty + CircularProgress 組合（封裝在內）。
+
+---
+
 ## 禁止事項
 
 - ❌ 直接在 JSX 用 `<SelectMenu>`——透過外層元件（Select / Combobox / PeoplePicker）消費

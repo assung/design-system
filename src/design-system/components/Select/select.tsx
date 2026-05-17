@@ -1,9 +1,12 @@
+// @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
+// code-quality-allow: file-size — Select 含 3 子元件(NativeSelect/CustomSelect/ReadonlyDisplay)+ helpers + 4-mode renderer + Field SSOT consumption,split-into-files 會破壞 file-local helper closure
+// @renderer-symmetry-allow: pre-existing Select architecture(2026-05-08 D-path)— selectedItemRenderer 由 CustomSelectTriggerContent 消費(edit + trigger 模式),ReadonlyDisplay 走 separate bare-span path(no D-path)。display→edit unify deferred 下 cycle per spec contract (a) note。本 turn 只加 `nakedCellRowModeAlign` import,no behavior change to renderer symmetry contract。
 import * as React from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction, ItemPrefix, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
@@ -19,15 +22,25 @@ const tagPadding: Record<string, string> = {
 
 // ── Display ─────────────────────────────────────────────────────────────────
 
-export interface SelectOption {
-  value: string
-  label: string
-  /** Tag 模式的顏色。只在 display='tag' 時生效,對應 Tag 的 variant */
+/**
+ * Select 用的 option schema(2026-05-10 Issue 4 + post-prune unify):**explicit extends
+ * SelectMenuOption(primitive SSOT)** — 任何 SelectMenuOption 加 field 都自動繼承,不會 drift。
+ *
+ * Why `extends SelectMenuOption`(per user 「全盤檢查避免下次又改壞或是偏移」要求):
+ *   - **schema SSOT 機械強制**:TypeScript inheritance 跟著 primitive 走,wrapper consumer 永遠
+ *     拿得到 primitive 所有 surface field
+ *   - **Hook lint**(M30 `check_wrapper_primitive_schema_drift.sh`):grep `interface .*Option`
+ *     未 `extends` SelectMenuOption / 同名重複 declare 直接 BLOCK
+ *
+ * Wrapper-only field(`tagVariant`)— Select 獨有 `display='tag'` 用,SelectMenu primitive 不該知道
+ * 此 wrapper-only concern,所以 wrapper 層 extend 加上,不污染 primitive。
+ *
+ * 對齊 Polaris ChoiceList / Material Autocomplete / Carbon Dropdown 的 wrapper-vs-primitive
+ * schema-extension idiom。
+ */
+export interface SelectOption extends SelectMenuOption {
+  /** Tag 模式的顏色。只在 display='tag' 時生效,對應 Tag 的 variant。Wrapper-only。 */
   tagVariant?: string
-  /** 代表 value 的 prefix icon。觸發器和 dropdown 都會顯示。顏色跟 label 同(foreground) */
-  icon?: LucideIcon
-  /** 分組 key — 對應 SelectProps.groups[].key,有 groups 時必填(SelectMenu canonical) */
-  group?: string
 }
 
 /** 分組設定 — 對齊 SelectMenuGroupConfig SSOT */
@@ -56,6 +69,11 @@ export interface SelectProps
   startIcon?: LucideIcon
   /** 啟用搜尋（desktop 時 field 變 input，打字即篩選） */
   searchable?: boolean
+  /** Loading state(2026-05-15 audit B fix per user verbatim「dropdown 隨時可開,讀取在 panel 中間 CircularProgress」)。
+   *  Forward 給 SelectMenu primitive SSOT;dropdown 開啟時取代 options 顯 CircularProgress + loadingText。
+   *  Trigger 不變(chevron 保留 user 隨時可點開)。對齊 Field family loading SSOT + Empty 元件 `<Empty icon={CircularProgress}/>` compose。*/
+  loading?: boolean
+
   /** Menu list 最小列數(空狀態 / 選項少時的視覺一致 reserve)。預設 3 — 選項 < 3 時顯式縮(如 And/Or 兩選項) */
   minRows?: number
   /** Initial open state(uncontrolled)。對齊 Radix Popover defaultOpen canonical;DataTable cell-as-input
@@ -65,6 +83,16 @@ export interface SelectProps
   /** open state 變更 callback(對齊 Radix Popover onOpenChange canonical)。
    *  DataTable cell-as-input 用:open=false 時 cell 自動 exit edit mode(避免 dismiss 後卡住)。 */
   onOpenChange?: (open: boolean) => void
+  /**
+   * Display mode 顯 picker intrinsic end icon(2026-05-08 D path Phase 1)。
+   * 預設 false:`mode="display"` 純展示 bare span(向後相容)。
+   * `variant="naked" && mode="display"` 場景(DataTable cell)opt-in 設 true → wrap 進
+   * Field naked-display + 渲 ChevronDown ItemSuffix。**只 display mode 生效**;readonly /
+   * disabled / edit 已有 Field wrapper + suffix(不受此 prop 影響)。
+   * Authority:`data-table.spec.md:204` + `inline-action.spec.md:157`「Field family endAction(自動繼承)」。
+   * @default false
+   */
+  showDisplayEndIcon?: boolean
   /**
    * Trigger 內「已選項目」客製 render(2026-05-07 v15.5)。
    *
@@ -153,19 +181,45 @@ function CustomSelectTriggerContent({
   selectedItemRenderer?: (selectedOpt: SelectOption) => React.ReactNode
 }): React.ReactNode {
   // Searchable + open: 顯示搜尋 input
+  // 2026-05-15 Bug 2 fix(Claude+Codex Step 5 比稿 consensus,user verbatim「就 A」):
+  // 撤掉 native `<input placeholder=selectedLabel>` 不可靠 ellipsis renderer(browser-specific
+  // placeholder painting,user 抓「placeholder 直接被截掉沒 ellipsis」)。改 span overlay:
+  // - input native placeholder 限「搜尋…」/「請選擇人員」trigger empty hint(無 selectedLabel)
+  // - sibling `<span aria-hidden pointer-events-none absolute inset-0 truncate>` 在 search='' 且
+  //   有 selectedLabel 時 overlay 顯該人名(memory aid,truncate-with-ellipsis 可控)
+  // 對齊 spec.md §B row 4「open + inline-search + 選 1 人 → input cursor + placeholder = 該人名 + ellipsis」。
+  // a11y guard(per codex Q2 reply):input aria-label / accessible name 來自 field/label/aria-label,
+  // **不**依賴 placeholder 當 label;overlay span aria-hidden + pointer-events-none。
   if (searchable && open) {
+    const triggerEmptyPlaceholder = placeholder || '搜尋…' // i18n-allow: DS fallback
+    const showSelectedOverlay = !search && selectedLabel
     return (
-      <>
+      <span className="relative flex-1 min-w-0 inline-flex items-center">
         {StartIcon && <ItemPrefix><StartIcon size={iconSize} className="text-fg-muted pointer-events-none" aria-hidden /></ItemPrefix>}
         <input
           ref={inputRef as React.RefObject<HTMLInputElement>}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={selectedLabel || placeholder || '搜尋…'}
+          // Native placeholder 限 trigger empty hint(無 selectedLabel 時);若已 selected,留空交給 overlay span
+          placeholder={showSelectedOverlay ? '' : triggerEmptyPlaceholder}
           className={cn(bareInputStyles, 'cursor-text')}
           autoFocus
         />
-      </>
+        {showSelectedOverlay && (
+          // 2026-05-16 Bug B 真 root cause fix(Claude+Codex M31 Step 5 比稿 consensus,user verbatim
+          // 「修了一百次還沒好」+ codex cite W3C CSS Overflow / MDN / Mozilla Bug 972664#c1):
+          // 原 `inline-flex items-center truncate` 套同一 span,text 變 anonymous flex item →
+          // `text-overflow:ellipsis` 對 anonymous item 不 styleable → ellipsis dots 不可見(text 純 clip)。
+          // 對齊 `person-display.tsx:148` 既有 DS canonical:outer flex container + inner truncate 真實 box。
+          // DS-wide grep 29 個 truncate 都遵此 pattern,只本處違反 — 修齊。
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 flex items-center text-fg-muted"
+          >
+            <span className="min-w-0 flex-1 truncate">{selectedLabel}</span>
+          </span>
+        )}
+      </span>
     )
   }
   // **selectedItemRenderer slot**(2026-05-07 v15.5):consumer 客製 selected display(e.g.
@@ -175,7 +229,9 @@ function CustomSelectTriggerContent({
     return (
       <>
         {StartIcon && <ItemPrefix><StartIcon size={iconSize} className="text-fg-muted pointer-events-none" aria-hidden /></ItemPrefix>}
-        <span className="flex-1 min-w-0 inline-flex items-center">{selectedItemRenderer(selectedOpt)}</span>
+        {/* 2026-05-14 item-anatomy SSOT fix(per codex H2 propagation 斷點):加 nakedCellRowModeAlign
+            → autoRowHeight cell 內 selected renderer 也對齊 first-line,不再 vertical-center 整 row。 */}
+        <span className={cn("flex-1 min-w-0 inline-flex items-center", nakedCellRowModeAlign)}>{selectedItemRenderer(selectedOpt)}</span>
       </>
     )
   }
@@ -195,7 +251,7 @@ function CustomSelectTriggerContent({
   return (
     <>
       {value && selectedOpt?.tagVariant
-        ? <Tag size={size} variant={selectedOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
+        ? <Tag size={size} color={selectedOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
         : value
           ? <Tag size={size} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
           : <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
@@ -208,8 +264,8 @@ CustomSelectTriggerContent.displayName = 'CustomSelectTriggerContent'
 
 // ── Shared readonly/disabled/display render ─────────────────────────────────
 function ReadonlyDisplay({
-  mode, variant: variantProp, size, options, value, display, startIcon: StartIcon, className, placeholder,
-}: Pick<SelectProps, 'mode' | 'variant' | 'size' | 'options' | 'value' | 'display' | 'startIcon' | 'className' | 'placeholder'>) {
+  mode, variant: variantProp, size, options, value, display, startIcon: StartIcon, className, placeholder, showDisplayEndIcon,
+}: Pick<SelectProps, 'mode' | 'variant' | 'size' | 'options' | 'value' | 'display' | 'startIcon' | 'className' | 'placeholder' | 'showDisplayEndIcon'>) {
   const resolvedMode = mode ?? 'readonly'
   const variant = variantProp ?? 'default'
   const sz = size ?? 'md'
@@ -222,15 +278,43 @@ function ReadonlyDisplay({
   const emptyColorCls = resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'
   const emptyText = placeholder ?? EMPTY_DISPLAY
 
-  // mode='display'(Phase B2 2026-05-05):純內容輸出,無 Field wrapper chrome / 無 input affordance。
-  //   對齊原 SelectDisplay sub-component(retired) — Tag mode → 純 <Tag>;text mode → 純 text。
-  //   readonly / disabled 仍走下方 fieldWrapperStyles(input chrome 鎖定的 a11y signal)。
+  // mode='display':2 path(2026-05-08 D path Phase 1 Select canary)
+  //   ❌ 預設(無 showDisplayEndIcon):純內容輸出 bare span/Tag(原行為,backward compat)
+  //      對齊原 SelectDisplay sub-component(retired)。readonly / disabled 仍走下方 fieldWrapperStyles。
+  //   ✅ showDisplayEndIcon=true(DataTable cell opt-in):Field naked-display wrapper +
+  //      ChevronDown ItemSuffix。SSOT canonical 跟 readonly/edit/disabled mode 同 DOM 結構。
+  //      Authority: data-table.spec.md:204 + inline-action.spec.md:157「Field family endAction」
   if (resolvedMode === 'display') {
-    if (!value) return <span className={cn('text-fg-muted', className)}>{emptyText}</span>
-    if (isTextDisplay) return <span className={cn('truncate', className)}>{label}</span>
+    if (!showDisplayEndIcon) {
+      // 2026-05-14 I2 fix(spec contract (e) display typography canonical):bare span 必套
+      // `fieldDisplayTextClass(sz)`(sm/md→text-body,lg→text-body-lg)— 對齊跨 Field
+      // family display 視覺尺寸統一。
+      if (!value) return <span className={cn(fieldDisplayTextClass(sz), 'text-fg-muted', className)}>{emptyText}</span>
+      if (isTextDisplay) return <span className={cn(fieldDisplayTextClass(sz), 'truncate', className)}>{label}</span>
+      const selOpt = options?.find(o => o.value === value)
+      const tVariant = selOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
+      return <Tag size={sz} color={tVariant} className={className}>{label}</Tag>
+    }
+    // D path opt-in: Field naked-display wrapper + ItemSuffix ChevronDown
     const selOpt = options?.find(o => o.value === value)
     const tVariant = selOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
-    return <Tag size={sz} variant={tVariant} className={className}>{label}</Tag>
+    return (
+      <div
+        className={cn(fieldWrapperStyles({ mode: 'display', variant, size: sz }), value && !isTextDisplay && tagPadding[sz], className)}
+        data-field-mode="display"
+      >
+        {isTextDisplay ? (
+          <span className={cn(bareInputStyles, 'flex-1 min-w-0 truncate', !value && emptyColorCls)}>
+            {value ? label : emptyText}
+          </span>
+        ) : value ? (
+          <Tag size={sz} color={tVariant}>{label}</Tag>
+        ) : (
+          <span className={cn('flex-1 min-w-0', emptyColorCls)}>{emptyText}</span>
+        )}
+        <ItemSuffix><ChevronDown size={iconSize} className="text-fg-muted pointer-events-none" aria-hidden /></ItemSuffix>
+      </div>
+    )
   }
 
   if (isTextDisplay) {
@@ -249,7 +333,7 @@ function ReadonlyDisplay({
 
   return (
     <div className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), value && tagPadding[sz], className)} data-field-mode={resolvedMode}>
-      {value ? <Tag size={sz} variant={tagVariant}>{label}</Tag> : <span className={emptyColorCls}>{emptyText}</span>}
+      {value ? <Tag size={sz} color={tagVariant}>{label}</Tag> : <span className={emptyColorCls}>{emptyText}</span>}
     </div>
   )
 }
@@ -258,7 +342,7 @@ function ReadonlyDisplay({
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, ...props }, ref) => {
+  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, showDisplayEndIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, ...props }, ref) => {
     const fieldCtx = useFieldContext()
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
@@ -275,7 +359,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
     }, [ref])
 
     if (resolvedMode !== 'edit') {
-      return <ReadonlyDisplay mode={resolvedMode} variant={variant} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} placeholder={placeholder} />
+      return <ReadonlyDisplay mode={resolvedMode} variant={variant} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} placeholder={placeholder} showDisplayEndIcon={showDisplayEndIcon} />
     }
 
     const selectEl = (
@@ -316,7 +400,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
         <div className={cn(fieldWrapperStyles({ mode: 'edit', variant: variant, size }), value && tagPadding[size], 'relative',
           error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
           style={{ paddingRight: '0.75rem' }} data-field-mode="edit" data-error={error ? '' : undefined}>
-          {value ? <Tag size={size} variant={nativeTagVariant} className="shrink-0 relative z-10 pointer-events-none">{label}</Tag> : <span className="text-fg-muted">{placeholder ?? '選擇...'}</span>}
+          {value ? <Tag size={size} color={nativeTagVariant} className="shrink-0 relative z-10 pointer-events-none">{label}</Tag> : <span className="text-fg-muted">{placeholder ?? '選擇...'}</span>}
           {selectEl}
           <span className="flex-1" />
           {clearEl}
@@ -344,7 +428,7 @@ NativeSelect.displayName = 'NativeSelect'
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
-  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, groups, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, searchable = false, minRows, defaultOpen = false, onOpenChange, selectedItemRenderer, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, 'aria-label': ariaLabel }, ref) => {
+  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, groups, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, searchable = false, loading, minRows, defaultOpen = false, onOpenChange, selectedItemRenderer, showDisplayEndIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, 'aria-label': ariaLabel }, ref) => {
     const fieldCtx = useFieldContext()
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
@@ -377,11 +461,15 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
       ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
       : options
     // ── 轉換 SelectOption → SelectMenuOption(必在 early return 前) ──
+    // Issue 4(2026-05-10):forward avatar / description / disabled SSOT(per SelectMenuOption schema)。
     const menuOptions: SelectMenuOption[] = React.useMemo(
       () => filteredOptions.map(opt => ({
         value: opt.value,
         label: opt.label,
         icon: isTextDisplay ? opt.icon : undefined,
+        avatar: opt.avatar,
+        description: opt.description,
+        disabled: opt.disabled,
         group: opt.group,
       })),
       [filteredOptions, isTextDisplay]
@@ -392,7 +480,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
       return (menuOpt: SelectMenuOption) => {
         const srcOpt = options.find(o => o.value === menuOpt.value)
         if (srcOpt?.tagVariant) {
-          return <Tag size={size} variant={srcOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'}>{menuOpt.label}</Tag>
+          return <Tag size={size} color={srcOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'}>{menuOpt.label}</Tag>
         }
         return menuOpt.label
       }
@@ -410,7 +498,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
 
     // Early return AFTER all hooks(disabled / readonly / display mode 走 ReadonlyDisplay)
     if (resolvedMode !== 'edit') {
-      return <ReadonlyDisplay mode={resolvedMode} variant={variant} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} placeholder={placeholder} />
+      return <ReadonlyDisplay mode={resolvedMode} variant={variant} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} placeholder={placeholder} showDisplayEndIcon={showDisplayEndIcon} />
     }
 
     const clearEl = showClear ? (
@@ -492,6 +580,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
         value={value ?? null}
         onValueChange={handleValueChange}
         searchable={false}
+        loading={loading}
         size={size}
         minRows={minRows}
         open={open}

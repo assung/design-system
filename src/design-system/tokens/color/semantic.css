@@ -290,7 +290,7 @@
   --status-online:        var(--color-green-6);    /* 在線(對齊 success 色相) */
   --status-busy:          var(--color-deep-orange-6); /* 忙碌(對齊 error 色相,強烈可見) */
   --status-away:          var(--color-yellow-6);   /* 離開(對齊 warning 色相) */
-  --status-offline:       var(--color-neutral-6);  /* 離線(neutral,弱化) */
+  --status-offline:       var(--color-neutral-6-opaque);  /* 離線(neutral,弱化;2026-05-15 user 拍板 → opaque tier 對齊 --border-opaque / --surface-strong alpha-immune idiom,避免 status dot 疊在非白 bg cell 時 alpha compositing 致視覺漂移)*/
 
   /* Border / Divider */
   --border:               var(--color-neutral-5);  /* 元件標準邊框 */
@@ -329,6 +329,14 @@
   /* Static Subtle — 靜態弱化背景 */
   --muted:                var(--color-neutral-2);  /* Badge/skeleton 底色 */
   --secondary:            var(--color-neutral-3);  /* Badge low 底色 */
+
+  /* Scrollbar — Lane / chrome / thumb(2026-05-09 抽 SSOT,DataTable fake + ScrollArea 共享)
+     Track 用 --muted(靜態 lane,非 disabled 元件 bg);Thumb 用 --border(中性低對比 chrome)。
+     對齊 shadcn ScrollArea(thumb=bg-border)/ MUI X DataGrid scrollbar slot / AG Grid grid theme tokens。
+     避免直接借 --bg-disabled(color.spec.md:169 語意 drift)— bg-disabled 是互動元件 disabled bg,跟 scrollbar lane 不同。 */
+  --scrollbar-track:       var(--muted);
+  --scrollbar-thumb:       var(--border);
+  --scrollbar-thumb-hover: var(--border-hover);
 
   /* Chart categorical — 5 色類別標記（Chart 元件消費）
      挑 step-6 確保對 surface-raised 的對比足夠,5 色差異明顯便於區分。
