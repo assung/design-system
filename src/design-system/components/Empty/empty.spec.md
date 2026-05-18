@@ -163,6 +163,14 @@ Empty 是 **non-interactive layout primitive**——本身無 ARIA role(讓 cons
 | SelectMenu | — | `<Empty description="無選項" className="py-6" />` |
 | Combobox | — | `<Empty description="找不到結果" className="py-6" />` |
 
+## 禁止事項
+
+- ❌ 把 Empty 拿來顯示 loading state(無 description 又無 spinner)— Empty 是「確定沒有」語意,loading 用 `<Skeleton>` / `<CircularProgress>` 或 `<Empty icon={<CircularProgress />}/>` compose
+- ❌ 把 Empty 拿來顯示 error state(只有 description)— error 需明確 action(重試 / 報告 / 聯絡支援),用 `<Alert>` + 重試 button
+- ❌ Empty title / description 文案太抽象(「Nothing here」「No data」)— 應描述「缺什麼資料」+「為什麼空」+「下一步動作」(對齊 Polaris EmptyState / Carbon Empty State copy guideline)
+- ❌ Action button 用 destructive variant — Empty 是引導 onboarding 心境,destructive 視覺敵意衝突
+- ❌ 整頁 Empty 但無 action — user 困惑「我該做什麼」;若該頁本質無 action(等待後台 invite),改用 Alert/Notice 解釋
+
 ## 為何無 Inspector / ColorMatrix / SizeMatrix / StateBehavior
 
 Empty 是 **pure layout primitive**(排列 icon / title / description / action 成居中垂直堆疊),不是互動元件,也不是 variant-driven 元件:

@@ -23,6 +23,7 @@
 | **Cell display vs edit content position**(picker offset)| `field.spec.md:407` Layout Family 4 + `data-table.spec.md:204` | 「Field control display + edit 共用同 wrapper geometry」 | ⚠ **MISALIGNED**:6 picker display 走裸 span,跟 edit Field wrapper 不同 DOM | 2026-05-07~08 round 1-5(blocked on indicator SSOT decision)|
 | **Field state machine focus dominates**(v13.3)| `field-wrapper.tsx:140-189` + `field.spec.md:371-415` + `check_field_family_invariants.sh` A.3 | 「focus dominates everything;naked 不寫平行 outline ring」 | ✅ aligned;hook A.3 enforce | 2026-05-06 v9-v13.3 5 round refinement |
 | **Solo dev workflow**(1 chat = 1 branch / Netlify gate / squash merge)| `feedback_solo_dev_workflow.md` + CLAUDE.md「Git solo-work canonical」 | 「1 chat = 1 working branch;Netlify preview = user gate;『push / OK』trigger 才 merge main」 | ✅ aligned(M28 + hook `check_solo_workflow.sh`)| 2026-05-08 M28 codify |
+| **Wrapper-vs-primitive schema unify**(SelectOption / MenuItemProps 等)| `SelectMenu/select-menu.tsx` SelectMenuOption + `Combobox/combobox.tsx` extends + `PeoplePicker/people-picker.tsx` extends | 「wrapper API schema 必 `extends primitive`,wrapper 內部 mapping 必 forward 全 primitive surface field(M30)」 | ✅ aligned(2026-05-10 Round 1 commit `561945b` Combobox extends + forward 全 field;PeoplePicker 對齊 + hook `check_wrapper_primitive_schema_drift.sh` BLOCKER)| 2026-05-10 M30 codify |
 
 ## How to maintain
 

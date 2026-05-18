@@ -42,6 +42,17 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 | 切換**平行** view（非階層）| `Tabs` | Breadcrumb 表達的是 parent-child 關係 |
 | 主導覽 | `Sidebar` / top nav | Breadcrumb 反映當前位置，不是全局導覽 |
 
+## 近親元件分界
+
+| vs | 差異軸 | 何時用 Breadcrumb |
+|---|---|---|
+| **Tabs** | Tabs 平行視圖切換;Breadcrumb 階層位置 indicator | 表達「我在 A → B → C 的 C」 |
+| **Steps** | Steps 是順序流程進度;Breadcrumb 是樹狀階層位置 | 非進度,而是 nested resource path |
+| **Sidebar nav** | Sidebar 是全局導覽 chrome;Breadcrumb 是 content header 內 inline path | 局部位置 anchor,不取代全局 nav |
+| **Link / page header** | Link 是單一導覽動作;Breadcrumb 是 parent-chain 完整路徑 | 路徑 ≥ 3 層需要可逐層回上 |
+
+對齊 Polaris Breadcrumbs / Material Breadcrumb / Atlassian Breadcrumbs 共識:nav inside page header,不取代 sidebar。
+
 ---
 
 ## 內部結構

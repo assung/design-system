@@ -149,6 +149,17 @@ Popover（浮動容器，handle 展開 / 定位）
 
 ---
 
+## 邊界案例
+
+- **Disabled option**:individual MenuItem 透過 `disabled?: boolean` 控制(SelectMenu primitive option contract)。視覺繼承 `MenuItem` SSOT:text → `text-fg-disabled`(M24)、無 hover bg、`aria-disabled="true"`、Enter / click 不觸發 onChange、鍵盤導覽自動 skip。
+- **Disabled trigger**:trigger 由 consumer(Select / Combobox / PeoplePicker)的 `disabled` prop own,本元件不獨立 disable trigger。
+- **Loading**:已 codify(見「Loading」段),`loading=true` 時 dropdown body 切 panel-center Empty + CircularProgress 48px。
+- **Empty**:已 codify(見「Empty state」段),搜尋無結果 + 非 creatable 時渲 emptyText;creatable 時保留「建立 "xxx"」row。
+- **Dark mode**:走 Popover / MenuItem semantic token 自動 adapt。
+- **Density**:row height 由 `MenuItem` SSOT 控(sm/md/lg);SelectMenu 不獨立 own density。
+
+---
+
 ## 為何無 ColorMatrix
 
 SelectMenu 是**多區塊 composite primitive**,不擁有獨立色彩決策:

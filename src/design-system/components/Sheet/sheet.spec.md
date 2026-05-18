@@ -90,6 +90,27 @@ Sheet 為容器,內容由 consumer 決定;focus trap + Escape close + `aria-labe
 
 ---
 
+## 禁止事項
+
+- ❌ Sheet 內塞滿全頁複雜流程 — Sheet 是 side surface 不是 page 替代;若內容超過 3-4 個 section / 多步表單,改 navigate 到獨立 route page
+- ❌ Sheet 內再開 Sheet(nested side surface)— 視覺空間衝突,user 找不到 escape;改用 Dialog 或 page transition
+- ❌ Sheet trigger 用 inline link(非 Button)— Sheet 是 substantive action 不是 navigation,affordance 必須是 Button(可 tertiary / icon-only)
+- ❌ Sheet content 無 title — `aria-labelledby` 必須對應可見 title,SR 否則讀「unnamed dialog」
+- ❌ Sheet 用作 Toast / 短暫通知 — Sheet 阻斷 chrome interaction,不適合 ephemeral 訊息;短暫 → Toast / 持久 → Alert / 阻斷 confirm → Dialog
+- ❌ 跳過 Radix Dialog primitive 自建 Sheet — focus trap / Esc close / Portal escape 邏輯複雜,自建必漏
+
+---
+
+## 邊界案例
+
+- **Disabled**:Sheet 本身無 disabled state(非互動 control,是 surface container);trigger Button 由 consumer 控 disabled。
+- **Loading(panel content loading)**:Sheet 為純容器,不獨立 own loading state。Async body 場景由 consumer 在 body slot 渲 `<Empty icon={<CircularProgress size={48}/>}/>`(對齊 `empty.spec.md:182` 全頁 loading SSOT)或 `<Skeleton>` line-stack 取代 content,不開 / 不關 Sheet 即可。
+- **Empty(no content)**:Sheet 必含 title(`aria-labelledby` 強制要求);body 為空時 consumer 應渲 `<Empty>` placeholder,不渲空白 panel。
+- **Dark mode**:overlay-surface SSOT 自動 adapt(`overlay-surface.spec.md`);Sheet 不獨立 own dark token。
+- **Density**:Sheet body density 由 consumer 控(若內含 form / DataTable / Menu 各自有 density 規則);Sheet container 自身不持 density。
+
+---
+
 ## 相關
 
 - `../Dialog/dialog.spec.md` — 居中 modal 的對應元件（共用 Radix Dialog base）

@@ -2,7 +2,7 @@
   "_meta": {
     "purpose": "Explicit semantic mapping: principle (M-rule / trait / hook) → audit dim cover",
     "ssot": ".claude/memory/feedback_audit_preflight_全盤查.md + design-system-audit/SKILL.md",
-    "updated": "2026-05-15",
+    "updated": "2026-05-18",
     "version": "1.0",
     "_principle":  "禁 heuristic match;每原則必 explicit dim list。新原則加入必同 commit 加 entry,違 = hook BLOCK"
   },

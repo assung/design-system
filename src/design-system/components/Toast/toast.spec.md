@@ -153,6 +153,16 @@ Toast 的 public API 是 `toast()` 函式(imperative 觸發)+ `<Toaster />` Prov
 
 ---
 
+## 邊界案例
+
+- **Disabled(action button)**:Toast 本身為 ephemeral notification 無 disabled state(自動消失,不需禁用);若 `toast()` 傳入 `action` button(sonner ToastOptions),該 button 在 async 動作中 consumer 可 disable,視覺繼承 Button SSOT(`text-fg-disabled` + `cursor-not-allowed`)。
+- **Loading**:Sonner 提供 `toast.promise(promise, { loading, success, error })` API — loading 階段渲 spinner + `loadingText`,promise 成功 / 失敗自動切 success / error variant;本元件不需 wrap。
+- **Empty**:`toast()` 必傳 title(API contract);無 title-empty 場景。
+- **Icon-only**:`neutral` variant 不渲 status icon,layout 收斂為 `[title + description?]  [action?]  [dismiss X?]`。
+- **Dark mode / density**:走 Notice / Sonner 內部策略(見「Theme 策略」段),固定寬度 360px 跨 density 不變。
+
+---
+
 ## 相關
 
 - `../Notice/notice.spec.md` — Toast 消費的 layout primitive（與 Alert 共用）

@@ -175,6 +175,14 @@ Subtle vs Solid 的完整 variant × theme class 對照見 anatomy `ColorMatrix`
 <Alert variant="info" placement="fixed" title="系統維護中，部分功能暫停" />
 ```
 
+---
+
+## 邊界案例
+
+- **Disabled(dismiss button)**:Alert 本身無 `disabled` prop(持久通知不該被禁用),但 dismiss close X 為 `<Button iconOnly dismiss size="sm" />`,自動繼承 Button disabled 視覺(`text-fg-disabled` + `cursor-not-allowed` + 無 hover bg);實務場景:後台正在執行 close action(API in-flight)時 consumer 可 disable button 防 double-click,fg token 走 Button SSOT 不在 Alert 加層。
+- **Loading**:Alert 本身不需 loading state(非 async surface);若 Alert body action row 內 CTA 在 async 動作中,該 Button 自己處理 `loading` prop。
+- **Empty / icon-only**:Alert 必有 `title`(API contract),無 empty 場景;若無 description 則僅顯示 title + icon,layout 自動收斂。
+
 ## 相關
 
 - `../Notice/notice.spec.md` — Alert 消費的 layout primitive（與 Toast 共用）

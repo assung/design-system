@@ -1,5 +1,7 @@
 # Drag & Drop Canonical(2026-05-06 v14.8 audit)
 
+**Status:** stale-pending-prune(2026-05-18 標記:Phase 1/2 fix plan propose 自 2026-05-06 後 12+ 天無 update,Path B 推薦未確認 ship verify;下次 `/knowledge-prune` 評估 update「現況 audit」表或 inactive 標記)
+
 **Purpose**:統整世界級 drag-drop 實作慣例,作為 DS 內 TreeView / DataTable row drag / DataTable column reorder 的對齊基準。M26 webfetch 後產出,Phase 2(table 進階 tree-view 式 drag)的設計依據。
 
 ---

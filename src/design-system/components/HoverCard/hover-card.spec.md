@@ -107,6 +107,14 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 
 ---
 
+## 禁止事項
+
+- ❌ 把關鍵資訊放在 HoverCard — 觸控裝置無 hover 能力,user 永遠看不到;關鍵 info 直接顯示或 Popover(click 觸發)
+- ❌ HoverCard 內塞表單 / 多步流程 — hover 離開可能誤關閉,複雜互動用 Dialog / Sheet
+- ❌ HoverCard 自帶 bg / border / shadow / padding 套在 HoverCardContent 上 — HoverCard 是純行為 primitive,視覺由 consumer NameCard / OverflowIndicator 各自決定(見「純行為 primitive」段)
+- ❌ HoverCard delay 設 0(立即彈出)— 滑鼠掃過所有 trigger 都彈,視覺雜訊;遵循 Radix delay 預設 700ms open / 300ms close
+- ❌ 拿 HoverCard 當 Tooltip(純文字提示)— 用 Tooltip(統一深色背景 + ARIA `role="tooltip"`),HoverCard 是 interactive surface 角色不同
+
 ## 空值 / 驗證 / loading / a11y
 
 純行為 primitive,無獨立 empty / validation / loading;a11y 由 Radix HoverCard 提供(open on hover / focus,Escape 關)。

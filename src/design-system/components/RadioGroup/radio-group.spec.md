@@ -101,6 +101,16 @@ Item-level default / hover / active / checked / disabled **色彩**與 Checkbox 
 
 ---
 
+## 邊界案例
+
+- **Disabled**:Group-level `disabled` 套用至所有 radio items;item-level `disabled` 單獨 disable 該選項。視覺繼承 SelectionItem SSOT(`text-fg-disabled` + 灰 radio circle + 不可點 + 鍵盤導覽自動 skip)。
+- **Loading(async option fetch)**:async option list 載入時 consumer 應渲 `<Skeleton>` 對應 radio item count(常見 3-5 行 skeleton),而非空 RadioGroup;RadioGroup 自身不獨立 own loading prop。
+- **Empty(no options)**:罕見場景。應由 consumer 條件性渲 `<Empty>` placeholder(「無可選項目」)取代空 RadioGroup,不渲 0-radio 空 group(SR 會讀「empty group」造成混淆)。
+- **No value selected**:`value=null` 為合法 initial state(所有 radio 都 unchecked);Field validation 在 required + null 時觸發 error。
+- **Dark mode / density**:走 SelectionItem semantic token 自動 adapt;垂直 gap 隨 layoutSpace token density-aware。
+
+---
+
 ## 相關
 
 - `../Checkbox/checkbox.spec.md` — 共用規則（SelectionItem 佈局 / clamp 政策 / 視覺語言）

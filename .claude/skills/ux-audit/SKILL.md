@@ -124,7 +124,7 @@ description: UX behavior audit for design-system components and product UI. Chec
 
 ## 相關
 
-- `.claude/skills/design-system-audit/SKILL.md` — 20 dim 統籌;本 skill 是 D4 補位
+- `.claude/skills/design-system-audit/SKILL.md` — 全 dim 統籌(per design-system-audit SSOT);本 skill 是 D4 補位
 - `.claude/skills/visual-audit/SKILL.md` — pixel 層(D5)
 - `.claude/skills/performance-audit/SKILL.md` — 效能層(D3)
 - `.claude/skills/component-quality-gate/SKILL.md` — Phase 4.5 進階模式 chain 本 skill

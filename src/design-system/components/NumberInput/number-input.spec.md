@@ -82,6 +82,27 @@ col.accessor('price', {
 
 ---
 
+## 禁止事項
+
+- ❌ 不要拿 NumberInput 顯示電話 / 郵遞區號 / 身分證號(非算術型數字)— 用 `Input`(電話千分位無意義 / step 不適用)
+- ❌ 不要把 `precision` 設超過 6(浮點精度雜訊)— 極端精度需求超出格式化能力,改用 `Input` + 自驗證
+- ❌ 不要在 DataTable cell 用左對齊 NumberInput(縱向比較位數需右對齊)— 走 DataTable column type `number` / `currency` 預設右對齊
+- ❌ 不要把 `prefix='$'` 跟 `suffix='元'` 同時用 — 貨幣語意衝突,擇一即可
+- ❌ 不要拿 NumberInput 做百分比但 value 存 0–1(`0.85` × 100 = 85%)— DS canonical 是 value 直接存百分比數值(85),`suffix='%'` 純顯示
+- ❌ 不要自加 step ↑↓ button — Native `<input type="number">` 已支援(若顯示則由 spec 統一決定外觀,目前 hide 避免視覺雜訊)
+
+---
+
+## 邊界案例
+
+- **Disabled**:由 Field SSOT own(`Field/field-controls.spec.md` State machine 段)。視覺:wrapper bg → `bg-fg-disabled-subtle`、formatted text → `text-fg-disabled`(M24 state>emphasis)、step ↑↓ button(若有)自動 disabled 不可點。Display mode + disabled 維持格式化輸出但 token 切 disabled。
+- **Loading**:走 Field SSOT 的 `loading?: boolean`(`field-controls.spec.md` L70-115);endAction slot 自動切 `<CircularProgress/>` + `aria-busy="true"`,input 仍可編輯。
+- **Empty(null / undefined / 空字串)**:Display mode 渲 `—`(em dash + `text-fg-muted`);Edit mode placeholder 走 default placeholder color。
+- **Invalid input**(non-numeric):由 native `<input type="number">` + Field validation 處理,渲 error variant(`aria-invalid="true"` + `text-fg-error` border + 下方 error message)。
+- **Dark mode / density**:走 Field SSOT,不獨立 own。
+
+---
+
 ## 相關
 
 - `../Input/input.spec.md` — 純文字（含電話 / 郵遞區號等「看起來像數字」的資料）

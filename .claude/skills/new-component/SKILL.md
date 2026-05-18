@@ -167,4 +167,4 @@ traits:
 
 - `/component-quality-gate` — review-phase gate,本 skill Phase 6 chain 進去(create/review 兩端互補)
 - `/story-writing` — Phase 5 chain 進去寫 stories
-- `/design-system-audit` — DS-wide audit(33 dim, Phase 0 自建 baseline),不是 per-component
+- `/design-system-audit` — DS-wide audit(全 dim per design-system-audit SSOT,Phase 0 自建 baseline),不是 per-component

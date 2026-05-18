@@ -190,6 +190,16 @@ DescriptionList 是**唯讀 label / value 資料呈現**(非互動 / 非 variant
 
 ---
 
+## 邊界案例
+
+- **Disabled(action cell)**:DescriptionList 主體為唯讀資料呈現,本身無 disabled state;若 `<dd>` 內 consumer 嵌入 inline action(Button / Link),該 action 自行 own disabled,DL 不干預(token 走 Button SSOT)。
+- **Loading**:DL 非 async surface,無 loading prop。若 page-level data 載入中,consumer 應在 DL 外層用 `<Skeleton>`(每組 dt/dd 對應一條 skeleton line)取代;DL 本體不渲染 loading state。
+- **Empty(no items / empty value)**:no items → consumer 應 conditional 渲 `<Empty>` 取代 DL,不渲空 `<dl>`(SR 會讀「empty list」造成混淆);individual value 空 → 渲 `—`(em dash,`text-fg-muted`,已在「無障礙」段 codify)。
+- **Dark mode**:走 semantic token(`text-fg-secondary` / `text-foreground`)自動 adapt。
+- **Density**:垂直 gap 隨 `layout-space` token density-aware(見「間距」段),typography fixed reading mode tier 不變。
+
+---
+
 ## 相關
 
 - `../Field/field.spec.md` — 表單輸入（需要編輯的對應元件）

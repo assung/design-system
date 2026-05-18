@@ -259,6 +259,16 @@ trigger 的互動狀態(focus / invalid / disabled / readonly)完全繼承 `../F
 
 ---
 
+## 邊界案例
+
+- **Disabled**:Field SSOT own;trigger 自動 disabled(`text-fg-disabled` + 不開 picker),Display mode + disabled 維持時間格式但 token 切 disabled。
+- **Loading**:TimePicker 為 sync UI(time math 在 client),無 loading state。極端 case(後端 disabled-times list)應由 consumer 先 disable trigger 直到 fetch 完成。
+- **Empty(no value)**:`value=null` 為合法 initial state,trigger 顯 placeholder(預設「選擇時間」);`null` + Display mode 顯 `—`(em dash + `text-fg-muted`)對齊 Input display empty 慣例。
+- **Empty(disabled all times)**:極端場景(`disabledHours` / `disabledMinutes` 覆蓋全範圍),panel column 全 disabled,鍵盤焦點停留無導覽目標。
+- **Dark mode / density**:走 Field + Popover SSOT 自動 adapt;panel column item 由 MenuItem SSOT 控 density。
+
+---
+
 ## 相關
 
 - `../DatePicker/date-picker.spec.md` — 日期選擇,TimePicker 姊妹元件,API 風格對齊

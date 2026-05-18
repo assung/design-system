@@ -201,6 +201,16 @@ Item-level default / hover / focused / selected / disabled **色彩**由 MenuIte
 
 ---
 
+## 邊界案例
+
+- **Disabled trigger**:由 trigger Button 的 `disabled` prop 控,該 Button 自動繼承 disabled token(M24 state precedence);click trigger 不開 menu。
+- **Disabled item**:`<DropdownMenuItem disabled>`(Radix 內建支援),視覺繼承 MenuItem SSOT(`text-fg-disabled` + `aria-disabled=true` + 鍵盤導覽 skip + 不觸發 onSelect)。
+- **Loading(async submenu / async items)**:DropdownMenu primitive 不獨立 own loading prop。async submenu 場景應由 consumer 在 `<DropdownMenuSub>` 內條件性渲 `<DropdownMenuItem disabled>` + spinner label(如「載入中...」);或 fetch options 前先 disable 整個 menu trigger。完整 loading body 替換 pattern 屬 SelectMenu scope,不在 DropdownMenu scope。
+- **Empty(no items / async fetch result empty)**:consumer 應條件性渲 `<DropdownMenuItem disabled>` 顯示「無可用動作」字樣;不渲空 menu。
+- **Dark mode / density**:走 MenuItem + Popover SSOT 自動 adapt;density 預設 lock `md`(M3 portal subtree convention)。
+
+---
+
 ## 相關
 
 - `../Menu/menu-item.spec.md` — 共用的 MenuItem primitive（prefix 對齊、尺寸、狀態）

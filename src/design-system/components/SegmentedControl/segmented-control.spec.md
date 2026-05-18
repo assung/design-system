@@ -289,12 +289,7 @@ Items 之間 `-ml-px`（除了第一個）讓相鄰 border 重疊、視覺上只
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `chip.spec.md`
+- `horizontal-overflow.spec.md`
 - `radio-group.spec.md`
 - `select.spec.md`
 - `slider.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `horizontal-overflow.spec.md`

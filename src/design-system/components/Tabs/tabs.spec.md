@@ -242,6 +242,13 @@ Size 建議:overlay / chrome header 內用 `sm`(32/40)— 對應 close X 也是 
 - Tab **沒有 loading 狀態**——載入的是 content 區，不是 tab 本身
 - Disabled tab **不應**同時有 badge（語意矛盾：「有待處理但你不能看」）
 
+### 補充邊界案例
+
+- **Empty(no tabs)**:單 tab 已禁用(見「禁止事項」),0 tab 同理 — consumer 應條件性不渲 `<Tabs>`,不渲空 TabsList。
+- **Empty content panel**:tab 切到沒內容的 view 時,content panel 應渲 `<Empty>` 引導 user(對齊 empty 元件的 page-empty pattern)— 由 consumer 決定,Tabs primitive 不獨立處理。
+- **Disabled tab 鍵盤行為**:Radix Tabs 自動 skip disabled tab(`←/→` 不停留),focus 跳到下一個可用 tab。
+- **Dark mode / density**:走 chrome-header / Field 對應 token 自動 adapt;`size` × `variant` matrix 已在 anatomy 完整呈現,density 由 size prop 表達不獨立 own 維度。
+
 ---
 
 ## 禁止事項

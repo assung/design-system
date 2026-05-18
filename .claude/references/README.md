@@ -4,18 +4,24 @@
 
 Agent 在執行時按需讀的深度 reference 檔 — audit protocol / FP 記憶 / workflow recipe / lookup tables。**不是 product design canonical**(那該進 spec.md / CLAUDE.md)。
 
-## 當前居民(8 檔,2026-04-24)
+## 當前居民(15 檔,2026-05-18 update)
 
 | Ref | 用途 |
 |-----|------|
+| `audit-coverage-vs-24-checklist.md` | 業界 24-checklist 對照 + 為何不平行 audit 24 dim rationale |
 | `build-ui-canonicals.md` | 建 UI 前 12 情境 + 8 layout primitive lookup |
 | `cva-patterns.md` | cva 適用 / 不適用 + 例外清單(跟 CLAUDE.md shadcn 規範互補) |
-| `tailwind-gotchas.md` | Tailwind v4 / tailwind-merge 技術陷阱深展 |
+| `drag-canonical.md` | 世界級 drag impl 對照 + dnd-kit collision strategy + Phase 1/2 fix plan |
+| `item-anatomy-recipe.md` | 7 步建立新 row primitive workflow + audit grep guard |
 | `naming-conventions.md` | 命名詳表 + 禁止清單(CLAUDE.md # 命名一致性 pointer) |
+| `principle-dim-map.json` | M-rule / trait / hook → audit dim explicit mapping(SSOT for dim coverage) |
 | `props-naming.md` | Props callback / Badge / icon canonical 詳表 |
 | `spec-rules.md` | SSOT 機制 / 邊界案例 scope default 詳展 |
 | `ssot-consultation.md` | SSOT 消費完整對照表 |
-| `item-anatomy-recipe.md` | 7 步建立新 row primitive workflow + audit grep guard |
+| `ssot-index.md` | High-risk interface ownership map(propose 前 grep 找 owner) |
+| `structural-token-retention.md` | 6 類結構性保留 token canonical(audit Dim 48 triple-verify) |
+| `tailwind-gotchas.md` | Tailwind v4 / tailwind-merge 技術陷阱深展 |
+| `ui-dev-rules.md` | flex slot 幾何 / 數值前先查 / Padding 三層 / Icon size 三類 |
 
 ## 這裡**不收**(反例 + 正確去處)
 

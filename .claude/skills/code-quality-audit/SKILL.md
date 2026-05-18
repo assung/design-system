@@ -9,7 +9,7 @@ Scope:**tsx / ts code hygiene**,跟 design canonical 正交。
 
 ## 為什麼要這 skill
 
-`/design-system-audit` 26 dim 管 design / spec / canonical correctness。但 **clean code 面向**(`any` 濫用 / dead export / 函式爆長 / circular dep / 檔案超標)**無任何 dim 覆蓋**。每次建元件 / audit / ship 都該跑這層。
+`/design-system-audit`(全 dim per design-system-audit SSOT)管 design / spec / canonical correctness。但 **clean code 面向**(`any` 濫用 / dead export / 函式爆長 / circular dep / 檔案超標)**無任何 dim 覆蓋**。每次建元件 / audit / ship 都該跑這層。
 
 ## 6 個 check
 

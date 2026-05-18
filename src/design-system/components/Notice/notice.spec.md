@@ -111,6 +111,15 @@ Notice 是 **Toast / Alert 共用的 layout primitive**,刻意不擁有尺寸與
 
 ---
 
+## 邊界案例
+
+- **Disabled(dismiss button)**:Notice 本身不擁有 disabled state(internal primitive,無互動);內嵌的 `<Button iconOnly dismiss size="xs" />` 自動繼承 Button disabled 視覺(`text-fg-disabled` + `cursor-not-allowed`)。Consumer(Alert / Toast)若需 disable dismiss,應透過 consumer-level prop pass-through。
+- **Loading**:Notice 非 async surface,無 loading state。Body 內若 consumer 注入 CTA Button,該 Button 自行處理 loading。
+- **Empty**:Notice 必有 title 或 description 其一(消費合約);無 title-only icon-less 形態,layout 至少 1 行內容。
+- **Icon-only / variant=neutral**:`neutral` variant 不渲 status icon,layout 自動收斂為 `[title + description?]  [endContent?]  [dismiss X?]` 三 slot。
+
+---
+
 ## 相關
 
 - `../Alert/alert.spec.md` — 主要消費者（持久通知）

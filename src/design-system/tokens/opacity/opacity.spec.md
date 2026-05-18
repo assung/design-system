@@ -63,3 +63,16 @@ Avatar、Sidebar、MenuItem、Slider、Switch、Steps、Chip。
 ## 反向引用
 
 - Disabled 策略選擇框架：`tokens/color/color.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `avatar.spec.md`
+- `chip.spec.md`
+- `color.spec.md`
+- `menu-item.spec.md`
+- `sidebar.spec.md`
+- `slider.spec.md`
+- `steps.spec.md`
+- `switch.spec.md`

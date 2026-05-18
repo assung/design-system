@@ -8,7 +8,7 @@ traits:
   - hasSizes
   - hasInteractiveStates
 variants:
-  primary:
+  primary:    # ★ cva default
     when: "主要 action / CTA"
     world-class: ["Polaris Button primary", "Material Filled Button", "Atlassian Primary"]
   secondary:
@@ -26,7 +26,7 @@ variants:
 sizes:
   xs: { when: "row-embedded inline(FileItem rich action / DataTable row action)" }
   sm: { when: "form field-height 28 / compact chrome" }
-  md: { when: "default general UI" }
+  md: { when: "default general UI" }   # ★ cva default
   lg: { when: "touch / prominent CTA / stakeholder-facing surface" }
 禁止事項:
   - rule: "iconOnly 必傳 aria-label"

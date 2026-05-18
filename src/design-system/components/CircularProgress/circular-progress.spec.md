@@ -232,6 +232,16 @@ CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維
 
 ---
 
+## 邊界案例
+
+- **Disabled(consumer host)**:CircularProgress 本身**不擁有 disabled state**(色彩繼承 host 的 `text-current`)。當消費 host 為 Button loading + disabled 組合時,spinner 顏色自動跟 Button text color 弱化為 `text-fg-disabled`;不需 CircularProgress 端 prop。
+- **Loading(本即元件本質)**:本元件本質是 loading indicator;無需另外的 loading prop。indeterminate(無 `value`)= 旋轉動畫,determinate(有 `value`)= 弧長對應 0–100%。
+- **Empty / 0 progress**:`value=0` 在 determinate mode 渲空 track,符合「尚未開始」語意;若 0 + lifecycle status `success`,自動切 success token(`UsageInline` story 演示)。
+- **Dark mode**:走 Progress token + `text-current` 繼承,自動 adapt。
+- **Size 極端值**:size 為自由 number(非 sm/md/lg tier);size < 12 不建議(stroke width / icon overlap 失調),size > 96 建議改 ProgressBar(linear 在大尺寸更易讀)。
+
+---
+
 ## 相關
 
 - **ProgressBar** — `components/ProgressBar/progress-bar.spec.md`(linear determinate 姊妹元件)

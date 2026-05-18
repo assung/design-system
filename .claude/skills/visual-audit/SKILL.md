@@ -7,7 +7,7 @@ description: Pixel-level visual audit for design-system components based on user
 
 ## 存在意義
 
-現有 `/design-system-audit`(33 dim)+ `/product-ui-audit`(6 dim)**全部在 code / spec 層**。code 對、spec 對,**視覺仍可能錯**——這類 bug 在專案歷史反覆出現:
+現有 `/design-system-audit`(全 dim per design-system-audit SSOT)+ `/product-ui-audit`(6 dim)**全部在 code / spec 層**。code 對、spec 對,**視覺仍可能錯**——這類 bug 在專案歷史反覆出現:
 
 - **DatePicker** 四邊邊距不對稱(左右不等 12px)、箭頭按鈕到容器頂距離 ≠ 最後一排日期到容器底距離
 - **Badge** 疊 Button 距離離譜(overlay offset 寫死 px 非 token)
@@ -28,7 +28,7 @@ description: Pixel-level visual audit for design-system components based on user
 ## Skill 生態位
 
 ```
-/design-system-audit    33 dim 深度 audit(code/spec 層,Phase 0 自建 baseline)
+/design-system-audit    全 dim 深度 audit(per design-system-audit SSOT,code/spec 層,Phase 0 自建 baseline)
 /product-ui-audit       consumer UI 對 DS 消費的 6 dim audit(code 層)
 /visual-audit           pixel-level 視覺 audit(本 skill,需 screenshot)
 /component-quality-gate  合入 DS 前的 45 項 checklist(Ship phase 可 chain 本 skill)
@@ -237,7 +237,7 @@ FAIL 項摘要:
 
 ## 相關
 
-- `.claude/skills/design-system-audit/SKILL.md` — 33 dim code/spec audit;本 skill 是其 pixel-level 補位
+- `.claude/skills/design-system-audit/SKILL.md` — 全 dim code/spec audit(per design-system-audit SSOT);本 skill 是其 pixel-level 補位
 - `.claude/skills/product-ui-audit/SKILL.md` — consumer UI 對 DS 消費 audit(code 層),不處理視覺
 - `.claude/skills/component-quality-gate/SKILL.md` — 元件合入 DS 前的 45 項 checklist;Ship phase 可 chain 本 skill
 - CLAUDE.md `# 同 flex 列的互動 slot 幾何鐵律` — 本 skill checklist #3 的主要 canonical 來源

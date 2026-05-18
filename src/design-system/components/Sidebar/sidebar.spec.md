@@ -679,6 +679,16 @@ Item-level default / hover / active / selected / disabled **色彩**完全共用
 
 ---
 
+## 邊界案例
+
+- **Disabled item**:SidebarMenuButton 走 MenuItem primitive SSOT(`disabled` prop → `text-fg-disabled` + `aria-disabled=true` + 不觸發 onClick + 鍵盤導覽自動 skip)。
+- **Loading(nav data-fetch)**:async nav tree fetch 時 consumer 應在對應 group 內渲 `<Skeleton>` line-stack(常見 3-5 條 sidebar nav skeleton 行)而非 Empty + spinner — Sidebar 是 chrome 不是 panel,loading 用 skeleton 更符合 chrome 持續存在的 affordance。對齊 Atlassian Sidebar / VS Code activity-bar idiom。
+- **Empty(no nav items)**:罕見場景(用戶無權限 / 全空 workspace)。若整個 group 無 item,consumer 應 conditional 不渲該 group(不渲空 group label);若整個 sidebar 無 item,可能該 hide sidebar(走 layout context 不渲)。不渲空白 sidebar。
+- **Dark mode / density**:Sidebar 為 chrome surface,走 chrome-header token 自動 adapt;density 預設 lock 跟隨 app density chrome token,不獨立 own。
+- **Collapsed mode(icon-only)**:已 codify(見 Sidebar collapsed mode 段);此時 label / endAction 隱藏,只留 icon + tooltip。
+
+---
+
 ## 相關
 
 - `../TreeView/tree-view.spec.md` — 階層樹元件（user data、任意深度）

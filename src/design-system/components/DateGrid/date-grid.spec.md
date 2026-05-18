@@ -191,8 +191,25 @@ Calendar 本元件是**對 `react-day-picker` 的 `<DayPicker>` 元件薄包裝*
 
 ---
 
+## 邊界案例
+
+- **Disabled day**:`disabled` prop 走 react-day-picker matcher;disabled cell 視覺 `text-fg-disabled`(M24)、`cursor-not-allowed`、click 不觸發 onSelect、鍵盤導覽自動 skip。
+- **Loading(server-rendered grid)**:DateGrid 為 sync render(date math 在 client),非 async surface。consumer 若需 async disabled-dates fetch(如後端 holiday list),應先 disable trigger 直到 fetch 完成,DateGrid 開啟後立即 ready。
+- **Empty(全 disabled days)**:極端場景(所有日期都被 disabled matcher 命中),DateGrid 渲完整 grid 但全部 cell 為 disabled state,鍵盤焦點停留無導覽目標(react-day-picker v9 內建)。
+- **Dark mode**:走 semantic token(primary / neutral / fg-muted)自動 adapt。
+- **Density**:DateGrid cell 尺寸固定不隨 density 變(date grid 為密度敏感的 8 列 × 6 行 layout,壓縮會破壞 reading)。
+
+---
+
 ## 相關
 
 - `../DatePicker/date-picker.spec.md` — **本元件 consumer**:DatePicker 消費 Calendar 作為選日 popup
 - `../../tokens/color/color.spec.md` — semantic token 來源（primary / neutral / fg-muted 等）
 - react-day-picker 官方文件 — `https://react-day-picker.js.org`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `calendar.spec.md`
+- `date-picker.spec.md`

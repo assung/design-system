@@ -54,6 +54,16 @@ ScrollArea 用 Radix 自訂 overlay 捲軸 → **跨 OS 一致、不吃寬度、
 | 極短內容 | 不包任何 wrapper | 內容不會溢出 → ScrollArea 是視覺噪音 |
 | 固定高度但內容永遠不溢出的容器 | 一般 `<div>` | ScrollArea 額外 overhead 無收益 |
 
+## 近親元件分界
+
+| vs | 差異軸 | 何時用 ScrollArea |
+|---|---|---|
+| **OverflowIndicator** | OverflowIndicator 是 horizontal 元素 list 的 hidden-count badge;ScrollArea 是 cross-OS scrollbar 視覺一致化 | 跨 OS 視覺一致 scrollbar(Windows 醜原生 vs macOS overlay)|
+| **Document native scroll** | Native scroll 用 OS scrollbar;ScrollArea 用 Radix overlay scrollbar | sub-region container,非全頁 |
+| **AspectRatio** | AspectRatio 鎖比例不 scroll;ScrollArea 允許溢出 scroll | 內容可能 overflow 容器需 scroll |
+
+對齊 Radix ScrollArea / Polaris Scrollable / Material `<Box overflow="auto">` 共識:sub-region scroll,document 留 native。
+
 ---
 
 ## Orientation

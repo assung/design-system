@@ -92,6 +92,15 @@ Consumer 無需額外處理 a11y,保留 cmdk 原結構 + 使用 `<CommandInput>`
 
 ---
 
+## 邊界案例
+
+- **Disabled item**:`<CommandItem disabled>` 透過 cmdk 內建支援,視覺繼承 MenuItem SSOT(`text-fg-disabled` + `aria-disabled=true` + 鍵盤導覽自動 skip + Enter 不觸發 onSelect)。
+- **Loading**:Command 本身非 async surface。async option fetch 應由 consumer(SelectMenu / Cmd+K palette)在外層處理 — 將 `<CommandList>` body 切換為 `<Empty icon={<CircularProgress size={48}/>}/>`(對齊 `empty.spec.md:182` SSOT)。Command primitive 不獨立 own loading prop。
+- **Empty(no results)**:`<CommandEmpty>` 自動偵測 search filter result = 0 時渲;consumer 必傳 fallback 文案(預設 cmdk 不渲)。
+- **Dark mode / density**:走 MenuItem + Input + Empty SSOT 自動 adapt;Command 不獨立 own density(由 consumer SelectMenu 控)。
+
+---
+
 ## 為何無 Inspector / ColorMatrix / SizeMatrix / StateBehavior
 
 Command 是 **internal primitive**(SelectMenu 底層消費,app 不直接使用,見本 spec「分類」段),結構規格完全繼承既有 primitive:

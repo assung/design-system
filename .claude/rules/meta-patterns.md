@@ -33,7 +33,7 @@
 
 **Marginal merge candidate**(留 user 後續 explicit approve):`codify-principle` + `codify-corrections` 都產 5-layer artifact,trigger 不同(live propose vs batch log)— 可合 `codify` 一統 skill。**不執行原因**:codex Q-13 sharp-rule preference + auto-mode 不 destructive 風險 + 兩 skill SKILL.md 各自 250 lines budget 內。User 後續 invoke `/knowledge-prune` 並 explicit approve 才動。
 
-**RFC**:Anthropic「~10 sweet spot」是 typical CRUD app benchmark;DS governance complexity(31 M-rules + 14-dim audit + dual-track codex collab + 8-home 治理)justified higher skill count。每 skill 都過 knowledge-prune retire rule(6 月 fire 或 rare-event 豁免)。
+**RFC**:Anthropic「~10 sweet spot」是 typical CRUD app benchmark;DS governance complexity(32 active M-rules + 全 dim audit per design-system-audit SSOT + dual-track codex collab + 8-home 治理)justified higher skill count。每 skill 都過 knowledge-prune retire rule(6 月 fire 或 rare-event 豁免)。
 
 
 | # | Meta-Principle | 能吸收的 bug 類型(舉例,非窮舉) |
@@ -95,7 +95,7 @@
 ## 判斷 meta-principle 是否漏寫的 test
 
 - 同類 bug 一年內被糾正 3 次 → meta-principle 漏寫或沒執行,檢討本清單
-- 某 bug 跟 29 條中任一條對不上 → **先評估 meta-merge 既有 M-rule(velocity ≤ 3/quarter,單 M-rule 必吸收 ≥ 3 prior bugs)**;真無上游覆蓋才考慮新增 M30+。M-rule 不該無限膨脹
+- 某 bug 跟現有 M-rules 任一條對不上 → **先評估 meta-merge 既有 M-rule(velocity ≤ 3/quarter,單 M-rule 必吸收 ≥ 3 prior bugs)**;真無上游覆蓋才考慮新增 M-rule。M-rule 不該無限膨脹
 
 ## 與失敗記憶索引的關係
 

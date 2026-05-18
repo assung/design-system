@@ -115,6 +115,25 @@ Email 格式 / URL 格式 / 必填等「single-field 純 syntax」blur 即可判
 
 對齊 Material `<TextField error>` + Form layer error 分層 / Carbon「format vs business」雙軌。視覺一致(都紅框 + error message)避免 reader 區分「為什麼這個 error 是 blur 出來那個是 submit 出來」。
 
+## 禁止事項
+
+- ❌ 在 onChange 即時 re-validate(已出錯後)— 違反「edit 清 error + blur 重驗」哲學,給使用者壓力
+- ❌ 對 Create form 用 disabled-until-dirty Submit button — 第一次進 form 看到 disabled CTA 困惑,改為 always-enabled + submit 後 scroll-to-error
+- ❌ Update form 用 always-enabled Submit — 沒改的 Update 沒提交意義,違反「intent 才 commit」
+- ❌ 對 single-field syntax(email / URL / required)用 submit-time API validation — 浪費 round-trip,blur 即可判
+- ❌ 對 business / async / cross-field 用 blur-time validation — 每換 field 觸 API call 體驗差,submit 才判
+- ❌ 不同 validation 來源用不同視覺(blur 黃框 / submit 紅框)— 視覺必一致,user 不需區分「為什麼是 blur 來的」
+
+## A11y 預設
+
+Form validation 的 ARIA / 鍵盤行為(對齊 WCAG 3.3.1 Error Identification + 3.3.3 Error Suggestion):
+
+- **Error message ARIA**:Field error 容器 `id="field-{name}-error"`,Input 設 `aria-describedby="field-{name}-error"` + `aria-invalid="true"`;SR 在 focus field 時自動讀「{label}, {error message}」
+- **Submit error scroll**:submit 失敗後,focus 自動 jump 到第一個 invalid field(`field.focus()` + `scrollIntoView({block: 'center'})`);對齊 Material / Atlassian 慣例
+- **Error live region**:跨欄位 / async error 用 `aria-live="polite"` 容器宣告 — SR 在空閒時讀出,不中斷使用者打字
+- **Required indicator**:label 的 `*` 必加 `aria-label="required"` 或 hidden span(SR 朗讀「required」),純視覺 `*` SR 讀「asterisk」語義不清
+- **Color-only error 警告**:error border 紅色之外必有 icon 或文字(WCAG 1.4.1 不僅靠顏色)— DS error variant 自動 prefix `<AlertCircle/>` icon
+
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

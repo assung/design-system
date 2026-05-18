@@ -7,7 +7,7 @@ description: Performance audit for design-system components and product UI. Chec
 
 ## 存在意義
 
-現有 `/design-system-audit`(20 dim,code/spec 層)+ `/visual-audit`(pixel 層)**都不看效能**。render 次數過多、context 亂鋪、useEffect 鏈條過長這類 bug:
+現有 `/design-system-audit`(全 dim per design-system-audit SSOT,code/spec 層)+ `/visual-audit`(pixel 層)**都不看效能**。render 次數過多、context 亂鋪、useEffect 鏈條過長這類 bug:
 - tsc 過、eslint 過、視覺正常
 - production 卡
 - 日常 dev 看不出來,到 stakeholder demo 才爆
@@ -101,7 +101,7 @@ description: Performance audit for design-system components and product UI. Chec
 
 ## 相關
 
-- `.claude/skills/design-system-audit/SKILL.md` — 20 dim 統籌;本 skill 是 D3 補位
+- `.claude/skills/design-system-audit/SKILL.md` — 全 dim 統籌(per design-system-audit SSOT);本 skill 是 D3 補位
 - `.claude/skills/visual-audit/SKILL.md` — pixel 層(D5)
 - `.claude/skills/ux-audit/SKILL.md` — UX 行為層(D4)
 - `.claude/skills/component-quality-gate/SKILL.md` — Phase 4.5 進階模式 chain 本 skill

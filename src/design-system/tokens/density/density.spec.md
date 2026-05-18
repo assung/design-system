@@ -113,3 +113,15 @@ document.documentElement.setAttribute('data-layout-space', 'md')
 - ❌ 元件同時設 `data-density` + `data-ui-size`(重複,以後者為準但混亂)
 - ❌ Overlay Portal 元件不自設 density(Portal 到 body 不繼承 trigger — 見 Meta-Pattern M3)
 - ❌ 為了追求表面一致性硬把 Dialog button 綁 lg ui-size(犧牲 header 高度 / strapline 彈性)
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `dialog.spec.md`
+- `dropdown-menu.spec.md`
+- `popover.spec.md`
+- `sheet.spec.md`
+- `sidebar.spec.md`
+- `tooltip.spec.md`
+- `uiSize.spec.md`

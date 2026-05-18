@@ -219,7 +219,7 @@ interface CalendarEvent {
 ## 相關
 
 - `../DatePicker/date-picker.spec.md` — 選日期的 form control,本元件姊妹概念(不同職責)
-- `../Calendar/calendar.spec.md` — DatePicker 內部 calendar grid primitive(DayPicker 包裝);**不直接面向 consumer**
+- `../DateGrid/date-grid.spec.md` — DatePicker 內部 calendar grid primitive(DayPicker v9 包裝;2026-04-21 從 Calendar 改名);**不直接面向 consumer**
 - `../../patterns/action-bar/action-bar.spec.md` — Toolbar 左中右分組規則
 - `../../patterns/element-anatomy/element-anatomy.spec.md` — Page-composite 分類
 
