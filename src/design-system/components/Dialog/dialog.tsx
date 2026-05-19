@@ -5,7 +5,7 @@ import { X as XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/design-system/components/Button/button"
-import { SurfaceHeader, SurfaceFooter } from "@/design-system/patterns/overlay-surface/overlay-surface"
+import { SurfaceHeader, SurfaceFooter, type SurfaceHeaderProps } from "@/design-system/patterns/overlay-surface/overlay-surface"
 import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
 
 /**
@@ -131,9 +131,13 @@ DialogContent.displayName = DialogPrimitive.Content.displayName
 
 // DialogHeader: SurfaceHeader + Close 按鈕(Dialog 特有)
 // justify-between 讓 children 與 Close 分左右;Close 用 Radix DialogPrimitive.Close 包裝。
+// 2026-05-18 audit gap fix:type 用 SurfaceHeaderProps 對齊 — DialogHeader 是 SurfaceHeader
+// 薄包裝,withTabs / lockDensity 等 props 透過 spread 已 forward,但 TS type 沒 expose
+// 導致 consumer 不能用 `<DialogHeader withTabs>` 而只能寫 `as any` 繞。Type lift 修
+// per header-canonical.spec.md W1 跨 6 consumer 同契約。
 const DialogHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  SurfaceHeaderProps
 >(({ className, children, ...props }, ref) => (
   <SurfaceHeader
     ref={ref}

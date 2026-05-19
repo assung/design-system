@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import {
   SurfaceHeader,
   SurfaceFooter,
+  type SurfaceHeaderProps,
 } from "@/design-system/patterns/overlay-surface/overlay-surface"
 import { Button } from "@/design-system/components/Button/button"
 import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
@@ -120,9 +121,12 @@ const SheetContent = React.forwardRef<
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 // ── SheetHeader:SurfaceHeader + Close X(對齊 DialogHeader canonical)──────────
+// 2026-05-18 audit gap fix:type 對齊 SurfaceHeaderProps,withTabs / lockDensity expose
+// 給 consumer(per header-canonical.spec.md W1 跨 6 consumer 同契約)。Spread 早 forward
+// 過去,只是 TS type 沒 expose 導致 consumer 不能 type-safe 用 `<SheetHeader withTabs>`。
 const SheetHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  SurfaceHeaderProps
 >(({ className, children, ...props }, ref) => (
   <SurfaceHeader
     ref={ref}
