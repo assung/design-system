@@ -109,12 +109,19 @@ export const SurfaceHeader = React.forwardRef<
         >
           {children}
         </div>
-        {/* Row 2:tabsSlot wrapper — 提供 W2 padding inheritance + 強制 TabsList full-width
-            2026-05-18 fix(user 抓雙線):原 wrapper 加 `border-b border-divider` 跟 TabsList 自身
-            `border-b border-border` 共存 = 2 條色不同 + 1px box gap 的線。撤掉 wrapper border,
-            用 `[&>[role=tablist]]:w-full` 強制 TabsList 從 content-width 變 full-width → 自身
-            border-b 自然延展到 wrapper px-loose 內邊 = 1 條 W1 「視覺一條線」。 */}
-        <div className="px-[var(--layout-space-loose)] [&>[role=tablist]]:w-full">
+        {/* Row 2:tabsSlot wrapper — TabsList 全 dialog 寬 + 內 px-loose padding inset triggers
+            2026-05-18 v3 fix(user verbatim approval「你確定這樣是世界級的設計且符合我們一致的設計
+            語言和 SSOT...就這樣做」):
+            - v1: wrapper border + TabsList border = 雙線(W1 違反)
+            - v2: wrapper px-loose + TabsList w-full inside = border 只跨 dialog - 2×px-loose
+                 (不到 dialog 邊 user 抓「分隔線寬度應該要填滿整個 dialog」)
+            - v3(本):wrapper 不 inset,TabsList 自己 px-loose 內 padding inset triggers
+                  → TabsList border-b 延展全 dialog 寬,triggers 對齊 header content
+            對齊既有 `tabs.spec.md:199`「TabsList 自身 border-b border-border 延展全 header 寬,因
+            TabsList wrapper 是 block-level full-width」+ `:187-189`「selected 底線從 TabsList
+            gray border 位置長出來」+ GitHub Primer UnderlineNav / Ant Design line type / Mantine
+            default 共識(全派 TabsList 自畫 full-width underline)。*/}
+        <div className="[&>[role=tablist]]:w-full [&>[role=tablist]]:px-[var(--layout-space-loose)]">
           {tabsSlot}
         </div>
       </div>

@@ -86,10 +86,11 @@ export const ChromeHeader = React.forwardRef<HTMLDivElement, ChromeHeaderProps>(
           >
             {children}
           </div>
-          {/* Row 2:tabsSlot wrapper — W2 padding inheritance + 強制 TabsList full-width
-              2026-05-18 fix:撤掉 wrapper border-b 避雙線(同 SurfaceHeader),TabsList full-width
-              延展自身 border-b 到 wrapper 內邊 = 1 條 W1「視覺一條線」。*/}
-          <div className="px-[var(--layout-space-loose)] [&>[role=tablist]]:w-full">
+          {/* Row 2:tabsSlot wrapper — TabsList 全 dialog 寬 + 內 px-loose inset triggers
+              2026-05-18 v3 fix(同 SurfaceHeader,per user verbatim「分隔線寬度應該要填滿整個
+              dialog」+「就這樣做」approval):TabsList 自己 px-loose 內 padding 而非 wrapper
+              提供,讓 TabsList border-b 延展全 dialog 寬。對齊 `tabs.spec.md:199` 既有 canonical。*/}
+          <div className="[&>[role=tablist]]:w-full [&>[role=tablist]]:px-[var(--layout-space-loose)]">
             {tabsSlot}
           </div>
         </div>

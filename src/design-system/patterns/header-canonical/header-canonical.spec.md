@@ -80,14 +80,21 @@ benchmark:
 
 **規則**:TabsList **不設自己的左右 padding**,**繼承** parent header 的 `var(--layout-space-loose)` padding。視覺結果 = tabs 第一個 trigger 從 header 內邊起 = 跟 header content row 對齊。
 
-**實作機制(2026-05-18 真實能用 — `tabsSlot` prop)**:
+**實作機制(2026-05-18 v3 — `tabsSlot` prop,user verbatim「分隔線寬度應該要填滿整個 dialog」)**:
 
 ChromeHeader / SurfaceHeader 新增 `tabsSlot?: ReactNode` prop。提供時自動 **column mode**:
 - Row 1:children(title + close X / actions)— 跟 single-row 模式同 padding,但 border-b 撤掉
-- Row 2:tabsSlot 包在 `<div className="px-[var(--layout-space-loose)] border-b border-divider">`
-  - wrapper 提供 W2 padding inheritance(TabsList 自然從 px-loose 內邊起)
-  - wrapper 提供 W1 全寬 paint(視覺一條線)
-  - TabsList 本身保留 `border-b border-border`(支援 selected underline 從 1px gray 長出 2px primary 的 idiom)— 跟 wrapper border 同 y 位置 = 視覺仍一條線
+- Row 2:tabsSlot 包在 `<div className="[&>[role=tablist]]:w-full [&>[role=tablist]]:px-[var(--layout-space-loose)]">`(wrapper 本身**不** inset,只用 CSS arbitrary variant 給 TabsList 注入 `w-full` + 內 padding)
+  - **TabsList 全 dialog 寬**(`w-full`)→ 自身 `border-b border-border` 延展全 dialog 寬 = W1 視覺一條線
+  - **TabsList 內 padding-x = px-loose** → triggers 從 px-loose 內邊起,對齊 header content row(W2 alignment 達成)
+  - Selected trigger 2px primary 真 overlay TabsList 1px gray border(`tabs.spec.md:187-189` canonical)
+
+**v1/v2 反 pattern**(歷史錨):
+- v1(2026-05-18 initial):wrapper 加 `border-b border-divider` + TabsList 自身 `border-b border-border` 共存 → 雙線(色不同 + 1px box gap)
+- v2(2026-05-18 mid):wrapper px-loose + TabsList w-full inside → border 只跨 dialog - 2×px-loose(沒到 dialog 邊)
+- v3(本):wrapper 不 inset,TabsList 自己 padding inset triggers + 全 dialog 寬 border ✓
+
+**W2 spec 註**:原 W2「TabsList 不設左右 padding,繼承 parent header padding」描述假設 ChromeHeader single-row 模式;**column mode 下實作機制改為 CSS arbitrary variant 注入 TabsList 內 padding**(不是 by-inheritance 從 wrapper)。Selected primary overlay full-width gray 共識(GitHub Primer UnderlineNav / Ant Design line type / Mantine default)需要 TabsList 自畫 full-width border。
 
 **Consumer 用法**(Dialog 範例):
 ```tsx

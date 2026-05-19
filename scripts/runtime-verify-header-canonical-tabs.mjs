@@ -54,11 +54,11 @@ async function probeDialogWithTabs(page) {
     const wrapperBorderPx = parseFloat(row2Style?.borderBottomWidth || '0')
     const tabListBorderPx = parseFloat(tabListStyle.borderBottomWidth || '0')
     const totalBorderCount = (wrapperBorderPx > 0 ? 1 : 0) + (tabListBorderPx > 0 ? 1 : 0)
-    // TabsList 必 full-width(W2 fix):span 從 wrapper 內邊(left=px-loose)到 wrapper 內邊(right=px-loose)
+    // 2026-05-18 v3 fix(user 抓「分隔線寬度應該要填滿整個 dialog」):TabsList 必延展全 dialog 寬
+    // (不再 inset by px-loose);triggers 對齊 header content 由 TabsList 內 padding-x 提供。
     const tabListWidth = tabListRect.width
     const dialogContentWidth = dialogRect.width
-    const expectedTabListWidth = dialogContentWidth - (titleLeftFromDialog * 2) // 2x px-loose 估算
-    const tabListFullWidth = Math.abs(tabListWidth - expectedTabListWidth) <= 2
+    const tabListFullDialogWidth = Math.abs(tabListWidth - dialogContentWidth) <= 2  // full dialog 寬
 
     return {
       titleLeftFromDialog,
@@ -69,8 +69,8 @@ async function probeDialogWithTabs(page) {
       tabListBorderPx,
       totalBorderCount,
       tabListWidth,
-      expectedTabListWidth,
-      tabListFullWidth,
+      dialogContentWidth,
+      tabListFullDialogWidth,
     }
   })
 }
@@ -118,12 +118,13 @@ async function run() {
         failed++
       }
 
-      // W2-extra — TabsList full-width(從 px-loose 內邊延展到內邊,不是 content-width)
-      if (probe.tabListFullWidth) {
-        console.log(`  ✅ W2-extra: TabsList full-width = ${probe.tabListWidth}px(expected ~${probe.expectedTabListWidth.toFixed(0)}px)`)
+      // W1-line-full-width — 2026-05-18 v3 fix:TabsList 必延展全 dialog 寬(border-b 跨 full dialog)
+      // 不是被 wrapper px-loose inset(v2 bug)
+      if (probe.tabListFullDialogWidth) {
+        console.log(`  ✅ W1-line-full-width: TabsList full-dialog-width = ${probe.tabListWidth}px(== dialog ${probe.dialogContentWidth}px)`)
         passed++
       } else {
-        console.error(`  ❌ W2-extra: TabsList width = ${probe.tabListWidth}px, expected ~${probe.expectedTabListWidth.toFixed(0)}px(差太多 = content-width 沒 full-width)`)
+        console.error(`  ❌ W1-line-full-width: TabsList ${probe.tabListWidth}px ≠ dialog ${probe.dialogContentWidth}px(被 inset = 分隔線不夠寬)`)
         failed++
       }
     }
