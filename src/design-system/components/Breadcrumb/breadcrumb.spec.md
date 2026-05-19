@@ -97,8 +97,8 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 | **`BreadcrumbLink`（可點擊）預設** | `text-fg-secondary` | neutral-8, 提示「可互動但非焦點」 |
 | **`BreadcrumbLink` hover** | **`text-primary-hover`** | 藍字 + `transition-colors duration-150`，明確回饋「點這個會有動作」 |
 | **`BreadcrumbPage`（當前）** | `text-foreground`（不加粗）| neutral-9 深色區分於 fg-secondary 的 links，但**不加粗**——加粗會讓 breadcrumb 最右端視覺過重，破壞「你從哪來 → 你在這」的流動感 |
-| **`BreadcrumbSeparator`** | `text-fg-muted` + `ChevronRight` size=14 | 視覺降噪，separator 不搶焦點 |
-| **`BreadcrumbEllipsis`** | `text-fg-muted` + `MoreHorizontal` size=14 | 同 separator 層級 |
+| **`BreadcrumbSeparator`** | `text-fg-muted` + `ChevronRight` size=`BREADCRUMB_ICON_SIZE[size]`(`breadcrumb.tsx:130` SSOT,sm/md=16, lg=20) | 視覺降噪,separator 不搶焦點;對齊 `uiSize.spec.md` Icon Size Tier(2026-05-18 retire 過去 14) |
+| **`BreadcrumbEllipsis`** | `text-fg-muted` + `MoreHorizontal` size=`BREADCRUMB_ICON_SIZE[size]` | 同 separator 層級 |
 
 ## 對齊既有設計語言
 

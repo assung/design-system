@@ -194,19 +194,23 @@ const ScrollTabsList = React.forwardRef<
   })
 
   return (
-    // 2026-05-18:border-border → border-divider 對齊 TABS_LIST_BASE(ScrollTabsList wrapper)
-    <div className="relative border-b border-divider">
+    // 2026-05-19 fix(scroll-overflow underline clip + y auto-promote):
+    //   outer 撤 `border-b` → owner 升到 `TabsList` (TABS_LIST_BASE 含 border-b border-divider)
+    //   把 trigger `after:bottom-[-1px]` 2px underline 的下半部 1px 收進 list border-box,
+    //   再加 `overflow-y-hidden` 明示阻 browser y auto-promote(CSS overflow-3 spec:
+    //   overflow-x:auto + overflow-y:visible 必 compute auto)。
+    //   不加 `pb-px`(outer border 撤後 list border 已接 -1px 部分,加 pb 多 1px 多餘空白)。
+    //   對齊 Primer UnderlineNav `overflow-x:auto; overflow-y:hidden` canonical 同步動
+    //   horizontal-overflow.spec.md L75/L101/L129 owner 升 list 內部。
+    <div className="relative">
       <div
         ref={scrollRef}
-        className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ maskImage, WebkitMaskImage: maskImage }}
       >
         <TabsPrimitive.List
           ref={ref}
-          className={cn(
-            'inline-flex items-stretch gap-[var(--layout-space-loose)] w-fit',
-            className
-          )}
+          className={cn(TABS_LIST_BASE, 'w-fit', className)}
           {...props}
         >
           {children}
@@ -290,26 +294,26 @@ const MenuTabsList = React.forwardRef<
   )
 
   return (
-    // 2026-05-18:border-border → border-divider 對齊 TABS_LIST_BASE(MenuTabsList wrapper)
-    <div className="flex items-center border-b border-divider">
+    // 2026-05-19 fix(scroll-overflow underline clip + y auto-promote,parallel to ScrollTabsList):
+    //   outer 改 items-stretch(menu button 容器跟 TabsList 含 border 共底線)+ 撤 border。
+    //   list 套 TABS_LIST_BASE,inner scroll 加 overflow-y-hidden。menu button 容器自帶
+    //   border-b border-divider 跟 TabsList border 同 y 對齊(items-stretch 保證)。
+    <div className="flex items-stretch">
       <div
         ref={scrollRef}
-        className="flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex-1 min-w-0 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ maskImage, WebkitMaskImage: maskImage }}
       >
         <TabsPrimitive.List
           ref={ref}
-          className={cn(
-            'inline-flex items-stretch gap-[var(--layout-space-loose)] w-fit',
-            className
-          )}
+          className={cn(TABS_LIST_BASE, 'w-fit', className)}
           {...props}
         >
           {enhancedChildren}
         </TabsPrimitive.List>
       </div>
       {canScroll && (
-        <div className="flex-shrink-0 pl-[var(--layout-space-loose)] flex items-center">
+        <div className="flex-shrink-0 pl-[var(--layout-space-loose)] flex items-center border-b border-divider">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <OverflowMenuTriggerButton

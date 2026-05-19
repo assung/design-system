@@ -370,7 +370,7 @@ className={cn(
 
 | Size | Icon size | 備註 |
 |------|-----------|------|
-| xs | 16px(Button)/ 14px(SegmentedControl) | xs 空間極小,SegmentedControl 用 14px 更平衡 |
+| xs | 16px | 統一規則(2026-05-18 retire 過去 SegmentedControl xs=14 例外);對齊 Icon Size Tier L132-143 |
 | sm | 16px | |
 | md | 16px | |
 | lg | 20px | lg 切換到大 icon tier |

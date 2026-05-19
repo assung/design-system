@@ -72,7 +72,7 @@
 
 ### 為什麼不做成封閉的 `<HorizontalOverflowContainer>`?
 
-- Tabs 的 outer 需要 `border-b border-border`(underline 語意);Chip 不需要
+- Tabs 的 underline border owner 在 **list 內部**(`TABS_LIST_BASE` 套 `border-b border-divider`),outer 不畫;Chip outer 是 pill border `rounded-full border border-border`,亦不需 outer `border-b`。Owner 升 list 是 2026-05-19 fix:outer `border-b` + inner `overflow-x-auto` → browser y auto-promote(CSS overflow-3 spec:一軸 auto 時另軸 visible compute auto)→ active underline `after:bottom:-1px` 1px clip + 1px 垂直可捲 bug
 - Tabs 用 `TabsPrimitive.List` 作為 inner list;Chip 用 `ToggleGroupPrimitive.Root`
 - Tabs 用 `DropdownMenuItem + selected`(單選);Chip 用 `DropdownMenuCheckboxItem`(多選)
 - Tabs 有 `gap-[var(--layout-space-loose)]`;Chip 有 `gap-2`
@@ -98,19 +98,21 @@ const maskImage = buildFadeMask({
 })
 
 return (
-  <div className="relative border-b border-border">    {/* 消費者自訂 outer */}
+  <div className="relative">    {/* outer 不畫 border;Tabs underline owner 在 list 內 */}
     <div
       ref={scrollRef}
-      className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       style={{ maskImage, WebkitMaskImage: maskImage }}
     >
-      <TabsPrimitive.List>...</TabsPrimitive.List>       {/* 消費者自己的 Radix list */}
+      <TabsPrimitive.List className={cn(TABS_LIST_BASE, 'w-fit')}>...</TabsPrimitive.List>
     </div>
     {!atStart && canScroll && <OverflowScrollArrow direction="left" onClick={() => scrollByPage('left')} />}
     {!atEnd && canScroll && <OverflowScrollArrow direction="right" onClick={() => scrollByPage('right')} />}
   </div>
 )
 ```
+
+> **Why `overflow-y-hidden`(2026-05-19 codify)**:CSS overflow-3 spec 強制「一軸 auto/scroll/hidden 時另軸 visible compute auto」。`overflow-x-auto` 單獨設 + active underline `after:bottom:-1px` 落在 box 外 → y auto-promote → 1px 垂直可捲 + underline 初始 1px clip bug。明示 `overflow-y-hidden` 阻 promote。對齊 Primer UnderlineNav `overflow-x:auto; overflow-y:hidden` 公開實作。
 
 ### 典型 menu 模式組裝
 
@@ -126,9 +128,9 @@ const { scrollRef, atStart, atEnd, canScroll } = useScrollEdges<HTMLDivElement>(
 const maskImage = buildFadeMask({ canScroll, atStart, atEnd, reserveArrowWidth: 0 })
 
 return (
-  <div className="flex items-center border-b border-border">   {/* 消費者自訂 outer */}
-    <div ref={scrollRef} className="flex-1 min-w-0 overflow-x-auto ..." style={{ maskImage, WebkitMaskImage: maskImage }}>
-      <TabsPrimitive.List>...</TabsPrimitive.List>
+  <div className="flex items-stretch">   {/* items-stretch 讓 menu button 容器跟 list 共底線 */}
+    <div ref={scrollRef} className="flex-1 min-w-0 overflow-x-auto overflow-y-hidden ..." style={{ maskImage, WebkitMaskImage: maskImage }}>
+      <TabsPrimitive.List className={cn(TABS_LIST_BASE, 'w-fit')}>...</TabsPrimitive.List>
     </div>
     {canScroll && (
       <DropdownMenu>
@@ -136,7 +138,7 @@ return (
           <OverflowMenuTriggerButton label={`頁籤選單(共 ${items.length} 個)`} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {items.map(item => <DropdownMenuItem selected={...} onSelect={...}>...</DropdownMenuItem>)}
+          {/* menu button container 自帶 border-b border-divider 對齊 list border */}
         </DropdownMenuContent>
       </DropdownMenu>
     )}

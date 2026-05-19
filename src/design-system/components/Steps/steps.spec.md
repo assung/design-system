@@ -4,16 +4,16 @@ family: 2
 variants: {}
 sizes:
   sm:
-    px: 12
-    when: "Sidebar / 緊湊 onboarding;indicator 12px,text-body"
+    px: 8
+    when: "Sidebar / 緊湊 onboarding;indicator 8px dot(hit area 24px),無內部 icon。對齊 INDICATOR_SIZE.sm + INDICATOR_ICON_SIZE.sm=0(steps.tsx:18-28)"
     world-class: ["Ant Design Steps small", "MUI Stepper compact"]
   md:
-    px: 16
-    when: "預設 — 主流程 wizard / checkout / 註冊"
-    world-class: ["Ant Design Steps default(16-20)", "MUI Stepper default", "Linear setup wizard"]
+    px: 24
+    when: "預設 — 主流程 wizard / checkout / 註冊;indicator 24px circle,內部 icon 16px(對齊 uiSize Icon Tier sm/md)"
+    world-class: ["Ant Design Steps default", "MUI Stepper default", "Linear setup wizard"]
   lg:
-    px: 20
-    when: "Marketing 流程展示 / 重要 onboarding(高 attention)"
+    px: 32
+    when: "Marketing / 重要 onboarding;indicator 32px circle,內部 icon 20px(對齊 uiSize Icon Tier lg)"
     world-class: ["Material 3 large step indicator"]
 traits:
   - hasSizes

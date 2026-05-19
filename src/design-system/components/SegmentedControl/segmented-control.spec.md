@@ -135,7 +135,7 @@ SegmentedControl 必須能塞進 `Field` 容器（就像 `Input` / `Button` / `S
 
 **在 Field 內自動讀 size**：透過 `useFieldContext()`，SegmentedControl 在 Field 內時 size 跟著 Field 的 size 走，不需 consumer 重複指定——機制與 Button 完全相同。
 
-**Icon size**：sm/md = 16、lg = 20、xs = 14（SegmentedControl xs 專用，14px 比 16px 更平衡極小空間）。
+**Icon size**：xs/sm/md = 16、lg = 20（對齊 `uiSize.spec.md` Icon Size Tier L132-143 統一規則,2026-05-18 retire 過去 xs=14 例外。Cite:Carbon icon-only line tabs 40/16,Ant small input 24/16）。
 
 ### xs 的專屬用途：icon-only toolbar utility
 
