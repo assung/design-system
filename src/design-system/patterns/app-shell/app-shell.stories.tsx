@@ -1,6 +1,21 @@
-// @benchmark-cited: cite Mantine AppShell / Ant Layout / Linear / GitHub real-product 場景。
+// @benchmark-cited: Sidebar full-layout baseline + DataTable toolbar pattern + Linear real-product 場景。
+// @story-baseline: src/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse (Sidebar 完整佈局)
+// @story-baseline: src/design-system/components/DataTable/data-table.stories.tsx#WithBulkActions (Toolbar + DataTable)
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
+import { createColumnHelper } from '@tanstack/react-table'
+import {
+  Inbox,
+  Calendar,
+  Settings,
+  Users,
+  BarChart3,
+  LayoutDashboard,
+  Search,
+  Filter,
+  ArrowUpDown,
+  PanelRightOpen,
+} from 'lucide-react'
 import { AppShell, AppShellAside } from './app-shell'
 import {
   Sidebar,
@@ -8,170 +23,334 @@ import {
   SidebarHeader,
   SidebarContent,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarFooter,
   SidebarTrigger,
 } from '@/design-system/components/Sidebar/sidebar'
-import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import { Button } from '@/design-system/components/Button/button'
-import { Inbox, Calendar, Settings, Users, BarChart3, PanelRightOpen } from 'lucide-react'
+import { Input } from '@/design-system/components/Input/input'
+import { DataTable } from '@/design-system/components/DataTable/data-table'
+import {
+  ItemAvatar,
+} from '@/design-system/patterns/element-anatomy/item-anatomy'
+import {
+  NameCard,
+  NameCardDefaultActions,
+} from '@/design-system/components/NameCard/name-card'
 
 const meta: Meta<typeof AppShell> = {
   title: 'Design System/Patterns/AppShell/展示',
   component: AppShell,
-  parameters: {
-    layout: 'fullscreen',
-  },
+  parameters: { layout: 'fullscreen' },
 }
 export default meta
 type Story = StoryObj<typeof AppShell>
 
-// ── Mock data — Linear-style workspace ──
-const ISSUES_MOCK = [
-  { id: '1', title: 'P0:登入後 redirect 失敗', status: 'In Progress' },
-  { id: '2', title: 'Stripe webhook timeout > 10s', status: 'Backlog' },
-  { id: '3', title: '新增 PeoplePicker multi-select', status: 'In Review' },
-  { id: '4', title: 'DataTable 在 Safari 滾動跳動', status: 'Done' },
-]
+// ── Helpers(對齊 sidebar.stories.tsx IconCollapse baseline)───────────────
 
-function LinearSidebar() {
+const MAIN_NAV = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'inbox', label: 'Inbox', icon: Inbox },
+  { id: 'team', label: 'Team', icon: Users },
+  { id: 'insights', label: 'Insights', icon: BarChart3 },
+  { id: 'calendar', label: 'Calendar', icon: Calendar },
+  { id: 'settings', label: 'Settings', icon: Settings },
+] as const
+
+/** Workspace brand:對齊 sidebar.stories.tsx WorkspaceBrand baseline。 */
+const WorkspaceBrand = () => (
+  <div className="flex items-center gap-2 min-w-0 group-data-[collapsible=icon]:justify-center">
+    <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
+    <span className="text-body-lg font-medium truncate group-data-[collapsible=icon]:hidden">Acme Inc</span>
+  </div>
+)
+
+/** User footer:對齊 sidebar.stories.tsx UserFooter baseline。 */
+const UserFooter = () => (
+  <SidebarMenu>
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild>
+        <div role="group" aria-label="當前使用者">
+          <ItemAvatar
+            alt="Alan Chen"
+            color="blue"
+            hoverCard={
+              <NameCard
+                name="Alan Chen"
+                subtitle="Design｜D-0042"
+                avatar={{ alt: 'Alan Chen', color: 'blue' }}
+                status="online"
+                actions={<NameCardDefaultActions />}
+              />
+            }
+          />
+          <span data-sidebar="menu-label" className="min-w-0 flex-1 truncate">Alan Chen</span>
+        </div>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  </SidebarMenu>
+)
+
+/** Acme workspace sidebar — 完整 production-grade baseline(對齊 sidebar IconCollapse story)。 */
+function AcmeSidebar() {
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
-        <span className="text-body font-medium px-2">Acme Inc.</span>
+        <WorkspaceBrand />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton><Inbox className="size-4" /> Inbox</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton><Calendar className="size-4" /> My Issues</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton><Users className="size-4" /> Team</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton><BarChart3 className="size-4" /> Insights</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton><Settings className="size-4" /> Settings</SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {MAIN_NAV.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    id={item.id}
+                    startIcon={item.icon}
+                    tooltip={item.label}
+                  >
+                    {item.label}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <UserFooter />
+      </SidebarFooter>
     </Sidebar>
   )
 }
 
-function IssueList() {
+/** Chrome header:對齊 sidebar.stories.tsx PageContent header pattern(SidebarTrigger + h1 gap-2 緊鄰)。 */
+function PageHeader({
+  title,
+  onToggleAside,
+  asideOpen,
+}: {
+  title: string
+  onToggleAside?: () => void
+  asideOpen?: boolean
+}) {
   return (
-    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
-      <ul className="divide-y divide-divider">
-        {ISSUES_MOCK.map((issue) => (
-          <li key={issue.id} className="py-3 flex justify-between items-center">
-            <span className="text-body">{issue.title}</span>
-            <span className="text-caption text-fg-muted">{issue.status}</span>
-          </li>
-        ))}
-      </ul>
+    <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
+      <SidebarTrigger />
+      <h1 className="text-body-lg font-medium flex-1 truncate">{title}</h1>
+      {onToggleAside && (
+        <Button
+          size="sm"
+          variant="text"
+          iconOnly
+          startIcon={PanelRightOpen}
+          aria-label={asideOpen ? '關閉詳情' : '開啟詳情'}
+          onClick={onToggleAside}
+        />
+      )}
+    </header>
+  )
+}
+
+// ── Mock data — Linear-style issue tracker ────────────────────────────────
+
+type Issue = {
+  id: string
+  title: string
+  status: 'In Progress' | 'Backlog' | 'In Review' | 'Done'
+  assignee: string
+  priority: 'P0' | 'P1' | 'P2'
+  due: string
+}
+
+const ISSUES: Issue[] = [
+  { id: 'ENG-1042', title: '登入後 redirect 失敗',         status: 'In Progress', assignee: 'Alan Chen',   priority: 'P0', due: '2026-05-22' },
+  { id: 'ENG-1041', title: 'Stripe webhook timeout > 10s', status: 'Backlog',     assignee: 'Jamie Lin',   priority: 'P0', due: '2026-05-25' },
+  { id: 'ENG-1038', title: 'PeoplePicker multi-select bug', status: 'In Review',  assignee: 'Sophia Wang', priority: 'P1', due: '2026-05-24' },
+  { id: 'ENG-1035', title: 'DataTable Safari scroll jitter', status: 'Done',      assignee: 'Marco Tsai',  priority: 'P1', due: '2026-05-20' },
+  { id: 'ENG-1031', title: '匯出 CSV 漏特殊字元',           status: 'In Progress', assignee: 'Sophia Wang', priority: 'P2', due: '2026-05-28' },
+  { id: 'ENG-1028', title: 'Onboarding 第 3 步無 a11y',     status: 'Backlog',     assignee: 'Jamie Lin',   priority: 'P2', due: '2026-06-02' },
+]
+
+const ch = createColumnHelper<Issue>()
+const ISSUE_COLUMNS = [
+  ch.accessor('id',       { header: 'ID',       meta: { width: 100 } }),
+  ch.accessor('title',    { header: 'Issue',    meta: { width: 280, minWidth: 160 } }),
+  ch.accessor('status',   { header: 'Status',   meta: { width: 120 } }),
+  ch.accessor('assignee', { header: 'Assignee', meta: { width: 140 } }),
+  ch.accessor('priority', { header: 'Priority', meta: { width: 90 } }),
+  ch.accessor('due',      { header: 'Due',      meta: { width: 110 } }),
+]
+
+/** Main content:Toolbar(search + filter + sort)+ DataTable(per data-table.stories WithBulkActions canonical)。 */
+function IssuesView({ onSelectIssue: _onSelectIssue }: { onSelectIssue: (issue: Issue) => void }) {
+  const [search, setSearch] = React.useState('')
+  const filtered = React.useMemo(
+    () =>
+      search
+        ? ISSUES.filter(
+            (i) =>
+              i.title.toLowerCase().includes(search.toLowerCase()) ||
+              i.id.toLowerCase().includes(search.toLowerCase()),
+          )
+        : ISSUES,
+    [search],
+  )
+
+  return (
+    <div className="flex h-full min-h-0 flex-col bg-canvas">
+      {/* Toolbar:對齊 data-table.stories WithBulkActions「左 search / 右 ops」idiom + layoutSpace 規則 1B 父層 padding */}
+      <div className="flex items-center gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+        <Input
+          size="md"
+          placeholder="搜尋 issue id / title…"
+          startIcon={Search}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm"
+        />
+        <span className="flex-1" />
+        <Button size="md" variant="secondary" startIcon={Filter}>
+          篩選
+        </Button>
+        <Button size="md" variant="secondary" startIcon={ArrowUpDown}>
+          排序
+        </Button>
+      </div>
+      {/* DataTable:naked structure,規則 1B 父層 mx 對齊 chrome 內容左右邊界 */}
+      <div className="flex-1 min-h-0 mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)]">
+        <DataTable
+          columns={ISSUE_COLUMNS as any}
+          data={filtered}
+          height="100%"
+          bordered
+        />
+      </div>
     </div>
   )
 }
 
-function IssueDetailAside() {
-  return (
-    <AppShellAside title="P0:登入後 redirect 失敗" width={360}>
-      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] space-y-3">
-        <p className="text-caption text-fg-muted">Issue #1 • In Progress</p>
-        <p className="text-body">
-          User 登入後本應跳轉到 dashboard,但停在 callback page 看到 404。Stripe SSO 回 token 但 cookie 沒 set。
-        </p>
-        <div className="flex gap-2">
-          <Button size="sm" variant="primary">Assign to me</Button>
-          <Button size="sm" variant="secondary">Mark resolved</Button>
-        </div>
+/** Aside content:Issue detail panel,內容自管 padding 遵循 layoutSpace 規則 1B。 */
+function IssueDetail({ issue }: { issue: Issue | null }) {
+  if (!issue) {
+    return (
+      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] text-fg-muted">
+        選一個 issue 看詳情
       </div>
-    </AppShellAside>
+    )
+  }
+  return (
+    <div className="flex flex-col gap-[var(--layout-space-loose)] px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+      <p className="text-caption text-fg-muted">
+        {issue.id} • {issue.status} • {issue.priority}
+      </p>
+      <h2 className="text-h5 font-medium">{issue.title}</h2>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-[var(--layout-space-loose)] gap-y-[var(--layout-space-tight)] text-body">
+        <dt className="text-fg-muted">Assignee</dt>
+        <dd>{issue.assignee}</dd>
+        <dt className="text-fg-muted">Due</dt>
+        <dd>{issue.due}</dd>
+      </dl>
+      <div className="flex gap-2">
+        <Button size="sm" variant="primary">分派給我</Button>
+        <Button size="sm" variant="secondary">標記完成</Button>
+      </div>
+    </div>
   )
 }
 
+// ── Stories ──────────────────────────────────────────────────────────────────
+
 /**
- * Linear / Notion / Figma 派 — sidebar 頂天立地,header 在 main 區當當前頁 toolbar。
- * Aside 開時 inline 顯示 issue detail panel,desktop 不蓋 mask 可同時操作 issue list。
+ * primary-sidebar mode(Linear / Notion / Figma 派)— Linear-style issue tracker:
+ * - Sidebar 完整佈局(WorkspaceBrand + SidebarFooter avatar HoverCard,對齊 sidebar.stories baseline)
+ * - Header SidebarTrigger + 當前頁 title 緊鄰 + 右 toggle Aside button
+ * - Main:Toolbar(search + filter + sort)+ DataTable(對齊 data-table.stories WithBulkActions)
+ * - Aside:always-on header + close X + issue detail content
  */
 export const PrimarySidebar: Story = {
-  name: 'primary-sidebar(Linear / Notion 派)',
+  name: 'primary-sidebar(Linear-style issue tracker)',
   render: () => {
+    const [activeId, setActiveId] = React.useState<string>('inbox')
     const [asideOpen, setAsideOpen] = React.useState(true)
+    const [selected, setSelected] = React.useState<Issue | null>(ISSUES[0])
+
     return (
-      <SidebarProvider>
+      <SidebarProvider activeId={activeId} onActiveChange={setActiveId}>
         <AppShell
           layout="primary-sidebar"
-          sidebar={<LinearSidebar />}
+          sidebar={<AcmeSidebar />}
           header={
-            <ChromeHeader>
-              <SidebarTrigger />
-              <span className="text-body font-medium flex-1 ml-2">My Issues</span>
-              <Button size="sm" variant="text" startIcon={PanelRightOpen} onClick={() => setAsideOpen(!asideOpen)}>
-                {asideOpen ? '關閉' : '開啟'}詳情
-              </Button>
-            </ChromeHeader>
+            <PageHeader
+              title={MAIN_NAV.find((n) => n.id === activeId)?.label ?? 'Inbox'}
+              onToggleAside={() => setAsideOpen(!asideOpen)}
+              asideOpen={asideOpen}
+            />
           }
-          aside={<IssueDetailAside />}
+          aside={
+            <AppShellAside title={selected ? selected.id : '詳情'} width={360}>
+              <IssueDetail issue={selected} />
+            </AppShellAside>
+          }
           asideOpen={asideOpen}
           onAsideOpenChange={setAsideOpen}
         >
-          <IssueList />
+          <IssuesView
+            onSelectIssue={(issue) => {
+              setSelected(issue)
+              setAsideOpen(true)
+            }}
+          />
         </AppShell>
       </SidebarProvider>
     )
   },
 }
 
-// GitHubGlobalHeader / RepoSidebar 已 retire(primary-header story pending Sidebar SSOT extension)
-
 /**
  * primary-header mode pending Sidebar SSOT viewport-inset extension(2026-05-19 codex Layer B
  * D1 verdict)。Sidebar 既有 `fixed inset-y-0 h-svh` 會蓋住 global header → broken UI。
  * 待 Sidebar 升級 `viewportInsetTop` 能力後 ship。本 story 暫 removed,避免 broken demo。
- *
- * 對齊 Mantine `layout="default"`(navbar 高度扣 header)— consume Sidebar inset 能力。
  */
 // export const PrimaryHeader: Story = { ... }  // future tier, pending Sidebar SSOT
 
 /**
- * Aside modal mode demo — viewport < 768px 時 Aside 自動切 Sheet,從右滑出 + 蓋 mask。
- * 對齊 Material 3 modal drawer canonical。
- * v2(2026-05-19 codex round 2 catch):asideOpen 預設 true 確保 visual probe 看到 modal Sheet 真開啟。
+ * Aside modal mode demo — viewport < 768px Aside 自動切 Sheet,從右滑出 + 蓋 mask。
+ * 對齊 Material 3 modal drawer canonical。Content 同 desktop inline 模式(panel role 不變,host 換)。
+ * asideOpen 預設 true 確保 visual probe 真實看到 modal Sheet。
  */
 export const AsideModalOnMobile: Story = {
   name: 'Aside modal mode(< 768px Sheet fallback)',
   parameters: { viewport: { defaultViewport: 'mobile1' } },
   render: () => {
-    // 預設 true:probe 直接 screenshot 開啟狀態,不需 click。
+    const [activeId, setActiveId] = React.useState<string>('inbox')
     const [asideOpen, setAsideOpen] = React.useState(true)
+    const [selected] = React.useState<Issue | null>(ISSUES[0])
+
     return (
-      <SidebarProvider>
+      <SidebarProvider activeId={activeId} onActiveChange={setActiveId}>
         <AppShell
           layout="primary-sidebar"
-          sidebar={<LinearSidebar />}
+          sidebar={<AcmeSidebar />}
           header={
-            <ChromeHeader>
-              <SidebarTrigger />
-              <span className="text-body font-medium flex-1 ml-2">My Issues</span>
-              <Button size="sm" variant="text" startIcon={PanelRightOpen} onClick={() => setAsideOpen(true)}>
-                詳情
-              </Button>
-            </ChromeHeader>
+            <PageHeader
+              title="Inbox"
+              onToggleAside={() => setAsideOpen(!asideOpen)}
+              asideOpen={asideOpen}
+            />
           }
-          aside={<IssueDetailAside />}
+          aside={
+            <AppShellAside title={selected ? selected.id : '詳情'} width={360}>
+              <IssueDetail issue={selected} />
+            </AppShellAside>
+          }
           asideOpen={asideOpen}
           onAsideOpenChange={setAsideOpen}
         >
-          <IssueList />
+          <IssuesView onSelectIssue={() => setAsideOpen(true)} />
         </AppShell>
       </SidebarProvider>
     )

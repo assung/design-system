@@ -463,6 +463,72 @@ ${PROP_REF_HITS}
   fi
 }
 
+# R7 — story_baseline_reference(PreToolUse Write/Edit,2026-05-20 codify per codex anti-drift D2)
+# 偵測 stories.tsx wrap 既有 primitive(<Sidebar> / <ChromeHeader> / <DataTable> 等)但跡證顯示
+# simplified mock(無 import 該 family helper / 無 @story-baseline marker)— stderr warn drift。
+# Anti-pattern 錨例:AppShell story 用 <Sidebar> 但 <SidebarHeader><span>name</span> 取代既有 WorkspaceBrand。
+
+rule_story_baseline_reference() {
+  case "$TOOL" in
+    Write|Edit) ;;
+    *) return 0 ;;
+  esac
+
+  case "$FILE_PATH" in
+    *.stories.tsx) ;;
+    *) return 0 ;;
+  esac
+
+  # 跳 same-file:Sidebar / ChromeHeader / DataTable 自己的 stories 不檢查
+  case "$FILE_PATH" in
+    */Sidebar/*|*/DataTable/*|*/header-canonical/*|*/Dialog/*|*/Sheet/*|*/Popover/*) return 0 ;;
+  esac
+
+  # 抓寫入內容
+  local CONTENT=""
+  if [ "$TOOL" = "Write" ]; then
+    CONTENT=$(echo "$INPUT" | jq -r '.tool_input.content // ""')
+  else
+    CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // ""')
+  fi
+
+  # 偵測 wrap 既有 primitive 但無 baseline marker
+  if echo "$CONTENT" | grep -qE '<(Sidebar|ChromeHeader|DataTable|Dialog|Sheet)\b'; then
+    # 檢 @story-baseline marker(現有檔 OR 新內容)
+    local HAS_BASELINE=0
+    if [ -f "$FILE_PATH" ] && head -10 "$FILE_PATH" 2>/dev/null | grep -qE '@story-baseline:'; then
+      HAS_BASELINE=1
+    fi
+    if echo "$CONTENT" | head -10 | grep -qE '@story-baseline:'; then
+      HAS_BASELINE=1
+    fi
+
+    if [ "$HAS_BASELINE" -eq 0 ]; then
+      echo "⚠️  R7 story_baseline_reference 違規:" >&2
+      echo "   $FILE_PATH wrap <Sidebar|ChromeHeader|DataTable|Dialog|Sheet>" >&2
+      echo "   但檔頭無 \`// @story-baseline: <path>#<StoryName>\` cite reference。" >&2
+      echo "" >&2
+      echo "   寫 stories wrap 既有 primitive 必先 grep family 完整佈局 story" >&2
+      echo "   (eg. sidebar.stories IconCollapse / data-table.stories WithBulkActions)" >&2
+      echo "   Read 其 helper(WorkspaceBrand / MAIN_NAV / PageContent / toolbar)當 baseline。" >&2
+      echo "   詳 .claude/rules/story-rules.md 「Production-grade composition fidelity」 +" >&2
+      echo "   .claude/skills/story-writing/SKILL.md Phase 0 +" >&2
+      echo "   memory/feedback_story_baseline_reference.md" >&2
+    fi
+
+    # 偵測明顯 simplified mock anti-pattern
+    if echo "$CONTENT" | grep -qE '<SidebarHeader>[[:space:]]*<span'; then
+      echo "❌ R7 anti-pattern:<SidebarHeader><span> — 應 wrap WorkspaceBrand-like ItemAvatar block(per sidebar.stories IconCollapse baseline)" >&2
+    fi
+    if echo "$CONTENT" | grep -qE '<SidebarMenuButton>[^<]*<[A-Z][a-zA-Z]+ className="size-'; then
+      echo "❌ R7 anti-pattern:<SidebarMenuButton><Icon className=\"size-N\"> — 應用 startIcon prop + tooltip prop(per sidebar.stories MAIN_NAV map)" >&2
+    fi
+    if echo "$CONTENT" | grep -qE '<ChromeHeader>[^<]*<span className="[^"]*flex-1'; then
+      echo "❌ R7 anti-pattern:<ChromeHeader><span flex-1> — 應 SidebarTrigger + h1 緊鄰 gap-2(per sidebar.stories PageContent baseline)" >&2
+    fi
+  fi
+}
+
 # ─── Run rules ───
 rule_anatomy
 rule_slot_split
@@ -470,5 +536,6 @@ rule_category
 rule_title_canonical
 rule_name_jargon
 rule_description_jargon
+rule_story_baseline_reference
 
 exit $WORST

@@ -36,6 +36,11 @@ paths:
 
 **Earn-existence 2 test**:(a) 教別 story 沒教的原則?(b) 移除後 spec 理解 degrade?兩題皆 NO → retire。
 
+**Production-grade composition fidelity**(2026-05-20 codify per codex anti-drift D2):
+- 寫 stories wrap **既有 primitive**(`<Sidebar>` / `<ChromeHeader>` / `<Dialog>` / `<DataTable>` 等)時,**必先 grep 該 primitive `*.stories.tsx` 找「完整佈局」類 story**(eg. `sidebar.stories.tsx IconCollapse` / `data-table.stories.tsx WithBulkActions`),Read 其 helper(`WorkspaceBrand` / `UserFooter` / `PageContent` / toolbar pattern 等)**當 baseline reference**
+- 禁直接寫 simplified mock(`<SidebarHeader><span>name</span>` / `<SidebarMenuButton><Icon className="size-4">` / `<ChromeHeader><span flex-1>title</span>`)= drift
+- 標 `// @story-baseline: <path>#<StoryName>` 在 stories.tsx 檔頭,reference 哪個 baseline。Hook `check_story_invariants.sh R7` 攔 drift(2026-05-20 ship)。
+
 **拆分原則**(對齊 Polaris / Carbon / Storybook):
 - 不同 affordance 必分(IconOnly / FullWidth)
 - AllVariants & AllSizes 對照各 1

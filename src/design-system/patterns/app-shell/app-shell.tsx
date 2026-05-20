@@ -13,13 +13,13 @@
  */
 
 import * as React from 'react'
+import { X as XIcon } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetBody,
 } from '@/design-system/components/Sheet/sheet'
+import { Button } from '@/design-system/components/Button/button'
+import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 import { useIsNarrowViewport } from '@/design-system/hooks/use-is-narrow-viewport'
 import { cn } from '@/lib/utils'
 
@@ -259,15 +259,39 @@ const AppShellAside = React.forwardRef<HTMLElement, AppShellAsideProps>(
     const isXl = useIsXl()
     const resolvedWidth = resolveAsideWidth(width, isXl)
 
+    // Shared frame:always-on header(title + close X)+ body(ScrollArea + layoutSpace 規則 1B 父層 padding)
+    // 對齊 codex Layer B 2026-05-20「container mode 可變,panel role/content 不該變」+ Notion/Figma right
+    // panel 共識(modal vs inline 結構相同,host wrapper 不同)。Header 用 chrome-header pattern
+    // 對齊 header-canonical.spec.md(h-chrome-header-height + border-b border-divider + px-loose + items-center gap-2)。
+    const frame = (
+      <>
+        <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
+          <h2 className="text-body-lg font-medium flex-1 truncate">{title}</h2>
+          <Button
+            iconOnly
+            dismiss
+            size="sm"
+            startIcon={XIcon}
+            aria-label="關閉"
+            onClick={() => setAsideOpen(false)}
+          />
+        </header>
+        <ScrollArea className="flex-1 min-h-0">
+          {children}
+        </ScrollArea>
+      </>
+    )
+
     // Modal mode(mobile)— Sheet from right
     if (isMobile) {
       return (
         <Sheet open={asideOpen} onOpenChange={setAsideOpen}>
-          <SheetContent side="right" className="w-[min(90vw,var(--app-shell-aside-modal-width))]" style={{ ['--app-shell-aside-modal-width' as string]: `${resolvedWidth}px` }}>
-            <SheetHeader>
-              <SheetTitle>{title}</SheetTitle>
-            </SheetHeader>
-            <SheetBody>{children}</SheetBody>
+          <SheetContent
+            side="right"
+            className="w-[min(90vw,var(--app-shell-aside-modal-width))] flex flex-col p-0 [&>button]:hidden"
+            style={{ ['--app-shell-aside-modal-width' as string]: `${resolvedWidth}px` }}
+          >
+            {frame}
           </SheetContent>
         </Sheet>
       )
@@ -281,14 +305,13 @@ const AppShellAside = React.forwardRef<HTMLElement, AppShellAsideProps>(
         ref={ref}
         aria-label={title}
         className={cn(
-          // own-scroll per codex Layer B D4(避雙 scrollbar);AppShell root overflow-hidden 防 body scroll
-          'flex flex-col h-full min-h-0 overflow-y-auto',
+          'flex flex-col h-full min-h-0 overflow-hidden',
           'bg-surface border-l border-divider',
           className
         )}
         style={{ width: resolvedWidth }}
       >
-        {children}
+        {frame}
       </aside>
     )
   }
