@@ -91,31 +91,47 @@ export const Overview: Story = {
   },
 }
 
-/** Layout mode matrix:primary-sidebar vs primary-header 並列對照 */
-export const LayoutModeMatrix: Story = {
-  name: 'LayoutModeMatrix — 兩 mode 對照',
+/**
+ * LayoutModeDiagram — 兩 mode 對照(2026-05-19 codex round 2 catch:原 LayoutModeMatrix 在 grid
+ * 內 nest 2 個 AppShell,Sidebar fixed inset-y-0 從 viewport 出來覆蓋左 column → 視覺崩壞 +
+ * 違反 spec.md「禁 nested AppShell」discipline)。v2:用 SVG / 描述式 diagram 取代 nested live demo,
+ * 兩 mode 的 live full-page demo 在「展示」分頁(primary-sidebar Linear-style 已 ship,
+ * primary-header pending Sidebar SSOT extension)。
+ */
+export const LayoutModeDiagram: Story = {
+  name: 'LayoutModeDiagram — 兩 mode 對照(diagram)',
   render: () => (
-    <div className="grid grid-cols-2 gap-2 h-svh">
-      <div className="border-r border-divider overflow-hidden">
-        <div className="text-caption px-2 py-1 bg-surface-strong">primary-sidebar(Linear 派)</div>
-        <div className="h-[calc(100%-32px)]">
-          <SidebarProvider>
-            <AppShell layout="primary-sidebar" sidebar={<MockSidebar />} header={<MockHeader />}>
-              <div className="p-4 text-caption">main content</div>
-            </AppShell>
-          </SidebarProvider>
+    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] space-y-6 text-body">
+      <h2 className="text-h4">兩 mode 對照</h2>
+
+      <section className="space-y-2">
+        <h3 className="text-h5">primary-sidebar(Linear / Notion / Figma 派)</h3>
+        <div className="flex gap-px bg-divider border border-divider rounded overflow-hidden text-caption">
+          <div className="w-32 bg-surface-strong px-2 py-8 text-center">Sidebar<br/>頂天立地</div>
+          <div className="flex-1 flex flex-col">
+            <div className="bg-surface-strong px-2 py-1">Header(在 main col 內,當前頁 toolbar)</div>
+            <div className="bg-canvas flex-1 px-2 py-6 text-fg-muted">Main content</div>
+          </div>
+          <div className="w-24 bg-surface-strong px-2 py-8 text-center text-fg-muted">Aside<br/>頂天</div>
         </div>
-      </div>
-      <div className="overflow-hidden">
-        <div className="text-caption px-2 py-1 bg-surface-strong">primary-header(GitHub 派)</div>
-        <div className="h-[calc(100%-32px)]">
-          <SidebarProvider>
-            <AppShell layout="primary-header" sidebar={<MockSidebar />} header={<MockHeader />}>
-              <div className="p-4 text-caption">main content</div>
-            </AppShell>
-          </SidebarProvider>
+        <p className="text-fg-muted">Header scope = 當前頁 actions。產品 single-workspace。</p>
+      </section>
+
+      <section className="space-y-2">
+        <h3 className="text-h5">primary-header(GitHub / Slack / Gmail 派)— pending</h3>
+        <div className="flex flex-col gap-px bg-divider border border-divider rounded overflow-hidden text-caption">
+          <div className="bg-surface-strong px-2 py-1 text-center">Header(global bar,橫跨整 viewport)</div>
+          <div className="flex">
+            <div className="w-32 bg-surface-strong px-2 py-8 text-center">Sidebar<br/>(在 header 下)</div>
+            <div className="flex-1 bg-canvas px-2 py-6 text-fg-muted">Main content</div>
+            <div className="w-24 bg-surface-strong px-2 py-8 text-center text-fg-muted">Aside</div>
+          </div>
         </div>
-      </div>
+        <p className="text-fg-muted">
+          Header scope = global account / workspace / notifications。產品 multi-workspace。
+          <span className="text-warning-text">⚠️ pending Sidebar SSOT viewport-inset extension(2026-05-19)</span>
+        </p>
+      </section>
     </div>
   ),
 }

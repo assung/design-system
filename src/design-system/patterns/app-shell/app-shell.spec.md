@@ -52,8 +52,8 @@ benchmark:
 ```tsx
 <AppShell
   layout="primary-sidebar" | "primary-header"   // 預設 primary-sidebar
-  sidebarOpen={open}    onSidebarOpenChange={setOpen}    // ⌘B / Ctrl+B toggle (Sidebar SSOT)
-  asideOpen={open}      onAsideOpenChange={setOpen}      // ⌘. / Ctrl+. toggle
+  // sidebar 開合 state 走 Sidebar SSOT 既有 SidebarProvider(消費既有 ⌘B / Ctrl+B,本 AppShell 不重發明)
+  asideOpen={open}      onAsideOpenChange={setOpen}      // ⌘. / Ctrl+. toggle (本 AppShell own)
   sidebar={<Sidebar>...</Sidebar>}              // SSOT in components/Sidebar/sidebar.spec.md
   header={<ChromeHeader>...</ChromeHeader>}     // SSOT in patterns/header-canonical/header-canonical.spec.md
   aside={<AppShellAside title="Detail">...</AppShellAside>}   // 本 pattern own;modal mode 必 title(Sheet a11y)
@@ -185,7 +185,13 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 | `aside` | `<aside aria-label={title}>` | title required(modal mode `aria-labelledby` 強制) |
 | `children`(main) | `<main>` | `role="main"`(implicit)+ skip-to-main 跳轉 anchor |
 
-**Landmark 分流**:`primary-header` mode 的 header = global banner(site-wide nav / account);`primary-sidebar` mode 的 header = local toolbar(當前頁 actions),**不該** auto banner role(W3C ARIA in HTML 規範)。
+**W3C ARIA in HTML banner rule(精準 quote)**:`<header>` element 在 `<body>` direct context = `role="banner"` implicit;若 `<header>` 是 `<main>` / `<nav>` / `<article>` / `<section>` / `<aside>` descendant,則 **NOT** banner role(W3C HTML AAM spec)。
+
+**本 AppShell 對應落實**:
+- `primary-header` mode:`<header>` 直接 `<body>` descendant(AppShell root flex-col 第一個 child)→ implicit banner role ✓
+- `primary-sidebar` mode:header 包在 `<div>`(main column 內,跟 `<main>` 是 sibling 非 descendant)→ ChromeHeader 本身是 `<div>` 元件,因此**沒有 banner role 觸發**。屬 local toolbar 語意。
+
+不發明新 ARIA,消費 HTML5 semantic + WAI-ARIA Landmark 標準 + W3C ARIA in HTML banner rule。
 
 不發明新 ARIA,消費 HTML5 semantic + WAI-ARIA Landmark 標準 + W3C ARIA in HTML banner rule。
 

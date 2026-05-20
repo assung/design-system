@@ -12,11 +12,12 @@ const mobile = await browser.newContext({ viewport: { width: 375, height: 667 } 
 
 const cases = [
   { id: 'design-system-patterns-appshell-展示--primary-sidebar', label: 'primary-sidebar', ctx: desktop },
-  { id: 'design-system-patterns-appshell-展示--primary-header', label: 'primary-header', ctx: desktop },
-  { id: 'design-system-patterns-appshell-展示--aside-modal-on-mobile', label: 'aside-mobile', ctx: mobile },
-  { id: 'design-system-patterns-appshell-設計規格--layout-mode-matrix', label: 'anatomy-mode-matrix', ctx: desktop },
+  // primary-header story retired pending Sidebar SSOT extension (2026-05-19)
+  { id: 'design-system-patterns-appshell-展示--aside-modal-on-mobile', label: 'aside-mobile-open', ctx: mobile },
+  { id: 'design-system-patterns-appshell-設計規格--layout-mode-diagram', label: 'anatomy-mode-diagram', ctx: desktop },
   { id: 'design-system-patterns-appshell-設計規格--overview', label: 'anatomy-overview', ctx: desktop },
   { id: 'design-system-patterns-appshell-設計規格--accessibility', label: 'anatomy-a11y', ctx: desktop },
+  { id: 'design-system-patterns-appshell-設計規格--state-behavior', label: 'anatomy-state-behavior', ctx: desktop },
 ]
 
 const results = []

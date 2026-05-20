@@ -131,72 +131,28 @@ export const PrimarySidebar: Story = {
   },
 }
 
-// ── GitHub-style global top bar workspace ──
-
-function GitHubGlobalHeader() {
-  return (
-    <ChromeHeader>
-      <SidebarTrigger />
-      <span className="text-body font-medium ml-2">GitHub</span>
-      <span className="text-caption text-fg-muted ml-4">acme-inc / ui-playground</span>
-      <span className="flex-1" />
-      <Button size="sm" variant="secondary">Notifications</Button>
-      <Button size="sm" variant="primary">+ New</Button>
-    </ChromeHeader>
-  )
-}
-
-function RepoSidebar() {
-  return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu>
-            <SidebarMenuItem><SidebarMenuButton>Code</SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton>Issues</SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton>Pull requests</SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton>Actions</SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton>Settings</SidebarMenuButton></SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
-  )
-}
+// GitHubGlobalHeader / RepoSidebar 已 retire(primary-header story pending Sidebar SSOT extension)
 
 /**
- * GitHub / Slack / Gmail 派 — header 頂部橫跨整 viewport 當 global bar,sidebar 在 header 下。
- * Header scope 是 global account / workspace / notifications,sidebar 是 secondary nav。
+ * primary-header mode pending Sidebar SSOT viewport-inset extension(2026-05-19 codex Layer B
+ * D1 verdict)。Sidebar 既有 `fixed inset-y-0 h-svh` 會蓋住 global header → broken UI。
+ * 待 Sidebar 升級 `viewportInsetTop` 能力後 ship。本 story 暫 removed,避免 broken demo。
+ *
+ * 對齊 Mantine `layout="default"`(navbar 高度扣 header)— consume Sidebar inset 能力。
  */
-export const PrimaryHeader: Story = {
-  name: 'primary-header(GitHub / Slack 派)',
-  render: () => (
-    <SidebarProvider>
-      <AppShell
-        layout="primary-header"
-        sidebar={<RepoSidebar />}
-        header={<GitHubGlobalHeader />}
-      >
-        <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
-          <h1 className="text-h4 mb-3">README.md</h1>
-          <p className="text-body text-fg-secondary">
-            Design system playground for Acme Inc product team. World-class component library aligned to Polaris / Material / Atlassian / Carbon canonical.
-          </p>
-        </div>
-      </AppShell>
-    </SidebarProvider>
-  ),
-}
+// export const PrimaryHeader: Story = { ... }  // future tier, pending Sidebar SSOT
 
 /**
  * Aside modal mode demo — viewport < 768px 時 Aside 自動切 Sheet,從右滑出 + 蓋 mask。
  * 對齊 Material 3 modal drawer canonical。
+ * v2(2026-05-19 codex round 2 catch):asideOpen 預設 true 確保 visual probe 看到 modal Sheet 真開啟。
  */
 export const AsideModalOnMobile: Story = {
   name: 'Aside modal mode(< 768px Sheet fallback)',
   parameters: { viewport: { defaultViewport: 'mobile1' } },
   render: () => {
-    const [asideOpen, setAsideOpen] = React.useState(false)
+    // 預設 true:probe 直接 screenshot 開啟狀態,不需 click。
+    const [asideOpen, setAsideOpen] = React.useState(true)
     return (
       <SidebarProvider>
         <AppShell

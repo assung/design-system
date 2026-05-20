@@ -20,6 +20,7 @@ import {
   SheetTitle,
   SheetBody,
 } from '@/design-system/components/Sheet/sheet'
+import { useIsNarrowViewport } from '@/design-system/hooks/use-is-narrow-viewport'
 import { cn } from '@/lib/utils'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -69,24 +70,26 @@ function useAppShell(): AppShellContextValue {
   return ctx
 }
 
-// ── Mobile breakpoint hook(對齊 Sidebar 768px SSOT)──────────────────────────
+// Mobile breakpoint:**消費既有 `useIsNarrowViewport`**(`hooks/use-is-narrow-viewport.ts` SSOT,
+// 768px,跟 Sidebar SSOT 同源)— 不發明 local hook,per codex Layer B D2/D4 verdict 避 drift。
 
-const MOBILE_BREAKPOINT_PX = 768
+// xl breakpoint(對齊 Tailwind v4 xl = 1280px,DS-wide consensus)
+const XL_BREAKPOINT_PX = 1280
 
-function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = React.useState<boolean>(() => {
+function useIsXl(): boolean {
+  const [isXl, setIsXl] = React.useState<boolean>(() => {
     if (typeof window === 'undefined') return false
-    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX - 1}px)`).matches
+    return window.matchMedia(`(min-width: ${XL_BREAKPOINT_PX}px)`).matches
   })
 
   React.useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX - 1}px)`)
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    const mq = window.matchMedia(`(min-width: ${XL_BREAKPOINT_PX}px)`)
+    const handler = (e: MediaQueryListEvent) => setIsXl(e.matches)
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  return isMobile
+  return isXl
 }
 
 // ── Width resolve(consumer 自傳 + clamp 240-640)──────────────────────────────
@@ -95,13 +98,13 @@ const ASIDE_WIDTH_MIN = 240
 const ASIDE_WIDTH_MAX = 640
 const ASIDE_WIDTH_DEFAULT = 320
 
-function resolveAsideWidth(width: AppShellAsideProps['width']): number {
+function resolveAsideWidth(width: AppShellAsideProps['width'], isXl: boolean): number {
   if (typeof width === 'number') {
     return Math.max(ASIDE_WIDTH_MIN, Math.min(ASIDE_WIDTH_MAX, width))
   }
   if (width && typeof width === 'object') {
-    // 簡化:先取 md,後續可加 ResizeObserver-driven xl 切換
-    const v = width.md ?? ASIDE_WIDTH_DEFAULT
+    // breakpoint-keyed:xl viewport(≥1280px)用 xl,否則 md
+    const v = (isXl ? width.xl ?? width.md : width.md) ?? ASIDE_WIDTH_DEFAULT
     return Math.max(ASIDE_WIDTH_MIN, Math.min(ASIDE_WIDTH_MAX, v))
   }
   return ASIDE_WIDTH_DEFAULT
@@ -155,7 +158,7 @@ const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       [isControlled, onAsideOpenChange]
     )
 
-    const isMobile = useIsMobile()
+    const isMobile = useIsNarrowViewport()
 
     // ── Keyboard: cmd+. toggle aside ──
     // ⌘B sidebar toggle by Sidebar SSOT(本 component 不重覆 register)
@@ -186,29 +189,16 @@ const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
     // AppShell 一律只 render `{aside}` 一次,AppShellAside 內部根據 isMobile 決定 render 形式。
 
     if (layout === 'primary-header') {
-      return (
-        <AppShellContext.Provider value={ctxValue}>
-          <div
-            ref={ref}
-            className={cn('flex h-svh w-full flex-col overflow-hidden bg-canvas', className)}
-            {...props}
-          >
-            <SkipToMain />
-            {/* Header row — banner role (global) */}
-            {header && <header className="flex-shrink-0">{header}</header>}
-            {/* Body row */}
-            <div className="flex flex-1 min-h-0 overflow-hidden">
-              {/* Sidebar — 不頂天(在 header 下) */}
-              {sidebar}
-              {/* Main */}
-              <main id="app-shell-main" className="flex-1 min-w-0 min-h-0 overflow-y-auto">
-                {children}
-              </main>
-              {/* Aside slot — desktop inline OR mobile Sheet,內部自決 */}
-              {aside}
-            </div>
-          </div>
-        </AppShellContext.Provider>
+      // primary-header guard(2026-05-19 codex Layer B D1 verdict):
+      // Sidebar SSOT 用 `fixed inset-y-0 h-svh` viewport-anchored → 跟 primary-header「sidebar 在 header 下」
+      // 衝突(visual probe confirmed primary-header.png sidebar 蓋 header)。production-grade ship 需
+      // 先擴 Sidebar SSOT 加 `viewportInsetTop` 能力(Sidebar 自己 own,不 AppShell customize)。
+      // Cite:Mantine `layout="default"` 規範 navbar 高度扣 header,代表 navbar 該知道 inset。
+      // 目前 throw 防 broken UI 被誤 ship,future tier 待 Sidebar SSOT 升級。
+      throw new Error(
+        '[AppShell] layout="primary-header" not yet shippable — Sidebar SSOT needs viewport-inset extension first. ' +
+          'Visual probe (2026-05-19) confirmed Sidebar fixed inset-y-0 covers header. ' +
+          'Use layout="primary-sidebar" (default) for v1 ship。See app-shell.spec.md Future extension 段。'
       )
     }
 
@@ -226,10 +216,16 @@ const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           {/* Main column(header + main 垂直堆)*/}
           <div className="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden">
             {header && (
-              // Header 在 main 內 → NOT a banner(W3C ARIA in HTML rule);wrap div not <header>
+              // Header 在 main column 內(main col sibling,非 main descendant)→ 跟 W3C ARIA in HTML
+              // banner rule 對照:`<header>` 在 main descendant 才不是 banner,本 ChromeHeader 是 <div>
+              // 所以本來就不會被 banner role 計算。仍包 wrap div not <header> 確保不無意觸發 banner。
               <div className="flex-shrink-0">{header}</div>
             )}
-            <main id="app-shell-main" className="flex-1 min-h-0 overflow-y-auto">
+            <main
+              id="app-shell-main"
+              tabIndex={-1}
+              className="flex-1 min-h-0 overflow-y-auto focus:outline-none"
+            >
               {children}
             </main>
           </div>
@@ -260,7 +256,8 @@ AppShell.displayName = 'AppShell'
 const AppShellAside = React.forwardRef<HTMLElement, AppShellAsideProps>(
   ({ title, width, children, className }, ref) => {
     const { asideOpen, setAsideOpen, isMobile } = useAppShell()
-    const resolvedWidth = resolveAsideWidth(width)
+    const isXl = useIsXl()
+    const resolvedWidth = resolveAsideWidth(width, isXl)
 
     // Modal mode(mobile)— Sheet from right
     if (isMobile) {
@@ -284,7 +281,8 @@ const AppShellAside = React.forwardRef<HTMLElement, AppShellAsideProps>(
         ref={ref}
         aria-label={title}
         className={cn(
-          'flex flex-col h-full min-h-0 overflow-hidden',
+          // own-scroll per codex Layer B D4(避雙 scrollbar);AppShell root overflow-hidden 防 body scroll
+          'flex flex-col h-full min-h-0 overflow-y-auto',
           'bg-surface border-l border-divider',
           className
         )}
