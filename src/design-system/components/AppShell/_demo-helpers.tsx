@@ -47,8 +47,12 @@ export const MAIN_NAV = [
 
 // ── WorkspaceBrand(對齊 sidebar.stories.tsx)────────────────────────────
 
+// 2026-05-20 撤回 group-data-[collapsible=icon]:justify-center(fix「avatar 飛右後左收」動畫)。
+// 真根因:展開 256px avatar 在 x=0,collapsible attribute 瞬切 + justify start→center,avatar
+// 瞬間 jump 到 x=128(中心)然後跟 width 縮到 x=24 → 視覺看到 fly-right-then-left。
+// Fix:avatar 永遠 left-align,sidebar 自身 side padding 視覺自然居中(對齊 VS Code / Linear 慣例)。
 export const WorkspaceBrand = () => (
-  <div className="flex items-center gap-2 min-w-0 group-data-[collapsible=icon]:justify-center">
+  <div className="flex items-center gap-2 min-w-0">
     <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
     <span className="text-body-lg font-medium truncate group-data-[collapsible=icon]:hidden">Acme Inc</span>
   </div>
@@ -82,13 +86,23 @@ export const UserFooter = () => (
 )
 
 // ── AcmeSidebar(完整 production-grade,對齊 sidebar IconCollapse story)──
+// `includeWorkspaceBrand` default true(primary-sidebar 派 Linear/Notion 慣例:workspace brand 在 sidebar 頂)。
+// `false` 用於 primary-header mode:workspace brand 移到 globalHeader 左側(GitHub logo / Slack workspace bar 慣例)。
 
-export function AcmeSidebar({ viewportInsetTop }: { viewportInsetTop?: string } = {}) {
+export function AcmeSidebar({
+  viewportInsetTop,
+  includeWorkspaceBrand = true,
+}: {
+  viewportInsetTop?: string
+  includeWorkspaceBrand?: boolean
+} = {}) {
   return (
     <Sidebar collapsible="icon" viewportInsetTop={viewportInsetTop}>
-      <SidebarHeader>
-        <WorkspaceBrand />
-      </SidebarHeader>
+      {includeWorkspaceBrand && (
+        <SidebarHeader>
+          <WorkspaceBrand />
+        </SidebarHeader>
+      )}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -112,6 +126,23 @@ export function AcmeSidebar({ viewportInsetTop }: { viewportInsetTop?: string } 
         <UserFooter />
       </SidebarFooter>
     </Sidebar>
+  )
+}
+
+// ── GlobalHeader(primary-header mode 用,跨頁 chrome:WorkspaceBrand 左 + 跨頁 actions 右)──
+// 2026-05-21 加 per user clarification「primary-header = primary-sidebar + 一條 global header」。
+// 對齊 GitHub top nav(logo 左 / search 中 / account 右)+ Slack workspace bar 慣例。
+// 消費 ChromeHeader(per `header-canonical.spec.md` Element + Background ownership 段:
+// top-level chrome → 自畫 bg-surface)。
+
+export function GlobalHeader({ rightSlot }: { rightSlot?: React.ReactNode } = {}) {
+  return (
+    <ChromeHeader className="bg-surface">
+      <SidebarTrigger />
+      <WorkspaceBrand />
+      <div className="flex-1" />
+      {rightSlot}
+    </ChromeHeader>
   )
 }
 

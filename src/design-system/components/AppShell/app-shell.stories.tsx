@@ -6,7 +6,7 @@ import * as React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { Search, Filter, ArrowUpDown, Info, UserCheck, CheckCircle2 } from 'lucide-react'
 import { AppShell, AppShellAside } from './app-shell'
-import { AcmeSidebar, PageHeader, MAIN_NAV } from './_demo-helpers'
+import { AcmeSidebar, PageHeader, GlobalHeader, MAIN_NAV } from './_demo-helpers'
 import { SidebarProvider } from '@/design-system/components/Sidebar/sidebar'
 import { Button } from '@/design-system/components/Button/button'
 import { Input } from '@/design-system/components/Input/input'
@@ -71,7 +71,7 @@ const ISSUE_COLUMNS = [
  * per data-table.spec L193 canonical)→ click 開 Aside + 被選 issue active visual(pressed prop)。
  * AppShell header toggle 降級為 secondary show/hide 不是主入口。
  */
-function IssuesView({ selectedId, onSelectIssue }: { selectedId?: string; onSelectIssue: (issue: Issue) => void }) {
+function IssuesView({ selectedId, asideOpen, onSelectIssue }: { selectedId?: string; asideOpen: boolean; onSelectIssue: (issue: Issue) => void }) {
   const [search, setSearch] = React.useState('')
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [filterTree, setFilterTree] = React.useState<FilterTree>(() => createEmptyFilterTree('flat'))
@@ -165,7 +165,7 @@ function IssuesView({ selectedId, onSelectIssue }: { selectedId?: string; onSele
               iconOnly
               startIcon={Info}
               aria-label={`開啟 ${row.id} 詳情`}
-              pressed={row.id === selectedId}
+              pressed={row.id === selectedId && asideOpen}
               onClick={() => onSelectIssue(row)}
             />
           )}
@@ -274,6 +274,7 @@ export const PrimarySidebar: Story = {
         >
           <IssuesView
             selectedId={selected?.id}
+            asideOpen={asideOpen}
             onSelectIssue={(issue) => {
               setSelected(issue)
               setAsideOpen(true)
@@ -336,6 +337,7 @@ export const PrimarySidebarWithTabs: Story = {
             <TabsContent value="all" className="flex-1 min-h-0 flex flex-col">
               <IssuesView
                 selectedId={selected?.id}
+                asideOpen={asideOpen}
                 onSelectIssue={(issue) => {
                   setSelected(issue)
                   setAsideOpen(true)
@@ -345,6 +347,7 @@ export const PrimarySidebarWithTabs: Story = {
             <TabsContent value="open" className="flex-1 min-h-0 flex flex-col">
               <IssuesView
                 selectedId={selected?.id}
+                asideOpen={asideOpen}
                 onSelectIssue={(issue) => {
                   setSelected(issue)
                   setAsideOpen(true)
@@ -354,6 +357,7 @@ export const PrimarySidebarWithTabs: Story = {
             <TabsContent value="done" className="flex-1 min-h-0 flex flex-col">
               <IssuesView
                 selectedId={selected?.id}
+                asideOpen={asideOpen}
                 onSelectIssue={(issue) => {
                   setSelected(issue)
                   setAsideOpen(true)
@@ -368,22 +372,21 @@ export const PrimarySidebarWithTabs: Story = {
 }
 
 /**
- * primary-header mode(GitHub / Gmail / Slack 派)— global bar 橫跨頂部 + sidebar/main/aside 在 header 下方。
+ * primary-header mode(GitHub / Gmail / Slack 派)— global header 橫跨頂部 + local header 仍在 main col 頂。
  *
- * @usage-ref: app-shell.spec.md L74(primary-header layout)
- * @usage-consumes: ChromeHeader + Sidebar viewportInsetTop + AcmeSidebar baseline + IssuesView
+ * @usage-ref: app-shell.spec.md L74(primary-header 2-layer model)
+ * @usage-consumes: ChromeHeader + Sidebar viewportInsetTop + GlobalHeader + PageHeader + IssuesView
  *
- * 2026-05-20 unblock per Sidebar `viewportInsetTop` SSOT extension。Sidebar 加 `viewportInsetTop`
- * prop = sidebar 從 header 下方起算(per Mantine `layout="default"` navbar inset canonical)。
- *
- * Header scope = global bar(account / workspace switcher / notifications / 跨頁 search)—
- * 真正 distinguishing factor 跟 workspace 多寡無關(per spec.md「真正的 distinguishing factor」段
- * 2026-05-20 撤回 single/multi-workspace mis-claim)。
- *
- * Aside 在 header 下方(per world-class GitHub / Slack / Gmail 100% 一致)— 非頂天立地。
+ * 2026-05-21 v2 per user clarification「primary-header = primary-sidebar + 一條 global header」:
+ * - **Row 1 globalHeader**:跨頁 chrome(WorkspaceBrand 左 + account / search 右),對齊
+ *   GitHub top nav / Slack workspace bar / Gmail logo bar
+ * - **Row 2 [sidebar][main col][aside]**:sidebar viewportInsetTop=globalHeader 高,不蓋 global
+ * - **Main col 仍有 local header(PageHeader)** — 當前頁 title / breadcrumb / page actions
+ *   對齊 GitHub repo header / Slack channel header / Gmail email-list toolbar 2-layer 慣例
+ * - Sidebar 內**不 render WorkspaceBrand**(`includeWorkspaceBrand={false}`),avoid 重複(已在 globalHeader)
  */
 export const PrimaryHeader: Story = {
-  name: 'primary-header(GitHub / Gmail / Slack 派 — global bar 頂)',
+  name: 'primary-header(GitHub / Gmail / Slack 派 — global + local 2-layer)',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('inbox')
     const [asideOpen, setAsideOpen] = React.useState(true)
@@ -393,8 +396,14 @@ export const PrimaryHeader: Story = {
       <SidebarProvider activeId={activeId} onActiveChange={setActiveId}>
         <AppShell
           layout="primary-header"
-          sidebar={<AcmeSidebar viewportInsetTop="var(--chrome-header-height)" />}
-          header={<PageHeader title="Acme Inc — Global" />}
+          sidebar={
+            <AcmeSidebar
+              viewportInsetTop="var(--chrome-header-height)"
+              includeWorkspaceBrand={false}
+            />
+          }
+          globalHeader={<GlobalHeader />}
+          header={<PageHeader title={MAIN_NAV.find((n) => n.id === activeId)?.label ?? 'Inbox'} />}
           aside={
             <AppShellAside title={selected ? selected.id : '詳情'} width={360}>
               <IssueDetail issue={selected} />
@@ -405,6 +414,7 @@ export const PrimaryHeader: Story = {
         >
           <IssuesView
             selectedId={selected?.id}
+            asideOpen={asideOpen}
             onSelectIssue={(issue) => {
               setSelected(issue)
               setAsideOpen(true)

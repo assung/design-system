@@ -1080,7 +1080,20 @@ function DataTableInner<TData>(
     // Codex root cause cite:circular feedback `tableRef.height ↔ bodyMaxHeight ↔ body layout ↔ tableRef.height`
     // Reproduce verified:viewport 1280→1920→900,parentH 392/672/292 變化,但 a524e03 fix 下 bodyRectH 永遠 240。
     let rafId: number | null = null
+    let stableTimer: ReturnType<typeof setTimeout> | null = null
     let lastValue: number | null = null
+    let pendingValue: number | null = null
+    // 2026-05-21 v4 真根因 fix(per user「請你仔細查查,務必仔細查」+「確保這個問題不再出現」):
+    // 即使 v3(observe parent + rAF + diff guard < 4px),Tabs / Storybook iframe / nested
+    // AppShell flex chain 仍可能 100ms+ settle period 內每 frame growth > 4px → setState
+    // 多次 fire → user 視覺「stepping growth」。
+    //
+    // **v4 加 stability window**:layout 連續 100ms 無變動才 setState。意味:
+    // - 初始 mount:bodyMaxHeight=null → body 不受 maxHeight 限制 → 顯全內容(intrinsic 高度)
+    // - RO 多 frame fire(layout settling):每 fire reset timer,setState 不 fire
+    // - Layout 穩定 100ms:setState fire 最終值,body 套 constraint(若 parent > content 無視覺變化)
+    // - 真實 resize(viewport 縮 / aside toggle):δ 必 ≫ 4px + 跨多 frame,timer 自然 settle
+    // 對齊 TanStack Virtual `observeElementRect` + Material X-DataGrid 「resize debounce 100ms」慣例。
     const compute = () => {
       if (!tableRef.current) return
       // ⭐ 量 parent slot(definite height,不受 child 反向影響),fallback 用 outer
@@ -1090,14 +1103,16 @@ function DataTableInner<TData>(
       const headerEl = tableRef.current.firstElementChild as HTMLElement | null
       const headerH = headerEl?.getBoundingClientRect().height ?? 0
       const next = Math.max(0, slotH - headerH)
-      // 2026-05-20 v3:Diff guard < 1px → < 4px(濾更多 micro-step)。
-      // 起因:Tabs / AppShell nested layout(eg. PrimarySidebarWithTabs story)初始 paint
-      // parent flex chain 多 frame settle,每 frame growth 2-4px 會繞過 < 1px guard 造成
-      // user 觀察「table 慢慢長高」。< 4px threshold 濾掉這類 micro-step,真實 resize
-      // (window resize / aside open/close)δ 都會 ≫ 4px,不會誤殺。
+      // Diff guard < 4px(濾 micro-step,real resize δ 必 ≫ 4px)
       if (lastValue != null && Math.abs(next - lastValue) < 4) return
       lastValue = next
-      setBodyMaxHeight(next)
+      pendingValue = next
+      // Stability window 100ms:layout 連續 100ms 無變才 setState
+      if (stableTimer != null) clearTimeout(stableTimer)
+      stableTimer = setTimeout(() => {
+        if (pendingValue != null) setBodyMaxHeight(pendingValue)
+        stableTimer = null
+      }, 100)
     }
     const scheduleCompute = () => {
       if (rafId != null) return
@@ -1106,13 +1121,14 @@ function DataTableInner<TData>(
         compute()
       })
     }
-    compute() // initial sync(cap 帶值,避 first paint blank)
+    compute() // initial schedule(會 enter stability window 等 100ms settle)
     // ⭐ 只 observe parent,不 observe tableRef(打破 circular)
     const obs = new ResizeObserver(scheduleCompute)
     if (tableRef.current?.parentElement) obs.observe(tableRef.current.parentElement)
     return () => {
       obs.disconnect()
       if (rafId != null) cancelAnimationFrame(rafId)
+      if (stableTimer != null) clearTimeout(stableTimer)
     }
   }, [isFillHeight])
 

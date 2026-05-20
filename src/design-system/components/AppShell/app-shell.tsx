@@ -33,8 +33,19 @@ export interface AppShellProps extends React.HTMLAttributes<HTMLDivElement> {
   layout?: AppShellLayout
   /** Sidebar 元素(必傳 Sidebar primitive,per Consumer 紀律)*/
   sidebar?: React.ReactNode
-  /** Header 元素(必傳 ChromeHeader 或 header-canonical-derived,per Consumer 紀律)*/
+  /**
+   * Local page header(永遠 render 在 main column 頂部,當前頁 actions / breadcrumb / page-level filter)。
+   * 兩 layout mode 都會 render 此 slot — `primary-header` mode 多了 globalHeader 在上方,
+   * **不取代** local header(per 2026-05-20 user clarification「primary-header = primary-sidebar + 一條 global header」)。
+   */
   header?: React.ReactNode
+  /**
+   * Global header(僅 `primary-header` mode render)。橫跨整 viewport 的頂部 bar:
+   * account avatar / workspace switcher / global search / notifications。
+   * 對齊 GitHub top nav / Slack workspace bar / Gmail logo bar 慣例。
+   * `primary-sidebar` mode 傳此 prop 會被忽略。
+   */
+  globalHeader?: React.ReactNode
   /** Aside 元素(`<AppShellAside>` sub-component);可選 */
   aside?: React.ReactNode
   /** Aside open state(modal mode 必須)*/
@@ -138,6 +149,7 @@ const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       layout = 'primary-sidebar',
       sidebar,
       header,
+      globalHeader,
       aside,
       asideOpen: asideOpenProp,
       onAsideOpenChange,
@@ -190,10 +202,11 @@ const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
     // AppShell 一律只 render `{aside}` 一次,AppShellAside 內部根據 isMobile 決定 render 形式。
 
     if (layout === 'primary-header') {
-      // primary-header layout(2026-05-20 ship per Sidebar `viewportInsetTop` SSOT extension):
-      // 結構:row1 header(全寬 global bar)/ row2 [sidebar][main][aside]
-      // Consumer 必傳 `<Sidebar viewportInsetTop="var(--chrome-header-height)">` 讓 sidebar
-      // 從 header 下方起算,不蓋 header(per Mantine `layout="default"` canonical)。
+      // primary-header layout(2026-05-21 v2 — user clarification「primary-header = primary-sidebar + 一條 global header」):
+      // 結構:row1 globalHeader(全寬 global bar)/ row2 [sidebar][main col: localHeader + main][aside]
+      // - globalHeader = 跨頁 account / workspace switcher / notifications(對齊 GitHub top nav / Slack workspace bar)
+      // - header = local page header,**仍存在**(per page actions / breadcrumb,對齊 GitHub repo header / Slack channel header / Gmail email-list toolbar 2-layer 慣例)
+      // Consumer 必傳 `<Sidebar viewportInsetTop="var(--chrome-header-height)">` 讓 sidebar 從 globalHeader 下方起算。
       return (
         <AppShellContext.Provider value={ctxValue}>
           <div
@@ -202,18 +215,22 @@ const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             {...props}
           >
             <SkipToMain />
-            {/* Row 1:Global header — 橫跨整 viewport,banner role(per ARIA spec page top header)*/}
-            {header && <div className="flex-shrink-0">{header}</div>}
-            {/* Row 2:[sidebar][main][aside]horizontal row */}
+            {/* Row 1:Global header(account / workspace switcher / notifications,橫跨整 viewport)*/}
+            {globalHeader && <div className="flex-shrink-0">{globalHeader}</div>}
+            {/* Row 2:[sidebar][main col][aside]horizontal row */}
             <div className="flex flex-1 min-h-0 w-full">
               {sidebar}
-              <main
-                id="app-shell-main"
-                tabIndex={-1}
-                className="flex-1 min-w-0 min-h-0 overflow-y-auto focus:outline-none"
-              >
-                {children}
-              </main>
+              {/* Main column:local header + main content(per user model「primary-header = primary-sidebar + global header」)*/}
+              <div className="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden">
+                {header && <div className="flex-shrink-0">{header}</div>}
+                <main
+                  id="app-shell-main"
+                  tabIndex={-1}
+                  className="flex-1 min-w-0 min-h-0 overflow-y-auto focus:outline-none"
+                >
+                  {children}
+                </main>
+              </div>
               {aside}
             </div>
           </div>
