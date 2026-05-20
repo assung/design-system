@@ -17,6 +17,7 @@ import { DataTableSortManager } from '@/design-system/components/DataTable/data-
 import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 import { ItemContent } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/design-system/components/Tabs/tabs'
 import type { SortingState } from '@tanstack/react-table'
 
 const meta: Meta<typeof AppShell> = {
@@ -280,6 +281,88 @@ export const PrimarySidebar: Story = {
           />
         </AppShell>
       </SidebarProvider>
+    )
+  },
+}
+
+/**
+ * primary-sidebar + header tabs(W1-W6 canonical 落地範例)。
+ *
+ * @usage-ref: patterns/header-canonical/header-canonical.spec.md(W1-W6 + Background ownership)
+ * @usage-consumes: ChromeHeader tabsSlot + Tabs + TabsList + TabsTrigger + TabsContent
+ *
+ * 對齊 GitHub Issues / Linear / Notion 派「頁面內 status filter 走 header tabs」idiom:
+ * - Tabs root wrap 整 AppShell(Radix TabsList ↔ TabsContent 必同 Tabs root)
+ * - PageHeader 接 tabsSlot → ChromeHeader 自動 column mode:row 1 = title / row 2 = tabs
+ * - W1 border auto-suppress(header 不畫 border,TabsList 接管)
+ * - W2 tabs padding 對齊 header(px-loose)
+ * - W3 tabs size = sm(chrome header 內 button-sm 統一)
+ * - W4 flush stack(無 negative margin)
+ * - TabsContent 放 AppShell children 內,自動 Tabs context binding
+ */
+export const PrimarySidebarWithTabs: Story = {
+  name: 'primary-sidebar + 頁面 tabs (header tabsSlot 範例)',
+  render: () => {
+    const [activeId, setActiveId] = React.useState<string>('inbox')
+    const [asideOpen, setAsideOpen] = React.useState(true)
+    const [selected, setSelected] = React.useState<Issue | null>(ISSUES[0])
+
+    return (
+      <Tabs defaultValue="all">
+        <SidebarProvider activeId={activeId} onActiveChange={setActiveId}>
+          <AppShell
+            layout="primary-sidebar"
+            sidebar={<AcmeSidebar />}
+            header={
+              <PageHeader
+                title={MAIN_NAV.find((n) => n.id === activeId)?.label ?? 'Inbox'}
+                tabsSlot={
+                  <TabsList size="sm">
+                    <TabsTrigger value="all">全部</TabsTrigger>
+                    <TabsTrigger value="open">未完成</TabsTrigger>
+                    <TabsTrigger value="done">已完成</TabsTrigger>
+                  </TabsList>
+                }
+              />
+            }
+            aside={
+              <AppShellAside title={selected ? selected.id : '詳情'} width={360}>
+                <IssueDetail issue={selected} />
+              </AppShellAside>
+            }
+            asideOpen={asideOpen}
+            onAsideOpenChange={setAsideOpen}
+          >
+            <TabsContent value="all" className="flex-1 min-h-0 flex flex-col">
+              <IssuesView
+                selectedId={selected?.id}
+                onSelectIssue={(issue) => {
+                  setSelected(issue)
+                  setAsideOpen(true)
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="open" className="flex-1 min-h-0 flex flex-col">
+              <IssuesView
+                selectedId={selected?.id}
+                onSelectIssue={(issue) => {
+                  setSelected(issue)
+                  setAsideOpen(true)
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="done" className="flex-1 min-h-0 flex flex-col">
+              <IssuesView
+                selectedId={selected?.id}
+                onSelectIssue={(issue) => {
+                  setSelected(issue)
+                  setAsideOpen(true)
+                }}
+              />
+            </TabsContent>
+          </AppShell>
+        </SidebarProvider>
+      </Tabs>
     )
   },
 }

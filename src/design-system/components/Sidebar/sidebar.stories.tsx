@@ -23,6 +23,7 @@ import {
 import { TreeView, TreeItem } from '@/design-system/components/TreeView/tree-view'
 import { ItemAvatar, ItemLabel } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 
 const meta: Meta = {
   title: 'Design System/Components/Sidebar/展示',
@@ -104,20 +105,21 @@ const UserFooter = () => (
 )
 
 /**
- * 主內容區——h-12 header 對齊 SidebarHeader 高度。
+ * 主內容區 — header 消費 ChromeHeader primitive(2026-05-20 migrate per
+ * header-canonical.spec.md「6. Background ownership」段:top-level chrome
+ * 自畫 bg-surface;Element canonical:ChromeHeader 內部用 `<header>`)。
  * Trigger 是唯一的 sidebar 切換入口。
  */
 const PageContent = ({ title, description }: { title: string; description: React.ReactNode }) => (
   <main className="flex-1 flex flex-col min-w-0 min-h-svh bg-canvas">
-    {/* Header 用 --chrome-header-height token,跟 SidebarHeader 自動同高對齊,隨 density 變 */}
-    <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
+    <ChromeHeader className="bg-surface">
       {/* 不加 -ml-1(shadcn 原版的 offset 是補償 Button 的 px-3;我們 text iconOnly 是 p-0 無 padding,
           trigger 直接貼 loose 邊界即對齊) */}
       <SidebarTrigger />
       {/* Chrome typography:跟 workspace brand 同 `text-body-lg font-medium` (16px),
           平等 sibling。「當下在哪頁」的訊號由 sidebar active item 負責,不靠 title 字重 */}
       <h1 className="text-body-lg font-medium">{title}</h1>
-    </header>
+    </ChromeHeader>
     <div className="flex-1 overflow-auto p-8">
       <div className="max-w-2xl">
         <p className="text-body text-fg-secondary mb-6">{description}</p>

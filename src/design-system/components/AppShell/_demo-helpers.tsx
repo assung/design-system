@@ -122,9 +122,19 @@ export function AcmeSidebar() {
 // global header aside toggle 已撤回(2026-05-20 user「圖二 global header 不該有」)— 由
 // DataTable rowActions Info icon 主入口(row-driven)取代,page header 純 title。
 
-export function PageHeader({ title }: { title: string }) {
+export function PageHeader({
+  title,
+  tabsSlot,
+}: {
+  title: string
+  /**
+   * Optional tabs row(per header-canonical.spec.md W1-W6 + Background ownership 段)。
+   * 提供時 ChromeHeader 自動 column mode + suppress border + delegate paint 給 TabsList。
+   */
+  tabsSlot?: React.ReactNode
+}) {
   return (
-    <ChromeHeader className="bg-surface">
+    <ChromeHeader className="bg-surface" tabsSlot={tabsSlot}>
       <SidebarTrigger />
       <h1 className="text-body-lg font-medium flex-1 truncate">{title}</h1>
     </ChromeHeader>
