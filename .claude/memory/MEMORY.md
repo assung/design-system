@@ -15,6 +15,7 @@
 - [feedback_audit_full_sweep_not_sample.md](feedback_audit_full_sweep_not_sample.md) — `/design-system-audit --deep` sub-agent 必 DS-wide 全盤,禁「sample top N」當理由縮 scope(2026-05-15)
 - [feedback_codex_local_transport_node_modules.md](feedback_codex_local_transport_node_modules.md) — 地端 codex 走 `node_modules/.bin/codex`(npm dep),不是全域 PATH;3-test discovery 順序固定(2026-05-17)
 - [feedback_push_always_call.md](feedback_push_always_call.md) — 每 substantive turn 結尾必 call PushNotification,不自我 suppress(harness 自決),user verbatim「先強制推」(2026-05-17)
+- [feedback_audit_preflight_全盤查.md](feedback_audit_preflight_全盤查.md) — `/design-system-audit --deep` Phase 1 前必跑 Phase 0.5 Preflight(全 DS file enum + 全原則 enum + coverage matrix)。`scripts/audit-preflight.mjs` SSOT
 
 ## Feedback (DS canonical / 視覺判斷)
 > **2026-05-15 prune D3 retired 4 entries**(已完全被上游吸收,SSOT pointer):
