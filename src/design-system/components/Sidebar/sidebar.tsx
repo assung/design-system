@@ -466,14 +466,22 @@ const SidebarHeader = React.forwardRef<
       tabsSlot={tabsSlot}
       data-sidebar="header"
       className={cn(
-        // 2026-05-21 v10 — padding-driven smooth animation(per Material MiniDrawer / VSCode /
-        // Linear sidebar 共識):避免 `justify-content` / `width` 等 discrete property 切換
-        // 造成的 toggle 期間「avatar 先跳左又往右」反向位移。
-        //   Expanded:ChromeHeader default `px-loose`(16 L+R)→ avatar.x=16 cx=28
-        //   Collapsed:`!pl-3 !pr-0`(12 / 0)→ avatar.x=12 cx=24 = menu icon cx=24 ✓
-        //   Padding 連續可 transition,avatar 在 200ms 內 monotonic 由 12 → 16(或反向),
-        //   無 discrete jump。Probe verified(scripts/probe-proposed-fix-final.mjs)。
-        "group-data-[collapsible=icon]:!pl-3 group-data-[collapsible=icon]:!pr-0",
+        // 2026-05-21 v13 — density-responsive collapsed padding(per user「density lg 你他媽 logo
+        // 沒有跟其下方的 icon 水平置中」+「不是要求你要寫得彈性好管理」directive):
+        //
+        // 公式 derivation(以 avatar 24px 為前提):
+        //   avatar.cx = padding-left + avatar/2 = padding-left + 12
+        //   要 align menu icon center = layout-space-loose + icon-size/2 = loose + 8
+        //   →  padding-left = loose - 4
+        //
+        // md density(loose=16): pl = 12 → avatar.cx = 24 = menu icon cx ✓
+        // lg density(loose=24): pl = 20 → avatar.cx = 32 = menu icon cx ✓
+        //
+        // 用 `calc(var(--layout-space-loose) - 4px)` 跟 density token 走,跨密度 zero 漂移。
+        // Padding 連續可 transition,toggle collapsed↔expanded avatar 沿 padding 軸 monotonic
+        // 移動,無 discrete property 切換。對齊 Material MiniDrawer / VSCode / Linear smooth animation 共識。
+        "group-data-[collapsible=icon]:!pl-[calc(var(--layout-space-loose)-4px)]",
+        "group-data-[collapsible=icon]:!pr-0",
         "transition-[padding] duration-200 ease-linear motion-reduce:duration-0",
         className
       )}
