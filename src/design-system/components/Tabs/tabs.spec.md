@@ -96,7 +96,8 @@ TabsContent ← 對應被選中的 trigger
 - **suffix 內 gap-1**（4px），對標 **Button** suffix wrapper（`button.tsx:288`）
 - `startIcon` 描述 tab 的內容性質（人像 icon 配「成員」、齒輪 icon 配「設定」）
 - `badge` 傳達該 tab 底下的待處理計數（「通知 3」「成員 12」）
-- `endIcon` 用於「該 tab 點下去會展開更多」的少見情境（如 popover tab），通常不用
+- `endIcon` **純視覺 indicator only**（方向 / 狀態 — ChevronDown 暗示「展開後看到子內容」、Pin / Star 狀態徽記）。**不拼 click 行為** — 點到 endIcon 跟點到 tab body 同效果（切 tab）
+- `inlineAction`（2026-05-21 加）拆分 click target：點到 inlineAction 走它自己的 handler 不切 tab；典型如「『更多 ▾』tab 後綴點開 overflow dropdown 不切 tab」（split-click pattern,對齊 GitHub「Code ▾」/ Linear "Triage..." menu / Atlassian split-tab 共識）
 
 ### 對標對象與故意的偏離
 

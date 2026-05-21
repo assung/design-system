@@ -1,8 +1,15 @@
 // @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase; hasInteractiveStates 的 Disabled story 已在本檔覆蓋(2026-05-15 F-migration)。
 import type { Meta, StoryObj } from '@storybook/react'
-import { Users, Settings, Bell, ChevronDown } from 'lucide-react'
+import { Users, Settings, Bell, ChevronDown, Archive, Pin, EyeOff } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
 import { Badge } from '@/design-system/components/Badge/badge'
+import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/design-system/components/DropdownMenu/dropdown-menu'
 
 const meta: Meta<typeof Tabs> = {
   title: 'Design System/Components/Tabs/展示',
@@ -35,14 +42,38 @@ export const Default: Story = {
 
 export const WithSuffix: Story = {
   name: '帶後綴',
-  // 2026-05-18 fix(user 抓 startIcon 違反 #4 全有全無):原 3 triggers 1 有 startIcon 1 有
-  // endIcon 1 純文字 → 改成全無 startIcon,專注示範 badge / endIcon 後綴 slot 不同型態。
+  // 2026-05-21 v3 升 inlineAction split-click pattern(per user「該後綴應該是 inline action +
+  // 點擊 inline action 跟其他地方應該不同反應」directive):
+  //   - 「全部」「通知」純文字 / badge 後綴(切 tab)
+  //   - 「更多」tab 用 `inlineAction` 包 DropdownMenu — 點 tab body 切 tab,
+  //     點 ChevronDown(inline action)開 dropdown 不切 tab。
+  // 對齊 GitHub「Code ▾」/ Linear "Triage..." menu split-tab 共識。endIcon 不再示範
+  // 「點下去展開更多」(misleading affordance),已撤回 spec L99。
   render: () => (
     <Tabs defaultValue="notifications" className="w-[700px]">
       <TabsList>
         <TabsTrigger value="all">全部</TabsTrigger>
         <TabsTrigger value="notifications" badge={<Badge count={12} />}>通知</TabsTrigger>
-        <TabsTrigger value="more" endIcon={ChevronDown}>更多</TabsTrigger>
+        <TabsTrigger
+          value="more"
+          inlineAction={
+            // ItemInlineActionButton(無 Tooltip 內層)— DropdownMenuTrigger asChild slot 直接 compose
+            // props 到 button(aria-haspopup, aria-expanded, data-state, onPointerDown toggle)。
+            // 若用外層 ItemInlineAction(有 Tooltip wrap)會斷 asChild chain,trigger 失效。
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ItemInlineActionButton icon={ChevronDown} aria-label="更多選項" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem startIcon={Archive}>封存</DropdownMenuItem>
+                <DropdownMenuItem startIcon={Pin}>釘選</DropdownMenuItem>
+                <DropdownMenuItem startIcon={EyeOff}>隱藏</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          }
+        >
+          更多
+        </TabsTrigger>
       </TabsList>
     </Tabs>
   ),

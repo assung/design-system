@@ -405,18 +405,33 @@ interface TabsTriggerProps
   startIcon?: LucideIcon
   /** 右側 badge（通常是計數指示器） */
   badge?: React.ReactNode
-  /** 右側 icon（少用，通常是 ChevronDown 等展開指示） */
+  /**
+   * 右側純視覺 indicator(LucideIcon)。**僅限方向 / 狀態 indicator**:ChevronDown / Pin / Star。
+   * **不要拼 click 行為** — endIcon 是 tab body 的一部分,點到也是切 tab。
+   * 需要「點該後綴開 dropdown / menu」場景請用 `inlineAction` slot(2026-05-21 拆分)。
+   */
   endIcon?: LucideIcon
+  /**
+   * Inline action slot(2026-05-21 v3 加,per user「圖一 後綴應該是 inline action」+「點擊
+   * 該 tab 的 inline action 跟其他地方應該不同反應」directive):
+   * 提供 `<ItemInlineAction>` / `<DropdownMenuTrigger asChild><ItemInlineAction ... /></DropdownMenuTrigger>`
+   * 等獨立 click target。**TabsTrigger 自動 stopPropagation**,inline action 點擊不冒泡到 tab body,
+   * 達成 split-click 行為(對齊 GitHub「Code ▾」/ Linear "Triage..." menu / Atlassian split-tab 共識)。
+   *
+   * 跟 endIcon 區別:endIcon = 純視覺 indicator(無獨立行為,連同 tab 一起 click),
+   * inlineAction = 獨立 click target(自己的 handler,不切 tab)。語意分家明確。
+   */
+  inlineAction?: React.ReactNode
 }
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   TabsTriggerProps
->(({ className, startIcon: StartIcon, badge, endIcon: EndIcon, children, ...props }, ref) => {
+>(({ className, startIcon: StartIcon, badge, endIcon: EndIcon, inlineAction, children, ...props }, ref) => {
   const { size } = React.useContext(TabsContext)
   // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
-  const hasSuffix = badge != null || EndIcon !== undefined
+  const hasSuffix = badge != null || EndIcon !== undefined || inlineAction != null
 
   return (
     <TabsPrimitive.Trigger
@@ -430,6 +445,26 @@ const TabsTrigger = React.forwardRef<
         <span className="inline-flex items-center gap-1">
           {badge}
           {EndIcon && <EndIcon size={iconSize} aria-hidden />}
+          {inlineAction != null && (
+            // 2026-05-21 split-click invariant:inlineAction 點擊不冒泡到 TabsPrimitive.Trigger。
+            // Radix Tabs 在 3 個 channel 觸發 tab 切換,全部 stopPropagation:
+            //   - onMouseDown(primary, Radix Tabs source code main switch trigger)
+            //   - onFocus(activationMode='automatic' default,focus 落內部按鈕也算「focused」)
+            //   - onKeyDown Enter/Space(鍵盤啟動)
+            // 加 onPointerDown / onClick 防禦其他 framework 慣例。
+            // 對齊 GitHub「Code ▾」/ Linear "Triage..." split-tab 共識。
+            <span
+              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              onFocus={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') e.stopPropagation()
+              }}
+            >
+              {inlineAction}
+            </span>
+          )}
         </span>
       )}
     </TabsPrimitive.Trigger>
