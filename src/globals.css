@@ -22,9 +22,12 @@
    顏色一律用既有 semantic token（bg-surface / text-foreground / border-divider），
    不引入 shadcn 的 slate palette --sidebar-* 顏色家族 */
 :root {
-  /* 預設寬度 17rem (272px)——CJK 內容在 16rem 常擠壓,17rem 較舒適。
-     最小寬度 240px 是絕對下限,任何情境下不可小於此值(使用者若自訂寬度也受限)。 */
-  --sidebar-width: 17rem;
+  /* 2026-05-21 v11 預設 15rem (240px)— user-mandated per 「sidebar的預設寬度調整為240px」+
+     世界級共識(Linear/Notion/Figma/Polaris/Material Drawer 主流 240–256,5/8 家 = 240)。
+     最小寬度 240px 是絕對下限(也是預設值;未來 drag-resize 開時拖拉地板)。
+     `--sidebar-width-min` 同時是 AppShell Aside 的 floor(`ASIDE_WIDTH_MIN = 240` 已 align),
+     兩元件 panel min width 共識 = 240px(per user「aside應該也要一起參照」). */
+  --sidebar-width: 15rem;
   --sidebar-width-min: 240px;
   --sidebar-width-mobile: 18rem;
 

@@ -97,11 +97,8 @@ const buttonVariants = cva(
           // (canonical 對齊 inline-action.spec.md:trigger 維持 host hover 直到 overlay 關閉)
           'data-[state=open]:text-primary-hover data-[state=open]:border-primary-hover',
           'disabled:bg-transparent disabled:text-fg-disabled disabled:border-border',
-          // Toggle pressed（secondary + data-state=on）：對齊原 checked variant 視覺
-          'data-[state=on]:bg-primary-subtle data-[state=on]:text-primary data-[state=on]:border-transparent',
-          'data-[state=on]:hover:text-primary-hover',
-          'data-[state=on]:active:text-primary-active',
-          'data-[state=on]:disabled:bg-disabled data-[state=on]:disabled:text-fg-disabled data-[state=on]:disabled:border-transparent',
+          // 2026-05-21 v12:Toggle pressed 視覺移到 compoundVariants(variant × pressedTone),
+          // 同時支援 emphasis(藍底)/ neutral(灰底)兩 tone。詳 cva.compoundVariants 段。
         ],
         tertiary: [
           'bg-surface text-foreground border-border',
@@ -110,11 +107,6 @@ const buttonVariants = cva(
           // Overlay trigger active — 維持 hover 樣式(同 secondary 邏輯)
           'data-[state=open]:text-primary-hover data-[state=open]:border-primary-hover',
           'disabled:bg-transparent disabled:text-fg-disabled disabled:border-border',
-          // Toggle pressed（tertiary + data-state=on）：與 secondary pressed 共用視覺
-          'data-[state=on]:bg-primary-subtle data-[state=on]:text-primary data-[state=on]:border-transparent',
-          'data-[state=on]:hover:text-primary-hover',
-          'data-[state=on]:active:text-primary-active',
-          'data-[state=on]:disabled:bg-disabled data-[state=on]:disabled:text-fg-disabled data-[state=on]:disabled:border-transparent',
         ],
         text: [
           'bg-transparent text-foreground border-transparent',
@@ -124,16 +116,6 @@ const buttonVariants = cva(
           // 不另開 selected 4% — 對齊 shadcn/Radix/Material 狀態極簡派,跨 host 一致)
           'data-[state=open]:bg-neutral-hover',
           'disabled:bg-transparent disabled:text-fg-disabled',
-          // Toggle pressed（text + data-state=on）：走 neutral-selected family
-          'data-[state=on]:bg-neutral-selected',
-          'data-[state=on]:hover:bg-neutral-selected-hover',
-          'data-[state=on]:active:bg-neutral-selected-active',
-          'data-[state=on]:disabled:bg-transparent data-[state=on]:disabled:text-fg-disabled',
-          // aria-pressed fallback:當 Button asChild 包進 Radix overlay trigger,Radix 會 override
-          // data-state 為 'open'/'closed' → data-[state=on] 失效;aria-pressed 不被 override,
-          // 用 aria 變體保證 pressed 視覺在 overlay trigger context 仍生效。
-          'aria-pressed:bg-neutral-selected',
-          'aria-pressed:hover:bg-neutral-selected-hover',
         ],
         link: [
           'bg-transparent text-primary border-transparent',
@@ -144,6 +126,18 @@ const buttonVariants = cva(
       },
       danger: {
         true: '', // 實際樣式由 compoundVariants 提供
+      },
+      /**
+       * 2026-05-21 v12 — pressed visual tone(per user「我認同這一個方向,然後預設emphasis」):
+       * emphasis = 淡藍底(toolbar functional toggle / 篩選啟用 / 面板開關 — Figma toolbar /
+       *            Linear toolbar / Material ToggleButton 共識)
+       * neutral  = 灰底(sidebar/contextual nav row pressed — Linear / Notion / VS Code Activity Bar 共識)
+       * 預設 `emphasis` per user directive。實際樣式由 compoundVariants(variant × pressedTone)套用。
+       * 只在 secondary / tertiary / text variant 觸發 toggle 視覺;primary / link 無視覺效果。
+       */
+      pressedTone: {
+        emphasis: '',
+        neutral: '',
       },
       size: {
         xs: 'h-field-xs px-2 text-caption leading-compact gap-0',
@@ -183,10 +177,42 @@ const buttonVariants = cva(
           'active:bg-neutral-active active:text-error-active',
         ],
       },
+      // ── 2026-05-21 v12 Toggle pressed(variant × pressedTone)──────────────────
+      // 視覺由 data-[state=on] + aria-pressed(Radix overlay trigger fallback)觸發
+      //
+      // emphasis tone:藍底(primary-subtle / primary 字)— functional toggle
+      {
+        variant: ['secondary', 'tertiary', 'text'],
+        pressedTone: 'emphasis',
+        class: [
+          'data-[state=on]:bg-primary-subtle data-[state=on]:text-primary data-[state=on]:border-transparent',
+          'data-[state=on]:hover:text-primary-hover',
+          'data-[state=on]:active:text-primary-active',
+          'data-[state=on]:disabled:bg-disabled data-[state=on]:disabled:text-fg-disabled data-[state=on]:disabled:border-transparent',
+          // aria-pressed fallback(Radix overlay trigger override data-state 時仍生效)
+          'aria-pressed:bg-primary-subtle aria-pressed:text-primary aria-pressed:border-transparent',
+          'aria-pressed:hover:text-primary-hover',
+        ],
+      },
+      // neutral tone:灰底(neutral-selected family)— sidebar/contextual nav pressed
+      {
+        variant: ['secondary', 'tertiary', 'text'],
+        pressedTone: 'neutral',
+        class: [
+          'data-[state=on]:bg-neutral-selected data-[state=on]:text-foreground data-[state=on]:border-transparent',
+          'data-[state=on]:hover:bg-neutral-selected-hover',
+          'data-[state=on]:active:bg-neutral-selected-active',
+          'data-[state=on]:disabled:bg-transparent data-[state=on]:disabled:text-fg-disabled',
+          // aria-pressed fallback
+          'aria-pressed:bg-neutral-selected aria-pressed:text-foreground aria-pressed:border-transparent',
+          'aria-pressed:hover:bg-neutral-selected-hover',
+        ],
+      },
     ],
     defaultVariants: {
       variant: 'primary',
       size: 'md',
+      pressedTone: 'emphasis',
     },
   }
 )
@@ -223,12 +249,23 @@ export interface ButtonProps
   /**
    * Toggle 按下狀態（持續 on/off）。設定時 Button 變為 toggle：
    * - 自動寫入 `aria-pressed` + `data-state="on" | "off"`
-   * - 樣式由 variant 的 `data-[state=on]` 分支套用
+   * - 樣式由 variant × `pressedTone` 的 compoundVariants 套用
    * - 僅 secondary / tertiary / text 有 toggle 視覺；primary / link 傳入無效果
    *
    * 不傳此 prop 時 Button 就是一般按鈕，不帶 aria-pressed。
    */
   pressed?: boolean
+  /**
+   * Pressed 視覺色調(2026-05-21 v12 加):
+   * - `'emphasis'`(預設)→ 淡藍底 / primary 字(對齊 Figma toolbar / Linear toolbar /
+   *   Material ToggleButton 共識 — toolbar functional toggle / 篩選啟用 / 面板開關)
+   * - `'neutral'` → 灰底 / foreground 字(對齊 Linear / Notion / VS Code Activity Bar
+   *   共識 — sidebar/contextual nav row pressed)
+   *
+   * 僅在 `pressed` 啟用且 variant ∈ {secondary, tertiary, text} 時生效。
+   * 跨 toggle context 維持單一 prop API,consumer 視語意選 tone 不另開 variant。
+   */
+  pressedTone?: 'emphasis' | 'neutral'
   /** 左側 icon（LucideIcon），最多一個，loading 時自動替換為 spinner */
   startIcon?: LucideIcon
   /** 右側 badge（ReactNode），通常傳入計數指示器 */

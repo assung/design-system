@@ -315,23 +315,19 @@ const ICON_ONLY_BASE = 'aspect-square p-0 min-w-0 gap-0'
 
 ### pressed（toggle）
 
-`pressed` prop 表示**該按鈕的功能目前啟用中**（只有開和關兩種狀態）。設定 `pressed` 時 Button 自動寫入 `aria-pressed` 與 `data-state`，由 variant 的 `data-[state=on]` 分支套用樣式。
+`pressed` 設定時 Button 自動寫入 `aria-pressed` + `data-state`，由 `variant × pressedTone` compoundVariants 套樣式。**僅 `secondary` / `tertiary` / `text` 有視覺；primary / link 無效果**。
 
-**適用 variant**：
+**`pressedTone`**(v12):
 
-- **`secondary` + `pressed`** → 淡藍底 / primary 字（對齊原 checked 視覺）
-- **`tertiary` + `pressed`** → 同 secondary pressed 視覺（兩個 variant 按下後視覺合併）
-- **`text` + `pressed`** → neutral-selected 底；hover 反向變淺（`neutral-selected-hover`）；`:active` 深一階（`neutral-selected-active`）
-- **`primary` / `link`** → 不支援 toggle，傳入 `pressed` 無視覺效果（primary 本身是主要操作不應 toggle；link 語意為導覽不應 toggle）
-
-適用場景：全螢幕開關、釘選、篩選啟用、面板展開等**單一功能的 on/off**。
+| 值 | 視覺 | 情境（world-class）|
+|---|---|---|
+| `'emphasis'` ★ | 淡藍底 / primary 字 | toolbar functional toggle、篩選、面板開關（Figma / Linear / Material ToggleButton）|
+| `'neutral'` | 灰底 / foreground 字 | sidebar / contextual nav row（Linear / Notion / VS Code Activity Bar）|
 
 ```tsx
-// 釘選按鈕（icon-only text variant）
-<Button variant="text" iconOnly pressed={isPinned} startIcon={Pin} aria-label="釘選" />
-
-// 篩選啟用
-<Button variant="tertiary" pressed={filterOn} startIcon={Filter}>只看未完成</Button>
+<Button variant="text" iconOnly pressed={isPinned} startIcon={Pin} aria-label="釘選" />         {/* emphasis default */}
+<Button variant="tertiary" pressed={filterOn} startIcon={Filter}>只看未完成</Button>             {/* emphasis */}
+<Button variant="text" pressed={isActive} pressedTone="neutral" startIcon={Inbox}>收件匣</Button> {/* neutral */}
 ```
 
 ### Dismiss 視覺類(X close only)
