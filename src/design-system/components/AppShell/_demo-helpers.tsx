@@ -28,6 +28,7 @@ import {
 import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import {
   ItemAvatar,
+  RowSizeProvider,
 } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import {
   NameCard,
@@ -47,13 +48,20 @@ export const MAIN_NAV = [
 
 // ── WorkspaceBrand(對齊 sidebar.stories.tsx)────────────────────────────
 
-// 2026-05-21 v9 — match sidebar.stories.tsx baseline 完整 restore(no `-ml-1` surgical hack):
-// SidebarHeader 自身 `!px-0 !justify-center` 在 collapsed mode 處理對齊;WorkspaceBrand 維持
-// vanilla 結構(無 collapsed-only override)。Expanded `px-loose` / Collapsed avatar 自動置中於
-// 48px square(text hidden, only avatar 24px, justify-center → center.x=24=menu icon center)。
+// 2026-05-21 v14 — Chrome header avatar SSOT lock(per user directive「header 內元素應由 header
+// 定義尺寸」+「不被外層 Sidebar.size 污染」):
+//
+// `<RowSizeProvider value="md">` lock 蓋外層 SidebarProvider 的 row context,讓 ItemAvatar
+// 永遠 lookup AVATAR_SIZE.inline.md = 24,不論 Sidebar.size 為 sm/md/lg 都不影響 header avatar。
+//
+// 對應 `--chrome-header-avatar-size: 1.5rem` token(`header-canonical.css`),公式端透過 CSS var
+// 連動;JS 端透過 RowSizeProvider lock + AVATAR_SIZE.inline.md JS const 連動。spec canonical
+// 集中在 `header-canonical.spec.md`「chrome header avatar = 24」段。
 export const WorkspaceBrand = () => (
   <div className="flex items-center gap-2 min-w-0">
-    <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
+    <RowSizeProvider value="md">
+      <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
+    </RowSizeProvider>
     <span className="text-body-lg font-medium truncate group-data-[collapsible=icon]:hidden">Acme Inc</span>
   </div>
 )

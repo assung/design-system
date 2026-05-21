@@ -8,6 +8,7 @@
 @import "./design-system/tokens/opacity/opacity.css";
 @import "./design-system/tokens/motion/motion.css";
 @import "./design-system/components/DataTable/data-table.css";
+@import "./design-system/patterns/header-canonical/header-canonical.css";
 
 /* ── Icon stroke width（全域 lucide 預設）── */
 .lucide { stroke-width: 1.75; }

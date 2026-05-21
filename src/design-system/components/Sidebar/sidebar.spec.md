@@ -240,7 +240,7 @@ Gmail / Linear 的標準版型：上方 SidebarGroup 放扁平主導覽（Sideba
 
 放在 SidebarHeader / SidebarFooter 裡的元件必須能容納在這個高度內：
 
-- Avatar: `size={24}`
+- Avatar: `size={24}` —— **chrome header avatar canonical（density-fixed）**。consumer 必透過 `<RowSizeProvider value="md">` 包 `<ItemAvatar>` lock 為 md row context（避免被外層 `<SidebarProvider size={...}>` 污染）。對應 CSS local token `--chrome-header-avatar-size: 1.5rem`（`header-canonical.css`），sidebar 收合對齊公式消費此 token。詳 `header-canonical.spec.md`「Chrome header avatar SSOT」段。
 - Button: `size="sm"` 或 `size="md"`
 - 單排 title 文字 + icon button
 

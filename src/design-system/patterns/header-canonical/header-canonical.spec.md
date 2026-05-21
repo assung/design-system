@@ -51,6 +51,22 @@ benchmark:
 - **永遠 size="sm"**(不論家族 / density):chrome / overlay header 內 button 一律 sm
 - 對齊 既有 `dialog.tsx:132-153` + `sheet.tsx:122-139` + `popover.tsx:87-110`(Dialog/Sheet/Popover 已內建 close X)
 
+### 4.5 Chrome header avatar SSOT(2026-05-21 codify per user directive)
+
+**Canonical**:Chrome header brand mark avatar = **24px,density-fixed,row-size-fixed**。
+
+對齊 5 家世界級共識(Linear / Notion / Figma / Slack / Polaris chrome header brand mark 皆固定 24px,不 density-scale 也不 row-size-scale)。設計理由:avatar 是品牌識別 mark,視覺穩定優於 density 緊鬆 / row size 調整(button 跟 density 走 touch target 邏輯,avatar 不該綁同邏輯)。
+
+**程式表達**(local pattern token,對齊 `data-table.css` 既有 local-token 先例):
+- CSS:`--chrome-header-avatar-size: 1.5rem`(`header-canonical.css`)
+- JS:`AVATAR_SIZE.inline.md = 24`(`item-anatomy.tsx:93`)— consumer 透過 `<RowSizeProvider value="md">` lock 強制 ItemAvatar lookup 此值
+
+**Consumer rule**:
+- 在 chrome header 內放 avatar(SidebarHeader / GlobalHeader / PageHeader / FileViewer Toolbar 等)→ **必** wrap `<RowSizeProvider value="md">` 蓋外層 row context 污染,內用 `<ItemAvatar>`
+- SidebarHeader 收合對齊公式必消費 `var(--chrome-header-avatar-size)` 不 hardcode 24
+
+**Sync invariant**:`--chrome-header-avatar-size` CSS 值必跟 `AVATAR_SIZE.inline.md` JS 值同步(`1.5rem = 24px`)。改 spec canonical 時 grep 雙向找全部 sync 點。
+
 ### 5. Title typography
 
 - `text-body-lg font-medium` 或 `text-h6`(細節由 family spec 自決)

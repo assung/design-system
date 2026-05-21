@@ -466,21 +466,30 @@ const SidebarHeader = React.forwardRef<
       tabsSlot={tabsSlot}
       data-sidebar="header"
       className={cn(
-        // 2026-05-21 v13 — density-responsive collapsed padding(per user「density lg 你他媽 logo
-        // 沒有跟其下方的 icon 水平置中」+「不是要求你要寫得彈性好管理」directive):
+        // 2026-05-21 v14 — rail-derived collapsed padding,full SSOT cascade(per user directive
+        // 「avatar尺寸、menu item padding、menu icon尺寸任一變動都要正確連動」+ codex Layer B
+        // 比稿共識):
         //
-        // 公式 derivation(以 avatar 24px 為前提):
-        //   avatar.cx = padding-left + avatar/2 = padding-left + 12
-        //   要 align menu icon center = layout-space-loose + icon-size/2 = loose + 8
-        //   →  padding-left = loose - 4
+        // 公式 derivation(rail-centered geometric identity):
+        //   avatar.cx = pl + avatar/2 = (sidebar-width-icon - avatar)/2 + avatar/2 = sidebar-width-icon/2
+        //   menu icon.cx = loose + icon-size/2
+        //   sidebar-width-icon = 2*loose + icon-size  →  sidebar-width-icon/2 = loose + icon-size/2 ✓
         //
-        // md density(loose=16): pl = 12 → avatar.cx = 24 = menu icon cx ✓
-        // lg density(loose=24): pl = 20 → avatar.cx = 32 = menu icon cx ✓
+        // → 任何 avatar / loose / icon-size 改值,公式自動對齊 menu icon 中心(rail 幾何恆等)。
         //
-        // 用 `calc(var(--layout-space-loose) - 4px)` 跟 density token 走,跨密度 zero 漂移。
-        // Padding 連續可 transition,toggle collapsed↔expanded avatar 沿 padding 軸 monotonic
-        // 移動,無 discrete property 切換。對齊 Material MiniDrawer / VSCode / Linear smooth animation 共識。
-        "group-data-[collapsible=icon]:!pl-[calc(var(--layout-space-loose)-4px)]",
+        // SSOT 連動鏈:
+        //   --layout-space-loose (density token) ─┐
+        //   --sidebar-menu-icon-size              ├→ --sidebar-width-icon (calc cascade)
+        //                                          └→ 公式自動跟 ✓
+        //   --chrome-header-avatar-size (header-canonical.css local token):公式 var 引用,
+        //                                JS 端透過 WorkspaceBrand RowSizeProvider value="md"
+        //                                + AVATAR_SIZE.inline.md spec-coupled 共識 sync。
+        //
+        // Numerical equivalence to v13 `loose-4` 公式(verified):
+        //   md density: (48-24)/2 = 12 = loose-4 = 12 ✓ identical
+        //   lg density: (64-24)/2 = 20 = loose-4 = 20 ✓ identical
+        // → v14 upgrade 純 SSOT chain robustness,0 視覺改變。
+        "group-data-[collapsible=icon]:!pl-[calc((var(--sidebar-width-icon)-var(--chrome-header-avatar-size))/2)]",
         "group-data-[collapsible=icon]:!pr-0",
         "transition-[padding] duration-200 ease-linear motion-reduce:duration-0",
         className
