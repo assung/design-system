@@ -1,7 +1,7 @@
 #!/bin/bash
 # check_substantive_edit_approval_preflight.sh — Pre-action gate for substantive design edits.
 #
-# Purpose: PRE-flight 偵測 src/design-system/**.{tsx,ts,css} edit + last 5 user msgs 無
+# Purpose: PRE-flight 偵測 packages/design-system/src/**.{tsx,ts,css} edit + last 5 user msgs 無
 # approval keyword → SOFT inject context warning。
 #
 # 對比 stop_self_audit.sh post-action BLOCKER:本 hook 是 PRE-action soft warn,
@@ -31,9 +31,9 @@ EVENT=$(echo "$INPUT" | jq -r '.hook_event_name // ""' 2>/dev/null)
 [ "$EVENT" != "PreToolUse" ] && exit 0
 case "$TOOL" in Edit|Write|MultiEdit) ;; *) exit 0 ;; esac
 
-# Substantive scope:src/design-system/**.{tsx,ts,css} only
+# Substantive scope:packages/design-system/src/**.{tsx,ts,css} only
 case "$FILE_PATH" in
-  */src/design-system/*.tsx|*/src/design-system/*.ts|*/src/design-system/*.css) ;;
+  */packages/design-system/src/*.tsx|*/packages/design-system/src/*.ts|*/packages/design-system/src/*.css) ;;
   *) exit 0 ;;
 esac
 
@@ -74,7 +74,7 @@ fi
 
 # 2026-05-15 upgrade per user verbatim:「上述的問題請你務必確實確保永遠他媽不要再給我犯了」
 # (memory/feedback_ship_then_revert_anti_pattern.md SSOT)
-# Soft warn → P0 BLOCKER on src/design-system/**/*.tsx production substantive without approval。
+# Soft warn → P0 BLOCKER on packages/design-system/src/**/*.tsx production substantive without approval。
 # Override env var:CLAUDE_BYPASS_DESIGN_APPROVAL=1(audit-logged below)
 REL_PATH=${FILE_PATH#*/my-project/}
 
@@ -90,7 +90,7 @@ fi
 # BLOCKER:stderr + exit 2 = halt PreToolUse(Edit/Write/MultiEdit)
 echo "🚨 BLOCKER: Pre-action gate(check_substantive_edit_approval_preflight,2026-05-15 P0 升級)" >&2
 echo "  - 目標: ${REL_PATH}" >&2
-echo "  - 範圍: src/design-system production code(substantive SSOT change)" >&2
+echo "  - 範圍: packages/design-system/src production code(substantive SSOT change)" >&2
 echo "  - 近 5 條 user msg approval keyword: ${HAS_APPROVAL} 次 / discuss keyword: ${HAS_DISCUSS} 次" >&2
 echo "" >&2
 echo "→ SSOT-affecting UI/UX edit without verbatim approval = ship-then-revert anti-pattern" >&2

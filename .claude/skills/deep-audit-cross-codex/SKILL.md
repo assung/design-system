@@ -40,8 +40,8 @@ arguments: scope?=full|changed focus?=「ssot|visual|behavior|all」
 1. `CLAUDE.md` 全文
 2. `.claude/rules/{meta-patterns,spec-rules,ui-development,story-rules,self-verify}.md` 全文
 3. `.claude/references/{ssot-index,ssot-consultation,build-ui-canonicals,naming-conventions}.md`
-4. `src/design-system/**/*.spec.md` 全部(60+ file,通過 Glob 列舉 + Read)
-5. `src/design-system/tokens/**/*.spec.md` + `src/design-system/patterns/**/*.spec.md` 全部
+4. `packages/design-system/src/**/*.spec.md` 全部(60+ file,通過 Glob 列舉 + Read)
+5. `packages/design-system/src/tokens/**/*.spec.md` + `packages/design-system/src/patterns/**/*.spec.md` 全部
 6. 本 session 對話脈絡 + memory `~/.claude/.../memory/MEMORY.md` index + active project memory files
 
 **完成 gate**:Phase A.0 output = `phaseA-preflight-checklist.md`(session-local,列出讀過的 N file + 任何 spec 漂移嫌疑點)。**禁** skip / sample / 「先看標題判斷」。

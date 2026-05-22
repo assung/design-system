@@ -46,12 +46,12 @@ Deep audit cross codex
 ### SSOT-UI/UX 4 項已拍板 + land
 
 **D1 Badge `leading-none` → `leading-compact`**
-- File:`src/design-system/components/Badge/badge.tsx:21`
+- File:`packages/design-system/src/components/Badge/badge.tsx:21`
 - Token:`--leading-compact: 1.3`(typography.css:111)
 - 高度不變 invariant:Badge `h-4 (16px) + flex items-center` 限制內部 line-box;text-[10px] × 1.3 = 13px < 16px container
 
 **D2 useAppShell `// code-quality-allow: dead-export` marker**
-- File:`src/design-system/components/AppShell/app-shell.tsx:363`(export 上方)
+- File:`packages/design-system/src/components/AppShell/app-shell.tsx:363`(export 上方)
 - Public compound API hook(對齊 Radix `useDialogContext` / MUI `useFormControl`)
 
 **D3 Select `defaultValue` prop + dual-mode**
@@ -63,7 +63,7 @@ Deep audit cross codex
 - 175 grep-orphan → comprehensive 5-path consumer detection → 真 retire = 0
 - 131 grep-orphan 落 8 個 structural-keep 範疇:palette 1-10(77)/ magenta-turquoise(14)/ mask alpha(16)/ chart reserved(0)/ state variants(8)/ neutral palette(13)/ SOP semantic 5-piece(1)/ JS literal mirror hover-delay(2)
 - 新 `scripts/audit-orphan-tokens.mjs` SSOT
-- 新 `src/design-system/tokens/orphan-tokens.spec.md` canonical
+- 新 `packages/design-system/src/tokens/orphan-tokens.spec.md` canonical
 - design-system-audit SKILL Dim 48 升級
 
 ### M34 Hook regex broadness fix(governance autonomous)
@@ -93,23 +93,23 @@ Deep audit cross codex
 ### Layer A 各自熟讀(read 不憑記憶)
 
 1. `CLAUDE.md` + `.claude/rules/{meta-patterns,spec-rules,ui-development,story-rules,self-verify}.md` 全文
-2. `src/design-system/**/*.spec.md` 全部(60+ files)
+2. `packages/design-system/src/**/*.spec.md` 全部(60+ files)
 3. 本 session 我新加/改的具體 file:
-   - `src/design-system/components/Badge/badge.tsx`(D1 leading 修)
-   - `src/design-system/components/AppShell/app-shell.tsx`(D2 marker)
-   - `src/design-system/components/Select/select.tsx` + `select.spec.md`(D3 dual-mode)
-   - `src/design-system/tokens/orphan-tokens.spec.md`(D4 SSOT 新建)
+   - `packages/design-system/src/components/Badge/badge.tsx`(D1 leading 修)
+   - `packages/design-system/src/components/AppShell/app-shell.tsx`(D2 marker)
+   - `packages/design-system/src/components/Select/select.tsx` + `select.spec.md`(D3 dual-mode)
+   - `packages/design-system/src/tokens/orphan-tokens.spec.md`(D4 SSOT 新建)
    - `scripts/audit-orphan-tokens.mjs`(D4 audit script 新建)
    - `.claude/hooks/check_substantive_edit_approval_preflight.sh` + `.claude/hooks/stop_self_audit.sh`(M34 regex)
    - `.claude/skills/design-system-audit/SKILL.md`(Dim 48 升級)
-   - `src/design-system/tokens/utility-registry.json`(token stories exception)
-   - `src/design-system/components/Tabs/tabs.tsx` + `Button/button.tsx` + `Sidebar/sidebar.tsx`(code-quality markers)
+   - `packages/design-system/src/tokens/utility-registry.json`(token stories exception)
+   - `packages/design-system/src/components/Tabs/tabs.tsx` + `Button/button.tsx` + `Sidebar/sidebar.tsx`(code-quality markers)
 
 ### Layer B 各自驗證
 
 1. `npx tsc -b`
 2. `node scripts/audit-orphan-tokens.mjs --check`
-3. `node scripts/code-quality-audit.mjs --scope=src/design-system/components`
+3. `node scripts/code-quality-audit.mjs --scope=packages/design-system/src/components`
 4. grep verify 我宣稱的 file:line 真實性
 
 ### Layer C 比稿(3 column verdict per decision)

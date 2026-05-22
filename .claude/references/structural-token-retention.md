@@ -22,7 +22,7 @@
 
 對每 candidate retire token,sub-agent 必 verify 3 layer:
 
-1. **`grep -rn var(--TOKEN_NAME)` DS-wide**(含 `src/design-system/**` + `src/app/**` + `src/explorations/**`)— 抓 direct `var()` consumption
+1. **`grep -rn var(--TOKEN_NAME)` DS-wide**(含 `packages/design-system/src/**` + `src/app/**` + `src/explorations/**`)— 抓 direct `var()` consumption
 2. **`grep -rn "TOKEN_NAME"` 排除 css/spec.md 定義 + template literal usage**(eg. `\`h-table-row-${size}\``)— 抓動態 utility class generation
 3. **Cross-check 上 6 類**:屬任一 → retract finding,**不列 retire candidate**
 

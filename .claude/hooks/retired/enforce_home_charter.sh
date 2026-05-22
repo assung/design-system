@@ -36,10 +36,10 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
 # Longest prefix first for nested matches.
 SENSITIVE_DIRS=(
-  "$PROJECT_ROOT/src/design-system/patterns"
-  "$PROJECT_ROOT/src/design-system/components"
-  "$PROJECT_ROOT/src/design-system/tokens"
-  "$PROJECT_ROOT/src/design-system"
+  "$PROJECT_ROOT/packages/design-system/src/patterns"
+  "$PROJECT_ROOT/packages/design-system/src/components"
+  "$PROJECT_ROOT/packages/design-system/src/tokens"
+  "$PROJECT_ROOT/packages/design-system/src"
   "$PROJECT_ROOT/.claude/skills"
   "$PROJECT_ROOT/.claude/hooks"
   "$PROJECT_ROOT/.claude/commands"

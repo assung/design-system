@@ -5,7 +5,7 @@ set -uo pipefail
 # 攔截:`people-picker.tsx` / `person-display.tsx` / `combobox.tsx` 動以下 PeoplePicker SSOT-bearing
 # code 路徑時,要求 commit message / new content 包含 cite 對應 spec.md SSOT table row 的 marker。
 #
-# 規則 SSOT:`src/design-system/components/PeoplePicker/people-picker.spec.md` §A-§F canonical table
+# 規則 SSOT:`packages/design-system/src/components/PeoplePicker/people-picker.spec.md` §A-§F canonical table
 # (Trigger display SSOT canonical table)。
 #
 # 警告(non-blocking):新內容含「動 SSOT-bearing API」但無 spec 引用 → stderr 警告,要求自查對應 row。

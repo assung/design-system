@@ -33,7 +33,7 @@ esac
 
 # Only spec.md / .tsx in design-system
 case "$FILE_PATH" in
-  */src/design-system/**/*.spec.md|*/src/design-system/**/*.tsx) ;;
+  */packages/design-system/src/**/*.spec.md|*/packages/design-system/src/**/*.tsx) ;;
   *) exit 0 ;;
 esac
 

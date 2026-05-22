@@ -7,7 +7,7 @@
 #   正確路線:prop 接收 + `loadingText` / `emptyText` 等 slot,或走 i18n 層。
 #
 # Scope:
-#   - ONLY src/design-system/components/**/*.tsx(primitives)
+#   - ONLY packages/design-system/src/components/**/*.tsx(primitives)
 #   - ONLY patterns/ 如果出現 user-facing string
 #   - SKIP stories.tsx(stories 用真實 Jira/Stripe 範例 = 刻意)
 #   - SKIP spec.md / anatomy
@@ -25,7 +25,7 @@ source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 
 # Scope: only design-system components/patterns .tsx
-if ! echo "$FILE_PATH" | grep -qE 'src/design-system/(components|patterns)/.*\.tsx$'; then
+if ! echo "$FILE_PATH" | grep -qE 'packages/design-system/src/(components|patterns)/.*\.tsx$'; then
   exit 0
 fi
 if echo "$FILE_PATH" | grep -qE '\.(stories|principles|anatomy\.stories)\.tsx$'; then

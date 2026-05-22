@@ -59,43 +59,43 @@ expect_warn() {
 echo "=== check_opacity_token_usage tests ==="
 
 # 1. raw opacity-30 → warn
-run_hook "/repo/src/design-system/components/Foo/foo.tsx" '
+run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
 className="bg-surface opacity-30"
 '
 expect_warn "1. opacity-30 raw → warn" "M23 violation"
 
 # 2. raw opacity-50 → warn
-run_hook "/repo/src/design-system/components/Foo/foo.tsx" '
+run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
 className="opacity-50"
 '
 expect_warn "2. opacity-50 raw → warn" "M23 violation"
 
 # 3. opacity-disabled token utility → silent
-run_hook "/repo/src/design-system/components/Foo/foo.tsx" '
+run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
 className="opacity-disabled pointer-events-none"
 '
 expect_pass_silent "3. opacity-disabled token → silent"
 
 # 4. opacity-0(visibility toggle)→ silent
-run_hook "/repo/src/design-system/components/Foo/foo.tsx" '
+run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
 className="opacity-0 group-hover:opacity-100"
 '
 expect_pass_silent "4. opacity-0 / opacity-100 visibility → silent"
 
 # 5. story file → skip
-run_hook "/repo/src/design-system/components/Foo/foo.stories.tsx" '
+run_hook "/repo/packages/design-system/src/components/Foo/foo.stories.tsx" '
 className="opacity-30 opacity-50"
 '
 expect_pass_silent "5. .stories.tsx → skip"
 
 # 6. token spec internal → skip
-run_hook "/repo/src/design-system/tokens/opacity/opacity.css" '
+run_hook "/repo/packages/design-system/src/tokens/opacity/opacity.css" '
 opacity: 0.30;
 '
 expect_pass_silent "6. tokens/opacity/* → skip"
 
 # 7. multiple raw opacity values → warn(catch all)
-run_hook "/repo/src/design-system/components/Foo/foo.tsx" '
+run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
 const a = "opacity-25"
 const b = "opacity-75"
 '

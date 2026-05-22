@@ -11,7 +11,7 @@
 #
 # File scope per rule:
 #   E.1: *.principles.stories.tsx
-#   E.2: *.ts / *.tsx outside src/design-system/{components,patterns,tokens,hooks}
+#   E.2: *.ts / *.tsx outside packages/design-system/src/{components,patterns,tokens,hooks}
 #   E.3: *.spec.md
 #
 # Allowlist tags:
@@ -114,7 +114,7 @@ esac
 case "$FILE_PATH" in
   *.ts|*.tsx)
     case "$FILE_PATH" in
-      */src/design-system/components/*|*/src/design-system/patterns/*|*/src/design-system/tokens/*|*/src/design-system/hooks/*) ;; # DS internal skip
+      */packages/design-system/src/components/*|*/packages/design-system/src/patterns/*|*/packages/design-system/src/tokens/*|*/packages/design-system/src/hooks/*) ;; # DS internal skip
       *)
         # File-level allowlist:檔頭 5 行
         ALLOW_E2=0

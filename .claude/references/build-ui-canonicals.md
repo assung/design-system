@@ -6,7 +6,7 @@
 
 ## 既有 DS 元件 / primitive 優先消費(完整表)
 
-**超級規則**:**`ls src/design-system/components/` + `ls src/design-system/patterns/` 看一次。任何視覺 / 行為命中既有元件 → 必消費,不 hand-craft raw HTML 繞過**。
+**超級規則**:**`ls packages/design-system/src/components/` + `ls packages/design-system/src/patterns/` 看一次。任何視覺 / 行為命中既有元件 → 必消費,不 hand-craft raw HTML 繞過**。
 
 ### 常見手刻 vs canonical 對照
 

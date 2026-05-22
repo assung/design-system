@@ -70,19 +70,19 @@ echo ""
 echo "=== C.2 inline-action canonical gap ==="
 
 # 4. components/ ItemInlineAction + gap-3 → WARN stderr
-run_hook "/r/src/design-system/components/Foo/foo.tsx" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.tsx" '
 <div className="flex gap-3"><ItemInlineAction /></div>
 '
 expect_exit "C.2.1 gap-3 inline-action → WARN" 0 "inline-action gap"
 
 # 5. components/ ItemInlineAction + gap-2 → silent
-run_hook "/r/src/design-system/components/Foo/foo.tsx" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.tsx" '
 <div className="flex gap-2"><ItemInlineAction /></div>
 '
 expect_exit "C.2.2 gap-2 inline-action → silent" 0 ""
 
 # 6. SSOT host item-anatomy → skip
-run_hook "/r/src/design-system/patterns/element-anatomy/item-anatomy.tsx" '
+run_hook "/r/packages/design-system/src/patterns/element-anatomy/item-anatomy.tsx" '
 <div className="flex gap-3"><ItemInlineAction /></div>
 '
 expect_exit "C.2.3 SSOT host skip → silent" 0 ""
@@ -117,26 +117,26 @@ echo ""
 echo "=== C.4 row slot handcraft (BLOCK) ==="
 
 # 10. components/ self-coded h-[1lh] shrink-0 flex items-center → BLOCK
-run_hook "/r/src/design-system/components/Bad/bad.tsx" '
+run_hook "/r/packages/design-system/src/components/Bad/bad.tsx" '
 function F() { return <span className="h-[1lh] shrink-0 flex items-center"><Icon/></span> }
 '
 expect_exit "C.4.1 row slot handcraft → BLOCK" 2 "row slot handcraft"
 
 # 11. SSOT host item-anatomy → skip
-run_hook "/r/src/design-system/patterns/element-anatomy/item-anatomy.tsx" '
+run_hook "/r/packages/design-system/src/patterns/element-anatomy/item-anatomy.tsx" '
 const x = "h-[1lh] shrink-0 flex items-center"
 '
 expect_exit "C.4.2 item-anatomy SSOT skip → silent" 0 ""
 
 # 12. Using ItemPrefix → silent
-run_hook "/r/src/design-system/components/Good/good.tsx" '
+run_hook "/r/packages/design-system/src/components/Good/good.tsx" '
 import { ItemPrefix } from "@/design-system/patterns/element-anatomy/item-anatomy"
 function F() { return <ItemPrefix><Icon/></ItemPrefix> }
 '
 expect_exit "C.4.3 ItemPrefix consume → silent" 0 ""
 
 # 13. allowlist → silent
-run_hook "/r/src/design-system/components/Edge/edge.tsx" '
+run_hook "/r/packages/design-system/src/components/Edge/edge.tsx" '
 // @row-slot-handcraft-allow: forced width
 function F() { return <span className="h-[1lh] shrink-0 flex items-center"><Icon/></span> }
 '

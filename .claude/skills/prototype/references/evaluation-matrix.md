@@ -29,7 +29,7 @@ Phase 2 將 Phase 1 scan 結果變成可決策的評分表。
 
 ### DS 一致性(1-5,5 最高)
 
-- **5**:全部消費 `src/design-system/components/` 既有元件 + 既有 layout primitives
+- **5**:全部消費 `packages/design-system/src/components/` 既有元件 + 既有 layout primitives
 - **4**:0-1 個新 primitive / 新 variant(低成本)
 - **3**:1-2 個新元件或顯著新 pattern(中成本)
 - **2**:3+ 個新元件 / 新 pattern(高成本 — 審慎)

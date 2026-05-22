@@ -15,8 +15,8 @@
 ### 我 v1(已 ship Phase 1 spec SSOT,production code 等 user 拍板)
 
 **已 land**(Phase 1,governance only):
-1. NEW `src/design-system/patterns/header-canonical/header-canonical.spec.md`(SSOT,含 W1-W6 withTabs lockstep)
-2. Update `src/design-system/components/Tabs/tabs.spec.md` size table 重整 + border 段加 cite
+1. NEW `packages/design-system/src/patterns/header-canonical/header-canonical.spec.md`(SSOT,含 W1-W6 withTabs lockstep)
+2. Update `packages/design-system/src/components/Tabs/tabs.spec.md` size table 重整 + border 段加 cite
 3. 6 consumer spec.md 加 pointer(Sidebar / Dialog / Sheet / Popover / FileViewer / ssot-consultation.md)
 4. 跑過 tsc + audit-content-quality + extract-canonical-rules 三綠
 
@@ -81,7 +81,7 @@
 
 ### 環境
 
-- 本 DS 位於 `src/design-system/`,framework Vite + React + TS + Tailwind v4 + Radix
+- 本 DS 位於 `packages/design-system/src/`,framework Vite + React + TS + Tailwind v4 + Radix
 - 既有 Phase 1 spec.md SSOT 已 ship(per Phase 1 file list)
 - M31 5-step canonical:本 brief 是 Step 0.05/0.5/1;你回完進 Step 4-4.5-4.6-5
 

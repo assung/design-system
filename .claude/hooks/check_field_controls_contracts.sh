@@ -5,7 +5,7 @@
 #   - 原 check_field_placeholder_vocabulary.sh — contract (b)
 #   - 原 check_selected_renderer_symmetry.sh — contract (a)
 #   - 原 check_cell_metric_escape_hatches.sh — contract (c)
-# 同 PostToolUse Edit/Write target(Field family src/design-system/components/*.tsx),
+# 同 PostToolUse Edit/Write target(Field family packages/design-system/src/components/*.tsx),
 # 合 1 hook 減少 hook count 從 27 → 25 回 soft cap 內,單一 entry settings.json。
 # 對齊 field-controls.spec.md 共享 contract (a) Selected value renderer / (b) Placeholder vocabulary /
 # (c) Cell surface metrics 3 段 canonical。
@@ -25,9 +25,9 @@ case "$TOOL" in Edit|Write|MultiEdit) ;; *) exit 0 ;; esac
 VIOLATIONS=""
 
 # ── Contract (b) Placeholder vocabulary ───────────────────────────────────────
-# Scope: 所有 src/design-system/components/*.tsx
+# Scope: 所有 packages/design-system/src/components/*.tsx
 case "$FILE_PATH" in
-  */src/design-system/components/*.tsx)
+  */packages/design-system/src/components/*.tsx)
     if ! head -3 "$FILE_PATH" | grep -qE '//[[:space:]]*@placeholder-vocabulary-allow:'; then
       HITS=$(grep -nE 'emptyPlaceholder=\{(emptyText|searchEmpty|noResults|notFound)' "$FILE_PATH" 2>/dev/null)
       if [ -n "$HITS" ]; then
@@ -45,7 +45,7 @@ esac
 # ── Contract (a) Selected value renderer symmetry ─────────────────────────────
 # Scope:Combobox / Select / PeoplePicker only
 case "$FILE_PATH" in
-  */src/design-system/components/Combobox/*.tsx|*/src/design-system/components/Select/*.tsx|*/src/design-system/components/PeoplePicker/*.tsx)
+  */packages/design-system/src/components/Combobox/*.tsx|*/packages/design-system/src/components/Select/*.tsx|*/packages/design-system/src/components/PeoplePicker/*.tsx)
     if ! head -3 "$FILE_PATH" | grep -qE '//[[:space:]]*@renderer-symmetry-allow:'; then
       DEFINES_RENDERER=$(grep -cE '(tagRenderer|selectedItemRenderer)\?:\s*\(' "$FILE_PATH" 2>/dev/null || echo 0)
       DEFINES_RENDERER=${DEFINES_RENDERER:-0}
@@ -79,7 +79,7 @@ esac
 # ── Contract (c) Cell metric escape hatches ───────────────────────────────────
 # Scope:Combobox / Select / PeoplePicker only
 case "$FILE_PATH" in
-  */src/design-system/components/Combobox/*.tsx|*/src/design-system/components/PeoplePicker/*.tsx|*/src/design-system/components/Select/*.tsx)
+  */packages/design-system/src/components/Combobox/*.tsx|*/packages/design-system/src/components/PeoplePicker/*.tsx|*/packages/design-system/src/components/Select/*.tsx)
     if ! head -3 "$FILE_PATH" | grep -qE '//[[:space:]]*@cell-metric-escape-allow:'; then
       HARDCODE_HITS=$(grep -nE 'tagAreaPaddingLeftPx=\{[0-9]+\}' "$FILE_PATH" 2>/dev/null)
       COND_NO_SURFACE=$(grep -nE 'tagAreaPaddingLeftPx=\{[^}]*\?[^}]*[0-9]+[^}]*\}' "$FILE_PATH" 2>/dev/null | grep -v "surface")

@@ -26,7 +26,7 @@ description: Performance audit for design-system components and product UI. Chec
 
 ## Preconditions
 
-- 元件 folder 存在於 `src/design-system/components/{Name}/`
+- 元件 folder 存在於 `packages/design-system/src/components/{Name}/`
 - `node_modules` 已安裝
 - Storybook 可啟動(用於 render-count 測量)
 

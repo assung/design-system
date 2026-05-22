@@ -6,7 +6,7 @@ CLAUDE.md `# SSOT 消費 canonical` 的詳表 + 反例。主章留核心 + point
 
 | 決策 | 必查的 SSOT 家 |
 |------|---------------|
-| **元件選擇**(這該用哪個既有元件?)| `ls src/design-system/components/` + `ls src/design-system/patterns/` + 近親元件 spec |
+| **元件選擇**(這該用哪個既有元件?)| `ls packages/design-system/src/components/` + `ls packages/design-system/src/patterns/` + 近親元件 spec |
 | **Token / 值**(padding / gap / height / color)| 對應 `tokens/{name}/spec.md` + `tokens/README.md` |
 | **Padding / spacing**(chrome vs 元件內 vs 精確幾何)| `.claude/rules/ui-development.md`「Padding source 分層規則」+ `tokens/layoutSpace/layoutSpace.spec.md` |
 | **Row / item 結構**(prefix / content / suffix slot)| `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 SSOT) |
@@ -50,7 +50,7 @@ CLAUDE.md `# SSOT 消費 canonical` 的詳表 + 反例。主章留核心 + point
  */
 ```
 
-Hook `check_ssot_consultation.sh`(Write 新 tsx 到 `src/design-system/components/` 或 `src/explorations/`)→ 若檔內無上述註解區 → warn 要求補齊。
+Hook `check_ssot_consultation.sh`(Write 新 tsx 到 `packages/design-system/src/components/` 或 `src/explorations/`)→ 若檔內無上述註解區 → warn 要求補齊。
 
 ## 禁止:隱性自創
 

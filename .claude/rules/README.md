@@ -13,7 +13,7 @@
 | Rule | Paths | Scope |
 |------|-------|-------|
 | [meta-patterns.md](meta-patterns.md) | always(fundamental)| 32 active M-rules(M1-M33,M27 retired)|
-| [spec-rules.md](spec-rules.md) | `**/*.spec.md` + `src/design-system/**` | Spec 撰寫紀律 + SSOT / 邊界案例 / 職責分離 |
+| [spec-rules.md](spec-rules.md) | `**/*.spec.md` + `packages/design-system/src/**` | Spec 撰寫紀律 + SSOT / 邊界案例 / 職責分離 |
 | [ui-development.md](ui-development.md) | `**/*.tsx` + `**/*.ts` | 建 UI 前必讀 / Tailwind 5 條 / Token 4 條 / Props 命名 / shadcn |
 | [story-rules.md](story-rules.md) | `**/*.stories.tsx` | 三層 stories canonical + Title / 範例 / 撰寫紀律 |
 | [self-verify.md](self-verify.md) | `src/**` + `.claude/**` + `*.spec.md` + `*.tsx` + `*.css` | 4 階段(Pre/Mid/Post/Pre-commit)自主驗證 routine(2026-05-17 codify M10/M11/M20/M32 散在 meta-patterns 之 SSOT)|

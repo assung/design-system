@@ -146,7 +146,7 @@ related:
 import { buttonMeta } from '@/design-system/components/Button/button'
 import { readFrontmatter } from './lib/frontmatter.mjs'
 
-const spec = readFrontmatter('src/design-system/components/Button/button.spec.md')
+const spec = readFrontmatter('packages/design-system/src/components/Button/button.spec.md')
 const tsx = buttonMeta
 
 // 1. 驗證 cva variants vs spec.variants keys 對齊

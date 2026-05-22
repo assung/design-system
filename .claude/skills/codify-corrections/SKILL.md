@@ -54,7 +54,7 @@ description: Process .claude/logs/user-corrections.jsonl — the Stop-hook-harve
 | Topic pattern | 應落 home |
 |--------------|----------|
 | 個人偏好 / 工作節奏 / 「我喜歡 X」| `~/.claude/.../memory/feedback_*.md` |
-| 設計 canonical / 元件行為 / prop API | `src/design-system/**/spec.md`(rationale 段) |
+| 設計 canonical / 元件行為 / prop API | `packages/design-system/src/**/spec.md`(rationale 段) |
 | 跨元件 meta 規則(「凡 overlay 都必 X」)| CLAUDE.md Meta-Pattern M-row(**必 Checkpoint 3**)|
 | Audit protocol / skill workflow | `.claude/skills/*/references/` |
 | Tool / hook 使用方式 | hook docblock or `.claude/hooks/*.sh` 修行為 |

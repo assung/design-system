@@ -8,7 +8,7 @@
 
 ## 任務 — DS-wide full audit(NO-SAMPLE per audit-must-be-full-sweep canonical)
 
-Scope:`src/design-system/**/*.{tsx,ts,css,md}` — 全 61 components / patterns / tokens / lib。
+Scope:`packages/design-system/src/**/*.{tsx,ts,css,md}` — 全 61 components / patterns / tokens / lib。
 **不抽樣**(context 不夠拆 batch 但不縮 scope)。
 
 ## 10 個 audit axis(per user verbatim)

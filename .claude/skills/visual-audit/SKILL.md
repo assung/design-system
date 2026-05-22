@@ -150,7 +150,7 @@ description: Pixel-level visual audit for design-system components based on user
 Target: {story path / URL / description}
 Screenshot: {user-provided, 檔名或描述}
 容器資訊: {width / viewport / density / theme}
-Spec 依據: {src/design-system/components/{Name}/{name}.spec.md}
+Spec 依據: {packages/design-system/src/components/{Name}/{name}.spec.md}
 
 ## Summary
 

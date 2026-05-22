@@ -174,8 +174,8 @@ grep -rlE '<DialogContent>' {target} | \
 
 | Added | File | Motivation |
 |-------|------|-----------|
-| Coachmark | src/design-system/components/Coachmark/ | onboarding tour 需求 |
-| --chart-accent | src/design-system/tokens/color/semantic.css | data viz 擴充 |
+| Coachmark | packages/design-system/src/components/Coachmark/ | onboarding tour 需求 |
+| --chart-accent | packages/design-system/src/tokens/color/semantic.css | data viz 擴充 |
 ```
 
 讓 stakeholder 看得出「這 feature 帶動了 DS 擴充」的成本。

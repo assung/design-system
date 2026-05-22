@@ -83,16 +83,16 @@ if [ -f CLAUDE.md ]; then
 fi
 
 # Foundational SSOT spec over cap
-for f in src/design-system/tokens/color/color.spec.md \
-         src/design-system/patterns/element-anatomy/item-anatomy.spec.md \
-         src/design-system/components/Sidebar/sidebar.spec.md \
-         src/design-system/components/TreeView/tree-view.spec.md \
-         src/design-system/components/Field/field.spec.md \
-         src/design-system/components/Field/field-controls.spec.md \
-         src/design-system/components/Button/button.spec.md \
-         src/design-system/patterns/overlay-surface/overlay-surface.spec.md \
-         src/design-system/patterns/action-bar/action-bar.spec.md \
-         src/design-system/tokens/uiSize/uiSize.spec.md; do
+for f in packages/design-system/src/tokens/color/color.spec.md \
+         packages/design-system/src/patterns/element-anatomy/item-anatomy.spec.md \
+         packages/design-system/src/components/Sidebar/sidebar.spec.md \
+         packages/design-system/src/components/TreeView/tree-view.spec.md \
+         packages/design-system/src/components/Field/field.spec.md \
+         packages/design-system/src/components/Field/field-controls.spec.md \
+         packages/design-system/src/components/Button/button.spec.md \
+         packages/design-system/src/patterns/overlay-surface/overlay-surface.spec.md \
+         packages/design-system/src/patterns/action-bar/action-bar.spec.md \
+         packages/design-system/src/tokens/uiSize/uiSize.spec.md; do
   [ -f "$f" ] || continue
   L=$(wc -l < "$f" | tr -d ' ')
   case "$f" in
@@ -116,7 +116,7 @@ done
 # 必須 signal(任一):
 #   (a) Bash with `grep` against any file path(cite verify)
 #   (b) Bash with `npx tsc` / `bash .claude/hooks/tests`(regression-class verify)
-#   (c) Read against codex-cited code path(`src/design-system/...`)
+#   (c) Read against codex-cited code path(`packages/design-system/src/...`)
 #   (d) Explicit retract phrase(撤回 / 未採納 / 不採用 / skip codex)
 # 任一 missing → CRITICAL 通知;同 Mechanism 1 升 BLOCKER 阻 turn 結束。
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE" -gt 0 ]; then
@@ -125,7 +125,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
   CODEX_REPLY_READ=${CODEX_REPLY_READ:-0}
   if [ "$CODEX_REPLY_READ" -gt 0 ]; then
     # Signal (a)/(b): grep / tsc / hook tests / src/ Read
-    VERIFY_SIG_RE='(Bash.*grep|Bash.*npx tsc|Bash.*bash .claude/hooks/tests|Read.*src/design-system)'
+    VERIFY_SIG_RE='(Bash.*grep|Bash.*npx tsc|Bash.*bash .claude/hooks/tests|Read.*packages/design-system/src)'
     # Signal (d): retract phrase in last assistant message
     # 2026-05-17 expanded: cover all FP patterns(historical cite / pure git / pure verify / 0 codex)
     RETRACT_CODEX_RE='(撤回採納|撤回 claim|未採納 codex|不採用 codex|skip codex|codex.*未 verify|0 條新 codex|0 codex|沒啟 codex|沒要啟 codex|純 git|純 verify|純文字|本 turn 純|本 turn 無 codex|引用 prior|cite previous|描述 prior|歷史 codex|historical reference)'
@@ -143,7 +143,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
     # `feedback_codex_dual_track_synthesizer.md` 規定:必 Layer A(Claude own)+ Layer B(codex own)+ Layer C(synthesize)
     # 2026-05-09 v2 user verbatim:「infra 還應該要強迫你跟 codex 自動進行合理有依據(各自參考世界級的設計後我們的設計系統)的辯論吧?尤其是你們意見不同的時候,應該辯出一個最完美完整且全方位的方案再提交給我」
     # Mechanical 偵測:本 turn 讀 codex reply 必含 (own-version OR dissent OR retract) — 任一 valid;
-    # 若 turn 還動 spec.md / src/design-system / CLAUDE.md 等 substantive home → 缺辯證 → BLOCKER
+    # 若 turn 還動 spec.md / packages/design-system/src / CLAUDE.md 等 substantive home → 缺辯證 → BLOCKER
     OWN_VERSION_RE='(Claude own|Step 0\.5|我 own analysis|我 Step 0|own version|own analysis)'
     DISSENT_RE='(撞 codex|不同意 codex|反駁 codex|撤回採|不採 codex|Layer C|比稿|我覺得 codex 錯|codex 撞我撞錯|codex 推論錯|採 user|user 撞對)'
     HAS_OWN_VERSION=$(echo "$LAST_ASSISTANT" | grep -ciE "$OWN_VERSION_RE" 2>/dev/null)
@@ -154,7 +154,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
     if [ "$HAS_DEBATE" -eq 0 ]; then
       WARNINGS="${WARNINGS}\n  • Codex pass-through risk:本 turn 讀 codex reply 但無 (Claude own / Step 0.5 / 撞 codex / 撤回採 / Layer C 比稿) 任一 marker。下輪明標「Layer A Claude own:」+「Layer C 撞 codex N 點」section,真撞不過水 codex 結論。"
       # Sub-check: 同 turn 有 substantive edit + 無辯證 → BLOCKER
-      SUBSTANTIVE_EDIT_RE='(Edit|Write).*(src/design-system|\.spec\.md|CLAUDE\.md|\.claude/rules)'
+      SUBSTANTIVE_EDIT_RE='(Edit|Write).*(packages/design-system/src|\.spec\.md|CLAUDE\.md|\.claude/rules)'
       HAS_SUBSTANTIVE=$(echo "$THIS_TURN_FULL" | grep -cE "$SUBSTANTIVE_EDIT_RE" 2>/dev/null)
       HAS_SUBSTANTIVE=${HAS_SUBSTANTIVE:-0}
       if [ "$HAS_SUBSTANTIVE" -gt 0 ]; then
@@ -179,19 +179,19 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
       WARNINGS="${WARNINGS}\n  • NO-SAMPLE violation:本 turn `--deep` audit sub-agent prompt 含 sample subset keyword(sample top N / subset / pick top X 等)違反 audit-full-sweep canonical(memory/feedback_audit_full_sweep_not_sample.md)。下輪 sub-agent dispatch 改 DS-wide ALL components,context 不夠拆 stage 不 sample。"
     fi
 
-    # Mechanical 偵測:codex reply read + Edit/Write production code(src/design-system/)+ 近 user 無 approval keyword → BLOCKER
+    # Mechanical 偵測:codex reply read + Edit/Write production code(packages/design-system/src/)+ 近 user 無 approval keyword → BLOCKER
     # 2026-05-15 fix(per user「Hook false-positive 再犯」):
-    # 原 regex `(Edit|Write).*src/design-system` 在 raw text 上掃 → 誤抓 sub-agent report
-    # 內含「Edit src/design-system/...」file:line snippet 的描述文字。
+    # 原 regex `(Edit|Write).*packages/design-system/src` 在 raw text 上掃 → 誤抓 sub-agent report
+    # 內含「Edit packages/design-system/src/...」file:line snippet 的描述文字。
     # 升級:jq 直接掃 tool_use 結構,只算「tool_name in {Edit,Write,MultiEdit} AND
-    # tool_input.file_path startsWith src/design-system/ AND NOT .stories.tsx/.test.ts/.spec.ts allowlist」。
+    # tool_input.file_path startsWith packages/design-system/src/ AND NOT .stories.tsx/.test.ts/.spec.ts allowlist」。
     HAS_EDIT_PRODUCTION=$(echo "$THIS_TURN_FULL" | jq -r '
       select(.message.content) | .message.content[]? |
       select(.type == "tool_use") |
       select(.name == "Edit" or .name == "Write" or .name == "MultiEdit") |
       .input.file_path // empty
     ' 2>/dev/null | \
-      grep -E '/src/design-system/' | \
+      grep -E '/packages/design-system/src/' | \
       grep -vE '\.stories\.tsx$|\.test\.ts$|\.spec\.ts$|\.anatomy\.stories\.tsx$|\.principles\.stories\.tsx$' | \
       wc -l | tr -d ' ')
     HAS_EDIT_PRODUCTION=${HAS_EDIT_PRODUCTION:-0}
@@ -208,7 +208,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
       HAS_APPROVAL=$(echo "$RECENT_USER_MSGS" | grep -cE "$APPROVAL_RE" 2>/dev/null)
       HAS_APPROVAL=${HAS_APPROVAL:-0}
       if [ "$HAS_APPROVAL" -eq 0 ] && [ "$HAS_RETRACT" -eq 0 ]; then
-        WARNINGS="${WARNINGS}\n  • Codex-design-no-approval:本 turn 讀 codex reply + Edit/Write src/design-system 但近 5 條 user message 無 approval keyword(同意/採用/拍板/可以/改成/OK/好/push)。設計決策 = substantive,需 user 拍板才 ship — 對齊 CLAUDE.md 稽核 canonical Audit-vs-execute 分權。下輪 (a) 撤回 ship + revert,OR (b) 確認 user 已拍板列具體 quote。"
+        WARNINGS="${WARNINGS}\n  • Codex-design-no-approval:本 turn 讀 codex reply + Edit/Write packages/design-system/src 但近 5 條 user message 無 approval keyword(同意/採用/拍板/可以/改成/OK/好/push)。設計決策 = substantive,需 user 拍板才 ship — 對齊 CLAUDE.md 稽核 canonical Audit-vs-execute 分權。下輪 (a) 撤回 ship + revert,OR (b) 確認 user 已拍板列具體 quote。"
         CRITICAL_CODEX_DESIGN_NO_APPROVAL=1
       fi
     fi
@@ -406,7 +406,7 @@ if [ "${CRITICAL_CODEX_DESIGN_NO_APPROVAL:-0}" = "1" ] && [ -n "$LAST_ASSISTANT"
   if [ "$DESIGN_HASH" != "$LAST_BLOCKED_DESIGN" ]; then
     echo "$DESIGN_HASH" > "$LAST_BLOCKED_DESIGN_FILE" 2>/dev/null || true
     REASON=$(printf '%s' \
-      "🚨 CODEX-DESIGN-NO-APPROVAL BLOCKER(M4 sub-check):本 turn 讀 codex reply + Edit/Write src/design-system 但近 5 條 user message 無 approval keyword。設計決策 substantive change 需 user 拍板才 ship(CLAUDE.md 稽核 canonical Audit-vs-execute 分權)。立刻(a)撤回 ship + revert commit,OR(b)在本 turn 明引 user verbatim approval quote。否則 turn 不結束。" \
+      "🚨 CODEX-DESIGN-NO-APPROVAL BLOCKER(M4 sub-check):本 turn 讀 codex reply + Edit/Write packages/design-system/src 但近 5 條 user message 無 approval keyword。設計決策 substantive change 需 user 拍板才 ship(CLAUDE.md 稽核 canonical Audit-vs-execute 分權)。立刻(a)撤回 ship + revert commit,OR(b)在本 turn 明引 user verbatim approval quote。否則 turn 不結束。" \
       "本機制 = workflow violation 升級為 mechanical BLOCKER(2026-05-09 user-authorized,起因 commit 698ff58 v15.16 ship 沒拍板)。")
     printf '{"decision":"block","reason":%s}\n' "$(printf '%s' "$REASON" | jq -Rs .)"
     exit 0

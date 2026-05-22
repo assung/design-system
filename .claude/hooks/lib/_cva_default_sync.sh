@@ -23,7 +23,7 @@ case "$TOOL" in
 esac
 
 # Only target component .tsx files (not stories, not specs)
-if ! echo "$FILE_PATH" | grep -qE 'src/design-system/components/[^/]+/[^/]+\.tsx$'; then
+if ! echo "$FILE_PATH" | grep -qE 'packages/design-system/src/components/[^/]+/[^/]+\.tsx$'; then
   exit 0
 fi
 echo "$FILE_PATH" | grep -qE '\.stories\.tsx$' && exit 0

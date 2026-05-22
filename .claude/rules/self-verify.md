@@ -15,11 +15,11 @@
 
 ## 強制 trigger condition(滿足任一 → 整 4 階段必跑)
 
-- 動 `src/design-system/**`(production code)
+- 動 `packages/design-system/src/**`(production code)
 - 動 `*.spec.md`(canonical text)
 - 動 `.claude/{rules,skills,hooks,memory,commands}/**`(governance)
 - 動 `CLAUDE.md`
-- 動 token(`src/design-system/tokens/**`)
+- 動 token(`packages/design-system/src/tokens/**`)
 - 動 component primitive consumer 行為
 
 ## 例外 escape(明寫,**不**靠記憶)

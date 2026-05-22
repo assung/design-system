@@ -64,8 +64,8 @@ User 在本 session 反覆強調:
 
 1. **全盤閱讀**(per `.claude/skills/deep-audit-cross-codex/references/phase-a-workflow.md` A.0 file list):
    - CLAUDE.md / `.claude/rules/*` / `.claude/references/*`
-   - `src/design-system/**/*.spec.md` 全 78 file
-   - `src/design-system/tokens/**/*.spec.md` + `patterns/**/*.spec.md`
+   - `packages/design-system/src/**/*.spec.md` 全 78 file
+   - `packages/design-system/src/tokens/**/*.spec.md` + `patterns/**/*.spec.md`
    - `~/.claude/.../memory/MEMORY.md` index + active project memory
 
 2. **53-dim deep audit NO-SAMPLE**(對齊 `.claude/skills/design-system-audit/SKILL.md` Group A-P)

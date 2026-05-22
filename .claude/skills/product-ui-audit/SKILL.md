@@ -38,7 +38,7 @@ Purpose: design-system-audit audits the **DS itself**(spec / cva / SSOT 三方�
 ## Preconditions
 
 - User 指定 audit target(file path / folder / feature area)
-- Target 是 consumer 層 UI code(`src/app/**` / `src/explorations/**` / `src/pages/**` / `src/features/**`等 — **不掃 `src/design-system/`**)
+- Target 是 consumer 層 UI code(`src/app/**` / `src/explorations/**` / `src/pages/**` / `src/features/**`等 — **不掃 `packages/design-system/src/`**)
 - CLAUDE.md 全讀(6 維 audit 都依此為基準)
 
 ---

@@ -159,12 +159,12 @@ Storybook title 慣例(不與 Components/ 衝突):
 
 每個 candidate story 必含:
 - 標題說明(candidate 名 + 一句話 positioning)
-- 實際可互動 prototype(用 src/design-system/ 既有元件!)
+- 實際可互動 prototype(用 packages/design-system/src/ 既有元件!)
 - 若需新元件,在 notes.md 標示「此 candidate 需新增 X 元件(若選用此版)」
 - 3 種以上使用場景示範(對齊 Mindset #4 真實業務場景)
 
 **DS 一致性鐵律**:
-- 優先用既有 `src/design-system/components/` 元件
+- 優先用既有 `packages/design-system/src/components/` 元件
 - 若需新元件 / primitive,**notes.md 明文標示**(不偷偷 add 到 components/)
 - 所有 token / layout primitive 按 CLAUDE.md「既有 layout primitives 清單」消費
 
@@ -204,7 +204,7 @@ Storybook title 慣例(不與 Components/ 衝突):
 ### ⚠️ Checkpoint 4 — Final decision & graduation
 
 User / stakeholder 決定採用某 candidate 後:
-- `(a)` 採用 A,promote 到 `src/design-system/` 正式(若需新元件)或消費既有元件建正式 UI
+- `(a)` 採用 A,promote 到 `packages/design-system/src/` 正式(若需新元件)或消費既有元件建正式 UI
 - `(b)` 採用 A 但修改(進第二輪 proposal)
 - `(c)` 混搭 A+B 新 hybrid(新 exploration)
 - `(d)` 全部不採用(保留 explorations/ 作紀錄,也是有價值的 ruled-out)

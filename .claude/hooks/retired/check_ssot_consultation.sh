@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check_ssot_consultation.sh
 #
-# Purpose: When writing a NEW .tsx file to src/design-system/components/ or
+# Purpose: When writing a NEW .tsx file to packages/design-system/src/components/ or
 # src/explorations/, warn if the file lacks the canonical SSOT Consultation
 # comment block. This enforces CLAUDE.md `# SSOT 消費 canonical` — the
 # mechanical guardrail for Mindset #2 ("不憑直覺發明 / 優先消費既有").
@@ -30,7 +30,7 @@ CONTENT=$(echo "$INPUT" | python3 -c "import sys, json; d = json.load(sys.stdin)
 
 # Only .tsx files in design-system components or explorations
 case "$FILE_PATH" in
-  */src/design-system/components/*/*.tsx) ;;
+  */packages/design-system/src/components/*/*.tsx) ;;
   */src/explorations/*/*.tsx) ;;
   *) exit 0 ;;
 esac

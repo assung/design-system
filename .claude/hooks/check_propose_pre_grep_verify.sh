@@ -51,7 +51,7 @@ if echo "$NEW_CONTENT" | head -3 | grep -qE '@propose-pre-verified'; then
 fi
 
 # Check for file:line cite evidence
-HAS_CITE=$(echo "$NEW_CONTENT" | grep -cE '`[a-z][a-z0-9/-]+\.(tsx|ts|css|md):[0-9]+`|`[a-z][a-z0-9/-]+\.(tsx|ts|css|md)`|`src/design-system/' || true)
+HAS_CITE=$(echo "$NEW_CONTENT" | grep -cE '`[a-z][a-z0-9/-]+\.(tsx|ts|css|md):[0-9]+`|`[a-z][a-z0-9/-]+\.(tsx|ts|css|md)`|`packages/design-system/src/' || true)
 
 if [ "$HAS_CITE" = "0" ]; then
   printf '⚠️ PRE-ASK SELF-VERIFY GAP(M18 Q0,P1 soft):\n' >&2

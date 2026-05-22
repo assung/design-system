@@ -37,7 +37,7 @@ esac
 
 # Only check .tsx in components/ or patterns/(不查 stories / markdown / css)
 case "$FILE_PATH" in
-  */src/design-system/components/*.tsx|*/src/design-system/patterns/*.tsx) ;;
+  */packages/design-system/src/components/*.tsx|*/packages/design-system/src/patterns/*.tsx) ;;
   *) exit 0 ;;
 esac
 

@@ -34,7 +34,7 @@
 - pattern rationale + 公式 + token 結構
 - **明列 pattern 的 consumers**
 - 例:`item-anatomy.spec.md`(4-Family Model 頂層 taxonomy + Family 1+2 SSOT)
-- **重要限制**:patterns/ 只收 runtime UI primitive,不收文件撰寫指南(那屬 Skill)。詳見 `src/design-system/patterns/README.md` charter。
+- **重要限制**:patterns/ 只收 runtime UI primitive,不收文件撰寫指南(那屬 Skill)。詳見 `packages/design-system/src/patterns/README.md` charter。
 
 ### Level 4 — Code(`.tsx` / `.css`)
 

@@ -6,7 +6,7 @@
 
 任一命中 → **STOP propose 等 user A/B**:
 
-- 動 `src/design-system/components/<X>/<X>.tsx` 的 cva variant / size / state(視覺 surface)
+- 動 `packages/design-system/src/components/<X>/<X>.tsx` 的 cva variant / size / state(視覺 surface)
 - 動 spec.md 的「視覺結構 / canonical / SSOT / 何時用 / 何時不用 / 邊界案例 / Layout Family」段落 substantive meaning
 - 加 / 刪 / 改 token(`tokens/**/*.css` / `*.spec.md`)
 - 加新 prop / 重命名 prop / 改 prop default value(API contract)

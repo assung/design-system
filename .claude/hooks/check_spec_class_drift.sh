@@ -24,7 +24,7 @@ case "${TOOL:-}" in
 esac
 
 case "${FILE_PATH:-}" in
-  */src/design-system/components/*/[a-z-]*.spec.md) ;;
+  */packages/design-system/src/components/*/[a-z-]*.spec.md) ;;
   *) exit 0 ;;
 esac
 

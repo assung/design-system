@@ -25,7 +25,7 @@ description: UX behavior audit for design-system components and product UI. Chec
 
 ## Preconditions
 
-- 元件 folder 存在於 `src/design-system/components/{Name}/`
+- 元件 folder 存在於 `packages/design-system/src/components/{Name}/`
 - Storybook 可啟動(用於互動驗證)
 - 若稽核產品頁:URL 可訪問
 

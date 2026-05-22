@@ -4,7 +4,7 @@ set -uo pipefail
 #   Production chrome header 必消費 `<ChromeHeader>` primitive,
 #   不可自寫 `h-[var(--chrome-header-height)] border-b border-divider px-loose` 那一套 className。
 #
-# PreToolUse(Edit / Write)hook —— 編輯 `src/design-system/components/**/*.tsx`(非 stories)時掃:
+# PreToolUse(Edit / Write)hook —— 編輯 `packages/design-system/src/components/**/*.tsx`(非 stories)時掃:
 #   檔內若有完整手刻 chrome header className signature → P1 soft warning(stderr,exit 0)。
 #   Migration 完成後升 P0 BLOCKER(exit 2)。
 #
@@ -29,7 +29,7 @@ case "$TOOL" in
 esac
 
 case "$FILE_PATH" in
-  */src/design-system/components/**/*.tsx) ;;
+  */packages/design-system/src/components/**/*.tsx) ;;
   *) exit 0 ;;
 esac
 

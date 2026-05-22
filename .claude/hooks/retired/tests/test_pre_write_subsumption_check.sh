@@ -54,7 +54,7 @@ run_hook "$P"; expect_fire_with "Test 3 Write M-row fires" "Meta-Pattern"
 
 # Scope B: M-row pattern in non-CLAUDE.md → silent
 echo "Test 4: M-row in random spec → silent (Scope B 限 CLAUDE.md)"
-P=$(jq -n --arg fp "/abs/src/design-system/components/Foo/foo.spec.md" --arg os "o" --arg ns "| **M99** | not real |" '{tool_name:"Edit",tool_input:{file_path:$fp,old_string:$os,new_string:$ns}}')
+P=$(jq -n --arg fp "/abs/packages/design-system/src/components/Foo/foo.spec.md" --arg os "o" --arg ns "| **M99** | not real |" '{tool_name:"Edit",tool_input:{file_path:$fp,old_string:$os,new_string:$ns}}')
 run_hook "$P"; expect_silent "Test 4 spec.md not Scope B"
 
 echo ""

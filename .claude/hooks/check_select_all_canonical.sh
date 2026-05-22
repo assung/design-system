@@ -3,11 +3,11 @@ set -uo pipefail
 # PreToolUse Edit/Write: Select All ordering SSOT drift guard(2026-05-16 user verbatim
 # 「以後遇到此類設計都有相同邏輯不會偏移」)
 #
-# 攔截 src/design-system/** edit 時,如果新內容含「Select All」 / 「checkAll」 / 「全選」 等 bulk-select
+# 攔截 packages/design-system/src/** edit 時,如果新內容含「Select All」 / 「checkAll」 / 「全選」 等 bulk-select
 # 動作 + 自寫 ordering logic(`onValueChange?.(options.map(...))` / `[...prev, ...]` 等),
 # 要求消費 `@/design-system/lib/multi-select-ordering` SSOT primitive 而非自刻。
 #
-# 規則 SSOT:`src/design-system/lib/multi-select-ordering.ts`(applySelectAll / clearSelection)。
+# 規則 SSOT:`packages/design-system/src/lib/multi-select-ordering.ts`(applySelectAll / clearSelection)。
 # 對應 Ant Transfer + Table rowSelection canonical(Layer A + Codex M31 Round 4 共識)。
 #
 # Soft warn(stderr,non-blocking)— 給開發者警示但不擋 ship。Edge case 真需自刻 → 在
@@ -24,7 +24,7 @@ NEW_CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.conte
 
 [ -z "$FILE_PATH" ] && exit 0
 [[ "$TOOL" != "Edit" && "$TOOL" != "Write" ]] && exit 0
-[[ "$FILE_PATH" != *src/design-system/* ]] && exit 0
+[[ "$FILE_PATH" != *packages/design-system/src/* ]] && exit 0
 # 本 SSOT primitive 檔自己不查
 [[ "$FILE_PATH" == *multi-select-ordering.ts ]] && exit 0
 # Allowlist

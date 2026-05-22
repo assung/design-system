@@ -5,7 +5,7 @@ set -uo pipefail
 #   兩 token scope 不同(uiSize 是 component-size reset / chrome-header-height 是 app-density)
 #   不該 CSS alias(綁死兩個不同 scope)— 改用 assert: parse 兩檔 md/lg 值對等。
 #
-# PreToolUse(Edit / Write)hook —— 編輯 `src/design-system/tokens/uiSize/uiSize.css` 或
+# PreToolUse(Edit / Write)hook —— 編輯 `packages/design-system/src/tokens/uiSize/uiSize.css` 或
 # `src/globals.css` 時 assert 兩值仍相等。動一方未同步 = BLOCKER。
 #
 # 對齊 M31 codex 比稿 Step 5「保留 duplicated literals + audit hook assert equality」decision。
@@ -24,12 +24,12 @@ case "$TOOL" in
 esac
 
 case "$FILE_PATH" in
-  */src/design-system/tokens/uiSize/uiSize.css|*/src/globals.css) ;;
+  */packages/design-system/src/tokens/uiSize/uiSize.css|*/src/globals.css) ;;
   *) exit 0 ;;
 esac
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-UISIZE_CSS="$PROJECT_ROOT/src/design-system/tokens/uiSize/uiSize.css"
+UISIZE_CSS="$PROJECT_ROOT/packages/design-system/src/tokens/uiSize/uiSize.css"
 GLOBALS_CSS="$PROJECT_ROOT/src/globals.css"
 
 # Extract value of --tab-height-lg in md context(default :root block)
@@ -58,7 +58,7 @@ if [ ${#ERRORS[@]} -gt 0 ]; then
     printf '   • %s\n' "$E" >&2
   done
   printf '\n  動一方必同步另一方(兩 token 像素相等是「lg tabs 取代 chrome header」SSOT linkage 鐵證)\n' >&2
-  printf '  SSOT: src/design-system/patterns/header-canonical/header-canonical.spec.md W3\n' >&2
+  printf '  SSOT: packages/design-system/src/patterns/header-canonical/header-canonical.spec.md W3\n' >&2
   printf '  修方向: 改 uiSize.css 的 --tab-height-lg OR globals.css 的 --chrome-header-height 讓兩邊相等\n' >&2
   exit 2
 fi

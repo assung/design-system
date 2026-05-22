@@ -14,7 +14,7 @@ run_hook "/tmp/foo.tsx" "import { Button } from '@/...'\nexport const X = () => 
 [ "$EXIT" = "0" ] && { echo "  PASS"; PASS=$((PASS+1)); } || { echo "  FAIL"; FAIL=$((FAIL+1)); }
 
 echo "Test 2: shadcn alias bg-popover → flag"
-run_hook "/tmp/src/design-system/components/Foo/foo.tsx" "<div className='bg-popover'/>"
+run_hook "/tmp/packages/design-system/src/components/Foo/foo.tsx" "<div className='bg-popover'/>"
 echo "$STDOUT" | grep -q "bg-popover\|alias\|hygiene" && { echo "  PASS (alias detected)"; PASS=$((PASS+1)); } || { echo "  PASS (silent — hook tolerant)"; PASS=$((PASS+1)); }
 
 echo "Results: $PASS PASS, $FAIL FAIL"

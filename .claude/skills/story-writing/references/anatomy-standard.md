@@ -214,4 +214,4 @@ See also:
 
 **曾發生的 bug**:SegmentedControl 的 cva `defaultVariants.size` 是 `md`,spec.md + docblock + anatomy 都寫 `sm ★default`——三方不一致持續存在到 audit 才發現(2026-04-18 修正)。
 
-**預防法**:改 `defaultVariants` 前,grep 該元件所有檔案(`grep "★\|預設\|default" src/design-system/components/{Name}/`),一次改完所有出現位置,不單改 code 就收工。
+**預防法**:改 `defaultVariants` 前,grep 該元件所有檔案(`grep "★\|預設\|default" packages/design-system/src/components/{Name}/`),一次改完所有出現位置,不單改 code 就收工。

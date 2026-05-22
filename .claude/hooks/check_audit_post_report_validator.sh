@@ -60,7 +60,7 @@ if [ -f "$AUDIT_PROMPTS" ]; then
 fi
 
 # ─ Validator D: @benchmark-unverified-blanket count drift ─────────────────
-BENCH_DEBT=$(grep -rc '@benchmark-unverified-blanket' "$PROJECT_DIR/src/design-system/" 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')
+BENCH_DEBT=$(grep -rc '@benchmark-unverified-blanket' "$PROJECT_DIR/packages/design-system/src/" 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')
 BENCH_DEBT=${BENCH_DEBT:-0}
 if [ "$BENCH_DEBT" -gt 0 ]; then
   WARNINGS="${WARNINGS}\n  ⚠️ [D] Benchmark cite debt:${BENCH_DEBT} 處 `@benchmark-unverified-blanket` marker — 對應 prune D9(M22 cite debt)"

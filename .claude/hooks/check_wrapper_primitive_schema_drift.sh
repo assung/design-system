@@ -2,7 +2,7 @@
 set -uo pipefail
 # M30 機械強制:wrapper-vs-primitive schema unify invariant。
 #
-# PreToolUse(Edit / Write)hook —— 編輯 `src/design-system/components/**/*.tsx` 時掃:
+# PreToolUse(Edit / Write)hook —— 編輯 `packages/design-system/src/components/**/*.tsx` 時掃:
 #   (a) 檢查同 file 是否 declare `export interface XxxOption` 同名於其他 file
 #   (b) 若同名且未 `extends XxxOption from primitive`/`extends YyyOption` → BLOCKER
 #   (c) 若 wrapper 用 `SelectMenuOption`(import from SelectMenu)但內部 `menuOptions` mapping
@@ -30,7 +30,7 @@ case "$TOOL" in
 esac
 
 case "$FILE_PATH" in
-  */src/design-system/components/**/*.tsx) ;;
+  */packages/design-system/src/components/**/*.tsx) ;;
   *) exit 0 ;;
 esac
 
@@ -52,7 +52,7 @@ if [ -z "$DECLARES" ]; then
 fi
 
 # For each declared OptionLike interface, check if same name declared elsewhere
-DS_COMPONENTS_DIR="$(dirname "$0")/../../src/design-system/components"
+DS_COMPONENTS_DIR="$(dirname "$0")/../../packages/design-system/src/components"
 
 # normalize FILE_PATH relative to project for self-skip
 SELF_BASENAME="$(basename "$FILE_PATH")"

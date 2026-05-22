@@ -45,11 +45,11 @@ teardown
 # Test 4: NameCard / Avatar self files skipped(real DS path pattern)
 echo "Test 4: src/.../NameCard/name-card.stories.tsx → skip"
 setup
-mkdir -p "$TMP/src/design-system/components/NameCard"
-cat > "$TMP/src/design-system/components/NameCard/name-card.stories.tsx" <<EOF
+mkdir -p "$TMP/packages/design-system/src/components/NameCard"
+cat > "$TMP/packages/design-system/src/components/NameCard/name-card.stories.tsx" <<EOF
 const p = { name: 'A', avatarUrl: 'x' }
 EOF
-run "$TMP/src/design-system/components/NameCard/name-card.stories.tsx"
+run "$TMP/packages/design-system/src/components/NameCard/name-card.stories.tsx"
 [ "$EXIT" = "0" ] && [ -z "$STDOUT" ] && { echo "  PASS"; PASS=$((PASS+1)); } || { echo "  FAIL: $STDOUT"; FAIL=$((FAIL+1)); }
 teardown
 

@@ -44,27 +44,27 @@ expect_exit() {
 echo "=== A.1 naked row-mode propagation ==="
 
 # 1. naked + items-center + nakedCellRowModeAlign import → pass
-run_hook "/r/src/design-system/components/PeoplePicker/people-picker.tsx" '
+run_hook "/r/packages/design-system/src/components/PeoplePicker/people-picker.tsx" '
 import { nakedCellRowModeAlign } from "@/design-system/components/Field/field-wrapper"
 function F() { return <div variant="naked" className="inline-flex items-center" /> }
 '
 expect_exit "A.1.1 naked + import → pass" 0
 
 # 2. naked + items-center + no SSOT → BLOCK
-run_hook "/r/src/design-system/components/Bad/bad.tsx" '
+run_hook "/r/packages/design-system/src/components/Bad/bad.tsx" '
 function F() { return <span variant="naked" className="inline-flex items-center" /> }
 '
 expect_exit "A.1.2 naked + no SSOT → BLOCK" 2 "naked row-mode propagation"
 
 # 3. allowlist → pass
-run_hook "/r/src/design-system/components/Edge/edge.tsx" '
+run_hook "/r/packages/design-system/src/components/Edge/edge.tsx" '
 // @naked-row-mode-allow: popover content
 function F() { return <span variant="naked" className="inline-flex items-center" /> }
 '
 expect_exit "A.1.3 allowlist → pass" 0
 
 # 4. SSOT host skip(field-wrapper.tsx)→ pass(自身 SSOT,不檢)
-run_hook "/r/src/design-system/components/Field/field-wrapper.tsx" '
+run_hook "/r/packages/design-system/src/components/Field/field-wrapper.tsx" '
 function F() { return <span variant="naked" className="inline-flex items-center" /> }
 '
 expect_exit "A.1.4 SSOT host skip → pass" 0
@@ -73,7 +73,7 @@ echo ""
 echo "=== A.2 FieldControlGroup wrapper direct child ==="
 
 # 5. <FieldControlGroup> 內 <div wrapper> → WARN(exit 1)
-run_hook "/r/src/design-system/components/Filter/filter.tsx" '
+run_hook "/r/packages/design-system/src/components/Filter/filter.tsx" '
 function F() { return (
   <FieldControlGroup>
     <div className="flex-1 min-w-0">
@@ -85,7 +85,7 @@ function F() { return (
 expect_exit "A.2.1 FCG with div wrapper → WARN" 1 "FieldControlGroup wrapper"
 
 # 6. <FieldControlGroup> 直接 child 沒 wrapper → pass
-run_hook "/r/src/design-system/components/Filter/filter.tsx" '
+run_hook "/r/packages/design-system/src/components/Filter/filter.tsx" '
 function F() { return (
   <FieldControlGroup>
     <FilterValuePicker className="flex-1 min-w-0" />
@@ -95,7 +95,7 @@ function F() { return (
 expect_exit "A.2.2 FCG direct child → pass" 0
 
 # 7. allowlist → pass
-run_hook "/r/src/design-system/components/Filter/filter.tsx" '
+run_hook "/r/packages/design-system/src/components/Filter/filter.tsx" '
 // @fcg-wrapper-allow: legacy migration
 function F() { return (
   <FieldControlGroup>
@@ -109,25 +109,25 @@ echo ""
 echo "=== A.3 Field state ring SSOT ==="
 
 # 8. shadow-[inset → BLOCK
-run_hook "/r/src/design-system/components/Combobox/combobox.tsx" '
+run_hook "/r/packages/design-system/src/components/Combobox/combobox.tsx" '
 const cls = "hover:shadow-[inset_0_0_0_1px_var(--border)]"
 '
 expect_exit "A.3.1 shadow-[inset → BLOCK" 2 "shadow inset"
 
 # 9. focus-within:outline-primary → BLOCK
-run_hook "/r/src/design-system/components/Select/select.tsx" '
+run_hook "/r/packages/design-system/src/components/Select/select.tsx" '
 const cls = "focus-within:outline-primary"
 '
 expect_exit "A.3.2 outline state ring → BLOCK" 2 "outline"
 
 # 10. open && border-primary → BLOCK
-run_hook "/r/src/design-system/components/Select/select.tsx" "
+run_hook "/r/packages/design-system/src/components/Select/select.tsx" "
 const cls = open && 'border-primary'
 "
 expect_exit "A.3.3 per-control open=blue → BLOCK" 2 "open=blue"
 
 # 11. SSOT host skip(textarea.tsx)→ pass
-run_hook "/r/src/design-system/components/Textarea/textarea.tsx" '
+run_hook "/r/packages/design-system/src/components/Textarea/textarea.tsx" '
 const cls = "hover:shadow-[inset_0_0_0_1px_red]"
 '
 expect_exit "A.3.4 textarea SSOT skip → pass" 0
@@ -136,7 +136,7 @@ echo ""
 echo "=== A.4 disabled placeholder color ==="
 
 # 12. placeholder:text-fg-muted no override → exit 0 with stderr warn
-run_hook "/r/src/design-system/components/Custom/custom.tsx" '
+run_hook "/r/packages/design-system/src/components/Custom/custom.tsx" '
 const cls = "placeholder:text-fg-muted"
 '
 # A.4 是 P1 stderr,exit 0 — verify stderr 有 warn 訊息但不 fail
@@ -150,7 +150,7 @@ else
 fi
 
 # 13. placeholder + disabled override → pass(stderr 不該 fire)
-run_hook "/r/src/design-system/components/Custom/custom.tsx" '
+run_hook "/r/packages/design-system/src/components/Custom/custom.tsx" '
 const cls = "placeholder:text-fg-muted disabled:placeholder:text-fg-disabled"
 '
 if [ "$EXIT" = "0" ] && ! echo "$STDERR_TEXT" | grep -q "disabled placeholder color"; then
@@ -162,7 +162,7 @@ else
 fi
 
 # 14. allowlist → silent pass
-run_hook "/r/src/design-system/components/Custom/custom.tsx" '
+run_hook "/r/packages/design-system/src/components/Custom/custom.tsx" '
 // @disabled-color-allow: caption text intentionally muted across modes
 const cls = "placeholder:text-fg-muted"
 '
@@ -178,11 +178,11 @@ echo ""
 echo "=== Skip cases ==="
 
 # 15. non-tsx → skip
-run_hook "/r/src/design-system/components/Foo.md" 'placeholder:text-fg-muted'
+run_hook "/r/packages/design-system/src/components/Foo.md" 'placeholder:text-fg-muted'
 expect_exit "S.1 non-tsx → skip" 0
 
 # 16. read tool → skip
-run_hook "/r/src/design-system/components/Foo.tsx" 'irrelevant' Read
+run_hook "/r/packages/design-system/src/components/Foo.tsx" 'irrelevant' Read
 expect_exit "S.2 non-edit tool → skip" 0
 
 echo ""

@@ -38,7 +38,7 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 **為何**:M18 / M23 / M29 都管「決策過程紀律」,但**propose 給 user 前的「problem 真存在?」基本判斷**沒 codify。本 session 我 propose 3 題(Sheet 補 / 5 元件 migrate inline-action / 5 元件 migrate SurfaceBody)**全部不是真 problem** — Sheet spec 已完整、inline-action 已全消費、SurfaceBody 有意設計不該動 — 但我 propose 給 user 拍板浪費 user 時間 + 動搖 user 信任。
 
 **強制檢查**:
-1. **grep 既有 code DS-wide** — 「該 migrate 的 X 元件」真沒消費 primitive?(`rg "<primitive>" src/design-system/components/<X>`)
+1. **grep 既有 code DS-wide** — 「該 migrate 的 X 元件」真沒消費 primitive?(`rg "<primitive>" packages/design-system/src/components/<X>`)
 2. **Read 相關 spec.md** — spec 有沒有明文 codify 該設計是有意 / 例外 / 合法分支?(本 session 例:Tag inline-action colored host 例外是 spec L52-54 明寫的)
 3. **Read consumer usage** — 該 pattern 已在 N 處 work fine?N ≥ 3 → 該 pattern 是 working canonical,不是 problem
 4. **反問**:「如果 user 答 A,我會做什麼?該動 K 個 file?那 K 個 file 真有問題嗎?還是我假設的?」
@@ -71,7 +71,7 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 ### Q1' — **M23 DS internal canonical 優先 grep**(2026-05-03 加,chevron 事件後)
 **先 grep DS 既有 token / variant / pattern 命中?有 → 必對齊,Q1 外部 benchmark 只是輔證。**
-**問**:propose 的 visual decision(color / size / spacing / typography / state)是否已 grep `src/design-system/tokens/` + 近親 component spec/tsx 確認沒命中既有?
+**問**:propose 的 visual decision(color / size / spacing / typography / state)是否已 grep `packages/design-system/src/tokens/` + 近親 component spec/tsx 確認沒命中既有?
 **Fail**:跳過 grep 直接搬 world-class → M23 違反(本 conv chevron 用 Ant 5 家 muted 覆蓋 DS 內 icon-only Button = neutral-9 canonical → user 4 輪糾正)
 **例**:
 - ✅ "grep `text-foreground` 已是 icon-only Button 預設(neutral-9 / 85%)→ 對齊;Ant cite 為輔證"

@@ -26,7 +26,7 @@ teardown
 # Test 2: stories.tsx with block + tight margin → flag
 echo "Test 2: tight margin near DataTable → flagged"
 setup
-mkdir -p "$TMP/src/design-system/components"
+mkdir -p "$TMP/packages/design-system/src/components"
 cat > "$TMP/test.stories.tsx" <<EOF
 import { DataTable } from '@/design-system/components/DataTable/data-table'
 export const X = { render: () => (

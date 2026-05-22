@@ -48,7 +48,7 @@
 | 自動機械檢查(pre/post tool) | `.claude/hooks/` | skill 需 AI 走流程,hook 是 tool-level 自動 |
 | 每 session 都要的 signal rule | `CLAUDE.md` | skill 只在 invoke 時載入,會 miss signal |
 | 隨時間變化的狀態(audit progress) | `memory/` | skill 是不變的 workflow,state 屬 memory |
-| 元件 runtime primitive | `src/design-system/patterns/` | skill 是 AI workflow,不是 UI code |
+| 元件 runtime primitive | `packages/design-system/src/patterns/` | skill 是 AI workflow,不是 UI code |
 
 ## 新 skill 的 criteria(必須全部通過)
 

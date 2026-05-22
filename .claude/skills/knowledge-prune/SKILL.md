@@ -109,7 +109,7 @@ Example:
 Scan:`*.spec.md` 寫的 canonical vs `*.tsx` 實際 code 行為衝突 / spec 寫禁止但 code 仍用 / spec 升級但 code 沒跟。
 
 Example:
-- `radius.spec.md:57-71` 禁 `rounded-xl/2xl/3xl` → grep `src/design-system/**/*.tsx` 仍有用 → drift
+- `radius.spec.md:57-71` 禁 `rounded-xl/2xl/3xl` → grep `packages/design-system/src/**/*.tsx` 仍有用 → drift
 - `field-controls.spec.md` v13 state machine 升級 → 但 Combobox.tsx 還是 v12 behavior → drift
 
 **Output**:per (spec, code) drift entry + 對應 commit hash 追溯 last alignment 時點

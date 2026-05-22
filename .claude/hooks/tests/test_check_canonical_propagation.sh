@@ -35,7 +35,7 @@ expect_exit() {
 echo "=== E.1 principles canonical ==="
 
 # 1. New principles file with 0 universal core → BLOCK
-run_hook "/r/src/design-system/components/Foo/foo.principles.stories.tsx" "
+run_hook "/r/packages/design-system/src/components/Foo/foo.principles.stories.tsx" "
 const meta = { title: 'Design System/Components/Foo/設計原則' }
 export default meta
 export const SomeStory = () => <div />
@@ -43,7 +43,7 @@ export const SomeStory = () => <div />
 expect_exit "E.1.1 0 universal core → BLOCK" 2 "principles canonical"
 
 # 2. New principles with WhenToUse + WhenNotToUse → silent
-run_hook "/r/src/design-system/components/Foo/foo.principles.stories.tsx" "
+run_hook "/r/packages/design-system/src/components/Foo/foo.principles.stories.tsx" "
 const meta = { title: 'Design System/Components/Foo/設計原則' }
 export default meta
 export const WhenToUse = () => <div />
@@ -52,7 +52,7 @@ export const WhenNotToUse = () => <div />
 expect_exit "E.1.2 WhenToUse+WhenNotToUse → silent" 0 ""
 
 # 3. UsageGuidance integrated single export → silent (counts as ≥2)
-run_hook "/r/src/design-system/components/Foo/foo.principles.stories.tsx" "
+run_hook "/r/packages/design-system/src/components/Foo/foo.principles.stories.tsx" "
 const meta = { title: 'Design System/Components/Foo/設計原則' }
 export default meta
 export const UsageGuidance = () => <div />
@@ -60,7 +60,7 @@ export const UsageGuidance = () => <div />
 expect_exit "E.1.3 UsageGuidance integrated → silent" 0 ""
 
 # 4. Deprecated naming Forbidden* on new file → BLOCK
-run_hook "/r/src/design-system/components/Foo/foo.principles.stories.tsx" "
+run_hook "/r/packages/design-system/src/components/Foo/foo.principles.stories.tsx" "
 const meta = { title: 'Design System/Components/Foo/設計原則' }
 export default meta
 export const ForbiddenPatterns = () => <div />
@@ -69,7 +69,7 @@ export const WhenToUse = () => <div />
 expect_exit "E.1.4 deprecated Forbidden* on new → BLOCK" 2 "principles canonical"
 
 # 5. Allowlist comment → silent
-run_hook "/r/src/design-system/components/Foo/foo.principles.stories.tsx" "
+run_hook "/r/packages/design-system/src/components/Foo/foo.principles.stories.tsx" "
 // @principles-rationale: legacy migration
 const meta = { title: 'Design System/Components/Foo/設計原則' }
 export default meta
@@ -86,7 +86,7 @@ import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-
 expect_exit "E.2.1 app code L3 import → BLOCK" 2 "L3 primitive import"
 
 # 7. DS internal can import L3 → silent
-run_hook "/r/src/design-system/components/MyHost/my-host.tsx" "
+run_hook "/r/packages/design-system/src/components/MyHost/my-host.tsx" "
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 " Write
 expect_exit "E.2.2 DS internal L3 → silent" 0 ""
@@ -107,21 +107,21 @@ echo ""
 echo "=== E.3 spec-impl default alignment ==="
 
 # 10. spec.md with 「預設」keyword → WARN stderr
-run_hook "/r/src/design-system/components/Foo/foo.spec.md" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.spec.md" '
 ## Width
 預設 = trigger-width(同 popover anchor 寬)
 ' Write
 expect_exit "E.3.1 預設 keyword → WARN stderr" 0 "spec-impl default"
 
 # 11. spec.md without default keyword → silent
-run_hook "/r/src/design-system/components/Foo/foo.spec.md" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.spec.md" '
 ## Behavior
 按下 Esc 關閉。
 ' Write
 expect_exit "E.3.2 no default keyword → silent" 0 ""
 
 # 12. spec.md with file-level allowlist → silent
-run_hook "/r/src/design-system/components/Foo/foo.spec.md" '// @spec-impl-allow: spec values are intentionally aspirational
+run_hook "/r/packages/design-system/src/components/Foo/foo.spec.md" '// @spec-impl-allow: spec values are intentionally aspirational
 ## Width
 預設 = trigger-width
 ' Write

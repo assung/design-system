@@ -17,7 +17,7 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 [ -n "$FILE_PATH" ] && [ ! -e "$FILE_PATH" ] || exit 0  # only NEW files
 
 # Classification dirs requiring charter
-DIRS=(.claude/hooks .claude/skills .claude/agents .claude/commands .claude/rules src/design-system/components src/design-system/patterns src/design-system/tokens)
+DIRS=(.claude/hooks .claude/skills .claude/agents .claude/commands .claude/rules packages/design-system/src/components packages/design-system/src/patterns packages/design-system/src/tokens)
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 REL=$(echo "$FILE_PATH" | sed "s|$PROJECT_DIR/||")

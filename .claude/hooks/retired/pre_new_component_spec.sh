@@ -1,6 +1,6 @@
 #!/bin/bash
 # PreToolUse hook for Write:
-# When creating a NEW {name}.spec.md under src/design-system/components/{Name}/,
+# When creating a NEW {name}.spec.md under packages/design-system/src/components/{Name}/,
 # inject a Layout Family declaration reminder. Prevents silent drift where
 # a new component spec is created without Family 1/2/3/4 or exception declared —
 # which bypasses the 4-Family Model taxonomy and accumulates classification debt.
@@ -20,8 +20,8 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
 [ -n "$FILE_PATH" ] || exit 0
 [ -e "$FILE_PATH" ] && exit 0   # only fire on NEW file
 
-# Match: src/design-system/components/{Name}/{name}.spec.md (exclude nested sub-specs)
-if ! echo "$FILE_PATH" | grep -qE 'src/design-system/components/[^/]+/[^/]+\.spec\.md$'; then
+# Match: packages/design-system/src/components/{Name}/{name}.spec.md (exclude nested sub-specs)
+if ! echo "$FILE_PATH" | grep -qE 'packages/design-system/src/components/[^/]+/[^/]+\.spec\.md$'; then
   exit 0
 fi
 

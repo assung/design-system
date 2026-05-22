@@ -38,19 +38,19 @@ expect_silent() {
 # Test 1: iconOnly + 16px formula → fire
 echo "Test 1: iconOnly host + padding-formula 16px"
 C='const ICON_ONLY = {sm:"px-[calc((var(--field-height-sm)-16px)/2)]"}; const Foo = ({iconOnly}) => null;'
-P=$(jq -nc --arg fp "/abs/src/design-system/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
+P=$(jq -nc --arg fp "/abs/packages/design-system/src/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
 run_hook "$P"; expect_fire "Test 1 padding-formula fires"
 
 # Test 2: vertical 1lh formula(label centering)— should NOT fire
 echo "Test 2: vertical 1lh formula silent"
 C='const PAD = "py-[calc((var(--field-height-sm)-1lh)/2)]"; export const Foo = ({iconOnly}) => null;'
-P=$(jq -nc --arg fp "/abs/src/design-system/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
+P=$(jq -nc --arg fp "/abs/packages/design-system/src/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
 run_hook "$P"; expect_silent "Test 2 1lh formula silent"
 
 # Test 3: 16px formula but no iconOnly keyword → silent
 echo "Test 3: formula without iconOnly keyword silent"
 C='const PAD = "px-[calc((var(--field-height-sm)-16px)/2)]"; export const Foo = () => null;'
-P=$(jq -nc --arg fp "/abs/src/design-system/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
+P=$(jq -nc --arg fp "/abs/packages/design-system/src/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
 run_hook "$P"; expect_silent "Test 3 no iconOnly keyword silent"
 
 # Test 4: allowlist comment → bypass
@@ -58,13 +58,13 @@ echo "Test 4: allowlist bypass"
 C='// @icon-only-padding-allow: legacy
 const ICON_ONLY = "px-[calc((var(--field-height-sm)-16px)/2)]";
 const Foo = ({iconOnly}) => null;'
-P=$(jq -nc --arg fp "/abs/src/design-system/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
+P=$(jq -nc --arg fp "/abs/packages/design-system/src/components/Foo/foo.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
 run_hook "$P"; expect_silent "Test 4 allowlist bypass"
 
 # Test 5: stories.tsx scope skip
 echo "Test 5: stories.tsx out of scope"
 C='const ICON_ONLY = "px-[calc((var(--field-height-sm)-16px)/2)]"; const iconOnly = true;'
-P=$(jq -nc --arg fp "/abs/src/design-system/components/Foo/foo.stories.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
+P=$(jq -nc --arg fp "/abs/packages/design-system/src/components/Foo/foo.stories.tsx" --arg c "$C" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}')
 run_hook "$P"; expect_silent "Test 5 stories.tsx skip"
 
 # Test 6: non-DS path skip

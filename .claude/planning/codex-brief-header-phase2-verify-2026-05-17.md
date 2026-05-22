@@ -9,14 +9,14 @@
 ## Claude 已 ship list(本 session Phase 2 + 3 + audit infra)
 
 ### Phase 2 production code
-1. NEW `src/design-system/patterns/header-canonical/chrome-header.tsx` — ChromeHeader primitive
+1. NEW `packages/design-system/src/patterns/header-canonical/chrome-header.tsx` — ChromeHeader primitive
    - API: `<ChromeHeader withTabs?: boolean lockDensity?: 'inherit' | 'lg'>`(per codex Q5 比稿:narrow API,不開自由 density,M21 防禦)
    - 內部:`flex items-center gap-2 shrink-0 h-[var(--chrome-header-height)] px-[var(--layout-space-loose)]`,withTabs 時移除 `border-b border-divider`,lockDensity='lg' 時 set `data-density="lg"`
-2. `src/design-system/patterns/overlay-surface/overlay-surface.tsx` — SurfaceHeader 加 `withTabs?: boolean` prop conditional 移 border
-3. `src/design-system/components/Sidebar/sidebar.tsx:424` — SidebarHeader migrate to consume `<ChromeHeader>`,forward `withTabs` prop,保留 icon-mode override(`group-data-[collapsible=icon]:!px-0`)
-4. `src/design-system/components/FileViewer/file-viewer.tsx:328,459` — Toolbar + InfoPanel header migrate to `<ChromeHeader lockDensity="lg">`
-5. `src/design-system/components/Tabs/tabs.tsx:127` — TabsList default size `md` → `sm`
-6. `src/design-system/components/Tabs/tabs.tsx:380` — cva `defaultVariants.size` `md` → `sm`
+2. `packages/design-system/src/patterns/overlay-surface/overlay-surface.tsx` — SurfaceHeader 加 `withTabs?: boolean` prop conditional 移 border
+3. `packages/design-system/src/components/Sidebar/sidebar.tsx:424` — SidebarHeader migrate to consume `<ChromeHeader>`,forward `withTabs` prop,保留 icon-mode override(`group-data-[collapsible=icon]:!px-0`)
+4. `packages/design-system/src/components/FileViewer/file-viewer.tsx:328,459` — Toolbar + InfoPanel header migrate to `<ChromeHeader lockDensity="lg">`
+5. `packages/design-system/src/components/Tabs/tabs.tsx:127` — TabsList default size `md` → `sm`
+6. `packages/design-system/src/components/Tabs/tabs.tsx:380` — cva `defaultVariants.size` `md` → `sm`
 
 ### Spec.md updates
 7. `tabs.spec.md:128` — size table ★ default 從 md 改 sm,md 標 future tier
@@ -40,9 +40,9 @@
 
 **Step 4.5 — grep cite verify**(read-only `exec -s read-only`):
 
-1. ChromeHeader primitive API 對齊 Layer 3 spec:`grep -n "withTabs\|lockDensity" src/design-system/patterns/header-canonical/chrome-header.tsx`,確認(a) `withTabs` conditional 移 `border-b border-divider` (b) `lockDensity='lg'` set `data-density="lg"` (c) 不開 free `density` prop
-2. Sidebar / FileViewer migrate 對 — `grep -n "ChromeHeader\|h-\[var\(--chrome-header-height\)\]" src/design-system/components/{Sidebar,FileViewer}/*.tsx`,確認 production tsx 已不再自寫 chrome header className signature(只剩 primitive import + consumption)
-3. Tabs cva default — `grep -n "defaultVariants\|size = 'md'\|size = 'sm'" src/design-system/components/Tabs/tabs.tsx`,確認 line 127 + 380 都是 `sm`
+1. ChromeHeader primitive API 對齊 Layer 3 spec:`grep -n "withTabs\|lockDensity" packages/design-system/src/patterns/header-canonical/chrome-header.tsx`,確認(a) `withTabs` conditional 移 `border-b border-divider` (b) `lockDensity='lg'` set `data-density="lg"` (c) 不開 free `density` prop
+2. Sidebar / FileViewer migrate 對 — `grep -n "ChromeHeader\|h-\[var\(--chrome-header-height\)\]" packages/design-system/src/components/{Sidebar,FileViewer}/*.tsx`,確認 production tsx 已不再自寫 chrome header className signature(只剩 primitive import + consumption)
+3. Tabs cva default — `grep -n "defaultVariants\|size = 'md'\|size = 'sm'" packages/design-system/src/components/Tabs/tabs.tsx`,確認 line 127 + 380 都是 `sm`
 4. Hook 4 個都存在 + executable — `ls -la .claude/hooks/check_{tab_lg_chrome_header_equal,header_with_tabs_border,chrome_header_handcraft,spec_class_drift}.sh`
 5. settings.json 註冊 4 hook — `grep -n "tab_lg_chrome_header_equal\|header_with_tabs_border\|chrome_header_handcraft\|spec_class_drift" .claude/settings.json`
 6. principle-dim-map.json 完整 mapping — `grep -n "tab_lg_chrome_header_equal\|header_with_tabs_border\|chrome_header_handcraft\|spec_class_drift\|\"52\"\|\"53\"" .claude/references/principle-dim-map.json`

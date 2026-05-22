@@ -19,7 +19,7 @@ source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 FILE_PATH=$(jq -r '.tool_input.file_path // empty')
 
 # Scope: only design-system component / pattern .tsx files (not stories, not specs)
-if ! echo "$FILE_PATH" | grep -qE 'src/design-system/(components|patterns)/.*\.tsx$'; then
+if ! echo "$FILE_PATH" | grep -qE 'packages/design-system/src/(components|patterns)/.*\.tsx$'; then
   exit 0
 fi
 if echo "$FILE_PATH" | grep -qE '\.stories\.tsx$'; then

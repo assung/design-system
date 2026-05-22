@@ -1,11 +1,11 @@
 ---
 name: component-quality-gate
-description: Pre-merge quality gate for new or significantly refactored design-system components. Walks through Spec / Code / Stories / Ship checklist (45+ items) to ensure world-class discipline before a component enters `src/design-system/components/`. Invoke when user says「元件做完了」「這元件可以收工了嗎」「元件 ready 嗎」「check 這個 element」「要 merge 進 DS 了」or before closing a component PR.
+description: Pre-merge quality gate for new or significantly refactored design-system components. Walks through Spec / Code / Stories / Ship checklist (45+ items) to ensure world-class discipline before a component enters `packages/design-system/src/components/`. Invoke when user says「元件做完了」「這元件可以收工了嗎」「元件 ready 嗎」「check 這個 element」「要 merge 進 DS 了」or before closing a component PR.
 ---
 
 # Component Quality Gate
 
-Purpose: 元件進 `src/design-system/components/` 前的最終 checklist。防止「code 寫完但 spec / stories / token 消費紀律有漂移」的半成品進入系統。
+Purpose: 元件進 `packages/design-system/src/components/` 前的最終 checklist。防止「code 寫完但 spec / stories / token 消費紀律有漂移」的半成品進入系統。
 
 ## When to run
 
@@ -18,7 +18,7 @@ Purpose: 元件進 `src/design-system/components/` 前的最終 checklist。防�
 
 ## Preconditions
 
-- 元件 folder 存在於 `src/design-system/components/{Name}/`
+- 元件 folder 存在於 `packages/design-system/src/components/{Name}/`
 - 該元件的 `.spec.md` / `.tsx` / `.stories.tsx` / `.anatomy.stories.tsx` / `.principles.stories.tsx` 已完成初稿
 - 已讀相關 path-scoped rules(`.claude/rules/spec-rules.md` / `.claude/rules/ui-development.md`(含 Tailwind / Token 命名 / Props 命名 / shadcn 元件規範) / `.claude/rules/story-rules.md`)
 

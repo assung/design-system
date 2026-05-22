@@ -230,7 +230,7 @@ Ant Design / Carbon / Apple HIG / VS Code / Figma。對每個 example,至少查 
     - 這兩 layer 的規則彼此 orthogonal:bg 邊可以 flush 也可以 inset,**content-inside-bg padding 跟 bg 邊位置無關**,但都必要
   - **AI 必自己跑此 check,不該靠 user 提醒**:rule 寫「必 / 禁」的瞬間就要觸發 M12 self-check。user 提醒第 3 次還沒 trigger = meta-loop 完全 bypass,違反「自我升級機制」
 - **Markdown 表格 row 計數 FP**(2026-04-22 audit session 發現)— sub-agent 跑 CLAUDE.md 一致性 audit(Dim 15 count drift)時,若表格中間有**空行分隔**(`| **M11** | ... |` 後接空行再接 `| **M12** | ... |`),agent 可能只算到第一段 rows。實際上 markdown table 中的 blank line 是 **visual spacing**(渲染後仍是同一 table)或**table 終止**(根據 parser)— 兩種都可能被誤判。Mitigation:agent 計數前 prefer `grep -c "^| \*\*M[0-9]"` 機械式計數,不靠 visual scan。本 FP 只影響 count 報告準度,不影響 fix 結果(因 user / 主 AI 會 double-check)
-- **Dim 2 SSOT dead link 只檢 heading anchor 不檢 bare file path**(2026-04-22 audit session 漏掉)— element-anatomy.spec.md dead pointer `src/design-system/ELEMENT-ANATOMY.md` 從未存在,但 agent 未 flag 因為 Dim 2 regex `\.spec\.md「」` 只抓 heading-anchor pointers。裸 file-path reference 落在檢測外。**已擴 Dim 2 prompt**(見 audit-prompts.md)增加 Part B(file path existence)+ Part C(spec self-placement drift)。本 FP 類別:**doc-structural drift**(doc 寫在 impl 前,impl 換方向後 doc 未更新),audit 應對 `README.md` home governance claim vs 實際 spec 位置交叉驗證
+- **Dim 2 SSOT dead link 只檢 heading anchor 不檢 bare file path**(2026-04-22 audit session 漏掉)— element-anatomy.spec.md dead pointer `packages/design-system/src/ELEMENT-ANATOMY.md` 從未存在,但 agent 未 flag 因為 Dim 2 regex `\.spec\.md「」` 只抓 heading-anchor pointers。裸 file-path reference 落在檢測外。**已擴 Dim 2 prompt**(見 audit-prompts.md)增加 Part B(file path existence)+ Part C(spec self-placement drift)。本 FP 類別:**doc-structural drift**(doc 寫在 impl 前,impl 換方向後 doc 未更新),audit 應對 `README.md` home governance claim vs 實際 spec 位置交叉驗證
 
 ---
 

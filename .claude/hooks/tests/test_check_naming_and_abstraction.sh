@@ -36,30 +36,30 @@ echo "=== D.1 premature abstraction ==="
 
 # Setup: temp components/ — create Button base so suffix matching can find it
 TMP_DS=$(mktemp -d)
-mkdir -p "$TMP_DS/src/design-system/components/Button"
-echo "// existing base" > "$TMP_DS/src/design-system/components/Button/button.tsx"
+mkdir -p "$TMP_DS/packages/design-system/src/components/Button"
+echo "// existing base" > "$TMP_DS/packages/design-system/src/components/Button/button.tsx"
 
 # 1. New ButtonOutline without rationale → BLOCK (suffix=Outline, base=Button exists)
-run_hook "$TMP_DS/src/design-system/components/ButtonOutline/button-outline.tsx" '
+run_hook "$TMP_DS/packages/design-system/src/components/ButtonOutline/button-outline.tsx" '
 import * as React from "react"
 export const ButtonOutline = () => <div />
 ' Write
 expect_exit "D.1.1 new ButtonOutline w/o rationale → BLOCK" 2 "premature abstraction"
 
 # 2. New ButtonOutline with rationale comment → silent
-run_hook "$TMP_DS/src/design-system/components/ButtonOutline/button-outline.tsx" '// @separate-component-rationale: 3-test passed; cite Linear / Notion / Stripe — separate components
+run_hook "$TMP_DS/packages/design-system/src/components/ButtonOutline/button-outline.tsx" '// @separate-component-rationale: 3-test passed; cite Linear / Notion / Stripe — separate components
 import * as React from "react"
 ' Write
 expect_exit "D.1.2 with rationale → silent" 0 ""
 
 # 3. New component name not matching any suffix → silent
-run_hook "$TMP_DS/src/design-system/components/Sparkline/sparkline.tsx" '
+run_hook "$TMP_DS/packages/design-system/src/components/Sparkline/sparkline.tsx" '
 export const Sparkline = () => null
 ' Write
 expect_exit "D.1.3 no suffix match → silent" 0 ""
 
 # 4. Edit existing file (not Write) → silent
-run_hook "$TMP_DS/src/design-system/components/Button/button.tsx" 'edit' Edit
+run_hook "$TMP_DS/packages/design-system/src/components/Button/button.tsx" 'edit' Edit
 expect_exit "D.1.4 edit tool → silent" 0 ""
 
 rm -rf "$TMP_DS"
@@ -92,7 +92,7 @@ expect_exit "D.2.2 consistent ns → silent" 0 ""
 rm -rf "$TMP_NS"
 
 # 7. Story without title → skip
-run_hook "/r/src/design-system/components/Foo/foo.stories.tsx" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.stories.tsx" '
 const meta = { title: "Other/Foo" }
 ' Write
 expect_exit "D.2.3 no DS title → silent" 0 ""
@@ -101,31 +101,31 @@ echo ""
 echo "=== D.3 primitive color var in tsx ==="
 
 # 8. tsx with var(--color-neutral-5) → WARN stderr
-run_hook "/r/src/design-system/components/Foo/foo.tsx" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.tsx" '
 const cls = "border-[var(--color-neutral-5)]"
 ' Write
 expect_exit "D.3.1 primitive var color → WARN stderr" 0 "primitive color var"
 
 # 9. tsx with semantic alias → silent
-run_hook "/r/src/design-system/components/Foo/foo.tsx" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.tsx" '
 const cls = "border-border"
 ' Write
 expect_exit "D.3.2 semantic alias → silent" 0 ""
 
 # 10. Tag scope skip → silent
-run_hook "/r/src/design-system/components/Tag/tag.tsx" '
+run_hook "/r/packages/design-system/src/components/Tag/tag.tsx" '
 const cls = "var(--color-blue-3)"
 ' Write
 expect_exit "D.3.3 Tag scope skip → silent" 0 ""
 
 # 11. allowlist (line-level) → silent
-run_hook "/r/src/design-system/components/Foo/foo.tsx" '
+run_hook "/r/packages/design-system/src/components/Foo/foo.tsx" '
 const cls = "border-[var(--color-neutral-5)] // @primitive-color-allow: legacy migration"
 ' Write
 expect_exit "D.3.4 allowlist line → silent" 0 ""
 
 # 12. blanket allowlist → silent
-run_hook "/r/src/design-system/components/Foo/foo.tsx" '// primitive-color-allow-blanket
+run_hook "/r/packages/design-system/src/components/Foo/foo.tsx" '// primitive-color-allow-blanket
 const cls = "var(--color-neutral-5)"
 ' Write
 expect_exit "D.3.5 blanket allowlist → silent" 0 ""

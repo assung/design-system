@@ -97,7 +97,7 @@ case "$FILE_PATH" in
     ;;
   *.spec.md)
     # New spec — grep existing specs for same component
-    MATCHES=$(find src/design-system -name "${BASENAME}*" 2>/dev/null | head -3 || true)
+    MATCHES=$(find packages/design-system/src -name "${BASENAME}*" 2>/dev/null | head -3 || true)
     HOME_LABEL="spec"
     ;;
   *) exit 0 ;;

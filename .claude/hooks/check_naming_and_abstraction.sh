@@ -46,7 +46,7 @@ record_worst() { local lvl=$1; [ "$lvl" -gt "$WORST" ] && WORST=$lvl; }
 # ── D.1 premature abstraction(Write only,新元件 BLOCK)──────────────────────
 if [ "$TOOL" = "Write" ]; then
   case "$FILE_PATH" in
-    */src/design-system/components/*/[^.]*.tsx|*/src/design-system/components/*/*.spec.md)
+    */packages/design-system/src/components/*/[^.]*.tsx|*/packages/design-system/src/components/*/*.spec.md)
       if [ ! -f "$FILE_PATH" ]; then
         COMPONENT_DIR=$(echo "$FILE_PATH" | sed -E 's|.*/components/([^/]+)/.*|\1|')
         SUFFIX=""

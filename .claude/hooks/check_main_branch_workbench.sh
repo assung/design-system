@@ -30,9 +30,9 @@ case "${TOOL:-}" in
   *) exit 0 ;;
 esac
 
-# Only intercept production code edits (src/design-system / src/app / src/explorations)
+# Only intercept production code edits (packages/design-system/src / src/app / src/explorations)
 case "${FILE_PATH:-}" in
-  */src/design-system/**/*.tsx|*/src/design-system/**/*.ts|*/src/design-system/**/*.css) ;;
+  */packages/design-system/src/**/*.tsx|*/packages/design-system/src/**/*.ts|*/packages/design-system/src/**/*.css) ;;
   */src/app/**|*/src/explorations/**) ;;
   *) exit 0 ;;
 esac
@@ -70,7 +70,7 @@ fi
 cat >&2 <<EOF
 🚨 MAIN-AS-WORKBENCH BLOCKER(check_main_branch_workbench,2026-05-17 P0 codify)
   - 目標: ${FILE_PATH}
-  - 範圍: src/design-system / src/app / src/explorations(production code)
+  - 範圍: packages/design-system/src / src/app / src/explorations(production code)
   - 當前 branch: ${CURRENT_BRANCH}(= main / master)
   - 近 5 條 user msg branch-trigger keyword: 0 次
 

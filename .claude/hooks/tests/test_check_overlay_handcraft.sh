@@ -19,105 +19,105 @@ run() {
 # Test 1: out-of-scope file(non-overlay path)→ silent
 echo "Test 1: out-of-scope path → silent for Check 6"
 setup
-mkdir -p "$TMP/src/design-system/components/Button"
-cat > "$TMP/src/design-system/components/Button/button.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Button"
+cat > "$TMP/packages/design-system/src/components/Button/button.tsx" <<'EOF'
 interface ButtonProps { flush?: boolean }
 EOF
-run "$TMP/src/design-system/components/Button/button.tsx"
+run "$TMP/packages/design-system/src/components/Button/button.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  FAIL: false positive on Button"; FAIL=$((FAIL+1)); } || { echo "  PASS"; PASS=$((PASS+1)); }
 teardown
 
 # Test 2: DialogBody re-introducing flush?: boolean → flagged
 echo "Test 2: DialogBody flush?: boolean → flagged"
 setup
-mkdir -p "$TMP/src/design-system/components/Dialog"
-cat > "$TMP/src/design-system/components/Dialog/dialog.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Dialog"
+cat > "$TMP/packages/design-system/src/components/Dialog/dialog.tsx" <<'EOF'
 interface DialogBodyProps {
   flush?: boolean
 }
 EOF
-run "$TMP/src/design-system/components/Dialog/dialog.tsx"
+run "$TMP/packages/design-system/src/components/Dialog/dialog.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  PASS"; PASS=$((PASS+1)); } || { echo "  FAIL: $STDOUT"; FAIL=$((FAIL+1)); }
 teardown
 
 # Test 3: SheetBody flush = false destructure default → flagged
 echo "Test 3: SheetBody flush = false destructure → flagged"
 setup
-mkdir -p "$TMP/src/design-system/components/Sheet"
-cat > "$TMP/src/design-system/components/Sheet/sheet.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Sheet"
+cat > "$TMP/packages/design-system/src/components/Sheet/sheet.tsx" <<'EOF'
 const SheetBody = ({ flush = false }) => null
 interface X { flush?: boolean }
 EOF
-run "$TMP/src/design-system/components/Sheet/sheet.tsx"
+run "$TMP/packages/design-system/src/components/Sheet/sheet.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  PASS"; PASS=$((PASS+1)); } || { echo "  FAIL: $STDOUT"; FAIL=$((FAIL+1)); }
 teardown
 
 # Test 4: PopoverBody naked?: boolean(equivalent rename)→ flagged
 echo "Test 4: PopoverBody naked?: boolean → flagged"
 setup
-mkdir -p "$TMP/src/design-system/components/Popover"
-cat > "$TMP/src/design-system/components/Popover/popover.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Popover"
+cat > "$TMP/packages/design-system/src/components/Popover/popover.tsx" <<'EOF'
 interface PopoverBodyProps { naked?: boolean }
 EOF
-run "$TMP/src/design-system/components/Popover/popover.tsx"
+run "$TMP/packages/design-system/src/components/Popover/popover.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  PASS"; PASS=$((PASS+1)); } || { echo "  FAIL: $STDOUT"; FAIL=$((FAIL+1)); }
 teardown
 
 # Test 5: bare?: boolean(equivalent rename)→ flagged
 echo "Test 5: DialogBody bare?: boolean → flagged"
 setup
-mkdir -p "$TMP/src/design-system/components/Dialog"
-cat > "$TMP/src/design-system/components/Dialog/dialog.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Dialog"
+cat > "$TMP/packages/design-system/src/components/Dialog/dialog.tsx" <<'EOF'
 interface Y { bare?: boolean }
 EOF
-run "$TMP/src/design-system/components/Dialog/dialog.tsx"
+run "$TMP/packages/design-system/src/components/Dialog/dialog.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  PASS"; PASS=$((PASS+1)); } || { echo "  FAIL: $STDOUT"; FAIL=$((FAIL+1)); }
 teardown
 
 # Test 6: noPadding?: boolean(equivalent rename)→ flagged
 echo "Test 6: SheetBody noPadding?: boolean → flagged"
 setup
-mkdir -p "$TMP/src/design-system/components/Sheet"
-cat > "$TMP/src/design-system/components/Sheet/sheet.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Sheet"
+cat > "$TMP/packages/design-system/src/components/Sheet/sheet.tsx" <<'EOF'
 interface Z { noPadding?: boolean }
 EOF
-run "$TMP/src/design-system/components/Sheet/sheet.tsx"
+run "$TMP/packages/design-system/src/components/Sheet/sheet.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  PASS"; PASS=$((PASS+1)); } || { echo "  FAIL: $STDOUT"; FAIL=$((FAIL+1)); }
 teardown
 
 # Test 7: stories.tsx 內出現 flush?: boolean → silent(stories scope skip)
 echo "Test 7: stories.tsx flush?: boolean → skipped(out-of-scope)"
 setup
-mkdir -p "$TMP/src/design-system/components/Dialog"
-cat > "$TMP/src/design-system/components/Dialog/dialog.stories.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Dialog"
+cat > "$TMP/packages/design-system/src/components/Dialog/dialog.stories.tsx" <<'EOF'
 interface ExampleProps { flush?: boolean }
 EOF
-run "$TMP/src/design-system/components/Dialog/dialog.stories.tsx"
+run "$TMP/packages/design-system/src/components/Dialog/dialog.stories.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  FAIL: false positive on stories"; FAIL=$((FAIL+1)); } || { echo "  PASS"; PASS=$((PASS+1)); }
 teardown
 
 # Test 8: allowlist comment escape hatch → silent
 echo "Test 8: allowlist escape hatch → silent"
 setup
-mkdir -p "$TMP/src/design-system/components/Dialog"
-cat > "$TMP/src/design-system/components/Dialog/dialog.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Dialog"
+cat > "$TMP/packages/design-system/src/components/Dialog/dialog.tsx" <<'EOF'
 // overlay-body-stripped-variant-allow: 已對照 Polaris/Material/X 三家,multi-row 已驗證 hold
 interface DialogBodyProps { flush?: boolean }
 EOF
-run "$TMP/src/design-system/components/Dialog/dialog.tsx"
+run "$TMP/packages/design-system/src/components/Dialog/dialog.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  FAIL: allowlist not honored"; FAIL=$((FAIL+1)); } || { echo "  PASS"; PASS=$((PASS+1)); }
 teardown
 
 # Test 9: clean DialogBody(post-2026-05-01 canonical)→ silent
 echo "Test 9: clean DialogBody(no flush variant)→ silent"
 setup
-mkdir -p "$TMP/src/design-system/components/Dialog"
-cat > "$TMP/src/design-system/components/Dialog/dialog.tsx" <<'EOF'
+mkdir -p "$TMP/packages/design-system/src/components/Dialog"
+cat > "$TMP/packages/design-system/src/components/Dialog/dialog.tsx" <<'EOF'
 const DialogBody = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof ScrollArea>>(
   ({ className, children, ...props }, ref) => null
 )
 EOF
-run "$TMP/src/design-system/components/Dialog/dialog.tsx"
+run "$TMP/packages/design-system/src/components/Dialog/dialog.tsx"
 echo "$STDOUT" | grep -q "stripped-padding boolean variant" && { echo "  FAIL: false positive on clean canonical"; FAIL=$((FAIL+1)); } || { echo "  PASS"; PASS=$((PASS+1)); }
 teardown
 

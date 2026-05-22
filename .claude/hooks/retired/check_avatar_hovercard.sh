@@ -1,7 +1,7 @@
 #!/bin/bash
 # PostToolUse hook: enforce "person avatar → NameCard hoverCard" DS-wide canonical.
 #
-# Canonical source: src/design-system/components/Avatar/avatar.spec.md
+# Canonical source: packages/design-system/src/components/Avatar/avatar.spec.md
 #   「Avatar HoverCard 原則(DS-wide canonical,必遵守)」section
 #
 # Rule: any `<Avatar>` with `alt="..."` that looks like a PERSON name

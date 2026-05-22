@@ -10,7 +10,7 @@
 - [ ] 完整讀至少 2 個近親 spec.md
 - [ ] 抓到 Layout Family 宣告、API surface、禁止事項、SSOT anchor
 - [ ] 查至少 2 個世界級 DS(Polaris / Material / Atlassian / Ant / Apple HIG)對應元件
-- [ ] `ls src/design-system/components/` 確認名字無衝突
+- [ ] `ls packages/design-system/src/components/` 確認名字無衝突
 - [ ] grep CLAUDE.md `# 失敗記憶索引` 查同類歷史 bug
 
 ## Checkpoint 1 — 定位 Proposal

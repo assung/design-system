@@ -227,10 +227,10 @@ rule_governance_drift() {
     fi
   fi
 
-  for f in src/design-system/tokens/color/color.spec.md \
-           src/design-system/patterns/element-anatomy/item-anatomy.spec.md \
-           src/design-system/components/Sidebar/sidebar.spec.md \
-           src/design-system/components/TreeView/tree-view.spec.md; do
+  for f in packages/design-system/src/tokens/color/color.spec.md \
+           packages/design-system/src/patterns/element-anatomy/item-anatomy.spec.md \
+           packages/design-system/src/components/Sidebar/sidebar.spec.md \
+           packages/design-system/src/components/TreeView/tree-view.spec.md; do
     [ -f "$f" ] || continue
     L=$(wc -l < "$f" | tr -d ' ')
     local cap

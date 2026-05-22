@@ -12,7 +12,7 @@ INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 
 # Only trigger for design-system component .tsx files (not stories, not specs)
-if ! echo "$FILE_PATH" | grep -q 'src/design-system/components/.*\.tsx$'; then
+if ! echo "$FILE_PATH" | grep -q 'packages/design-system/src/components/.*\.tsx$'; then
   exit 0
 fi
 echo "$FILE_PATH" | grep -q '\.stories\.tsx$' && exit 0
@@ -35,11 +35,11 @@ if [ -n "$DIFF_TEXT" ]; then
   [ -z "$MEANINGFUL" ] && exit 0
 fi
 
-COMP_DIR=$(echo "$FILE_PATH" | sed -n 's|.*src/design-system/components/\([^/]*\)/.*|\1|p')
+COMP_DIR=$(echo "$FILE_PATH" | sed -n 's|.*packages/design-system/src/components/\([^/]*\)/.*|\1|p')
 [ -z "$COMP_DIR" ] && exit 0
 
 SPEC_BASENAME=$(echo "$COMP_DIR" | sed 's/\([a-z]\)\([A-Z]\)/\1-\2/g; s/\([A-Z]\)\([A-Z][a-z]\)/\1-\2/g' | tr '[:upper:]' '[:lower:]')
-SPEC_PATH="${CLAUDE_PROJECT_DIR}/src/design-system/components/${COMP_DIR}/${SPEC_BASENAME}.spec.md"
+SPEC_PATH="${CLAUDE_PROJECT_DIR}/packages/design-system/src/components/${COMP_DIR}/${SPEC_BASENAME}.spec.md"
 
 # Extract 禁止事項 section(如 spec 存在且有該 section)— inject 到 additionalContext
 # 讓 AI 改 tsx 前機械上讀到 forbid list,不靠記憶。2026-04-24 FileUpload `files` prop

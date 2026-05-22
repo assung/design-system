@@ -1,6 +1,6 @@
 ---
 name: new-component
-description: Create-phase workflow for building a new design-system component from scratch. Walks through 6 phases (近親 spec → Family 判定 → 7-dim spec → tsx → 3 stories → self quality-gate) with checkpoints, ensuring world-class discipline is applied *while building*, not discovered in review. Complements /component-quality-gate (review-phase gate). Invoke when user says「我要做新元件 X」「新增 X 元件」「create new X component」or is about to `mkdir src/design-system/components/Xyz`.
+description: Create-phase workflow for building a new design-system component from scratch. Walks through 6 phases (近親 spec → Family 判定 → 7-dim spec → tsx → 3 stories → self quality-gate) with checkpoints, ensuring world-class discipline is applied *while building*, not discovered in review. Complements /component-quality-gate (review-phase gate). Invoke when user says「我要做新元件 X」「新增 X 元件」「create new X component」or is about to `mkdir packages/design-system/src/components/Xyz`.
 ---
 
 # New Component 建立流程(create-phase workflow)
@@ -16,7 +16,7 @@ description: Create-phase workflow for building a new design-system component fr
 ## When to invoke
 
 - User 明說建新元件(「做一個 X」「新增 X 元件」)
-- AI 即將 `mkdir src/design-system/components/Xyz/`
+- AI 即將 `mkdir packages/design-system/src/components/Xyz/`
 - 建元件前的「先 plan 再建」需求
 
 **不 invoke 的情境**:
@@ -27,7 +27,7 @@ description: Create-phase workflow for building a new design-system component fr
 ## Preconditions
 
 - User 已給出新元件的 **名字 + 大致用途**(否則先對話釐清,再 invoke)
-- 元件 folder 不存在於 `src/design-system/components/`(真的是新的)
+- 元件 folder 不存在於 `packages/design-system/src/components/`(真的是新的)
 - 已讀 CLAUDE.md(skill 會 re-ref 關鍵章節,但 session 整體已有 context 更好)
 
 ## Workflow(6 phase + 多 checkpoint)
@@ -46,7 +46,7 @@ description: Create-phase workflow for building a new design-system component fr
    - 禁止事項(往往透露 gotcha)
    - SSOT anchor(往哪指)
 3. **查世界級對照**:Polaris / Material / Atlassian / Ant / Apple HIG 有沒對應元件?**至少 2 個** DS 的做法,記 3 行筆記(naming / API / 視覺模式)。
-4. **查 baseline 狀況**:`ls src/design-system/components/` 確認名字衝突;`grep` CLAUDE.md「失敗記憶索引」看有沒同類別的歷史 bug。
+4. **查 baseline 狀況**:`ls packages/design-system/src/components/` 確認名字衝突;`grep` CLAUDE.md「失敗記憶索引」看有沒同類別的歷史 bug。
 
 ### Checkpoint 1 — 定位 Proposal(STOP 點)
 
@@ -154,7 +154,7 @@ traits:
 
 ## Non-goals
 
-- 不自動進入 `src/design-system/components/`(explorations/ 才是實驗場;prototype 階段跑 `/prototype` skill)
+- 不自動進入 `packages/design-system/src/components/`(explorations/ 才是實驗場;prototype 階段跑 `/prototype` skill)
 - 不替 user 決定 positioning(Checkpoint 1 必須 user 點頭)
 - 不跳過 spec(`.claude/rules/spec-rules.md`:先 spec 後 code,spec 是 judgment home)
 - 不省略 quality-gate(Phase 6 chain mandatory,merge 前必過)

@@ -1,6 +1,6 @@
 # Item Anatomy Recipe — 建立新 row primitive 的完整 workflow
 
-Extracted from `src/design-system/patterns/element-anatomy/item-anatomy.spec.md`(2026-04-24 prune)。Recipe 是創建 workflow(不是日常 canonical),留 spec 會讓 SSOT 過長;搬本檔,spec 只留 1-line pointer。
+Extracted from `packages/design-system/src/patterns/element-anatomy/item-anatomy.spec.md`(2026-04-24 prune)。Recipe 是創建 workflow(不是日常 canonical),留 spec 會讓 SSOT 過長;搬本檔,spec 只留 1-line pointer。
 
 建立新 row primitive 時讀本檔 + 讀 item-anatomy.spec.md 其他 section 的 canonical(結構 / padding / 24px 閾值等)。
 
@@ -207,8 +207,8 @@ const isActive = variant === "meta" ? false : (... 同上)
 rg '<ItemPrefix>\s*<[A-Z]' src/design-system
 
 # 找出硬寫 size 的 Avatar / Icon（在 row primitive 內應該為零）
-rg '<Avatar[^>]*size=\{[0-9]+\}' src/design-system/components/{Sidebar,TreeView,SelectMenu,DropdownMenu}
-rg 'size=\{16\}|size=\{20\}|size=\{24\}' src/design-system/components/{Sidebar,TreeView}
+rg '<Avatar[^>]*size=\{[0-9]+\}' packages/design-system/src/components/{Sidebar,TreeView,SelectMenu,DropdownMenu}
+rg 'size=\{16\}|size=\{20\}|size=\{24\}' packages/design-system/src/components/{Sidebar,TreeView}
 
 # 找出沒走 ItemInlineAction 的 inline action button
 rg "group/action.*relative grid place-content-center" src/design-system

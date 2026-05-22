@@ -133,7 +133,7 @@ title: 'Explorations/{Topic Title}/{Candidate Name}'
 ## 下一步
 
 Phase 4 summary 整理完畢後,stakeholder 決定採用,走 graduation 流程:
-- 採用者遷移到 `src/design-system/`(若有新元件)或直接 app-level UI
+- 採用者遷移到 `packages/design-system/src/`(若有新元件)或直接 app-level UI
 - 未採用者:留 `explorations/{topic-slug}/` 或移 `_archive/`(保紀錄)
 
 ## 參考
@@ -214,7 +214,7 @@ export const NewbieOnboardingConcern: Story = {
 
 Phase 3 建 exploration 時:
 
-1. **優先用既有元件** `src/design-system/components/`,不自創
+1. **優先用既有元件** `packages/design-system/src/components/`,不自創
 2. **Layout primitives 消費**(per CLAUDE.md 清單):Empty / item-layout / overlay-surface / ScrollArea / AspectRatio
 3. **Token 紀律**:只用 semantic token,不硬寫 hex / rgb / shadow-sm
 4. **hook check_token_hygiene 4 項**:shadcn alias / v4 shorthand / hardcoded shadow / native overflow — 4 項全過

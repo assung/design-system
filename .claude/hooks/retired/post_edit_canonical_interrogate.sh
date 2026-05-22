@@ -5,7 +5,7 @@
 #
 # Scope(極窄,避免噪音):
 #   - CLAUDE.md Edit/Write
-#   - src/design-system/**/*.spec.md Edit/Write
+#   - packages/design-system/src/**/*.spec.md Edit/Write
 #   - .claude/skills/*/SKILL.md Edit/Write
 #
 # 觸發條件(只在真正「加新 rule」時 fire):
@@ -33,7 +33,7 @@ esac
 IN_SCOPE=0
 case "$FILE_PATH" in
   */CLAUDE.md) IN_SCOPE=1 ;;
-  */src/design-system/*/*.spec.md) IN_SCOPE=1 ;;
+  */packages/design-system/src/*/*.spec.md) IN_SCOPE=1 ;;
   */.claude/skills/*/SKILL.md) IN_SCOPE=1 ;;
 esac
 [ "$IN_SCOPE" = "0" ] && exit 0
@@ -88,7 +88,7 @@ case "$FILE_PATH" in
     HOME_LABEL="CLAUDE.md"
     SCOPE_NOTE="canonical 最高層;任何新規則必 benchmark + 下游吸收"
     ;;
-  */src/design-system/*/*.spec.md)
+  */packages/design-system/src/*/*.spec.md)
     HOME_LABEL="spec.md"
     SCOPE_NOTE="spec SSOT;新規則必對齊 7 維 + 近親 spec cross-check"
     ;;

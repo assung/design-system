@@ -89,7 +89,7 @@ your-org GitHub:
 
 ### Phase 1 — DS repo restructure to npm workspaces
 
-**Goal**: `src/design-system/` → `packages/design-system/`,build pipeline ready for `npm publish`
+**Goal**: `packages/design-system/src/` → `packages/design-system/`,build pipeline ready for `npm publish`
 
 **Deliverable**:
 - `packages/design-system/package.json`(name: `@your-org/design-system`,exports field)

@@ -59,7 +59,7 @@ run_hook "/r/src/app/products.tsx" '
 expect_silent "B.1.2 enableRowDrag + getRowId → silent"
 
 # 3. DataTable internal — skip
-run_hook "/r/src/design-system/components/DataTable/data-table.tsx" '
+run_hook "/r/packages/design-system/src/components/DataTable/data-table.tsx" '
 const x = "enableRowDrag"
 '
 expect_silent "B.1.3 DataTable internal skip → silent"
@@ -92,7 +92,7 @@ const cols = [
 expect_silent "B.2.3 size 'md' string → silent"
 
 # 7. cell-registry skip → silent
-run_hook "/r/src/design-system/components/DataTable/cell-registry.tsx" '
+run_hook "/r/packages/design-system/src/components/DataTable/cell-registry.tsx" '
 const cols = [{ accessorKey: "x", size: 240 }]
 '
 expect_silent "B.2.4 cell-registry skip → silent"
@@ -101,13 +101,13 @@ echo ""
 echo "=== B.3 filter↔sort sibling sync ==="
 
 # 8. edit filter panel → reminder
-run_hook "/r/src/design-system/components/DataTable/data-table-filter-panel.tsx" '
+run_hook "/r/packages/design-system/src/components/DataTable/data-table-filter-panel.tsx" '
 const x = 1
 '
 expect_stderr "B.3.1 edit filter → reminder" "data-table-sort-manager"
 
 # 9. edit sort manager → reminder
-run_hook "/r/src/design-system/components/DataTable/data-table-sort-manager.tsx" '
+run_hook "/r/packages/design-system/src/components/DataTable/data-table-sort-manager.tsx" '
 const x = 1
 '
 expect_stderr "B.3.2 edit sort → reminder" "data-table-filter-panel"

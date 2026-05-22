@@ -72,7 +72,7 @@ git show HEAD --stat
 
 **Static grep**(快,適合 token / class / API mis-use):
 ```bash
-grep -rnE "$ANTI_PATTERN" src/design-system/ --include="*.tsx" \
+grep -rnE "$ANTI_PATTERN" packages/design-system/src/ --include="*.tsx" \
   | grep -v "test_\|stories\|node_modules"
 ```
 
@@ -89,9 +89,9 @@ node scripts/scan-asymmetric-icons.mjs   # 已存在,iconOnly visual scan templa
 向 user present:
 ```
 Phase 1 found N candidates of same anti-pattern:
-- src/design-system/components/A/a.tsx:42  > grep match
-- src/design-system/components/B/b.tsx:18  > grep match
-- src/design-system/components/C/c.tsx:55  > 視覺 14×16
+- packages/design-system/src/components/A/a.tsx:42  > grep match
+- packages/design-system/src/components/B/b.tsx:18  > grep match
+- packages/design-system/src/components/C/c.tsx:55  > 視覺 14×16
 
 Proceed?
 - (a) Auto-fix all N(若修法 deterministic 例 token rename)

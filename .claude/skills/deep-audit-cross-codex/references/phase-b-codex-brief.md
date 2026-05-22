@@ -42,8 +42,8 @@ ls -la ~/.codex/auth.json                                              # 3 Auth(
 
 1. **全盤閱讀**(per A.0 file list,不 sample):
    - CLAUDE.md / `.claude/rules/*` / `.claude/references/*`
-   - `src/design-system/**/*.spec.md` 全部(~60 file)
-   - `src/design-system/tokens/**/*.spec.md` + `src/design-system/patterns/**/*.spec.md`
+   - `packages/design-system/src/**/*.spec.md` 全部(~60 file)
+   - `packages/design-system/src/tokens/**/*.spec.md` + `packages/design-system/src/patterns/**/*.spec.md`
    - `~/.claude/.../memory/MEMORY.md` index + active project memory
 
 2. **全 dim deep audit NO-SAMPLE**(對齊 `.claude/skills/design-system-audit/SKILL.md` Group A-P 全 dim per SKILL.md):

@@ -4,7 +4,7 @@ set -uo pipefail
 #   原 hook 名 `check_opacity_token_usage.sh`(keep filename for settings.json registration),
 #   實際 logic 已升級成 full Tailwind utility registry compliance(per Dim 47 SSOT)。
 #
-# SSOT source:`src/design-system/tokens/utility-registry.json`(block list per category)。
+# SSOT source:`packages/design-system/src/tokens/utility-registry.json`(block list per category)。
 # 對齊 Atlassian @atlaskit/tokens / Carbon @carbon/themes / Ant ConfigProvider / Polaris polaris-tokens
 # token-first lint enforcement。
 #
@@ -48,10 +48,10 @@ NEW_CONTENT=$(echo "$INPUT" | jq -r '.tool_input.content // .tool_input.new_stri
 [ -z "$NEW_CONTENT" ] && exit 0
 
 # Resolve registry path(absolute via $CLAUDE_PROJECT_DIR or relative fallback)
-REGISTRY="${CLAUDE_PROJECT_DIR:-}/src/design-system/tokens/utility-registry.json"
+REGISTRY="${CLAUDE_PROJECT_DIR:-}/packages/design-system/src/tokens/utility-registry.json"
 if [ ! -f "$REGISTRY" ]; then
   # Fallback: try relative from hook dir
-  REGISTRY="$(dirname "$0")/../../src/design-system/tokens/utility-registry.json"
+  REGISTRY="$(dirname "$0")/../../packages/design-system/src/tokens/utility-registry.json"
 fi
 if [ ! -f "$REGISTRY" ]; then
   # 沒 registry → fall back 到原 opacity-only logic(避免 hook 啞掉)
@@ -131,7 +131,7 @@ EOF_HEAD
   echo -e "$VIOLATIONS" >&2
   cat >&2 <<'EOF_BODY'
 
-   SSOT:src/design-system/tokens/utility-registry.json(block list per category)
+   SSOT:packages/design-system/src/tokens/utility-registry.json(block list per category)
    修法 quick map:
      text-xs..9xl  → text-h1..h6 / text-body / text-caption / text-helper / text-label
      font-thin/...black → font-normal / font-medium / font-bold
