@@ -97,6 +97,9 @@ for f in src/design-system/tokens/color/color.spec.md \
   L=$(wc -l < "$f" | tr -d ' ')
   case "$f" in
     */item-anatomy.spec.md) cap=1200 ;;
+    # 2026-05-22 prune codify per CLAUDE.md「foundational SSOT 例外 ≤ 800-1200」range:
+    # color.spec.md = token system 218-line semantic 不可拆 + nested theme + Atlassian-flow rationale,foundational tier 2 cap 1000。
+    */color/color.spec.md) cap=1000 ;;
     *) cap=800 ;;
   esac
   if [ "$L" -gt "$cap" ]; then

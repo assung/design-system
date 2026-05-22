@@ -1,11 +1,11 @@
 {
-  "ts": "2026-05-19T02:16:29.366Z",
+  "ts": "2026-05-22T13:09:23.016Z",
   "counts": {
-    "hooks": 36,
-    "mRules": 33,
-    "auditDims": 53,
+    "hooks": 37,
+    "mRules": 31,
+    "auditDims": 56,
     "auditDimMin": 1,
-    "auditDimMax": 53,
+    "auditDimMax": 56,
     "specTraits": 11
   },
   "mRulesList": [
@@ -39,12 +39,11 @@
     "M29",
     "M30",
     "M31",
-    "M32",
-    "M33",
-    "M34"
+    "M32"
   ],
   "hookFiles": [
     ".claude/hooks/block_prototype_imports.py",
+    ".claude/hooks/check_app_shell_primary_header_consistency.sh",
     ".claude/hooks/check_audit_post_report_validator.sh",
     ".claude/hooks/check_audit_sample_escape.sh",
     ".claude/hooks/check_benchmark_citation.sh",

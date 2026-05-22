@@ -182,7 +182,7 @@ Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design 
 
 僅在相關檔案打開時載入,降低本檔 token 成本:
 
-- `.claude/rules/meta-patterns.md` — 32 active M-rules(M1-M33,M27 retired,always loads,fundamental)
+- `.claude/rules/meta-patterns.md` — 31 active M-rules(M1-M32,M27/M33/M34/M35 retired,always loads,fundamental)
 - `.claude/rules/spec-rules.md` — paths: `**/*.spec.md` + `src/design-system/**`
 - `.claude/rules/ui-development.md` — paths: `**/*.tsx` + `**/*.ts`(含 Tailwind / Token / Props 命名 / shadcn)
 - `.claude/rules/story-rules.md` — paths: `**/*.stories.tsx`(三層定位 + Title + 範例最高準則)

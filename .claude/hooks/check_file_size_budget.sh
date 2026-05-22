@@ -35,7 +35,10 @@ case "$FILE_PATH" in
   # 2026-05-18 加 data-table:DS 最複雜 composite + 跨家族 anchor(L1-L4 完整 grid taxonomy,
   # 行對齊 item-anatomy / 浮層對齊 overlay-surface / state 對齊 field-controls)。
   # frontmatter 已標 `foundational_ssot: true`。
-  */color.spec.md|*/sidebar.spec.md|*/tree-view.spec.md|*/data-table.spec.md)
+  # 2026-05-22 prune:color.spec.md 升 tier 2 cap 1000(per CLAUDE.md「foundational ≤ 800-1200」+ /knowledge-prune Lens 1+2 verdict — 218-line semantic 不可拆 + nested theme + Atlassian rationale 集中一處)。
+  */color.spec.md)
+    BUDGET=800;  TRANSITION=1000; LABEL="foundational SSOT spec.md(color tier 2 cap 1000)" ;;
+  */sidebar.spec.md|*/tree-view.spec.md|*/data-table.spec.md)
     BUDGET=500;  TRANSITION=800; LABEL="foundational SSOT spec.md" ;;
   *.spec.md)                            BUDGET=300;  TRANSITION=500; LABEL="spec.md" ;;
   *.claude/skills/*/SKILL.md)           BUDGET=250;  TRANSITION=400; LABEL="SKILL.md" ;;

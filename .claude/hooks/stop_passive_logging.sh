@@ -236,6 +236,8 @@ rule_governance_drift() {
     local cap
     case "$f" in
       */item-anatomy.spec.md) cap=1200 ;;
+      # 2026-05-22 prune codify per CLAUDE.md「foundational SSOT 例外 ≤ 800-1200」range(SSOT sync with stop_self_audit.sh:99-102)
+      */color/color.spec.md) cap=1000 ;;
       *) cap=800 ;;
     esac
     if [ "$L" -gt "$cap" ]; then

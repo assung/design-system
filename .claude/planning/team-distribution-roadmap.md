@@ -2,7 +2,10 @@
 
 **Status**: Planned, not yet started
 **Created**: 2026-05-01
+**Last numeric refresh**: 2026-05-22(per /knowledge-prune deep audit)
 **Trigger to start**: user 說「開始 team distribution setup / Phase 1 開做 / 拆 npm package」
+
+> **數值 anti-drift contract**(2026-05-22 codify):本 roadmap 所有「N skills / N hooks / N components / N tests」具體數字 = stale by-default;唯一 SSOT 是 `node scripts/sync-governance-counters.mjs` 動態輸出。Phase 1 開做前必先重跑 counter,本 roadmap snapshot 僅作日期錨點,不靠它做 acceptance gate。
 
 > **Cross-session pickup contract**: 新 session 第一句講「繼續 team distribution roadmap」或「Phase X 開做」,
 > AI 必先 read 本檔 → confirm 上次到 Phase Y → 接續 Phase Y+1。**禁止憑記憶跳 phase**。
@@ -95,10 +98,10 @@ your-org GitHub:
 - `npm run build` outputs `packages/design-system/dist/`
 - `tsup` or `vite build --lib` for bundle generation
 
-**Acceptance**:
+**Acceptance**(數值動態以 `node scripts/sync-governance-counters.mjs` 跑出為準,以下為 2026-05-22 snapshot):
 - `npm run build` 0 errors
 - `npm run build-storybook` 仍跑(workspace local link)
-- 既有 50+ component tests 全 pass
+- 既有 **63 components**(63 spec.md / 100% coverage)全 pass
 - `npm pack --dry-run` 看 publish 內容正確(不含 stories / spec 等 internal files)
 
 **World-class ref**: Material UI monorepo structure / Radix UI packages
@@ -133,7 +136,10 @@ your-org GitHub:
 
 **Deliverable**:
 - `.claude-plugin/marketplace.json`(plugin manifest 對齊 Anthropic spec)
-- Plugin 包含:全 27 skills / 19 top-level hooks / 16 lib/ subs / 全 rules / CLAUDE.md instructions
+- Plugin 包含:全 skills / top-level hooks / lib/ subs / 全 rules / CLAUDE.md instructions
+- **數值動態**(以 `governance-counters.json` 跑出為準,**不在本 roadmap 寫死**避免 drift):
+  - 2026-05-22 snapshot:**22 skills / 37 top-level hooks / 10 lib/ subs / 31 active M-rules**
+  - Phase 3 開做前重跑 `node scripts/sync-governance-counters.mjs` 取最新
 - Plugin name: `design-system@your-org`,version 跟 npm package 同步
 - Local test:DS repo 自己 enable 此 plugin(自我消費 dogfood)
 
@@ -183,7 +189,7 @@ your-org GitHub:
 - `.claude/settings.json`:`enabledPlugins: { "design-system@your-org": true }` + `defaultMode: "auto"`
 - `.storybook/main.ts`:`import preset from '@your-org/storybook-config'`
 - `.github/CODEOWNERS`:全部 `* @team`(team 內互相 review)
-- `.github/workflows/audit.yml`:tsc + build + storybook + audit-content-quality + code-quality + visual-audit
+- `.github/workflows/audit.yml`:tsc + build + storybook + audit-content-quality + code-quality + visual-audit + **audit-orphan-tokens(2026-05-21 新)** + **audit-preflight(2026-05-15 新)** + **sync-governance-counters --check(2026-05-18 新)**
 - `.github/workflows/deploy.yml`:per-app Vercel/Netlify deploy(matrix on apps/*)
 - `README.md`:onboarding(clone → install → claude → 開做)
 - `.gitignore` + `.husky/pre-commit`(client-side warning if 試圖 import non-public DS internal)
