@@ -1,0 +1,95 @@
+# 2026-05-22 Phase 4 team-distribution-roadmap:GitHub Actions release pipeline
+#
+# Trigger:push tag `v*` → publish to npm + GitHub Release + plugin host
+# Per roadmap acceptance:Mock `v0.1.0-beta.1` tag → CI 自動跑完 publish 到 internal registry
+#
+# 對齊 changesets/changesets GitHub repo + Vercel `pkg.pr.new` pre-release model
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'Release type'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - next
+          - stable
+
+jobs:
+  release:
+    name: Release packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci
+
+      - name: Audit gates(must PASS before publish)
+        run: |
+          npx tsc -b
+          node scripts/audit-orphan-tokens.mjs --check
+          node scripts/code-quality-audit.mjs --scope=packages/design-system/src/components
+          node scripts/audit-content-quality.mjs --check
+          node scripts/sync-governance-counters.mjs --check
+
+      - name: Build
+        run: npm run build
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Pack dry-run(verify shipping content)
+        run: |
+          cd packages/design-system
+          npm pack --dry-run
+          cd ../storybook-config
+          npm pack --dry-run
+
+      - name: Publish to npm
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Determine dist-tag from tag(v1.0.0 → latest;v1.0.0-beta.1 → beta;v1.0.0-next.1 → next)
+          TAG_NAME="${GITHUB_REF#refs/tags/v}"
+          if [[ "$TAG_NAME" == *"-beta"* ]]; then DIST_TAG=beta;
+          elif [[ "$TAG_NAME" == *"-next"* ]]; then DIST_TAG=next;
+          else DIST_TAG=latest; fi
+          echo "Publishing with dist-tag: $DIST_TAG"
+
+          cd packages/design-system
+          npm publish --access restricted --tag $DIST_TAG
+          cd ../storybook-config
+          npm publish --access restricted --tag $DIST_TAG
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-next') }}
+
+      # TODO Phase 3 follow-up:plugin marketplace publish step
+      # - name: Publish Claude plugin
+      #   run: ...

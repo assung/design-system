@@ -1,0 +1,26 @@
+{
+  "name": "@your-org/storybook-config",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Shared Storybook config (addons preset + preview parameters + decorators) for design-system + consumer products. Single SSOT for storybook UX.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "files": [
+    "preview.ts",
+    "preview.tsx",
+    "addons-preset.ts",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./preview.tsx",
+    "./preset": "./addons-preset.ts",
+    "./preview": "./preview.tsx"
+  },
+  "main": "./preview.tsx",
+  "peerDependencies": {
+    "@storybook/react": ">=8.0.0",
+    "@storybook/react-vite": ">=8.0.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  }
+}

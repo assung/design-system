@@ -141,7 +141,13 @@ your-org GitHub:
 
 **World-class ref**: `@vercel/style-guide` / `@shopify/polaris-icons` 拆 package model
 
-**Status**: Not started
+**Status**: **DONE 2026-05-22**:
+- `packages/storybook-config/package.json`(name `@your-org/storybook-config`)
+- `packages/storybook-config/addons-preset.ts`(shared addons / framework / docs / typescript / story globs)
+- `packages/storybook-config/preview.tsx`(shared globalTypes / parameters / decorators / TooltipProvider wrapper)
+- DS repo dogfood:`.storybook/main.ts` + `preview.tsx` 改 import 此 package
+- Local-only addon(`./addons/ds-devmode/preset`)保 DS repo,consumer 不需要
+- tsc PASS
 
 ---
 
@@ -164,11 +170,15 @@ your-org GitHub:
 
 **World-class ref**: Anthropic Claude Code Plugin docs(2025 官方)+ shadcn registry CLI
 
-**Status**: Not started
+**Status**: **DONE(scaffold)2026-05-22**:
+- `.claude-plugin/marketplace.json` 新建 — plugin manifest 含 exports / pathScopedRules / manifest / consumerSetup
+- Plugin name `design-system@your-org`,version 跟 npm package 同步
+- DS repo dogfood:`.claude/` 物理檔目前直接 active(plugin host 等 Phase 4 release pipeline 配)
+- pathScopedRules 對齊 `.claude/rules/{meta-patterns,spec-rules,ui-development,story-rules,self-verify}.md`
 
-**Open question for user**:
-- Plugin host:Anthropic public marketplace? GitHub direct? Internal NPM registry?
-- 若 internal,需提供 plugin URL pattern(public link)
+**Open question 仍需 user 拍板**:
+- Plugin host:Anthropic public marketplace? GitHub direct? Internal NPM registry?(open question 留 manifest 內)
+- Phase 4 release.yml 內 plugin publish step 仍 TODO,等 host 決策
 
 ---
 
@@ -190,7 +200,16 @@ your-org GitHub:
 
 **World-class ref**: changesets/changesets GitHub repo / Vercel `pkg.pr.new` pre-release model
 
-**Status**: Not started
+**Status**: **DONE(scaffold)2026-05-22**:
+- `.github/workflows/release.yml` 新建 — tag-push trigger / audit gates / build / publish npm + GitHub Release / dist-tag detection(beta/next/latest from tag suffix)
+- `.changeset/config.json` 新建 — linked versions(design-system + storybook-config)/ access restricted / main baseBranch
+- `.changeset/README.md` 新建 — changesets workflow + codemod for breaking change + 對齊 Material UI / Storybook / Vercel pkg.pr.new
+- `CONTRIBUTING.md` 新建 — daily / PR-based / release flow / quality gates / codemod / world-class refs
+
+**Mock release 仍需 user run**(when ready):
+- `git tag v0.1.0-beta.1 && git push origin v0.1.0-beta.1` → CI 自動跑 audit gates → publish to `@beta` dist-tag
+- Verify `npm install @your-org/design-system@beta` 拉得到
+- NPM_TOKEN secret 需 user 設定 in GitHub repo settings
 
 ---
 
@@ -216,7 +235,15 @@ your-org GitHub:
 
 **World-class ref**: Vercel `create-next-app` template / shadcn `next.js` starter / Stripe Engineering monorepo internal docs
 
-**Status**: Not started
+**Status**: **DEFERRED — needs separate repo `your-org/product-workspace`**(per `.claude/planning/phase-5-6-product-workspace-setup.md` handoff doc)
+
+User pre-requisite(GitHub UI / CLI,不在 Claude session 範圍):
+1. Create new GitHub repo `your-org/product-workspace`
+2. Team collaborators add(write access)
+3. Branch protection main(1 reviewer approval)
+4. CI secrets(NPM_TOKEN / Netlify or Vercel token)
+
+User 完成上述後回 Claude session 講「Phase 5 開做 / 開做 product-workspace boilerplate」→ Claude 走 pickup contract 生 boilerplate(per handoff doc)。
 
 ---
 
@@ -237,7 +264,8 @@ your-org GitHub:
 
 **World-class ref**: Stripe API docs onboarding / Vercel Quickstart / shadcn install flow
 
-**Status**: Not started
+**Status**: **DEFERRED — depends on Phase 5(separate product-workspace repo)**
+docs/ 寫在 product-workspace,非本 DS repo。User 完成 Phase 5 pre-req 後 invoke Claude 協助生 5 個 onboarding docs(per `phase-5-6-product-workspace-setup.md`)。
 
 ---
 
