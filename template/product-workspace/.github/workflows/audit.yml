@@ -1,0 +1,43 @@
+# Per-PR audit pipeline(Phase 5 deliverable)
+# Trigger:every PR + main push
+# 對齊 DS repo 的 release.yml audit gates(同 SSOT script,版本一致)
+name: Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci
+
+      # DS-provided audit scripts(via @your-org/design-system package's scripts/)
+      - name: TypeScript strict
+        run: npx tsc -b
+
+      - name: Content quality(spec.md drift)
+        run: node node_modules/@your-org/design-system/scripts/audit-content-quality.mjs --check
+        continue-on-error: true # consumer apps 通常無 spec.md,non-critical
+
+      - name: Code quality
+        run: node node_modules/@your-org/design-system/scripts/code-quality-audit.mjs --scope=apps
+
+      # Build verify
+      - name: Build app
+        run: npm run build --workspaces --if-present
+
+      - name: Build Storybook
+        run: npm run build-storybook

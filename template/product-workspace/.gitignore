@@ -1,0 +1,14 @@
+node_modules
+dist
+storybook-static
+*.local
+.DS_Store
+.vscode
+.idea
+.env
+.env.local
+.env.*.local
+*.log
+coverage
+.turbo
+.vercel

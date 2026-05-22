@@ -1,0 +1,54 @@
+# Per-app deploy pipeline(Phase 5 deliverable)
+# Strategy:matrix on apps/* — 每 app 平行 build + deploy preview
+# Hostable:Vercel / Netlify / Cloudflare Pages — 此 template assume Vercel
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.list.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          # List apps/* dirs as JSON array for matrix
+          APPS=$(ls -d apps/*/ 2>/dev/null | grep -v '_template' | sed 's|apps/||;s|/||' | jq -R . | jq -sc .)
+          echo "apps=$APPS" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: detect
+    runs-on: ubuntu-latest
+    if: needs.detect.outputs.apps != '[]'
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.detect.outputs.apps) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install
+        run: npm ci
+      - name: Build ${{ matrix.app }}
+        run: npm -w @your-org/${{ matrix.app }} run build
+
+      # Vercel deploy(adjust per your host)
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ]; then
+            npx vercel deploy --prod=${{ github.event_name == 'push' }} \
+              --cwd apps/${{ matrix.app }} \
+              --token $VERCEL_TOKEN
+          else
+            echo "VERCEL_TOKEN not set,skip deploy"
+          fi

@@ -1,0 +1,12 @@
+# CODEOWNERS — product-workspace template
+# Per team-distribution-roadmap:team 全員互相 review,不分子模組
+
+# Catch-all:any change requires team approval
+* @your-org/team
+
+# DS-internal config — extra scrutiny if consumer 試圖 override
+/.claude/settings.json @your-org/team-leads
+/package.json @your-org/team-leads
+
+# 改 .storybook config = 影響全 team workspace UX
+/.storybook/ @your-org/team-leads
