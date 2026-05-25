@@ -31,11 +31,16 @@ Brief format invariant(2026-05-07 user 拍板,禁短 format)。
 N. <SSOT 是否該抽到更上層 primitive?>
 
 ## Constraints
-- DS 原則 M1-M33 全適用(尤其 M8 / M17 / M22 / M23 / M27)
+- DS 原則 M1-M32 全適用(31 active;M27/M33/M34/M35 retired,折入 M20/M7/M23(c)(d);尤其 M8 / M17 / M22 / M23)
 - 不可 commit,純文字討論
 - 程式碼建議須 cite world-class DS source
 - Counter-proposal request:挑戰我的 hypothesis,提第 4 條路
 - 必產 3-column cite table(claim / path:line / reasoning)
+
+## 🚨 三 invariant — 2026-05-23 user 永久 directive(缺一 = brief 不合格)
+1. **全盤閱讀全部 source**(CLAUDE.md / 31 active M-rules / 5 rules/*.md / 56 audit dims SKILL.md / 全 82 spec.md / 全 196 stories / 全 62 components / tokens / patterns / hooks / 20 memory files / planning),**禁憑記憶**
+2. **Triple-verify per finding**:(a) grep DS-wide 確認 pattern 存在 (b) Read 對應 spec.md / tsx 確認 problem 真存在 (c) 對照既有 canonical 確認非 documented exception。任一 NO → 自動撤回,**禁無病呻吟**
+3. **禁抽樣** — DS-wide ALL files 全掃,context 不夠拆 stage 全跑完;sub-agent admission「I sampled / spot-check / representative」= audit incomplete reject
 ```
 
 ## 歷史錨點

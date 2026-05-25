@@ -7,7 +7,7 @@
 3. **改一處必看三處**——code / spec / story 三方聯動。改 cva `defaultVariants` / variant / token 前先 grep 該元件所有檔案,一次改完。
 4. **範例必真實業務場景**——Jira / Stripe / Notion / Figma 可辨識情境;禁 `Option A/B/C`、「按鈕一」、極端不現實、ASCII art。
 5. **猶豫就問**——無前例的決策:grep 既有 → 讀近親 spec → 仍不確定停下問。**禁止憑直覺造新 pattern**。
-6. **大原則吸收瑣碎**——同類 bug 反覆糾正 = meta 層沒抓住。見 `.claude/rules/meta-patterns.md` 32 active M-rules(M1-M33,M27 retired 2026-05-15 → M23(c) child)。**AI 不需 user 提醒才找 root invariant**——rule 震盪 → AI 自跑 M12 benchmark + invariant test。User 第 2 次問 → 必截圖 verify(M13)。對話結論 → AUTO 5-layer pipeline(M14)。Visual / behavior decision 前必先 WebFetch ≥ 3 source(M26)。Solo-work git ops 必先 grep canonical(M28)。**視覺/結構 propose 前必 grep DS spec.md 找 owner SSOT(M29)— 出 3-column 表;否則提案不被接受**。使用者 tell me once 不該要 tell me twice。
+6. **大原則吸收瑣碎**——同類 bug 反覆糾正 = meta 層沒抓住。見 `.claude/rules/meta-patterns.md` 31 active M-rules(M1-M32,M27/M33/M34/M35 retired,折入 M20/M7/M23(c)(d))。**AI 不需 user 提醒才找 root invariant**——rule 震盪 → AI 自跑 M12 benchmark + invariant test。User 第 2 次問 → 必截圖 verify(M13)。對話結論 → AUTO 5-layer pipeline(M14)。Visual / behavior decision 前必先 WebFetch ≥ 3 source(M26)。Solo-work git ops 必先 grep canonical(M28)。**視覺/結構 propose 前必 grep DS spec.md 找 owner SSOT(M29)— 出 3-column 表;否則提案不被接受**。使用者 tell me once 不該要 tell me twice。
 
 完整 M-rules 詳 `.claude/rules/meta-patterns.md`(always loads)。
 
@@ -150,6 +150,10 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 **反 pattern**(禁):「省工」/「下次再做」/「下個 session」(M33)/「OK 嗎?」過度 ASK / shortcut 避 verify / 不對齊 mindset #1。
 
 **Trigger phrase auto-pipeline**(M19 升級):「依原則自主」/「不需問」/「馬不停蹄」/「全部做完」/「自動」→ 進 autonomous mode,僅 SSOT-affecting UI/UX 停下 ASK。
+
+**2026-05-23 永久 reinforcement(user verbatim,hook 機械強制)**:
+- **Triple-verify before propose**(M18 Q0 universal gate):propose / 列 option / 發現「問題」(含 codex / deep audit findings)前必 inline 跑 (1) grep DS-wide (2) Read spec.md / tsx (3) 對照 canonical exception。三題全過才 propose;任一 NO → 自動撤回不煩 user。Hook `check_propose_pre_grep_verify.sh`。Anchor:2026-05-18 Sheet/inline-action/SurfaceBody false positive、2026-05-23 Badge `text-[10px]` 誤判為 drift(spec L161-167 documented exception)
+- **SSOT auto-sync invariant**:M-rule count / hook count / dim count / npm scope / version / plugin name 等跨 file 數字禁 hardcode 多處;SSOT in `session_start_governance_check.sh:173` / `meta-patterns.md` / `design-system-audit/SKILL.md` / `package.json` / `.claude-plugin/plugin.json`;其他 file reference 或 `scripts/sync-governance-counters.mjs` 機械對齊,drift 偵測 auto fix
 
 # 遇不確定時的協議
 

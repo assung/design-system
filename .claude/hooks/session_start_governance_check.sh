@@ -171,7 +171,7 @@ if [ -d "$HOOKS_DIR" ]; then
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
 if [ "$HOOK_COUNT" -gt 40 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 40 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-18 升 35→40:Phase B codex audit verdict 36 active hooks 無 retire candidate(全 fire);新增 M30 wrapper-primitive-schema + M34 hook-regex-broadness invariants 各自有 dedicated hook;DS governance complexity(53 audit dims + 33 active M-rules + codex collab 5-step + cross-family canonical)justified raise。Re-raise 41+ 需先跑 /knowledge-prune 評估 retire / consolidate 候選。"
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 40 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-18 升 35→40:Phase B codex audit verdict 36 active hooks 無 retire candidate(全 fire);新增 M30 wrapper-primitive-schema + M34 hook-regex-broadness invariants 各自有 dedicated hook;DS governance complexity(56 audit dims + 31 active M-rules + codex collab 5-step + cross-family canonical)justified raise。Re-raise 41+ 需先跑 /knowledge-prune 評估 retire / consolidate 候選。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution
@@ -222,6 +222,18 @@ if git -C "$PROJECT_DIR" rev-parse origin/main >/dev/null 2>&1; then
   if [ -n "$AHEAD" ] && [ -n "$BEHIND" ]; then
     if [ "$AHEAD" -gt 0 ] || [ "$BEHIND" -gt 0 ]; then
       PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- Local main divergent (ahead ${AHEAD} / behind ${BEHIND} vs origin/main). 'git fetch && git checkout main && git reset --hard origin/main' 對齊。"
+    fi
+  fi
+fi
+
+# Check 10: SSOT auto-sync drift(2026-05-23 — sync-governance-counters drift report)
+SSOT_DRIFT=""
+if command -v node >/dev/null 2>&1 && [ -f scripts/sync-governance-counters.mjs ]; then
+  DRIFT_OUT=$(node scripts/sync-governance-counters.mjs --quiet 2>&1 || true)
+  if echo "$DRIFT_OUT" | grep -q "Hardcoded drift detected"; then
+    SSOT_DRIFT=$(echo "$DRIFT_OUT" | sed -n '/Hardcoded drift detected/,/^Log:/p' | grep '^  - ' | head -8)
+    if [ -n "$SSOT_DRIFT" ]; then
+      PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- SSOT drift detected:\n${SSOT_DRIFT}\n  → 跑 node scripts/sync-governance-counters.mjs 看完整 + 對齊 SSOT 數字 / npm scope / plugin manifest。"
     fi
   fi
 fi

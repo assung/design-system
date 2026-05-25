@@ -1,0 +1,17 @@
+{
+  "ts": "2026-05-23T08:01:24.062Z",
+  "scope": {
+    "total_story_files": 199,
+    "manual_story_files": 75
+  },
+  "violations": {
+    "title_canonical": [],
+    "name_jargon": [],
+    "name_pure_english": [],
+    "placeholder": []
+  },
+  "totals": {
+    "titles_scanned": 199,
+    "names_scanned": 356
+  }
+}
