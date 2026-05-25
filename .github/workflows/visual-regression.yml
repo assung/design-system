@@ -1,0 +1,69 @@
+name: Visual Regression
+
+# Phase 5.2 2026-05-25 — DS-wide visual regression CI
+#
+# Pixel diff every story screenshot vs committed snapshots-baseline/.
+# Fail = block merge(防止視覺 drift ship 進 main)。
+#
+# 對齊 Chromatic / Percy / BackstopJS 的 self-hosted visual diff infra
+# (我們用 playwright + pixelmatch 自己跑,免 SaaS 訂閱)。
+#
+# Updating baseline:
+#   1. 改 component 視覺(intentional change)
+#   2. Local 跑 `npm run visual-audit -- --scope=all --update-baseline`
+#   3. Review 新 baseline PNG → commit + push
+#   4. CI 此 step diff 新 commit 對 latest baseline → 0 diff pass
+#
+# Skip mechanism: PR title 含「[skip-visual]」可暫繞(emergency only,需 audit reason 進 commit msg)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  visual-regression:
+    name: Visual Regression Diff(DS-wide pixel match)
+    if: "!contains(github.event.head_commit.message, '[skip-visual]') && !contains(github.event.pull_request.title, '[skip-visual]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45  # ~1000 stories × screenshot + diff ≈ 20-30 min
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true  # snapshots-baseline/ 可能未來改 LFS — 提前 enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Storybook
+        run: npm run build-storybook 2>&1 | tail -5
+
+      - name: Visual regression diff(scope=all)
+        run: |
+          # Auto-start storybook static server inside visual-audit.mjs
+          npm run visual-audit -- --scope=all 2>&1 | tail -40
+
+      - name: Upload diff artifacts(on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-diffs
+          path: |
+            snapshots/
+            snapshots/report.json
+          if-no-files-found: warn
+          retention-days: 14
