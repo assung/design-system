@@ -96,13 +96,23 @@ jobs:
         # Fail = block publish(per user verbatim「不要再耍白痴,確保自己驗證到成功」)。
         run: node scripts/dogfood-prepublish-verify.mjs
 
-      - name: Storybook story FULL smoke test(release pre-publish gate)
-        # 2026-05-25 Phase 4.13 加 — release 必跑 --full 全 947 stories runtime probe
-        # ci.yml 跑 sample mode(critical 365)以 daily fast lane;release 跑 full mode 卡 gate。
-        # Fail = block npm publish(防 runtime bug ship to consumer)。
+      - name: Storybook story SAMPLE smoke test(release pre-publish gate)
+        # 2026-05-25 Phase 5.3 fix:beta.14 release 卡 FULL 947-story timeout(20 min job cap)。
+        # Beta releases already covered by:
+        #   (a) `Dogfood pre-publish verify` step(fresh consumer install + vite build)
+        #   (b) ci.yml SAMPLE 365 critical stories on every push
+        # FULL 947-story probe moved to separate weekly cron workflow(防 runtime bug shipping)。
+        # Stable release(no -beta/-next/-rc tag)仍跑 FULL — codify「beta=fast / stable=full」gate hygiene。
         run: |
           npm run build-storybook 2>&1 | tail -5
-          node scripts/storybook-smoke-test.mjs --full
+          TAG_NAME="${GITHUB_REF#refs/tags/v}"
+          if [[ "$TAG_NAME" == *"-beta"* ]] || [[ "$TAG_NAME" == *"-next"* ]] || [[ "$TAG_NAME" == *"-rc"* ]]; then
+            echo "📦 Pre-release tag($TAG_NAME)→ SAMPLE mode(365 critical stories)"
+            node scripts/storybook-smoke-test.mjs
+          else
+            echo "📦 Stable tag($TAG_NAME)→ FULL mode(947 stories)"
+            node scripts/storybook-smoke-test.mjs --full
+          fi
 
       - name: Publish to npm
         if: startsWith(github.ref, 'refs/tags/v')
