@@ -14,17 +14,26 @@ on:
     inputs:
       releaseType:
         description: 'Release type'
-        required: true
+        required: false
         default: 'beta'
         type: choice
         options:
           - beta
           - next
           - stable
+      action:
+        description: 'Action to run(release = normal publish trigger via tag push;clear-latest = unpoint latest dist-tag back to nothing,for pre-release hygiene before v1.0.0)'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - clear-latest
 
 jobs:
   release:
     name: Release packages
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'release')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -54,16 +63,26 @@ jobs:
           node scripts/sync-governance-counters.mjs --check
           node scripts/gen-figma-make-artifacts.mjs --check
 
-      - name: Build
-        run: npm run build
+      - name: Build DS lib(produces packages/design-system/dist/ — required for npm publish)
+        run: npm run build:lib
 
       - name: Build Storybook
         run: npm run build-storybook
 
-      - name: Pack dry-run(verify shipping content)
+      - name: Pack dry-run + verify dist/ included
         run: |
           cd packages/design-system
-          npm pack --dry-run
+          npm pack --dry-run 2>&1 | tee /tmp/pack.log
+          # 強制驗 dist/components/Button/index.js 在 pack 中 — 補位 beta.1-4 sliently
+          # 漏 dist/ 的 retro-fix(fix 2026-05-25)
+          if ! grep -q "dist/components/Button" /tmp/pack.log; then
+            echo "❌ dist/components/Button/ not in pack — lib build broken"
+            exit 1
+          fi
+          if ! grep -q "dist/index.js" /tmp/pack.log; then
+            echo "❌ dist/index.js not in pack"
+            exit 1
+          fi
           cd ../storybook-config
           npm pack --dry-run
 
@@ -114,3 +133,28 @@ jobs:
             echo "::warning::marketplace.json plugin entry version($MARKETPLACE_VERSION)≠ tag($TAG_VERSION)"
           fi
           # Non-blocking warning(per Anthropic spec:omit version → commit SHA auto-version,仍 work)
+
+  clear-latest-tag:
+    name: Clear latest dist-tag(pre-release hygiene)
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'clear-latest'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - name: Remove latest tag from both packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Why:beta.1 第一次 publish 時 npm 自動把 `latest` = beta.1,之後 --tag beta 只
+          # 更新 beta 不動 latest。consumer 跑 `npm install @qijenchen/design-system`(無
+          # @beta 後綴)會拉到 stale beta.X。Pre-release 期間 `latest` 不該存在,等 v1.0.0
+          # 才該指向 stable。
+          # User triggers from GitHub Actions UI(Run workflow → action=clear-latest)。
+          npm dist-tag rm @qijenchen/design-system latest || echo "(已無 latest 或第一次清)"
+          npm dist-tag rm @qijenchen/storybook-config latest || echo "(已無 latest 或第一次清)"
+          echo "---after cleanup---"
+          npm view @qijenchen/design-system dist-tags
+          npm view @qijenchen/storybook-config dist-tags
