@@ -1,7 +1,7 @@
 {
-  "ts": "2026-05-25T14:03:29.559Z",
+  "ts": "2026-05-25T14:22:41.592Z",
   "counts": {
-    "hooks": 38,
+    "hooks": 40,
     "mRules": 31,
     "auditDims": 56,
     "auditDimMin": 1,
@@ -42,6 +42,8 @@
     "M32"
   ],
   "hookFiles": [
+    ".claude/hooks/auto_regen_ds_barrel.sh",
+    ".claude/hooks/auto_sync_memory.sh",
     ".claude/hooks/block_prototype_imports.py",
     ".claude/hooks/check_app_shell_primary_header_consistency.sh",
     ".claude/hooks/check_audit_post_report_validator.sh",
