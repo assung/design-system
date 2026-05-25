@@ -4,7 +4,7 @@
   "commit": false,
   "fixed": [],
   "linked": [["@qijenchen/design-system", "@qijenchen/storybook-config"]],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [],

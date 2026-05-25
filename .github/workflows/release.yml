@@ -79,9 +79,9 @@ jobs:
           echo "Publishing with dist-tag: $DIST_TAG"
 
           cd packages/design-system
-          npm publish --access restricted --tag $DIST_TAG
+          npm publish --access public --tag $DIST_TAG
           cd ../storybook-config
-          npm publish --access restricted --tag $DIST_TAG
+          npm publish --access public --tag $DIST_TAG
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
