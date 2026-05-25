@@ -27,6 +27,8 @@
     "test:datatable-invariants": "node scripts/data-table-invariants.mjs",
     "sync-memory": "node scripts/sync-memory.mjs",
     "sync-counters": "node scripts/sync-governance-counters.mjs",
+    "changeset": "changeset",
+    "changeset:version": "changeset version && node scripts/sync-version-to-all-manifests.mjs",
     "postinstall": "node scripts/ensure-playwright-browsers.mjs",
     "prepare": "husky"
   },
@@ -75,6 +77,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.2",
+    "@changesets/cli": "^2.31.0",
     "@openai/codex": "^0.128.0",
     "@size-limit/preset-small-lib": "^12.1.0",
     "@storybook/addon-a11y": "^8.6.0",

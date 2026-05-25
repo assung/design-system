@@ -63,6 +63,7 @@ jobs:
           node scripts/audit-content-quality.mjs --check
           node scripts/sync-governance-counters.mjs --check
           node scripts/gen-figma-make-artifacts.mjs --check
+          node scripts/plugin-structure-validate.mjs
 
       - name: Build DS lib(produces packages/design-system/dist/ — required for npm publish)
         run: npm run build:lib

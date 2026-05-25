@@ -1,0 +1,56 @@
+name: Changeset Version PR
+
+on:
+  push:
+    branches: [main]
+
+# 2026-05-25 Phase 5 — Automated CHANGELOG.md + version bump via changesets/action
+#
+# Flow:
+#   1. Dev 改 code → 寫 .changeset/<descriptive-name>.md(describe semver bump)
+#      Example:
+#        ---
+#        "@qijenchen/design-system": minor
+#        "@qijenchen/storybook-config": patch
+#        ---
+#        Add Breadcrumb showHomeIcon prop + storybook-config tooltip delay
+#   2. PR / push main → 此 workflow 偵測 .changeset/ 內 unconsumed entries
+#   3. Auto-open「Version Packages」PR(bump 4 處 version + CHANGELOG.md 自動生成)
+#   4. User review + merge PR → triggers release.yml(if CHANGESET_PUBLISH=true)OR 等 user 手動 tag push
+#
+# Reference: https://github.com/changesets/action
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: changeset-version
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Open Version Packages PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Create Version Packages PR
+        uses: changesets/action@v1
+        with:
+          version: npm run changeset:version
+          commit: 'chore(release): version packages'
+          title: 'chore(release): version packages'
+          createGithubReleases: false  # release.yml 已處理(tag push trigger)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
