@@ -131,16 +131,24 @@ Chevron 是**展開/收合控件**,不是 prefix icon:`fg-muted`(指示色,hover
 
 ### 多選(file browser / permission picker)
 
-- **視覺 SSOT(per M23 DS-internal canonical)**:對齊 `SelectMenu`(select-menu.tsx:352-354)多選 pattern —
-  - **Checkbox 為 selection 唯一視覺信號**:`<TreeItem checkbox={<Checkbox />}>` slot
-  - **Row 本身 NO `bg-neutral-selected`**(該 token 保留給 single mode)
-  - `text-foreground`(字色從 muted 變 emphasis)仍套用所有 selected node(跟 single 一致)
-  - 對齊 cite:**SelectMenu** 已 codified `checked={isSelected} / selected={!multiple && isSelected}` 二分;TreeView 沿用同 canonical(per mindset #2 + M23 「DS 既有 canonical 優先於外部 benchmark」)
-- API:`selectionMode="multiple"` **必同時 pass checkbox prop** 才完整(妥當文件 + audit-dim 應 enforce);無 checkbox 的 multi-select = footgun
+- **視覺 SSOT(2026-05-26 user explicit lock)**:對齊 `SelectMenu` multi pattern,checkbox 為**唯一** visual signal —
+  - **Auto-render `<Checkbox>`**:`selectionMode="multiple"` 時 TreeItem 內建 render checkbox(reflect `selectedIds`),consumer **無需手動傳** `checkbox` prop
+  - **Row 不套 `bg-neutral-selected`**(該 token 保留給 single mode 補無 checkbox 的視覺信號)
+  - **Text 也不變 `text-foreground`**(已有 checkbox 強信號,text 變色會雙重 noise)→ 維持 `text-fg-secondary` muted
+  - 對齊 cite:`menu-item.tsx:194-195`(MenuItem selected → bg only)+ `select-menu.tsx:352-354`(SelectMenu multi → checkbox only)
+- API:`selectionMode="multiple"` 自動 render checkbox;consumer 傳 `checkbox={<Checkbox/>}` 可 override(parent-child cascade 等 advanced 場景)
 - `Shift+Click` 範圍選取 / `Ctrl/Cmd+Click` 切換個別 / `aria-multiselectable="true"` 在 TreeView 上
-- Checkbox state 應反映**內建 `selectedIds`**(consumer 不該繞過 built-in selection 自管 `checked` Record)— 修 `WithCheckbox` story 對齊
 
-歷史錨例(2026-05-26):一次 revert 引世界級對照 macOS Finder 改 bg apply 多選 → user 抓「應跟我們 multiple select 樣式維持一樣才是 SSOT」 → M23 違反 → restore single-only bg + cite SelectMenu pattern。
+### 視覺信號 SSOT 對照表(single vs multi)
+
+| Mode | Default text | Selected text | Selected bg | Checkbox |
+|---|---|---|---|---|
+| `single` | `text-fg-secondary`(muted)| `text-foreground` ✅ | `bg-neutral-selected` ✅ | N/A |
+| `multiple` | `text-fg-secondary`(muted)| 不變(維持 muted)| 不變 | auto `<Checkbox checked={isSelected} />` ✅ |
+
+設計理由:single 沒 checkbox → text+bg 雙信號補;multi 有 checkbox 強信號 → text+bg 不再變化避 noise。
+
+歷史錨例(2026-05-26):本 session 多次 revert + 對齊。User 明確「multi 已有 checkbox,text 不該再變色」→ 鎖 multi mode `text-foreground` apply 改 `selectionMode === 'single'` only。對齊 SelectMenu pattern,無偏移。
 
 ### 無選取(純展開/收合)
 

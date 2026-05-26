@@ -18,6 +18,7 @@ import { cva } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { dragSourceClass, dropIndicatorRow, dropIndicatorInside } from '@/design-system/lib/drag-visual'
 import { cn } from '@/lib/utils'
+import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 // Row primitive 共用常數——單一 source of truth
 import {
   ICON_SIZE,
@@ -907,18 +908,18 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             className={cn(
               'group/tree-item',
               treeItemVariants({ size }),
-              // 預設文字色 neutral-8 (fg-secondary),選中後變 neutral-9 (foreground)
-              // icon 透過 currentColor 繼承,不需要另外設
+              // 2026-05-26 SSOT lock(user explicit「multi 已有 checkbox 強信號,text 不該再變色」):
+              // ── Single mode ──
+              //   - default text 預設 fg-secondary muted(hierarchy navigation 慣例,跟 Sidebar 一致)
+              //   - selected → text-foreground emphasis + bg-neutral-selected(無 checkbox,需 text+bg 雙信號)
+              // ── Multi mode ──
+              //   - default text 維持 fg-secondary muted(跟 single 對齊 hierarchy)
+              //   - selected → 視覺信號只在 checkbox(auto-render below),text 不變、bg 不變
+              //   - 對齊 SelectMenu multi pattern(menu-item.tsx:194-195 selected → bg only;multi → checkbox only)
               !disabled && !isSelected && 'text-fg-secondary',
-              !disabled && isSelected && 'text-foreground',
-              // inside: 資料夾背景高亮(Figma 風格),不用 ring/border
+              !disabled && isSelected && selectionMode === 'single' && 'text-foreground',
               isDropTarget && dropTarget?.position === 'inside' && dropIndicatorInside,
               !disabled && 'hover:bg-neutral-hover hover:text-foreground',
-              // 2026-05-26 RESTORE(per DS SSOT M23):bg-neutral-selected 只 single mode 套。
-              // 對齊 SelectMenu(select-menu.tsx:352-354)既有 canonical:
-              //   multi-select = checkbox 表達 selection,row 本身不套 bg highlight
-              // 之前一次 fix(2026-05-26 13:00 commit b8843c2b)引世界級對照 macOS Finder 改 bg apply
-              // 多選,違反 M23「DS 既有 canonical 優先於外部 benchmark」。User 抓 + revert。
               !disabled && isSelected && selectionMode === 'single' && 'bg-neutral-selected',
               showRing && 'ring-2 ring-ring ring-inset',
               disabled && 'pointer-events-none text-fg-disabled cursor-default',
@@ -936,10 +937,16 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
           >
             {chevronSlot}
 
-            {/* Checkbox 在 icon 前——消費 `<ItemPrefix>` 對齊第一行 */}
-            {checkbox && (
+            {/* Checkbox 在 icon 前——消費 `<ItemPrefix>` 對齊第一行
+              * 2026-05-26 SSOT lock(user explicit「多選的方式應該也是要跟 menu 一樣是出現 checkbox」):
+              *   - selectionMode='multiple' + 無 consumer checkbox prop → auto-render `<Checkbox>` reflect selectedIds
+              *     (對齊 SelectMenu multi pattern;consumer 不用手寫 checkbox)
+              *   - selectionMode='multiple' + consumer 傳 checkbox → 用 consumer 的(parent-child cascade 等 advanced)
+              *   - selectionMode='single' / 'none' → 不 render checkbox(text-foreground + bg 雙信號表 selected)
+              * 對齊 cite:menu-item.tsx:194-195(MenuItem selected bg)+ select-menu.tsx:352-354(SelectMenu multi=checkbox) */}
+            {(checkbox || selectionMode === 'multiple') && (
               <ItemPrefix className="pointer-events-none">
-                {checkbox}
+                {checkbox || <Checkbox checked={isSelected} disabled={disabled} aria-hidden="true" />}
               </ItemPrefix>
             )}
 
