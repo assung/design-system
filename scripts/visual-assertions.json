@@ -96,7 +96,7 @@
       "file": "rating-in-field.png"
     },
     {
-      "id": "design-system-components-rating-展示--all-sizes",
+      "id": "design-system-components-rating-設計規格--size-matrix",
       "file": "rating-sizes.png"
     },
     {
@@ -149,7 +149,7 @@
       "file": "button-icon-only.png"
     },
     {
-      "id": "design-system-components-button-展示--all-sizes",
+      "id": "design-system-components-button-設計規格--size-matrix",
       "file": "button-sizes.png"
     },
     {
@@ -353,7 +353,7 @@
       "file": "linkinput-basic.png"
     },
     {
-      "id": "design-system-components-namecard-展示--default",
+      "id": "design-system-internal-namecard-設計規格--overview",
       "file": "namecard-basic.png"
     },
     {
@@ -373,7 +373,7 @@
       "file": "progressbar-default.png"
     },
     {
-      "id": "design-system-components-radiogroup-展示--states",
+      "id": "design-system-components-radiogroup-設計規格--state-behavior",
       "file": "radiogroup-states.png"
     },
     {
@@ -381,7 +381,7 @@
       "file": "scrollarea-vertical-issue-list.png"
     },
     {
-      "id": "design-system-components-segmentedcontrol-展示--default",
+      "id": "design-system-components-segmentedcontrol-設計規格--overview",
       "file": "segmentedcontrol-default.png"
     },
     {
@@ -405,7 +405,7 @@
       "file": "skeleton-default.png"
     },
     {
-      "id": "design-system-components-slider-展示--default",
+      "id": "design-system-components-slider-設計規格--overview",
       "file": "slider-default.png"
     },
     {
@@ -421,7 +421,7 @@
       "file": "tabs-default.png"
     },
     {
-      "id": "design-system-components-tag-展示--all-variants",
+      "id": "design-system-components-tag-設計規格--color-matrix",
       "file": "tag-all-variants.png"
     },
     {
@@ -429,7 +429,7 @@
       "file": "textarea-default.png"
     },
     {
-      "id": "design-system-components-toast-展示--all-variants",
+      "id": "design-system-components-toast-設計規格--color-matrix",
       "file": "toast-all-variants.png"
     },
     {

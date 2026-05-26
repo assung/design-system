@@ -27,7 +27,7 @@
 
 ## Project (active state)
 - [project_hover_overlay_decisions_2026_05_09.md](project_hover_overlay_decisions_2026_05_09.md) — Hover overlay Q1-Q7 已決 + cell picker D-path 已完成 + 路 B 拍板 spreadsheet target;Q3.6 send codex Q-A/Q-B/Q-C 比稿中
-- [codex_collab_backfill_2026-05-19.md](codex_collab_backfill_2026-05-19.md) — 14 條 codex reply 7-column audit table(3 DONE / 4 DEEP-VERIFY-PENDING / 7 TRIAGE-PENDING),Q3.1 last-verdict gate SSOT
+- [codex_collab_backfill_2026-05-19.md](codex_collab_backfill_2026-05-19.md) — CLOSED 2026-05-26:3 DONE + 11 UNVERIFIABLE(/tmp wiped);M31 Step 4.5 gate codified prevents future backlog
 - [feedback_story_baseline_reference.md](feedback_story_baseline_reference.md) — 寫 stories wrap primitive 必 reference 既有完整佈局 baseline(per 2026-05-20 AppShell-vs-Sidebar drift)
 - [feedback_nearest_same_purpose_canonical.md](feedback_nearest_same_purpose_canonical.md) — M35 nearest same-purpose canonical wins(registry-driven + hook R8 + SKILL Phase 0.0)
 
