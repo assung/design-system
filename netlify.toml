@@ -1,5 +1,8 @@
 [build]
-  command = "npm run build-storybook"
+  # 2026-05-26 fix(per user 「ds repo netlify failed 那麼多次」):chain build:lib 先把
+  # @qijenchen/design-system dist + @qijenchen/storybook-config dist build 出來,Storybook 才有 type
+  # 之前 only `npm run build-storybook` → prebuild-storybook 只 build storybook-config 但 DS dist 缺 → tsc fail → exit 2
+  command = "npm run build:lib && npm run build-storybook"
   publish = "storybook-static"
 
 [build.environment]

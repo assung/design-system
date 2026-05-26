@@ -40,10 +40,20 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: tsc -b(0 errors required)
+      - name: Build DS lib + storybook-config dist(required for tsc + Storybook)
+        # 2026-05-26 fix(per user 「DS repo netlify failed 那麼多次」+ CI fail diagnose):
+        # `.storybook/main.ts` imports `@qijenchen/storybook-config/preset` types → 需 storybook-config dist 才能 resolve。
+        # storybook-config 本身又 imports `@qijenchen/design-system` types → 需 DS dist。
+        # `build:lib` chain DS build → DS dts → storybook-config build,正確 dependency order。
+        run: npm run build:lib
+
+      - name: tsc -b(0 errors required + 印 errors 出來)
+        # 2026-05-26 fix:`2>&1 | grep -q` 把 errors silent 掉,無法 diagnose CI 真實 fail。改 print 完整 errors。
         run: |
-          if npx tsc -b 2>&1 | grep -q "error TS"; then
-            echo "❌ tsc errors found"
+          OUTPUT=$(npx tsc -b 2>&1)
+          if echo "$OUTPUT" | grep -q "error TS"; then
+            echo "❌ tsc errors found:"
+            echo "$OUTPUT"
             exit 1
           fi
 
