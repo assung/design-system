@@ -138,6 +138,10 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/inject_deploy_url_after_push.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_post_main_ssot_propagate.sh\""
           }
         ]
       },

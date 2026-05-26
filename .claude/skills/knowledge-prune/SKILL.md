@@ -188,37 +188,15 @@ Proceed with P0+P1 as atomic commit? Then discuss P2?
 - 每 P2 item 一個獨立 commit(animation trail 可回溯)
 - 新 meta-pattern 加進 CLAUDE.md `# Meta-Pattern 預警` → 同時**必檢討哪些下游條目冗餘**(上游加 = 下游減)
 
-### Phase Z — Cross-repo SSOT propagation(MUST AUTO,2026-05-26 user verbatim「我如果在 ds repo 跑 knowledge audit deep,完成後 product workspace repo 是否能主動更新同步?照理說應該要可以才對」)
+### Phase Z reference — Cross-repo SSOT propagation(2026-05-26 retract skill-specific Phase Z,移到 CLAUDE.md canonical)
 
-**Why**:`/knowledge-prune` 改動 DS repo `.claude/` + `packages/design-system/src/**` SSOT 後,不 npm publish 則 product-workspace + fork repos 永遠 stuck 在舊版 — 之前 6 個月花在 SSOT propagation 的工作 collapse。
+**Per user 2026-05-26 correction**:「不是只要一 knowledge audit deep 之後就要,是等我 push main 後才要」。
 
-**Auto pipeline(Phase 5 完 → 自動跑)**:
+Cross-repo SSOT sync trigger 不是「skill 跑完」而是「push main 後 SSOT-affecting diff」— canonical 統一在:
+- `CLAUDE.md` `# Git solo-work canonical` Step 5.5
+- Hook `check_post_main_ssot_propagate.sh`(PostToolUse Bash 偵測 `git push origin main` + diff)
 
-```bash
-# 1. Detect SSOT-affecting changes(Phase 3-4 commit 改到的 file 範圍)
-SSOT_TOUCHED=$(git diff main HEAD --name-only | grep -E "^(packages/design-system/src|\.claude/(rules|hooks|skills|commands|references)|CLAUDE\.md|hooks/hooks\.json|\.claude-plugin)")
-
-# 2. 若有 SSOT-affecting → propose npm version bump(beta.N+1)
-if [ -n "$SSOT_TOUCHED" ]; then
-  # 跑 npm version bump(plugin manifests + package.json + lockfile)
-  node scripts/sync-governance-counters.mjs           # SSOT auto-align numbers
-  # propose to user:「Phase Z 偵測 SSOT 改動 N 處,要 ship beta.N+1 嗎?」
-  # User YES → bump version + tag + push → Release workflow auto-fire → npm publish
-  # Dependabot daily 自動 pick up → product-workspace + fork PR 自動 bump
-fi
-```
-
-**Mechanical chain(已 wire,不需重建)**:
-- DS repo `.github/workflows/release.yml`:push tag `v*` → npm publish + GitHub Release(2026-05-23 ship)
-- product-workspace `.github/dependabot.yml`:daily auto-PR scope `@qijenchen/design-system + storybook-config`(2026-05-25 ship)
-- product-workspace `.github/workflows/sync-design-system.yml`:repository_dispatch 接 DS release 事件(2026-05-25 ship)
-- Plugin marketplace:`/plugin marketplace update` 拿最新 hooks / skills(2026-05-23 ship)
-
-→ Phase Z 只負責 trigger 整鏈,**不需手動 1 個 1 個 update**(per user「一次更新所有 ds repo 增刪改的東西不需要單獨一個一個更新」directive)。
-
-**User-facing summary 必含**:
-- Cross-repo sync verdict:「✅ Phase Z triggered npm publish v0.1.0-beta.N+1 → product-workspace Dependabot 24h 內 auto-PR」
-- 或:「⏸ 無 SSOT-affecting changes,skip npm publish」
+→ /knowledge-prune skill 本身**不負責 trigger sync**;Phase 3-4 commit + Phase 6 user 拍板 push main 後,canonical hook 自動偵測 SSOT diff + 提議 npm bump。**整鏈 1 trigger 同時 cover /deep-audit-cross-codex / 一般 dev / 任何 SSOT-affecting 來源**(DRY,不複製到每個 skill)。
 
 ---
 
