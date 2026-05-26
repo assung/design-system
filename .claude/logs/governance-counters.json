@@ -1,11 +1,11 @@
 {
-  "ts": "2026-05-26T13:59:37.039Z",
+  "ts": "2026-05-26T14:23:48.116Z",
   "counts": {
-    "hooks": 41,
+    "hooks": 42,
     "mRules": 31,
-    "auditDims": 62,
+    "auditDims": 64,
     "auditDimMin": 1,
-    "auditDimMax": 62,
+    "auditDimMax": 64,
     "specTraits": 11
   },
   "mRulesList": [
@@ -76,6 +76,7 @@
     ".claude/hooks/check_wrapper_primitive_schema_drift.sh",
     ".claude/hooks/chrome_header_dispatcher.sh",
     ".claude/hooks/enforce_home_charter.sh",
+    ".claude/hooks/inject_deploy_url_after_push.sh",
     ".claude/hooks/inject_pending_self_audit.sh",
     ".claude/hooks/log_governance_fires.sh",
     ".claude/hooks/log_skill_invokes.sh",
