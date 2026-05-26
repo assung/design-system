@@ -84,6 +84,12 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Build DS lib + storybook-config dist(required for tsc audit + Storybook + publish)
+        # 2026-05-26 移到 Audit gates 之前:`tsc -b` 需 DS dist/index.d.ts 才能 resolve `@qijenchen/design-system`
+        # `.storybook/main.ts` 需 storybook-config dist/addons-preset.d.ts 才能 resolve `@qijenchen/storybook-config/preset`
+        # build:lib script chain DS build → DS dts → storybook-config build,順序保證 type resolution OK
+        run: npm run build:lib
+
       - name: Audit gates(must PASS before publish)
         run: |
           npx tsc -b
@@ -93,9 +99,6 @@ jobs:
           node scripts/sync-governance-counters.mjs --check
           node scripts/gen-figma-make-artifacts.mjs --check
           node scripts/plugin-structure-validate.mjs
-
-      - name: Build DS lib(produces packages/design-system/dist/ — required for npm publish)
-        run: npm run build:lib
 
       - name: Build Storybook
         run: npm run build-storybook
