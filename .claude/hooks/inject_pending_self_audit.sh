@@ -8,6 +8,8 @@ set -uo pipefail
 # Reads:
 #   .claude/logs/self-audit-warnings.jsonl(stop_self_audit 寫入,behavioral check)
 #   .claude/logs/score-history.jsonl(stop_meta_self_audit 寫入,infra-score regression)
+#   .claude/logs/audit-post-report-validator.jsonl(check_audit_post_report_validator 寫入,
+#                                                  prune-chain-trigger signal — 補 2026-05-17 directive)
 # State:
 #   .claude/logs/last-inject-ts.txt — 上次 inject 的 timestamp
 #
@@ -103,6 +105,8 @@ extract_warnings_dedup() {
 WARNINGS_BEHAVIORAL=""
 WARNINGS_SCORE=""
 LATEST_SCORE=""
+PRUNE_CHAIN_TRIGGER=0
+PRUNE_CHAIN_REASONS=""
 
 # ── Read behavioral warnings since LAST_TS ─────────────────────────────────
 if [ -f .claude/logs/self-audit-warnings.jsonl ]; then
@@ -128,12 +132,41 @@ if [ -f .claude/logs/score-history.jsonl ]; then
   ' .claude/logs/score-history.jsonl)
 fi
 
+# ── Read prune-chain-trigger signal(2026-05-27 v2 ship per user directive)──
+# check_audit_post_report_validator.sh emit signal to validator jsonl when audit
+# completes with retire candidates(audit-prompts coverage < 100% OR @benchmark-
+# unverified-blanket > 0 OR design-system-audit Phase 4.5 9-trigger conditions met).
+# Without this handler the signal is half-shipped — emitted but no one listens.
+if [ -f .claude/logs/audit-post-report-validator.jsonl ]; then
+  PRUNE_SIGNAL=$(awk -v cutoff="$LAST_TS" '
+    {
+      if (match($0, /"ts":"[^"]+"/)) {
+        ts=substr($0, RSTART+6, RLENGTH-7)
+        if (ts <= cutoff) next
+      }
+      if (match($0, /"trigger_prune":1/)) {
+        if (match($0, /"warnings":"[^"]*"/)) {
+          w=substr($0, RSTART+12, RLENGTH-13)
+          gsub(/\\\\n/, " | ", w)
+          print w
+        } else {
+          print "trigger_prune=1"
+        }
+      }
+    }
+  ' .claude/logs/audit-post-report-validator.jsonl 2>/dev/null | tail -1)
+  if [ -n "$PRUNE_SIGNAL" ]; then
+    PRUNE_CHAIN_TRIGGER=1
+    PRUNE_CHAIN_REASONS="$PRUNE_SIGNAL"
+  fi
+fi
+
 # Update LAST_TS regardless(若 inject 失敗,下 turn 會重看到 — 但 jq 出錯就靜默)
 mkdir -p .claude/logs 2>/dev/null
 echo "$NOW" > "$LAST_TS_FILE"
 
 # Silent exit if nothing accumulated
-if [ -z "$WARNINGS_BEHAVIORAL" ] && [ -z "$WARNINGS_SCORE" ]; then
+if [ -z "$WARNINGS_BEHAVIORAL" ] && [ -z "$WARNINGS_SCORE" ] && [ "$PRUNE_CHAIN_TRIGGER" -eq 0 ]; then
   exit 0
 fi
 
@@ -176,6 +209,17 @@ if echo "${WARNINGS_BEHAVIORAL}${WARNINGS_SCORE}" | grep -q "Claim-verify gap"; 
   DIRECTIVE="${DIRECTIVE}
 🚨 **DIRECTIVE — Claim-verify gap**:
   你說 done / verified / 通過 但本 turn 沒跑 \`tsc -b\` / hook test / score script。**現在立刻跑驗證**或在回答中明撤回 claim。"
+fi
+if [ "$PRUNE_CHAIN_TRIGGER" -eq 1 ]; then
+  DIRECTIVE="${DIRECTIVE}
+🚨 **DIRECTIVE — Prune-chain-trigger fire(2026-05-17 user directive)**:
+  上一 audit cycle(via /design-system-audit --deep Phase 4.5 OR /deep-audit-cross-codex Phase A.1 → Phase 4.5 transitive chain)post-report validator E 偵測到 retire 候選 signal。**立刻 invoke \`/knowledge-prune\` scope=full** via \`Skill\` tool(SSOT-direct,不重寫 prune logic)。
+  Reasons: ${PRUNE_CHAIN_REASONS}"
+  # Add to CTX_PARTS so it shows in self-audit section
+  CTX_PARTS="${CTX_PARTS}## Prune-chain-trigger signal(audit-post-report-validator E):
+  • ${PRUNE_CHAIN_REASONS}
+
+"
 fi
 
 ADDITIONAL_CONTEXT=$(printf '⚠️ 來自上 turn(s) 的 governance self-audit warnings — M14/M20 auto-inject:

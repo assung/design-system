@@ -260,14 +260,91 @@ for (const m of mapping) {
     }
     return await p.screenshot({ fullPage: false })
   }
+  // v4 2026-05-27 dual-track: capture DOM signature alongside pixel.
+  // Per user verbatim「DOM diff 不能取代 pixel diff,要雙管齊下」+ AI self-audit unreliable rule.
+  // DOM diff catches structural drift(class / ARIA / data-* / computed style)pixel cannot see;
+  // pixel diff catches visual rendering drift DOM cannot see. Both run, both report,
+  // any layer FAIL = overall FAIL. EXPAND not REPLACE(per feedback_ai_self_audit_unreliable_*).
+  async function domSignature(p) {
+    return await p.evaluate(() => {
+      // Capture every element's stable signature: tag + role + class set + data-* + key computed styles
+      // Skip our own fidelity-mask overlay divs
+      const KEY_COMPUTED = ['display', 'position', 'width', 'height', 'padding', 'margin',
+                            'border-width', 'border-radius', 'background-color', 'color',
+                            'font-size', 'font-weight', 'line-height', 'gap', 'grid-template-columns']
+      function normalizeClass(cls) {
+        // Defensive coerce — SVGAnimatedString.className is object not string;use baseVal
+        let s = ''
+        if (typeof cls === 'string') s = cls
+        else if (cls && typeof cls === 'object' && typeof cls.baseVal === 'string') s = cls.baseVal
+        // Sort class names so order doesn't matter; strip storybook auto-added
+        return s.split(/\s+/).filter(c => c && !c.startsWith('sb-')).sort().join(' ')
+      }
+      function snapshot(el, depth = 0) {
+        if (!el || el.nodeType !== 1) return null
+        if (el.getAttribute('data-fidelity-mask') === '1') return null
+        const cs = getComputedStyle(el)
+        const styles = {}
+        for (const k of KEY_COMPUTED) styles[k] = cs.getPropertyValue(k)
+        const dataAttrs = {}
+        for (const a of el.attributes) if (a.name.startsWith('data-')) dataAttrs[a.name] = a.value
+        return {
+          tag: el.tagName.toLowerCase(),
+          role: el.getAttribute('role') || null,
+          ariaLabel: el.getAttribute('aria-label') || null,
+          class: normalizeClass(el.className),
+          data: dataAttrs,
+          styles,
+          children: Array.from(el.children).map(c => snapshot(c, depth + 1)).filter(Boolean),
+        }
+      }
+      return snapshot(document.body)
+    })
+  }
+  function flattenDom(node, out = [], path = '') {
+    if (!node) return out
+    const here = `${path}/${node.tag}${node.role ? `[role=${node.role}]` : ''}${node.class ? `.${node.class.replace(/\s+/g, '.')}` : ''}`
+    out.push({ path: here, role: node.role, class: node.class, data: node.data, styles: node.styles })
+    for (const c of node.children || []) flattenDom(c, out, here)
+    return out
+  }
+  function domDiff(baselineDom, consumerDom) {
+    const a = flattenDom(baselineDom)
+    const b = flattenDom(consumerDom)
+    const pathsA = new Set(a.map(x => x.path))
+    const pathsB = new Set(b.map(x => x.path))
+    const missingInConsumer = [...pathsA].filter(p => !pathsB.has(p))
+    const extraInConsumer = [...pathsB].filter(p => !pathsA.has(p))
+    // Style drift on shared paths
+    const styleDrifts = []
+    const aByPath = Object.fromEntries(a.map(x => [x.path, x]))
+    for (const node of b) {
+      const ref = aByPath[node.path]
+      if (!ref) continue
+      for (const k of Object.keys(ref.styles)) {
+        if (ref.styles[k] !== node.styles[k]) {
+          styleDrifts.push({ path: node.path, prop: k, baseline: ref.styles[k], consumer: node.styles[k] })
+        }
+      }
+    }
+    return {
+      missing: missingInConsumer.length,
+      extra: extraInConsumer.length,
+      styleDrifts: styleDrifts.length,
+      sample: { missing: missingInConsumer.slice(0, 5), extra: extraInConsumer.slice(0, 5), styles: styleDrifts.slice(0, 10) },
+    }
+  }
+  let baselineDom, consumerDom
   try {
     await page.goto(`${dsUrl}/iframe.html?id=${encodeURIComponent(m.baselineStoryId)}&viewMode=story&globals=theme:${FORCE_THEME};density:${FORCE_DENSITY}`, { waitUntil: 'domcontentloaded', timeout: 20_000 })
     await page.waitForTimeout(800)
+    baselineDom = await domSignature(page)  // v4 dual-track: capture DOM BEFORE mask injection
     baselineBuf = await snapshot(page)
     writeFileSync(join(OUT, 'baseline', `${fileSafe}.png`), baselineBuf)
 
     await page.goto(`${consumerUrl}/iframe.html?id=${encodeURIComponent(m.consumerStoryId)}&viewMode=story&globals=theme:${FORCE_THEME};density:${FORCE_DENSITY}`, { waitUntil: 'domcontentloaded', timeout: 20_000 })
     await page.waitForTimeout(800)
+    consumerDom = await domSignature(page)  // v4 dual-track
     consumerBuf = await snapshot(page)
     writeFileSync(join(OUT, 'consumer', `${fileSafe}.png`), consumerBuf)
   } catch (e) {
@@ -297,10 +374,46 @@ for (const m of mapping) {
   const totalPx = width * height
   const diffPct = (diffPx / totalPx) * 100
   const effectiveThreshold = m.threshold ?? THRESHOLD_PCT
-  const passed = diffPct <= effectiveThreshold
-  results.push({ ...m, status: passed ? 'PASS' : 'FAIL', diffPx, totalPx, diffPct: diffPct.toFixed(4), threshold: effectiveThreshold })
-  if (!passed) failCount++
-  console.log(`${passed ? '✓' : '✗'} ${m.consumerStoryId} ← ${m.baselineStoryId}  diff=${diffPct.toFixed(4)}% (${diffPx}/${totalPx} px,threshold=${effectiveThreshold}%)${passed ? '' : '  FAIL'}`)
+  const pixelPassed = diffPct <= effectiveThreshold
+
+  // v4 2026-05-27 dual-track: DOM signature diff(EXPAND not REPLACE pixel layer)
+  // Per feedback_ai_self_audit_unreliable_mechanical_primary_2026_05_27.md:
+  //   - pixel diff = primary visual ground truth
+  //   - DOM diff = secondary structural ground truth(catches drift pixel cannot see + vice versa)
+  //   - any layer FAIL = overall FAIL(union semantics)
+  let domVerdict = { status: 'SKIP', reason: 'no DOM snapshot captured' }
+  if (baselineDom && consumerDom) {
+    const dd = domDiff(baselineDom, consumerDom)
+    // Threshold:0 missing/extra/style drift = clean。Any > 0 = potential drift。
+    // For template-vs-canonical scope: missing/extra > 5 OR styleDrifts > 20 = FAIL
+    const domThreshold = m.domThreshold || { missing: 5, extra: 5, styleDrifts: 20 }
+    const domPassed = dd.missing <= domThreshold.missing && dd.extra <= domThreshold.extra && dd.styleDrifts <= domThreshold.styleDrifts
+    domVerdict = {
+      status: domPassed ? 'PASS' : 'FAIL',
+      missing: dd.missing,
+      extra: dd.extra,
+      styleDrifts: dd.styleDrifts,
+      sample: dd.sample,
+      threshold: domThreshold,
+    }
+    writeFileSync(join(OUT, 'diff', `${fileSafe}.dom.json`), JSON.stringify({ baselineDom, consumerDom, diff: dd }, null, 2))
+  }
+
+  // Overall verdict: UNION fail (any layer fail = overall fail), per AI-self-audit-unreliable canonical
+  const overallPassed = pixelPassed && (domVerdict.status === 'PASS' || domVerdict.status === 'SKIP')
+  const overallStatus = overallPassed ? 'PASS' : (pixelPassed ? 'DOM_FAIL' : (domVerdict.status === 'FAIL' ? 'BOTH_FAIL' : 'PIXEL_FAIL'))
+
+  results.push({
+    ...m,
+    status: overallStatus,
+    pixel: { passed: pixelPassed, diffPx, totalPx, diffPct: diffPct.toFixed(4), threshold: effectiveThreshold },
+    dom: domVerdict,
+  })
+  if (!overallPassed) failCount++
+
+  const pixelIcon = pixelPassed ? '✓' : '✗'
+  const domIcon = domVerdict.status === 'PASS' ? '✓' : domVerdict.status === 'SKIP' ? '○' : '✗'
+  console.log(`pixel:${pixelIcon} dom:${domIcon} ${m.consumerStoryId} ← ${m.baselineStoryId}  pixel=${diffPct.toFixed(4)}% dom=missing/${domVerdict.missing ?? '?'} extra/${domVerdict.extra ?? '?'} styles/${domVerdict.styleDrifts ?? '?'}${overallPassed ? '' : '  FAIL('+overallStatus+')'}`)
 }
 
 await browser.close()

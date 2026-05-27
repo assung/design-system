@@ -225,7 +225,7 @@ Send via `codex exec`(local CLI per M31 Step 0.4)或 cloud `@codex` 後序。
 | `/codex-collab` | M31 5-step dual-track for **任意題目** | 本 skill chain 為 Phase B,額外 Phase A 前置 + 全 dim 完整覆蓋(per design-system-audit SSOT) + Phase C 共識 commit |
 | `/propose-options` | M18 4-Q gate single propose | 本 skill A.2 / B.5 chain 用它格式化 propose |
 | `/ensure-canonical` | M19 5-layer auto-pipeline | 本 skill A.3 / B.5 chain 用它落地 canonical |
-| `/knowledge-prune` | 治理文件冗贅清 | 正交,本 skill 跑稽核;`/knowledge-prune` 跑治理 hygiene |
+| `/knowledge-prune` | 治理文件冗贅清 | **Transitively chained**:Phase A.1 chain `/design-system-audit --deep` → Phase 4.5 auto-chain `/knowledge-prune`(per `design-system-audit/SKILL.md:334-340` 9-trigger 條件)。SSOT 透過 `Skill` tool 直接 invoke,**不**重寫 prune logic / **不**複製 phase。Mechanical signal:`check_audit_post_report_validator.sh:81` emit `prune-chain-trigger` → `inject_pending_self_audit.sh` parse `.claude/logs/audit-post-report-validator.jsonl` → next-turn inject directive |
 | `/bug-fix-rhythm` | surgical visual bug 修 | 正交,本 skill 是 broad sweep;surgical bug 不該觸發本 skill |
 
 ## Anti-pattern(永久 ban)
