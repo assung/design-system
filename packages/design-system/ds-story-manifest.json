@@ -1,0 +1,1690 @@
+{
+  "_meta": {
+    "purpose": "DS canonical story id SSOT for consumer visual diff and baseline validation",
+    "canonicalSource": "M31 codex synthesis 2026-05-27 dual-track",
+    "consumedBy": [
+      ".claude/hooks/check_consumer_story_baseline.sh",
+      "scripts/composition-fidelity-visual-diff.mjs",
+      "product-workspace apps/template/src/AllDsComponents.stories.tsx (DsCanonicalPortal)"
+    ],
+    "generatedAt": "2026-05-27T10:08:48.174Z"
+  },
+  "components": {
+    "accordion": {
+      "tiers": {
+        "展示": [
+          "design-system-components-accordion-展示--default",
+          "design-system-components-accordion-展示--states",
+          "design-system-components-accordion-展示--faq",
+          "design-system-components-accordion-展示--settings-sections",
+          "design-system-components-accordion-展示--advanced-options"
+        ],
+        "設計規格": [
+          "design-system-components-accordion-設計規格--overview",
+          "design-system-components-accordion-設計規格--inspector",
+          "design-system-components-accordion-設計規格--color-matrix",
+          "design-system-components-accordion-設計規格--size-matrix",
+          "design-system-components-accordion-設計規格--state-behavior",
+          "design-system-components-accordion-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-accordion-設計原則--usage-guidance",
+          "design-system-components-accordion-設計原則--type-rule",
+          "design-system-components-accordion-設計原則--no-nesting-rule",
+          "design-system-components-accordion-設計原則--content-rule",
+          "design-system-components-accordion-設計原則--single-item-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "alert": {
+      "tiers": {
+        "展示": [
+          "design-system-components-alert-展示--subtle-single-line",
+          "design-system-components-alert-展示--solid-single-line",
+          "design-system-components-alert-展示--subtle-with-description",
+          "design-system-components-alert-展示--solid-with-description",
+          "design-system-components-alert-展示--corner-action-group",
+          "design-system-components-alert-展示--fixed"
+        ],
+        "設計規格": [
+          "design-system-components-alert-設計規格--overview",
+          "design-system-components-alert-設計規格--inspector",
+          "design-system-components-alert-設計規格--color-matrix",
+          "design-system-components-alert-設計規格--placement-matrix",
+          "design-system-components-alert-設計規格--state-behavior",
+          "design-system-components-alert-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-alert-設計原則--usage-guidance",
+          "design-system-components-alert-設計原則--variant-rule",
+          "design-system-components-alert-設計原則--placement-rule",
+          "design-system-components-alert-設計原則--appearance-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "appshell": {
+      "tiers": {
+        "展示": [
+          "design-system-components-appshell-展示--primary-sidebar",
+          "design-system-components-appshell-展示--primary-sidebar-with-tabs",
+          "design-system-components-appshell-展示--primary-header"
+        ],
+        "設計規格": [
+          "design-system-components-appshell-設計規格--overview",
+          "design-system-components-appshell-設計規格--layout-mode-diagram",
+          "design-system-components-appshell-設計規格--state-behavior",
+          "design-system-components-appshell-設計規格--accessibility",
+          "design-system-components-appshell-設計規格--size-matrix"
+        ],
+        "設計原則": [
+          "design-system-components-appshell-設計原則--usage-guidance"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "aspectratio": {
+      "tiers": {
+        "展示": [
+          "design-system-components-aspectratio-展示--hero-banner-16-x-9",
+          "design-system-components-aspectratio-展示--product-photo-4-x-3",
+          "design-system-components-aspectratio-展示--square-avatar-1-x-1",
+          "design-system-components-aspectratio-展示--ultrawide-21-x-9",
+          "design-system-components-aspectratio-展示--common-ratios"
+        ],
+        "設計規格": [
+          "design-system-components-aspectratio-設計規格--overview",
+          "design-system-components-aspectratio-設計規格--inspector",
+          "design-system-components-aspectratio-設計規格--standard-ratios",
+          "design-system-components-aspectratio-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-aspectratio-設計原則--usage-guidance",
+          "design-system-components-aspectratio-設計原則--ratio-choice",
+          "design-system-components-aspectratio-設計原則--children-fill-rule",
+          "design-system-components-aspectratio-設計原則--placeholder-and-skeleton"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "avatar": {
+      "tiers": {
+        "展示": [
+          "design-system-components-avatar-展示--modes",
+          "design-system-components-avatar-展示--fallback",
+          "design-system-components-avatar-展示--in-context"
+        ],
+        "設計規格": [
+          "design-system-components-avatar-設計規格--overview",
+          "design-system-components-avatar-設計規格--inspector",
+          "design-system-components-avatar-設計規格--color-matrix",
+          "design-system-components-avatar-設計規格--size-matrix",
+          "design-system-components-avatar-設計規格--state-behavior",
+          "design-system-components-avatar-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-avatar-設計原則--usage-guidance",
+          "design-system-components-avatar-設計原則--fallback-rule",
+          "design-system-components-avatar-設計原則--with-badge-overlay-rule",
+          "design-system-components-avatar-設計原則--hover-card-integration-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "badge": {
+      "tiers": {
+        "展示": [
+          "design-system-components-badge-展示--shape",
+          "design-system-components-badge-展示--dot",
+          "design-system-components-badge-展示--max-count"
+        ],
+        "設計規格": [
+          "design-system-components-badge-設計規格--overview",
+          "design-system-components-badge-設計規格--inspector",
+          "design-system-components-badge-設計規格--color-matrix",
+          "design-system-components-badge-設計規格--size-matrix",
+          "design-system-components-badge-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-badge-設計原則--usage-guidance",
+          "design-system-components-badge-設計原則--default-low-rule",
+          "design-system-components-badge-設計原則--contrast-floor-rule",
+          "design-system-components-badge-設計原則--accessibility-rule",
+          "design-system-components-badge-設計原則--placement-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "breadcrumb": {
+      "tiers": {
+        "展示": [
+          "design-system-components-breadcrumb-展示--default",
+          "design-system-components-breadcrumb-展示--interactive-ellipsis",
+          "design-system-components-breadcrumb-展示--declarative-auto-collapse",
+          "design-system-components-breadcrumb-展示--deep",
+          "design-system-components-breadcrumb-展示--two-levels",
+          "design-system-components-breadcrumb-展示--with-home-icon",
+          "design-system-components-breadcrumb-展示--paired-with-page-title",
+          "design-system-components-breadcrumb-展示--integrate-router-link"
+        ],
+        "設計規格": [
+          "design-system-components-breadcrumb-設計規格--overview",
+          "design-system-components-breadcrumb-設計規格--inspector",
+          "design-system-components-breadcrumb-設計規格--color-matrix",
+          "design-system-components-breadcrumb-設計規格--size-matrix",
+          "design-system-components-breadcrumb-設計規格--state-behavior",
+          "design-system-components-breadcrumb-設計規格--usage-examples",
+          "design-system-components-breadcrumb-設計規格--collapse-matrix",
+          "design-system-components-breadcrumb-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-breadcrumb-設計原則--usage-guidance",
+          "design-system-components-breadcrumb-設計原則--last-item-rule",
+          "design-system-components-breadcrumb-設計原則--long-path-rule",
+          "design-system-components-breadcrumb-設計原則--scope-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "bulkactionbar": {
+      "tiers": {
+        "展示": [
+          "design-system-components-bulkactionbar-展示--default",
+          "design-system-components-bulkactionbar-展示--with-filter-hidden",
+          "design-system-components-bulkactionbar-展示--with-extend-dataset-hint",
+          "design-system-components-bulkactionbar-展示--empty-selection-hidden"
+        ],
+        "設計規格": [
+          "design-system-components-bulkactionbar-設計規格--overview",
+          "design-system-components-bulkactionbar-設計規格--inspector",
+          "design-system-components-bulkactionbar-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-bulkactionbar-設計原則--usage-guidance",
+          "design-system-components-bulkactionbar-設計原則--vs-toast-rule",
+          "design-system-components-bulkactionbar-設計原則--action-variant-rule",
+          "design-system-components-bulkactionbar-設計原則--hint-banner-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "button": {
+      "tiers": {
+        "展示": [
+          "design-system-components-button-展示--default",
+          "design-system-components-button-展示--pressed",
+          "design-system-components-button-展示--danger",
+          "design-system-components-button-展示--with-badge",
+          "design-system-components-button-展示--icon-only",
+          "design-system-components-button-展示--disabled",
+          "design-system-components-button-展示--loading",
+          "design-system-components-button-展示--full-width",
+          "design-system-components-button-展示--hover-focus-state",
+          "design-system-components-button-展示--tooltip-visible"
+        ],
+        "設計規格": [
+          "design-system-components-button-設計規格--overview",
+          "design-system-components-button-設計規格--inspector",
+          "design-system-components-button-設計規格--color-matrix",
+          "design-system-components-button-設計規格--size-matrix",
+          "design-system-components-button-設計規格--state-behavior",
+          "design-system-components-button-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-button-設計原則--usage-guidance",
+          "design-system-components-button-設計原則--variant-rule",
+          "design-system-components-button-設計原則--primary-rule",
+          "design-system-components-button-設計原則--danger-rule",
+          "design-system-components-button-設計原則--icon-rule",
+          "design-system-components-button-設計原則--order-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "calendar": {
+      "tiers": {
+        "展示": [
+          "design-system-components-calendar-展示--team-calendar",
+          "design-system-components-calendar-展示--content-publishing-schedule",
+          "design-system-components-calendar-展示--empty-calendar"
+        ],
+        "設計規格": [
+          "design-system-components-calendar-設計規格--overview",
+          "design-system-components-calendar-設計規格--inspector",
+          "design-system-components-calendar-設計規格--color-matrix",
+          "design-system-components-calendar-設計規格--state-behavior",
+          "design-system-components-calendar-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-calendar-設計原則--usage-guidance",
+          "design-system-components-calendar-設計原則--color-semantic",
+          "design-system-components-calendar-設計原則--mvp-scope"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "carousel": {
+      "tiers": {
+        "展示": [
+          "design-system-components-carousel-展示--homepage-hero-banner",
+          "design-system-components-carousel-展示--product-image-gallery"
+        ],
+        "設計規格": [
+          "design-system-components-carousel-設計規格--overview",
+          "design-system-components-carousel-設計規格--inspector",
+          "design-system-components-carousel-設計規格--color-matrix",
+          "design-system-components-carousel-設計規格--size-matrix",
+          "design-system-components-carousel-設計規格--state-behavior",
+          "design-system-components-carousel-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-carousel-設計原則--usage-guidance",
+          "design-system-components-carousel-設計原則--arrow-hover-only",
+          "design-system-components-carousel-設計原則--item-count-limit"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "chart": {
+      "tiers": {
+        "展示": [
+          "design-system-components-chart-展示--bar-chart-revenue",
+          "design-system-components-chart-展示--line-chart-response-time",
+          "design-system-components-chart-展示--donut-chart-traffic-source",
+          "design-system-components-chart-展示--stacked-area-chart-expenses"
+        ],
+        "設計規格": [
+          "design-system-components-chart-設計規格--overview",
+          "design-system-components-chart-設計規格--inspector",
+          "design-system-components-chart-設計規格--category-tokens",
+          "design-system-components-chart-設計規格--color-matrix",
+          "design-system-components-chart-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-chart-設計原則--usage-guidance",
+          "design-system-components-chart-設計原則--chart-type-rule",
+          "design-system-components-chart-設計原則--category-token-rule",
+          "design-system-components-chart-設計原則--five-category-limit-rule",
+          "design-system-components-chart-設計原則--a-11-y-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "checkbox": {
+      "tiers": {
+        "展示": [
+          "design-system-components-checkbox-展示--modes",
+          "design-system-components-checkbox-展示--states",
+          "design-system-components-checkbox-展示--vertical-group",
+          "design-system-components-checkbox-展示--horizontal"
+        ],
+        "設計規格": [
+          "design-system-components-checkbox-設計規格--overview",
+          "design-system-components-checkbox-設計規格--inspector",
+          "design-system-components-checkbox-設計規格--color-matrix",
+          "design-system-components-checkbox-設計規格--size-matrix",
+          "design-system-components-checkbox-設計規格--state-behavior",
+          "design-system-components-checkbox-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-checkbox-設計原則--usage-guidance",
+          "design-system-components-checkbox-設計原則--clamp-policy-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "chip": {
+      "tiers": {
+        "展示": [
+          "design-system-components-chip-展示--default",
+          "design-system-components-chip-展示--states",
+          "design-system-components-chip-展示--with-badge",
+          "design-system-components-chip-展示--single-selection"
+        ],
+        "設計規格": [
+          "design-system-components-chip-設計規格--overview",
+          "design-system-components-chip-設計規格--inspector",
+          "design-system-components-chip-設計規格--color-matrix",
+          "design-system-components-chip-設計規格--selection-matrix",
+          "design-system-components-chip-設計規格--size-matrix",
+          "design-system-components-chip-設計規格--state-behavior",
+          "design-system-components-chip-設計規格--layout-matrix",
+          "design-system-components-chip-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-chip-設計原則--usage-guidance",
+          "design-system-components-chip-設計原則--layout-rule",
+          "design-system-components-chip-設計原則--selected-style-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "circularprogress": {
+      "tiers": {
+        "展示": [
+          "design-system-components-circularprogress-展示--default",
+          "design-system-components-circularprogress-展示--button-loading",
+          "design-system-components-circularprogress-展示--inline-action",
+          "design-system-components-circularprogress-展示--inline-cell-loading",
+          "design-system-components-circularprogress-展示--full-screen-overlay",
+          "design-system-components-circularprogress-展示--determinate"
+        ],
+        "設計規格": [
+          "design-system-components-circularprogress-設計規格--overview",
+          "design-system-components-circularprogress-設計規格--usage-in-button",
+          "design-system-components-circularprogress-設計規格--usage-inline",
+          "design-system-components-circularprogress-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-circularprogress-設計原則--usage-guidance",
+          "design-system-components-circularprogress-設計原則--indeterminate-vs-determinate-rule",
+          "design-system-components-circularprogress-設計原則--usage-scenario-rule",
+          "design-system-components-circularprogress-設計原則--size-match-context-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "coachmark": {
+      "tiers": {
+        "展示": [
+          "design-system-components-coachmark-展示--feature-discovery",
+          "design-system-components-coachmark-展示--multi-step-tour",
+          "design-system-components-coachmark-展示--tips-multi-step"
+        ],
+        "設計規格": [
+          "design-system-components-coachmark-設計規格--overview",
+          "design-system-components-coachmark-設計規格--inspector",
+          "design-system-components-coachmark-設計規格--color-matrix",
+          "design-system-components-coachmark-設計規格--size-matrix",
+          "design-system-components-coachmark-設計規格--state-behavior",
+          "design-system-components-coachmark-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-coachmark-設計原則--usage-guidance",
+          "design-system-components-coachmark-設計原則--multi-step-best-practices-rule",
+          "design-system-components-coachmark-設計原則--media-content-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "combobox": {
+      "tiers": {
+        "展示": [
+          "design-system-components-combobox-展示--modes",
+          "design-system-components-combobox-展示--size-alignment",
+          "design-system-components-combobox-展示--wrap-modes",
+          "design-system-components-combobox-展示--searchable",
+          "design-system-components-combobox-展示--in-data-table"
+        ],
+        "設計規格": [
+          "design-system-components-combobox-設計規格--overview",
+          "design-system-components-combobox-設計規格--inspector",
+          "design-system-components-combobox-設計規格--color-matrix",
+          "design-system-components-combobox-設計規格--size-matrix",
+          "design-system-components-combobox-設計規格--state-behavior",
+          "design-system-components-combobox-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-combobox-設計原則--usage-guidance",
+          "design-system-components-combobox-設計原則--wrap-rule",
+          "design-system-components-combobox-設計原則--tag-operation-rule",
+          "design-system-components-combobox-設計原則--overflow-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "command": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-command-展示--command-palette",
+          "design-system-internal-command-展示--inline-command",
+          "design-system-internal-command-展示--theme-switcher",
+          "design-system-internal-command-展示--empty-state"
+        ],
+        "設計規格": [
+          "design-system-internal-command-設計規格--overview",
+          "design-system-internal-command-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-command-設計原則--usage-guidance",
+          "design-system-internal-command-設計原則--composition-rules"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "datatable": {
+      "tiers": {
+        "展示": [
+          "design-system-components-datatable-展示--number-alignment",
+          "design-system-components-datatable-展示--column-resize",
+          "design-system-components-datatable-展示--column-reorder",
+          "design-system-components-datatable-展示--row-auto-height-inline-edit",
+          "design-system-components-datatable-展示--row-auto-height",
+          "design-system-components-datatable-展示--empty-state",
+          "design-system-components-datatable-展示--container-height",
+          "design-system-components-datatable-展示--row-actions",
+          "design-system-components-datatable-展示--pinned-columns",
+          "design-system-components-datatable-展示--inline-edit",
+          "design-system-components-datatable-展示--inline-edit-with-spreadsheet-overlay",
+          "design-system-components-datatable-展示--cell-errors",
+          "design-system-components-datatable-展示--cell-errors-fixed-row-override",
+          "design-system-components-datatable-展示--nested-rows",
+          "design-system-components-datatable-展示--nested-rows-with-drag",
+          "design-system-components-datatable-展示--virtual-scroll",
+          "design-system-components-datatable-展示--with-bulk-actions",
+          "design-system-components-datatable-展示--selection-keyboard-and-shift",
+          "design-system-components-datatable-展示--selection-single-mode",
+          "design-system-components-datatable-展示--selection-disabled-rows",
+          "design-system-components-datatable-展示--filter-panel-empty",
+          "design-system-components-datatable-展示--filter-panel-with-conditions",
+          "design-system-components-datatable-展示--filter-panel-nested",
+          "design-system-components-datatable-展示--filter-panel-relative-date",
+          "design-system-components-datatable-展示--filter-panel-modified",
+          "design-system-components-datatable-展示--filter-panel-long-tag-overflow",
+          "design-system-components-datatable-展示--row-drag-interactive",
+          "design-system-components-datatable-展示--row-drag-with-virtualization",
+          "design-system-components-datatable-展示--roadmap-all-in-one"
+        ],
+        "設計規格": [
+          "design-system-components-datatable-設計規格--overview",
+          "design-system-components-datatable-設計規格--inspector",
+          "design-system-components-datatable-設計規格--column-types",
+          "design-system-components-datatable-設計規格--row-height-matrix",
+          "design-system-components-datatable-設計規格--alignment-rule",
+          "design-system-components-datatable-設計規格--features",
+          "design-system-components-datatable-設計規格--color-matrix",
+          "design-system-components-datatable-設計規格--empty-state",
+          "design-system-components-datatable-設計規格--bordered-prop",
+          "design-system-components-datatable-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-datatable-設計原則--usage-guidance",
+          "design-system-components-datatable-設計原則--column-type-rule",
+          "design-system-components-datatable-設計原則--virtual-scroll-rule",
+          "design-system-components-datatable-設計原則--empty-state-rule",
+          "design-system-components-datatable-設計原則--not-spreadsheet-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "dategrid": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-dategrid-展示--single",
+          "design-system-internal-dategrid-展示--multiple",
+          "design-system-internal-dategrid-展示--range",
+          "design-system-internal-dategrid-展示--inline"
+        ],
+        "設計規格": [
+          "design-system-internal-dategrid-設計規格--overview",
+          "design-system-internal-dategrid-設計規格--inspector",
+          "design-system-internal-dategrid-設計規格--color-matrix",
+          "design-system-internal-dategrid-設計規格--size-matrix",
+          "design-system-internal-dategrid-設計規格--state-behavior",
+          "design-system-internal-dategrid-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-dategrid-設計原則--usage-guidance",
+          "design-system-internal-dategrid-設計原則--mode-rule",
+          "design-system-internal-dategrid-設計原則--visual-token-rule",
+          "design-system-internal-dategrid-設計原則--locale-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "datepicker": {
+      "tiers": {
+        "展示": [
+          "design-system-components-datepicker-展示--default",
+          "design-system-components-datepicker-展示--typed-input",
+          "design-system-components-datepicker-展示--modes",
+          "design-system-components-datepicker-展示--clearable",
+          "design-system-components-datepicker-展示--size-alignment",
+          "design-system-components-datepicker-展示--range-picker",
+          "design-system-components-datepicker-展示--with-error",
+          "design-system-components-datepicker-展示--show-time",
+          "design-system-components-datepicker-展示--range-popover-open",
+          "design-system-components-datepicker-展示--show-time-popover-open",
+          "design-system-components-datepicker-展示--show-time-range-popover-open",
+          "design-system-components-datepicker-展示--range-middle-hover-state",
+          "design-system-components-datepicker-展示--show-time-range",
+          "design-system-components-datepicker-展示--display"
+        ],
+        "設計規格": [
+          "design-system-components-datepicker-設計規格--overview",
+          "design-system-components-datepicker-設計規格--inspector",
+          "design-system-components-datepicker-設計規格--color-matrix",
+          "design-system-components-datepicker-設計規格--size-matrix",
+          "design-system-components-datepicker-設計規格--state-behavior",
+          "design-system-components-datepicker-設計規格--calendar-tokens",
+          "design-system-components-datepicker-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-datepicker-設計原則--usage-guidance",
+          "design-system-components-datepicker-設計原則--calendar-rule",
+          "design-system-components-datepicker-設計原則--formatting-rule",
+          "design-system-components-datepicker-設計原則--clearable-rule"
+        ]
+      },
+      "openSnapshotIds": [
+        "design-system-components-datepicker-展示--range-popover-open",
+        "design-system-components-datepicker-展示--show-time-popover-open",
+        "design-system-components-datepicker-展示--show-time-range-popover-open"
+      ],
+      "exception": null
+    },
+    "descriptionlist": {
+      "tiers": {
+        "展示": [
+          "design-system-components-descriptionlist-展示--user-profile",
+          "design-system-components-descriptionlist-展示--product-spec",
+          "design-system-components-descriptionlist-展示--order-summary",
+          "design-system-components-descriptionlist-展示--detail-panel",
+          "design-system-components-descriptionlist-展示--horizontal",
+          "design-system-components-descriptionlist-展示--retired-horizontal-divided"
+        ],
+        "設計規格": [
+          "design-system-components-descriptionlist-設計規格--overview",
+          "design-system-components-descriptionlist-設計規格--inspector",
+          "design-system-components-descriptionlist-設計規格--cols-matrix",
+          "design-system-components-descriptionlist-設計規格--state-behavior",
+          "design-system-components-descriptionlist-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-descriptionlist-設計原則--usage-guidance",
+          "design-system-components-descriptionlist-設計原則--layout-rule",
+          "design-system-components-descriptionlist-設計原則--label-alignment-rule",
+          "design-system-components-descriptionlist-設計原則--no-interaction-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "dialog": {
+      "tiers": {
+        "展示": [
+          "design-system-components-dialog-展示--default",
+          "design-system-components-dialog-展示--with-form",
+          "design-system-components-dialog-展示--long-content",
+          "design-system-components-dialog-展示--destructive",
+          "design-system-components-dialog-展示--list-body",
+          "design-system-components-dialog-展示--with-tabs-in-header",
+          "design-system-components-dialog-展示--open-snapshot"
+        ],
+        "設計規格": [
+          "design-system-components-dialog-設計規格--overview",
+          "design-system-components-dialog-設計規格--inspector",
+          "design-system-components-dialog-設計規格--height-behavior",
+          "design-system-components-dialog-設計規格--destructive-matrix",
+          "design-system-components-dialog-設計規格--size-matrix",
+          "design-system-components-dialog-設計規格--state-behavior",
+          "design-system-components-dialog-設計規格--color-matrix",
+          "design-system-components-dialog-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-dialog-設計原則--usage-guidance",
+          "design-system-components-dialog-設計原則--height-behavior-rule",
+          "design-system-components-dialog-設計原則--footer-action-rule"
+        ]
+      },
+      "openSnapshotIds": [
+        "design-system-components-dialog-展示--open-snapshot"
+      ],
+      "exception": null
+    },
+    "dropdownmenu": {
+      "tiers": {
+        "展示": [
+          "design-system-components-dropdownmenu-展示--default",
+          "design-system-components-dropdownmenu-展示--groups",
+          "design-system-components-dropdownmenu-展示--with-suffix",
+          "design-system-components-dropdownmenu-展示--sub-menu",
+          "design-system-components-dropdownmenu-展示--checkbox-items",
+          "design-system-components-dropdownmenu-展示--radio-items",
+          "design-system-components-dropdownmenu-展示--open-snapshot",
+          "design-system-components-dropdownmenu-展示--item-hover"
+        ],
+        "設計規格": [
+          "design-system-components-dropdownmenu-設計規格--overview",
+          "design-system-components-dropdownmenu-設計規格--inspector",
+          "design-system-components-dropdownmenu-設計規格--color-matrix",
+          "design-system-components-dropdownmenu-設計規格--size-matrix",
+          "design-system-components-dropdownmenu-設計規格--state-behavior",
+          "design-system-components-dropdownmenu-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-dropdownmenu-設計原則--usage-guidance",
+          "design-system-components-dropdownmenu-設計原則--item-type-rule",
+          "design-system-components-dropdownmenu-設計原則--destructive-rule",
+          "design-system-components-dropdownmenu-設計原則--suffix-rule"
+        ]
+      },
+      "openSnapshotIds": [
+        "design-system-components-dropdownmenu-展示--open-snapshot"
+      ],
+      "exception": null
+    },
+    "empty": {
+      "tiers": {
+        "展示": [
+          "design-system-components-empty-展示--search-no-results",
+          "design-system-components-empty-展示--no-tasks",
+          "design-system-components-empty-展示--load-failure",
+          "design-system-components-empty-展示--no-permission"
+        ],
+        "設計規格": [
+          "design-system-components-empty-設計規格--overview",
+          "design-system-components-empty-設計規格--inspector",
+          "design-system-components-empty-設計規格--scenario-matrix",
+          "design-system-components-empty-設計規格--slot-combinations",
+          "design-system-components-empty-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-empty-設計原則--usage-guidance",
+          "design-system-components-empty-設計原則--next-action-rule",
+          "design-system-components-empty-設計原則--structure-rule",
+          "design-system-components-empty-設計原則--copy-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "field": {
+      "tiers": {
+        "展示": [
+          "design-system-components-field-展示--vertical",
+          "design-system-components-field-展示--horizontal",
+          "design-system-components-field-展示--horizontal-label-alignment",
+          "design-system-components-field-展示--mixed-control-alignment",
+          "design-system-components-field-展示--segmented-control-in-field",
+          "design-system-components-field-展示--block-control-radio-group",
+          "design-system-components-field-展示--button-as-control",
+          "design-system-components-field-展示--label-width",
+          "design-system-components-field-展示--with-slider",
+          "design-system-components-field-展示--slider-aligns-with-other-fields",
+          "design-system-components-field-展示--slider-with-live-number-input"
+        ],
+        "設計規格": [
+          "design-system-components-field-設計規格--overview",
+          "design-system-components-field-設計規格--inspector",
+          "design-system-components-field-設計規格--orientation-matrix",
+          "design-system-components-field-設計規格--size-matrix",
+          "design-system-components-field-設計規格--state-behavior",
+          "design-system-components-field-設計規格--color-matrix",
+          "design-system-components-field-設計規格--field-group-behavior",
+          "design-system-components-field-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-field-設計原則--usage-guidance",
+          "design-system-components-field-設計原則--responsibility-rule",
+          "design-system-components-field-設計原則--orientation-rule",
+          "design-system-components-field-設計原則--not-for-form-actions-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "fieldcontrolgroup": {
+      "tiers": {
+        "展示": [
+          "design-system-components-fieldcontrolgroup-展示--phone-number-input",
+          "design-system-components-fieldcontrolgroup-展示--currency-amount",
+          "design-system-components-fieldcontrolgroup-展示--search-submit",
+          "design-system-components-fieldcontrolgroup-展示--filter-row-real-usage"
+        ],
+        "設計規格": [
+          "design-system-components-fieldcontrolgroup-設計規格--overview",
+          "design-system-components-fieldcontrolgroup-設計規格--size-matrix",
+          "design-system-components-fieldcontrolgroup-設計規格--state-behavior",
+          "design-system-components-fieldcontrolgroup-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-fieldcontrolgroup-設計原則--usage-guidance"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "fileitem": {
+      "tiers": {
+        "展示": [
+          "design-system-components-fileitem-展示--rich",
+          "design-system-components-fileitem-展示--compact",
+          "design-system-components-fileitem-展示--hover-swap",
+          "design-system-components-fileitem-展示--clickable",
+          "design-system-components-fileitem-展示--compact-mixed"
+        ],
+        "設計規格": [
+          "design-system-components-fileitem-設計規格--overview",
+          "design-system-components-fileitem-設計規格--inspector",
+          "design-system-components-fileitem-設計規格--color-matrix",
+          "design-system-components-fileitem-設計規格--mode-matrix",
+          "design-system-components-fileitem-設計規格--size-matrix",
+          "design-system-components-fileitem-設計規格--state-behavior",
+          "design-system-components-fileitem-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-fileitem-設計原則--usage-guidance",
+          "design-system-components-fileitem-設計原則--mode-rule",
+          "design-system-components-fileitem-設計原則--status-progress-rule",
+          "design-system-components-fileitem-設計原則--actions-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "fileupload": {
+      "tiers": {
+        "展示": [
+          "design-system-components-fileupload-展示--resume-upload",
+          "design-system-components-fileupload-展示--bulk-image-upload",
+          "design-system-components-fileupload-展示--with-file-list",
+          "design-system-components-fileupload-展示--custom-children"
+        ],
+        "設計規格": [
+          "design-system-components-fileupload-設計規格--overview",
+          "design-system-components-fileupload-設計規格--inspector",
+          "design-system-components-fileupload-設計規格--color-matrix",
+          "design-system-components-fileupload-設計規格--size-matrix",
+          "design-system-components-fileupload-設計規格--state-behavior",
+          "design-system-components-fileupload-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-fileupload-設計原則--usage-guidance",
+          "design-system-components-fileupload-設計原則--multiple-rule",
+          "design-system-components-fileupload-設計原則--division-of-labor-rule",
+          "design-system-components-fileupload-設計原則--error-feedback-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "fileviewer": {
+      "tiers": {
+        "展示": [
+          "design-system-components-fileviewer-展示--jira-attachments",
+          "design-system-components-fileviewer-展示--notion-gallery",
+          "design-system-components-fileviewer-展示--figma-design-review",
+          "design-system-components-fileviewer-展示--gmail-attachment-preview",
+          "design-system-components-fileviewer-展示--event-photos-collection",
+          "design-system-components-fileviewer-展示--fallback-unknown-type",
+          "design-system-components-fileviewer-展示--open-snapshot"
+        ],
+        "設計規格": [
+          "design-system-components-fileviewer-設計規格--overview",
+          "design-system-components-fileviewer-設計規格--inspector",
+          "design-system-components-fileviewer-設計規格--color-matrix",
+          "design-system-components-fileviewer-設計規格--size-matrix",
+          "design-system-components-fileviewer-設計規格--state-behavior",
+          "design-system-components-fileviewer-設計規格--renderer-registry",
+          "design-system-components-fileviewer-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-fileviewer-設計原則--usage-guidance",
+          "design-system-components-fileviewer-設計原則--info-panel-default-rule",
+          "design-system-components-fileviewer-設計原則--close-button-position-rule",
+          "design-system-components-fileviewer-設計原則--filmstrip-rule",
+          "design-system-components-fileviewer-設計原則--read-only-rule",
+          "design-system-components-fileviewer-設計原則--no-nested-overlay-rule",
+          "design-system-components-fileviewer-設計原則--dark-mode-locked-rule",
+          "design-system-components-fileviewer-設計原則--keyboard-shortcut-rule"
+        ]
+      },
+      "openSnapshotIds": [
+        "design-system-components-fileviewer-展示--open-snapshot"
+      ],
+      "exception": null
+    },
+    "hovercard": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-hovercard-展示--person-name-card",
+          "design-system-internal-hovercard-展示--link-preview",
+          "design-system-internal-hovercard-展示--overflow-list",
+          "design-system-internal-hovercard-展示--repo-card",
+          "design-system-internal-hovercard-展示--trigger-showcase"
+        ],
+        "設計規格": [
+          "design-system-internal-hovercard-設計規格--overview",
+          "design-system-internal-hovercard-設計規格--visual-variants",
+          "design-system-internal-hovercard-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-hovercard-設計原則--usage-guidance",
+          "design-system-internal-hovercard-設計原則--pure-behavior-primitive-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "input": {
+      "tiers": {
+        "展示": [
+          "design-system-components-input-展示--modes",
+          "design-system-components-input-展示--size-alignment",
+          "design-system-components-input-展示--end-action",
+          "design-system-components-input-展示--error-state"
+        ],
+        "設計規格": [
+          "design-system-components-input-設計規格--overview",
+          "design-system-components-input-設計規格--inspector",
+          "design-system-components-input-設計規格--color-matrix",
+          "design-system-components-input-設計規格--size-matrix",
+          "design-system-components-input-設計規格--state-behavior",
+          "design-system-components-input-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-input-設計原則--usage-guidance",
+          "design-system-components-input-設計原則--mode-rule",
+          "design-system-components-input-設計原則--start-icon-rule",
+          "design-system-components-input-設計原則--end-action-rule",
+          "design-system-components-input-設計原則--error-rule",
+          "design-system-components-input-設計原則--data-type-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "linkinput": {
+      "tiers": {
+        "展示": [
+          "design-system-components-linkinput-展示--default",
+          "design-system-components-linkinput-展示--empty",
+          "design-system-components-linkinput-展示--validation",
+          "design-system-components-linkinput-展示--size-alignment",
+          "design-system-components-linkinput-展示--modes",
+          "design-system-components-linkinput-展示--display"
+        ],
+        "設計規格": [
+          "design-system-components-linkinput-設計規格--overview",
+          "design-system-components-linkinput-設計規格--inspector",
+          "design-system-components-linkinput-設計規格--color-matrix",
+          "design-system-components-linkinput-設計規格--size-matrix",
+          "design-system-components-linkinput-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-linkinput-設計原則--usage-guidance",
+          "design-system-components-linkinput-設計原則--display-state-rule",
+          "design-system-components-linkinput-設計原則--validation-rule",
+          "design-system-components-linkinput-設計原則--empty-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "menu": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-menu-展示--default",
+          "design-system-internal-menu-展示--with-description",
+          "design-system-internal-menu-展示--avatar-inline",
+          "design-system-internal-menu-展示--avatar-block",
+          "design-system-internal-menu-展示--states",
+          "design-system-internal-menu-展示--multi-select",
+          "design-system-internal-menu-展示--groups",
+          "design-system-internal-menu-展示--creatable",
+          "design-system-internal-menu-展示--full-example"
+        ],
+        "設計規格": [
+          "design-system-internal-menu-設計規格--overview",
+          "design-system-internal-menu-設計規格--inspector",
+          "design-system-internal-menu-設計規格--color-matrix",
+          "design-system-internal-menu-設計規格--size-matrix",
+          "design-system-internal-menu-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-menu-設計原則--usage-guidance",
+          "design-system-internal-menu-設計原則--composition-rules"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "namecard": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-namecard-展示--default"
+        ],
+        "設計規格": [
+          "design-system-internal-namecard-設計規格--overview",
+          "design-system-internal-namecard-設計規格--inspector",
+          "design-system-internal-namecard-設計規格--section-matrix",
+          "design-system-internal-namecard-設計規格--color-matrix",
+          "design-system-internal-namecard-設計規格--hover-card-integration",
+          "design-system-internal-namecard-設計規格--state-behavior",
+          "design-system-internal-namecard-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-namecard-設計原則--usage-guidance",
+          "design-system-internal-namecard-設計原則--trigger-context-rule",
+          "design-system-internal-namecard-設計原則--fixed-width-rule",
+          "design-system-internal-namecard-設計原則--section-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "notice": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-notice-展示--deployment-success",
+          "design-system-internal-notice-展示--billing-failed",
+          "design-system-internal-notice-展示--inline-variants",
+          "design-system-internal-notice-展示--toast-like-solid",
+          "design-system-internal-notice-展示--neutral-title-only"
+        ],
+        "設計規格": [
+          "design-system-internal-notice-設計規格--overview",
+          "design-system-internal-notice-設計規格--inspector",
+          "design-system-internal-notice-設計規格--variant-icon-map",
+          "design-system-internal-notice-設計規格--state-behavior",
+          "design-system-internal-notice-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-notice-設計原則--usage-guidance",
+          "design-system-internal-notice-設計原則--composition-rules"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "numberinput": {
+      "tiers": {
+        "展示": [
+          "design-system-components-numberinput-展示--modes",
+          "design-system-components-numberinput-展示--size-alignment",
+          "design-system-components-numberinput-展示--format-options",
+          "design-system-components-numberinput-展示--in-data-table"
+        ],
+        "設計規格": [
+          "design-system-components-numberinput-設計規格--overview",
+          "design-system-components-numberinput-設計規格--inspector",
+          "design-system-components-numberinput-設計規格--color-matrix",
+          "design-system-components-numberinput-設計規格--size-matrix",
+          "design-system-components-numberinput-設計規格--state-behavior",
+          "design-system-components-numberinput-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-numberinput-設計原則--usage-guidance",
+          "design-system-components-numberinput-設計原則--alignment-rule",
+          "design-system-components-numberinput-設計原則--format-options-rule",
+          "design-system-components-numberinput-設計原則--data-type-match-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "overflowindicator": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-overflowindicator-展示--combobox-tag-overflow",
+          "design-system-internal-overflowindicator-展示--avatar-stack-overflow",
+          "design-system-internal-overflowindicator-展示--shapes",
+          "design-system-internal-overflowindicator-展示--breadcrumb-collapse",
+          "design-system-internal-overflowindicator-展示--table-row-assignees"
+        ],
+        "設計規格": [
+          "design-system-internal-overflowindicator-設計規格--overview",
+          "design-system-internal-overflowindicator-設計規格--inspector",
+          "design-system-internal-overflowindicator-設計規格--shape-matrix",
+          "design-system-internal-overflowindicator-設計規格--size-matrix",
+          "design-system-internal-overflowindicator-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-overflowindicator-設計原則--usage-guidance",
+          "design-system-internal-overflowindicator-設計原則--composition-rules"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "peoplepicker": {
+      "tiers": {
+        "展示": [
+          "design-system-components-peoplepicker-展示--single",
+          "design-system-components-peoplepicker-展示--multi",
+          "design-system-components-peoplepicker-展示--size-alignment",
+          "design-system-components-peoplepicker-展示--race-test"
+        ],
+        "設計規格": [
+          "design-system-components-peoplepicker-設計規格--overview",
+          "design-system-components-peoplepicker-設計規格--inspector",
+          "design-system-components-peoplepicker-設計規格--mode-matrix",
+          "design-system-components-peoplepicker-設計規格--size-matrix",
+          "design-system-components-peoplepicker-設計規格--color-matrix",
+          "design-system-components-peoplepicker-設計規格--state-behavior",
+          "design-system-components-peoplepicker-設計規格--person-value-type",
+          "design-system-components-peoplepicker-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-peoplepicker-設計原則--usage-guidance",
+          "design-system-components-peoplepicker-設計原則--single-vs-multi-rule",
+          "design-system-components-peoplepicker-設計原則--empty-state-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "popover": {
+      "tiers": {
+        "展示": [
+          "design-system-components-popover-展示--filter-panel",
+          "design-system-components-popover-展示--open-snapshot"
+        ],
+        "設計規格": [
+          "design-system-components-popover-設計規格--overview",
+          "design-system-components-popover-設計規格--inspector",
+          "design-system-components-popover-設計規格--placement-matrix",
+          "design-system-components-popover-設計規格--color-matrix",
+          "design-system-components-popover-設計規格--size-matrix",
+          "design-system-components-popover-設計規格--state-behavior",
+          "design-system-components-popover-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-popover-設計原則--usage-guidance",
+          "design-system-components-popover-設計原則--visual-alignment-rule"
+        ]
+      },
+      "openSnapshotIds": [
+        "design-system-components-popover-展示--open-snapshot"
+      ],
+      "exception": null
+    },
+    "progressbar": {
+      "tiers": {
+        "展示": [
+          "design-system-components-progressbar-展示--default",
+          "design-system-components-progressbar-展示--batch-task",
+          "design-system-components-progressbar-展示--inline-table-cell"
+        ],
+        "設計規格": [
+          "design-system-components-progressbar-設計規格--overview",
+          "design-system-components-progressbar-設計規格--inspector",
+          "design-system-components-progressbar-設計規格--color-matrix",
+          "design-system-components-progressbar-設計規格--affix-behavior",
+          "design-system-components-progressbar-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-progressbar-設計原則--usage-guidance",
+          "design-system-components-progressbar-設計原則--status-rule",
+          "design-system-components-progressbar-設計原則--affix-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "radiogroup": {
+      "tiers": {
+        "展示": [
+          "design-system-components-radiogroup-展示--modes",
+          "design-system-components-radiogroup-展示--vertical-group",
+          "design-system-components-radiogroup-展示--horizontal",
+          "design-system-components-radiogroup-展示--disabled"
+        ],
+        "設計規格": [
+          "design-system-components-radiogroup-設計規格--overview",
+          "design-system-components-radiogroup-設計規格--inspector",
+          "design-system-components-radiogroup-設計規格--color-matrix",
+          "design-system-components-radiogroup-設計規格--size-matrix",
+          "design-system-components-radiogroup-設計規格--state-behavior",
+          "design-system-components-radiogroup-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-radiogroup-設計原則--usage-guidance",
+          "design-system-components-radiogroup-設計原則--decision-node-rule",
+          "design-system-components-radiogroup-設計原則--must-be-in-group-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "rating": {
+      "tiers": {
+        "展示": [
+          "design-system-components-rating-展示--read-only-product-rating",
+          "design-system-components-rating-展示--interactive-review",
+          "design-system-components-rating-展示--in-field",
+          "design-system-components-rating-展示--disabled"
+        ],
+        "設計規格": [
+          "design-system-components-rating-設計規格--overview",
+          "design-system-components-rating-設計規格--inspector",
+          "design-system-components-rating-設計規格--color-matrix",
+          "design-system-components-rating-設計規格--size-matrix",
+          "design-system-components-rating-設計規格--state-behavior",
+          "design-system-components-rating-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-rating-設計原則--usage-guidance",
+          "design-system-components-rating-設計原則--precision-choice",
+          "design-system-components-rating-設計原則--yellow-star-convention"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "scrollarea": {
+      "tiers": {
+        "展示": [
+          "design-system-components-scrollarea-展示--vertical-issue-list",
+          "design-system-components-scrollarea-展示--sidebar-nav",
+          "design-system-components-scrollarea-展示--horizontal-product-table",
+          "design-system-components-scrollarea-展示--both-directions"
+        ],
+        "設計規格": [
+          "design-system-components-scrollarea-設計規格--overview",
+          "design-system-components-scrollarea-設計規格--inspector",
+          "design-system-components-scrollarea-設計規格--color-matrix",
+          "design-system-components-scrollarea-設計規格--size-matrix",
+          "design-system-components-scrollarea-設計規格--orientation-behavior",
+          "design-system-components-scrollarea-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-scrollarea-設計原則--usage-guidance",
+          "design-system-components-scrollarea-設計原則--orientation-choice",
+          "design-system-components-scrollarea-設計原則--solves-data-table-bug",
+          "design-system-components-scrollarea-設計原則--out-of-scope-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "segmentedcontrol": {
+      "tiers": {
+        "展示": [
+          "design-system-components-segmentedcontrol-展示--view-switcher"
+        ],
+        "設計規格": [
+          "design-system-components-segmentedcontrol-設計規格--overview",
+          "design-system-components-segmentedcontrol-設計規格--inspector",
+          "design-system-components-segmentedcontrol-設計規格--size-matrix",
+          "design-system-components-segmentedcontrol-設計規格--state-behavior",
+          "design-system-components-segmentedcontrol-設計規格--full-width-matrix",
+          "design-system-components-segmentedcontrol-設計規格--icon-only-matrix",
+          "design-system-components-segmentedcontrol-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-segmentedcontrol-設計原則--usage-guidance",
+          "design-system-components-segmentedcontrol-設計原則--size-limits",
+          "design-system-components-segmentedcontrol-設計原則--icon-only-rule",
+          "design-system-components-segmentedcontrol-設計原則--full-width-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "select": {
+      "tiers": {
+        "展示": [
+          "design-system-components-select-展示--modes",
+          "design-system-components-select-展示--display-mode",
+          "design-system-components-select-展示--size-alignment",
+          "design-system-components-select-展示--clearable",
+          "design-system-components-select-展示--searchable",
+          "design-system-components-select-展示--in-data-table"
+        ],
+        "設計規格": [
+          "design-system-components-select-設計規格--overview",
+          "design-system-components-select-設計規格--inspector",
+          "design-system-components-select-設計規格--color-matrix",
+          "design-system-components-select-設計規格--size-matrix",
+          "design-system-components-select-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-select-設計原則--usage-guidance",
+          "design-system-components-select-設計原則--display-mode-rule",
+          "design-system-components-select-設計原則--immediate-vs-submit-rule",
+          "design-system-components-select-設計原則--searchable-rule",
+          "design-system-components-select-設計原則--native-select-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "selectmenu": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-selectmenu-展示--single-select",
+          "design-system-internal-selectmenu-展示--searchable",
+          "design-system-internal-selectmenu-展示--multi-select",
+          "design-system-internal-selectmenu-展示--multi-searchable",
+          "design-system-internal-selectmenu-展示--clearable",
+          "design-system-internal-selectmenu-展示--states"
+        ],
+        "設計規格": [
+          "design-system-internal-selectmenu-設計規格--overview",
+          "design-system-internal-selectmenu-設計規格--inspector",
+          "design-system-internal-selectmenu-設計規格--mode-matrix",
+          "design-system-internal-selectmenu-設計規格--size-matrix",
+          "design-system-internal-selectmenu-設計規格--state-behavior",
+          "design-system-internal-selectmenu-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-selectmenu-設計原則--usage-guidance",
+          "design-system-internal-selectmenu-設計原則--composition-rules"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "selectioncontrol": {
+      "tiers": {
+        "展示": [
+          "design-system-internal-selectioncontrol-展示--notification-preferences",
+          "design-system-internal-selectioncontrol-展示--plan-picker",
+          "design-system-internal-selectioncontrol-展示--with-prefix-icon",
+          "design-system-internal-selectioncontrol-展示--with-prefix-avatar-block"
+        ],
+        "設計規格": [
+          "design-system-internal-selectioncontrol-設計規格--overview",
+          "design-system-internal-selectioncontrol-設計規格--inspector",
+          "design-system-internal-selectioncontrol-設計規格--prefix-alignment",
+          "design-system-internal-selectioncontrol-設計規格--size-matrix",
+          "design-system-internal-selectioncontrol-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-internal-selectioncontrol-設計原則--usage-guidance",
+          "design-system-internal-selectioncontrol-設計原則--composition-rules"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "separator": {
+      "tiers": {
+        "展示": [
+          "design-system-components-separator-展示--horizontal",
+          "design-system-components-separator-展示--vertical",
+          "design-system-components-separator-展示--in-dropdown-menu",
+          "design-system-components-separator-展示--between-sections"
+        ],
+        "設計規格": [
+          "design-system-components-separator-設計規格--overview",
+          "design-system-components-separator-設計規格--token-matrix",
+          "design-system-components-separator-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-separator-設計原則--usage-guidance",
+          "design-system-components-separator-設計原則--who-decides-rule",
+          "design-system-components-separator-設計原則--decorative-semantic-rule",
+          "design-system-components-separator-設計原則--not-as-border-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "sheet": {
+      "tiers": {
+        "展示": [
+          "design-system-components-sheet-展示--create-project-right",
+          "design-system-components-sheet-展示--edit-user-right",
+          "design-system-components-sheet-展示--open-snapshot"
+        ],
+        "設計規格": [
+          "design-system-components-sheet-設計規格--overview",
+          "design-system-components-sheet-設計規格--inspector",
+          "design-system-components-sheet-設計規格--side-matrix",
+          "design-system-components-sheet-設計規格--color-matrix",
+          "design-system-components-sheet-設計規格--size-matrix",
+          "design-system-components-sheet-設計規格--state-behavior",
+          "design-system-components-sheet-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-sheet-設計原則--usage-guidance",
+          "design-system-components-sheet-設計原則--side-prop-rule",
+          "design-system-components-sheet-設計原則--header-footer-structure-rule"
+        ]
+      },
+      "openSnapshotIds": [
+        "design-system-components-sheet-展示--open-snapshot"
+      ],
+      "exception": null
+    },
+    "sidebar": {
+      "tiers": {
+        "展示": [
+          "design-system-components-sidebar-展示--icon-collapse",
+          "design-system-components-sidebar-展示--mixed-content",
+          "design-system-components-sidebar-展示--offcanvas",
+          "design-system-components-sidebar-展示--integration-sidebar"
+        ],
+        "設計規格": [
+          "design-system-components-sidebar-設計規格--overview",
+          "design-system-components-sidebar-設計規格--inspector",
+          "design-system-components-sidebar-設計規格--size-matrix",
+          "design-system-components-sidebar-設計規格--color-matrix",
+          "design-system-components-sidebar-設計規格--variant-matrix",
+          "design-system-components-sidebar-設計規格--state-behavior",
+          "design-system-components-sidebar-設計規格--chrome-tokens",
+          "design-system-components-sidebar-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-sidebar-設計原則--usage-guidance",
+          "design-system-components-sidebar-設計原則--content-type-choice",
+          "design-system-components-sidebar-設計原則--group-header-rules",
+          "design-system-components-sidebar-設計原則--settings-scenario",
+          "design-system-components-sidebar-設計原則--icon-mode-rules",
+          "design-system-components-sidebar-設計原則--active-state"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "skeleton": {
+      "tiers": {
+        "展示": [
+          "design-system-components-skeleton-展示--default",
+          "design-system-components-skeleton-展示--user-profile-card",
+          "design-system-components-skeleton-展示--task-list-loading",
+          "design-system-components-skeleton-展示--table-row-loading",
+          "design-system-components-skeleton-展示--document-loading",
+          "design-system-components-skeleton-展示--card-grid-loading"
+        ],
+        "設計規格": [
+          "design-system-components-skeleton-設計規格--overview",
+          "design-system-components-skeleton-設計規格--common-shapes",
+          "design-system-components-skeleton-設計規格--design-principle",
+          "design-system-components-skeleton-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-skeleton-設計原則--usage-guidance",
+          "design-system-components-skeleton-設計原則--shape-match-rule",
+          "design-system-components-skeleton-設計原則--duration-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "slider": {
+      "tiers": {
+        "展示": [
+          "design-system-components-slider-展示--size-alignment",
+          "design-system-components-slider-展示--min-max-step",
+          "design-system-components-slider-展示--disabled-removed",
+          "design-system-components-slider-展示--on-commit"
+        ],
+        "設計規格": [
+          "design-system-components-slider-設計規格--overview",
+          "design-system-components-slider-設計規格--inspector",
+          "design-system-components-slider-設計規格--color-matrix",
+          "design-system-components-slider-設計規格--size-matrix",
+          "design-system-components-slider-設計規格--state-behavior",
+          "design-system-components-slider-設計規格--color-binding-rule",
+          "design-system-components-slider-設計規格--keyboard-matrix",
+          "design-system-components-slider-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-slider-設計原則--usage-guidance",
+          "design-system-components-slider-設計原則--position-as-state-rule",
+          "design-system-components-slider-設計原則--hover-uses-shadow-rule",
+          "design-system-components-slider-設計原則--thumb-binding-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "steps": {
+      "tiers": {
+        "展示": [
+          "design-system-components-steps-展示--default",
+          "design-system-components-steps-展示--focus-ring-combinations",
+          "design-system-components-steps-展示--non-linear",
+          "design-system-components-steps-展示--horizontal",
+          "design-system-components-steps-展示--multiple-expansion",
+          "design-system-components-steps-展示--mixed-description"
+        ],
+        "設計規格": [
+          "design-system-components-steps-設計規格--overview",
+          "design-system-components-steps-設計規格--inspector",
+          "design-system-components-steps-設計規格--orientation-matrix",
+          "design-system-components-steps-設計規格--color-matrix",
+          "design-system-components-steps-設計規格--size-matrix",
+          "design-system-components-steps-設計規格--state-behavior",
+          "design-system-components-steps-設計規格--indent-alignment",
+          "design-system-components-steps-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-steps-設計原則--usage-guidance",
+          "design-system-components-steps-設計原則--parent-controlled",
+          "design-system-components-steps-設計原則--ring-is-focus-marker",
+          "design-system-components-steps-設計原則--blue-connector-logic",
+          "design-system-components-steps-設計原則--column-rhythm",
+          "design-system-components-steps-設計原則--linear-back-click-does-not-mutate"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "switch": {
+      "tiers": {
+        "展示": [
+          "design-system-components-switch-展示--modes",
+          "design-system-components-switch-展示--states",
+          "design-system-components-switch-展示--with-label"
+        ],
+        "設計規格": [
+          "design-system-components-switch-設計規格--overview",
+          "design-system-components-switch-設計規格--inspector",
+          "design-system-components-switch-設計規格--size-matrix",
+          "design-system-components-switch-設計規格--state-behavior",
+          "design-system-components-switch-設計規格--label-integration",
+          "design-system-components-switch-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-switch-設計原則--usage-guidance",
+          "design-system-components-switch-設計原則--disabled-opacity-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "tabs": {
+      "tiers": {
+        "展示": [
+          "design-system-components-tabs-展示--default",
+          "design-system-components-tabs-展示--with-suffix",
+          "design-system-components-tabs-展示--all-with-start-icon",
+          "design-system-components-tabs-展示--overflow-scroll",
+          "design-system-components-tabs-展示--overflow-menu",
+          "design-system-components-tabs-展示--disabled"
+        ],
+        "設計規格": [
+          "design-system-components-tabs-設計規格--overview",
+          "design-system-components-tabs-設計規格--inspector",
+          "design-system-components-tabs-設計規格--size-matrix",
+          "design-system-components-tabs-設計規格--color-matrix",
+          "design-system-components-tabs-設計規格--state-behavior",
+          "design-system-components-tabs-設計規格--overflow-matrix",
+          "design-system-components-tabs-設計規格--spacing-tokens",
+          "design-system-components-tabs-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-tabs-設計原則--usage-guidance",
+          "design-system-components-tabs-設計原則--size-selection",
+          "design-system-components-tabs-設計原則--trigger-slots"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "tag": {
+      "tiers": {
+        "展示": [
+          "design-system-components-tag-展示--with-avatar",
+          "design-system-components-tag-展示--dismissable",
+          "design-system-components-tag-展示--truncation"
+        ],
+        "設計規格": [
+          "design-system-components-tag-設計規格--overview",
+          "design-system-components-tag-設計規格--inspector",
+          "design-system-components-tag-設計規格--color-matrix",
+          "design-system-components-tag-設計規格--size-matrix",
+          "design-system-components-tag-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-tag-設計原則--usage-guidance",
+          "design-system-components-tag-設計原則--variant-not-semantic-rule",
+          "design-system-components-tag-設計原則--subtle-vs-solid-rule",
+          "design-system-components-tag-設計原則--dismiss-rule",
+          "design-system-components-tag-設計原則--icon-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "textarea": {
+      "tiers": {
+        "展示": [
+          "design-system-components-textarea-展示--default",
+          "design-system-components-textarea-展示--in-field"
+        ],
+        "設計規格": [
+          "design-system-components-textarea-設計規格--overview",
+          "design-system-components-textarea-設計規格--inspector",
+          "design-system-components-textarea-設計規格--size-matrix",
+          "design-system-components-textarea-設計規格--mode-matrix",
+          "design-system-components-textarea-設計規格--color-matrix",
+          "design-system-components-textarea-設計規格--rows-resize-matrix",
+          "design-system-components-textarea-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-textarea-設計原則--usage-guidance",
+          "design-system-components-textarea-設計原則--resize-rule",
+          "design-system-components-textarea-設計原則--readonly-rule",
+          "design-system-components-textarea-設計原則--no-icon-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "timepicker": {
+      "tiers": {
+        "展示": [
+          "design-system-components-timepicker-展示--modes",
+          "design-system-components-timepicker-展示--meeting-slot",
+          "design-system-components-timepicker-展示--flight-departure-time",
+          "design-system-components-timepicker-展示--shop-business-hours",
+          "design-system-components-timepicker-展示--event-timestamp",
+          "design-system-components-timepicker-展示--employee-shift-schedule",
+          "design-system-components-timepicker-展示--disabled",
+          "design-system-components-timepicker-展示--with-error"
+        ],
+        "設計規格": [
+          "design-system-components-timepicker-設計規格--overview",
+          "design-system-components-timepicker-設計規格--color-matrix",
+          "design-system-components-timepicker-設計規格--size-matrix",
+          "design-system-components-timepicker-設計規格--mode-matrix",
+          "design-system-components-timepicker-設計規格--precision-matrix",
+          "design-system-components-timepicker-設計規格--inspector",
+          "design-system-components-timepicker-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-timepicker-設計原則--usage-guidance",
+          "design-system-components-timepicker-設計原則--rule-minute-step-for-meetings",
+          "design-system-components-timepicker-設計原則--rule-range-composition",
+          "design-system-components-timepicker-設計原則--rule-clear-no-label-button"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "toast": {
+      "tiers": {
+        "展示": [
+          "design-system-components-toast-展示--with-description",
+          "design-system-components-toast-展示--interactive"
+        ],
+        "設計規格": [
+          "design-system-components-toast-設計規格--overview",
+          "design-system-components-toast-設計規格--inspector",
+          "design-system-components-toast-設計規格--container-architecture",
+          "design-system-components-toast-設計規格--color-matrix",
+          "design-system-components-toast-設計規格--state-behavior",
+          "design-system-components-toast-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-toast-設計原則--usage-guidance",
+          "design-system-components-toast-設計原則--action-rule",
+          "design-system-components-toast-設計原則--variant-rule",
+          "design-system-components-toast-設計原則--duration-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "tooltip": {
+      "tiers": {
+        "展示": [
+          "design-system-components-tooltip-展示--default",
+          "design-system-components-tooltip-展示--non-button-trigger",
+          "design-system-components-tooltip-展示--placement",
+          "design-system-components-tooltip-展示--long-text"
+        ],
+        "設計規格": [
+          "design-system-components-tooltip-設計規格--overview",
+          "design-system-components-tooltip-設計規格--inspector",
+          "design-system-components-tooltip-設計規格--placement-reference",
+          "design-system-components-tooltip-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-tooltip-設計原則--usage-guidance",
+          "design-system-components-tooltip-設計原則--needs-tooltip-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    },
+    "treeview": {
+      "tiers": {
+        "展示": [
+          "design-system-components-treeview-展示--file-browser",
+          "design-system-components-treeview-展示--stepper",
+          "design-system-components-treeview-展示--with-checkbox",
+          "design-system-components-treeview-展示--long-label",
+          "design-system-components-treeview-展示--drag-and-drop",
+          "design-system-components-treeview-展示--indent-alignment"
+        ],
+        "設計規格": [
+          "design-system-components-treeview-設計規格--overview",
+          "design-system-components-treeview-設計規格--inspector",
+          "design-system-components-treeview-設計規格--size-matrix",
+          "design-system-components-treeview-設計規格--color-matrix",
+          "design-system-components-treeview-設計規格--indent-matrix",
+          "design-system-components-treeview-設計規格--state-behavior",
+          "design-system-components-treeview-設計規格--keyboard-matrix",
+          "design-system-components-treeview-設計規格--accessibility"
+        ],
+        "設計原則": [
+          "design-system-components-treeview-設計原則--usage-guidance",
+          "design-system-components-treeview-設計原則--expand-select-separation-rule",
+          "design-system-components-treeview-設計原則--indent-rule"
+        ]
+      },
+      "openSnapshotIds": [],
+      "exception": null
+    }
+  },
+  "totalComponents": 62,
+  "totalStories": 916
+}

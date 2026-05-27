@@ -33,7 +33,9 @@
     "changeset": "changeset",
     "changeset:version": "changeset version && node scripts/sync-version-to-all-manifests.mjs",
     "postinstall": "node scripts/ensure-playwright-browsers.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "gen-ds-story-manifest": "node scripts/gen-ds-story-manifest.mjs",
+    "postbuild-storybook": "node scripts/gen-ds-story-manifest.mjs"
   },
   "dependencies": {
     "@babel/runtime": "^7.29.2",
@@ -126,7 +128,7 @@
       "gzip": true
     },
     {
-      "name": "DataTable(heaviest — filter+sort+drag+virtual)",
+      "name": "DataTable(heaviest \u2014 filter+sort+drag+virtual)",
       "path": "packages/design-system/dist/components/DataTable/data-table.js",
       "limit": "60 KB",
       "gzip": true
