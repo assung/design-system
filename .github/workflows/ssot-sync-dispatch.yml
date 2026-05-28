@@ -19,8 +19,12 @@ on:
     branches: [main]
     paths:
       # SSOT-affecting paths(per CLAUDE.md `# Step 5.5 SSOT propagation gate`)
+      # storybook-config 無 src/ dir — files 在 root(addons/ + addons-preset.ts + preview.tsx)
       - 'packages/design-system/src/**'
-      - 'packages/storybook-config/src/**'
+      - 'packages/storybook-config/addons/**'
+      - 'packages/storybook-config/addons-preset.ts'
+      - 'packages/storybook-config/preview.tsx'
+      - 'packages/storybook-config/package.json'
       - '.claude/rules/**'
       - '.claude/hooks/**'
       - '.claude/skills/**'

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
   "name": "design-system",
-  "description": "World-class DS governance — skills + hooks + rules + CLAUDE.md instructions + 31 active M-rules + 56 audit dims. Source-of-truth for product workspaces consuming @qijenchen/design-system npm package.",
+  "description": "World-class DS governance — skills + hooks + rules + CLAUDE.md instructions + 31 active M-rules + 82 audit dims. Source-of-truth for product workspaces consuming @qijenchen/design-system npm package.",
   "version": "0.1.0-beta.32",
   "author": {
     "name": "Your-Org DS Owner"
@@ -20,7 +20,7 @@
       "skills/ symlink → .claude/skills/(22 skills accessible)",
       "commands/ symlink → .claude/commands/(commands accessible)",
       "hooks/hooks.json generated from .claude/settings.json hooks section + ${CLAUDE_PLUGIN_ROOT} path rewrite",
-      "hooks/scripts/ symlink → .claude/hooks/(30+ hook scripts accessible)",
+      "hooks/scripts/ symlink → .claude/hooks/(59 hook scripts accessible per snapshot 2026-05-28;count via sync-governance-counters.mjs)",
       ".claude-plugin/plugin.json + marketplace.json real schema(2026-05-23 fix)"
     ],
     "intentional_omissions": [

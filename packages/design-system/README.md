@@ -76,7 +76,7 @@ import { Button, Avatar, Dialog } from '@qijenchen/design-system'
 <Dialog>...</Dialog>
 ```
 
-**只用 top barrel import**(對齊 Material UI canonical)。`./components/<Name>` subpath 目前未支援 — v1.0.0 stable 才會開啟(待 cross-component export name collision rename 完成)。
+**預設用 top barrel import**(對齊 Material UI canonical)。需要更窄的 import surface 時,也支援 `@qijenchen/design-system/components/<Name>` / `patterns/<Name>` / `hooks/<name>` subpath(見 package `exports`)。
 
 Tree-shake 透過 `sideEffects: ["**/*.css"]` 配置自動 work,unused JS 被 bundler 剝除。
 

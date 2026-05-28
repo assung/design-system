@@ -24,6 +24,15 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_codex_brief_invariants.sh\""
+          }
+        ]
+      },
+      {
         "matcher": "Write",
         "hooks": [
           {
@@ -106,19 +115,7 @@
           },
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_tab_lg_chrome_header_equal.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_header_with_tabs_border.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_chrome_header_handcraft.sh\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_app_shell_primary_header_consistency.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/chrome_header_dispatcher.sh\""
           },
           {
             "type": "command",
@@ -141,6 +138,15 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_audit_sample_escape.sh\""
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -159,10 +165,6 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block_prototype_imports.py\""
-          },
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_layout_space_magic_numbers.sh\""
           },
           {
             "type": "command",
@@ -187,6 +189,22 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_escape_marker_abuse.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_tailwind_wildcard_in_docs.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_addon_subdir_ship.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_storybook_addon_preset_cjs.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_consumer_app_story_title.sh\""
           }
         ]
       },
@@ -207,6 +225,10 @@
           },
           {
             "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_layout_space_magic_numbers.sh\""
+          },
+          {
+            "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_field_controls_contracts.sh\""
           },
           {
@@ -220,6 +242,10 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_audit_post_report_validator.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/auto_regen_ds_barrel.sh\""
           }
         ]
       },
@@ -263,11 +289,15 @@
           },
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/audit-content-quality.mjs\" --check 2>&1 | grep -E '\\[P[01]\\]|\u2705|\u26a0\ufe0f' | head -10 || true"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_orphan_ds_css.sh\""
           },
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/extract-canonical-rules.mjs\" 2>&1 | grep -E 'GAPS|\u2705|keywords missing' | head -8 || true"
+            "command": "bash -lc 'cd \"${CLAUDE_PLUGIN_ROOT}\" && node scripts/audit-content-quality.mjs --check 2>&1 | grep -E '\\[P[01]\\]|✅|⚠️' | head -10 || true'"
+          },
+          {
+            "type": "command",
+            "command": "bash -lc 'cd \"${CLAUDE_PLUGIN_ROOT}\" && node scripts/extract-canonical-rules.mjs 2>&1 | grep -E 'GAPS|✅|keywords missing' | head -8 || true'"
           }
         ]
       }
