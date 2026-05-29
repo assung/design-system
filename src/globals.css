@@ -16,65 +16,6 @@
 @source not "**/.claude/**";
 @source not "**/planning/**";
 
-@import "../packages/design-system/src/tokens/color/primitives.css";
-@import "../packages/design-system/src/tokens/color/semantic.css";
-@import "../packages/design-system/src/tokens/typography/typography.css";
-@import "../packages/design-system/src/tokens/uiSize/uiSize.css";
-@import "../packages/design-system/src/tokens/layoutSpace/layoutSpace.css";
-@import "../packages/design-system/src/tokens/radius/radius.css";
-@import "../packages/design-system/src/tokens/opacity/opacity.css";
-@import "../packages/design-system/src/tokens/motion/motion.css";
-@import "../packages/design-system/src/components/DataTable/data-table.css";
-@import "../packages/design-system/src/patterns/header-canonical/header-canonical.css";
-
-/* ── Base layer SSOT(lucide stroke + reset + body typography + focus + button cursor)── */
-@import "../packages/design-system/src/styles/base.css";
-
-/* ── 雜項 token（不屬於任何 token category）── */
-@theme inline {
-  /* white — 明確納入 token 系統，供 text-white / bg-white 使用 */
-  --color-white: oklch(1 0 0);
-}
-
-/* Sidebar layout tokens — 唯一保留的 sidebar-* 變數
-   顏色一律用既有 semantic token（bg-surface / text-foreground / border-divider），
-   不引入 shadcn 的 slate palette --sidebar-* 顏色家族 */
-/* 2026-05-26 SSOT-home migration:全部 sidebar / chrome-header tokens 已搬到
-   packages/design-system/src/tokens/uiSize/uiSize.css(consumer-published)。
-   此處不再宣告,DS package 自包,符 M17 SSOT 鐵律。
-   原因:user 2026-05-26 抓 product-workspace AppShell 跑版 root cause —
-   consumer install DS 沒拿到 sidebar-width → flex layout fail。 */
-
-
-/* ── Collapsible animation（Radix Collapsible 用）── */
-@keyframes collapsible-down {
-  from { height: 0; }
-  to { height: var(--radix-collapsible-content-height); }
-}
-@keyframes collapsible-up {
-  from { height: var(--radix-collapsible-content-height); }
-  to { height: 0; }
-}
-@utility animate-collapsible-down {
-  animation: collapsible-down 150ms ease-out;
-}
-@utility animate-collapsible-up {
-  animation: collapsible-up 150ms ease-out;
-}
-
-/* ── Accordion animation（Radix Accordion 用，變數名稱與 Collapsible 不同） ── */
-@keyframes accordion-down {
-  from { height: 0; }
-  to { height: var(--radix-accordion-content-height); }
-}
-@keyframes accordion-up {
-  from { height: var(--radix-accordion-content-height); }
-  to { height: 0; }
-}
-@utility animate-accordion-down {
-  animation: accordion-down 200ms ease-out;
-}
-@utility animate-accordion-up {
-  animation: accordion-up 200ms ease-out;
-}
-
+/* DS runtime SSOT: tokens + component CSS + base/runtime utilities.
+   Keep repo-root Storybook and consumers on the same aggregator to prevent drift. */
+@import "../packages/design-system/src/styles/tokens.css";
