@@ -4,12 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:lib": "npm -w @qijenchen/design-system run build && npm -w @qijenchen/design-system run build:dts && npm -w @qijenchen/storybook-config run build",
+    "create-app": "node scripts/create-app.mjs",
+    "setup:netlify": "node scripts/setup-netlify-access.mjs",
     "preview": "vite preview",
     "prestorybook": "npm -w @qijenchen/storybook-config run build",
     "storybook": "storybook dev -p 6006",
