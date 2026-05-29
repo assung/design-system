@@ -41,7 +41,8 @@
     "./styles/tokens.css": "./src/styles/tokens.css",
     "./styles/tokens": "./src/styles/tokens.css",
     "./package.json": "./package.json",
-    "./ds-story-manifest.json": "./ds-story-manifest.json"
+    "./ds-story-manifest.json": "./ds-story-manifest.json",
+    "./styles/base": "./src/styles/base.css"
   },
   "bin": {
     "qijenchen-ds-init": "./cli-init.mjs"

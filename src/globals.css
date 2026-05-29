@@ -27,8 +27,8 @@
 @import "../packages/design-system/src/components/DataTable/data-table.css";
 @import "../packages/design-system/src/patterns/header-canonical/header-canonical.css";
 
-/* ── Icon stroke width（全域 lucide 預設）── */
-.lucide { stroke-width: 1.75; }
+/* ── Base layer SSOT(lucide stroke + reset + body typography + focus + button cursor)── */
+@import "../packages/design-system/src/styles/base.css";
 
 /* ── 雜項 token（不屬於任何 token category）── */
 @theme inline {
@@ -45,41 +45,6 @@
    原因:user 2026-05-26 抓 product-workspace AppShell 跑版 root cause —
    consumer install DS 沒拿到 sidebar-width → flex layout fail。 */
 
-/* ── Base reset ── */
-@layer base {
-  *, ::before, ::after {
-    box-sizing: border-box;
-    border-color: var(--color-neutral-5);
-  }
-
-  body {
-    background-color: var(--canvas);
-    color: var(--foreground);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-  }
-
-  /* ── Button pointer cursor(Tailwind v4 upgrade 補丁)──
-     Tailwind v3 preflight 有 `button { cursor: pointer }`,v4 移除了這條,改讓瀏覽器
-     跟隨 HTML spec(`cursor: default`)。Chrome 100+ 已跟進。但對 web UX 來說,
-     button 應該要顯示 pointer cursor 才符合使用者直覺(hover = clickable)。
-
-     官方建議:https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor
-
-     在 @layer base 加這條後,所有 button / role="button" 的可點擊元素都自動有
-     pointer cursor,不需在每個元件的 cva 單獨加 `cursor-pointer` utility。
-     disabled 狀態維持瀏覽器預設(default cursor),符合「不能點」的視覺。 */
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
-}
 
 /* ── Collapsible animation（Radix Collapsible 用）── */
 @keyframes collapsible-down {
