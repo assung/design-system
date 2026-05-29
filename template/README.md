@@ -12,15 +12,17 @@
 - ❌ **GitHub Pages**:public host,private workspace 不該 expose
 - ❌ **Vercel free tier**:可,但本 template 統一 Netlify(reduce host fragmentation)
 
-## 命名 SSOT(2026-05-29 釐清,前期 dir/repo 名 drift)
+## 命名 SSOT(2026-05-29 對齊完成,前期歷史 drift 已修)
 
-- **DS-internal source dir**: `template/product-workspace/`(本目錄,scaffold source SSOT;歷史名「product-workspace」沿用,內部 path 不影響 fork user)
+- **DS-internal source dir**: `template/ds-product-template/`(本目錄,scaffold source SSOT,2026-05-29 從歷史名 `product-workspace` 重命名對齊 published repo)
 - **Published GitHub Template Repository**: [`ajenchen/ds-product-template`](https://github.com/ajenchen/ds-product-template)(fork user 真實看到 / fork 的 repo,2026-05-27 從 `product-workspace` 重命名)
 - **Fork user 創的 new repo**: `<their-username>/<their-product-name>`(他們自選)
 
+**3 層命名現完全對齊** `ds-product-template`(DS-internal 名 = published 名,fork user 自選自由)。
+
 ## 怎麼用(2026-05-27 已升級成「Use this template」按鈕,以下為 owner setup 流程)
 
-**Owner setup once**:在 `ajenchen/ds-product-template` GitHub repo → `Settings → General → Template repository ✓` 勾選 + `Settings → General → Change visibility: Public`。本 DS repo `template/product-workspace/` 內容透過 sync 機制(or 手動 push)同步到 `ajenchen/ds-product-template`。
+**Owner setup once**:在 `ajenchen/ds-product-template` GitHub repo → `Settings → General → Template repository ✓` 勾選 + `Settings → General → Change visibility: Public`。本 DS repo `template/ds-product-template/` 內容透過 sync 機制(or 手動 push)同步到 `ajenchen/ds-product-template`。
 
 **Fork user**:在 `ajenchen/ds-product-template` 點「Use this template」→ 自動建他自己的 repo,流程詳該 repo `README.md`「Template Usage」段。
 
@@ -29,7 +31,7 @@
 gh repo create ajenchen/ds-product-template --private --confirm
 git clone github.com/ajenchen/ds-product-template
 cd ds-product-template
-cp -r /path/to/this-ds-repo/template/product-workspace/. .
+cp -r /path/to/this-ds-repo/template/ds-product-template/. .
 sed -i '' 's/qijenchen/<YOUR_ORG>/g' package.json .github/CODEOWNERS README.md
 npm install
 git add . && git commit -m "chore: initial scaffold from DS template"
@@ -41,7 +43,7 @@ git push origin main
 ## Files included
 
 ```
-template/product-workspace/
+template/ds-product-template/
 ├── README.md                            ← consumer-facing quick start
 ├── package.json                          ← workspaces + DS deps + scripts
 ├── tsconfig.json                         ← (TODO consumer 自添)

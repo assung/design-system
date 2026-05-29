@@ -62,11 +62,11 @@ detect_mode() {
 }
 ```
 
-**為何 2-mode 不是 3-mode**(per user「避免原則無限膨脹」):「template SSOT」實際上是 ds-repo 內 `template/product-workspace/` 子目錄;DS owner 編 template scaffold 仍在 ds-repo cwd 跑,**無 semantic 區隔**。Published `ds-product-template` GitHub repo 跟 fork user new repo 在 file structure 上一致(都消費 DS via npm + plugin),統一 fork-user-repo mode 處理。3-mode 設計 dead code:`ds-template-ssot` 永不 trigger 因 `packages/design-system/src` 條件先 win。
+**為何 2-mode 不是 3-mode**(per user「避免原則無限膨脹」):「template SSOT」實際上是 ds-repo 內 `template/ds-product-template/` 子目錄;DS owner 編 template scaffold 仍在 ds-repo cwd 跑,**無 semantic 區隔**。Published `ds-product-template` GitHub repo 跟 fork user new repo 在 file structure 上一致(都消費 DS via npm + plugin),統一 fork-user-repo mode 處理。3-mode 設計 dead code:`ds-template-ssot` 永不 trigger 因 `packages/design-system/src` 條件先 win。
 
 | Mode | A.0 全盤閱讀 scope | A.1 audit dim scope | Phase B codex scope |
 |---|---|---|---|
-| **ds-repo**(DS owner workflow,含 template SSOT 編輯)| full DS canonical + spec + token + pattern + memory + `template/product-workspace/` scaffold | 全 dim per `/design-system-audit --deep` SSOT(含 dim 83 cross-3-repo runtime audit)| 全 dim parallel verify |
+| **ds-repo**(DS owner workflow,含 template SSOT 編輯)| full DS canonical + spec + token + pattern + memory + `template/ds-product-template/` scaffold | 全 dim per `/design-system-audit --deep` SSOT(含 dim 83 cross-3-repo runtime audit)| 全 dim parallel verify |
 | **fork-user-repo**(published template repo / fork user product repo)| `node_modules/@qijenchen/design-system/CLAUDE.md` + `ds-canonical/rules/meta-patterns.md` + `apps/**` + 本 repo `CLAUDE.md` | dim 83 fork-side runtime checks(hook fire / cross-load / setup-netlify smoke / deploy URL hook live) + dim 62-67 consumer subset | 同 dim,fork-side verify;**禁** propose DS source change |
 
 ### Fork-mode safety invariants(2026-05-29 加)
