@@ -60,6 +60,11 @@ jobs:
           fi
           echo "✅ ds-devmode manager 用 classic JSX(無 jsx-runtime)"
 
+      # 2026-05-29:機械保證 consumer CSS 入口完整(tailwind + tokens+base + DS @source)。
+      # 防 globals.css「掉東掉西」drift class(字體 / 沒吃到元件 / 底色 退預設)。
+      - name: Guard consumer CSS entry completeness
+        run: npm run verify:consumer-css
+
       - name: tsc -b(0 errors required + 印 errors 出來)
         # 2026-05-26 fix:`2>&1 | grep -q` 把 errors silent 掉,無法 diagnose CI 真實 fail。改 print 完整 errors。
         run: |

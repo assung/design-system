@@ -65,6 +65,7 @@ const ALLOWLIST = [
   'scripts/deploy-url.mjs',
   'scripts/lint-ds-internal-imports.mjs',
   'scripts/sync-all.mjs',
+  'scripts/verify-consumer-css-entry.mjs',
   // Cloud-dev path
   '.devcontainer',
   // Consumer-facing scaffold(template/ds-product-template/ 內)

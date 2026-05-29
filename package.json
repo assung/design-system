@@ -35,6 +35,7 @@
     "test:datatable-invariants": "node scripts/data-table-invariants.mjs",
     "sync-memory": "node scripts/sync-memory.mjs",
     "sync:ds-canonical": "node scripts/sync-ds-canonical.mjs",
+    "verify:consumer-css": "node scripts/verify-consumer-css-entry.mjs",
     "verify:published-deploy": "node scripts/verify-published-deploy.mjs",
     "sync-counters": "node scripts/sync-governance-counters.mjs",
     "changeset": "changeset",
@@ -135,7 +136,7 @@
       "gzip": true
     },
     {
-      "name": "DataTable(heaviest \u2014 filter+sort+drag+virtual)",
+      "name": "DataTable(heaviest — filter+sort+drag+virtual)",
       "path": "packages/design-system/dist/components/DataTable/data-table.js",
       "limit": "60 KB",
       "gzip": true
