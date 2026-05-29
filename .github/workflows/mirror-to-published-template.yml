@@ -84,6 +84,11 @@ jobs:
           git clone --depth 1 "$REPO_URL" /tmp/published
           rsync -a --delete --exclude='.git' --exclude='.github/workflows' /tmp/mirror-build/ /tmp/published/
           cd /tmp/published
+          # Regenerate package-lock.json matching the FULL published structure(scaffold + apps/template workspace).
+          # Why:published Audit CI 用 setup-node cache:npm + npm ci → 需 valid committed lock 含 @product/template
+          # workspace。Template source(template/ds-product-template/)無 apps/ → 只有此 mirror 結構能生正確 lock。
+          # rsync 上一步已移除 clone 的舊 lock(mirror-build 無 lock)→ 在此重生確保與 scaffold 同步。
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
           git config user.name "DS Mirror Bot"
           git config user.email "bot@noreply.github.com"
           git add -A
