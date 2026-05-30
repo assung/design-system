@@ -54,7 +54,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/TimePicker/展示" name="員工上班時段設定"><span className="text-primary hover:underline font-medium cursor-pointer">員工上班時段設定</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">不確定是否該用 TimePicker 時,先對照下方「何時不用」清單;若情境不符,改用清單建議的替代元件(例如同時要日期就用 DatePicker)。</p>
     </div>
 
       {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
@@ -117,10 +117,9 @@ export const RuleRangeComposition: Story = {
 }
 
 /**
- * Rule:禁止用 label Button 作 clear
- * 對齊 CLAUDE.md「Dismiss 按鈕 canonical」—— clear button 必用 ItemInlineActionButton
- * (本元件 clearable=true 自動渲染 X Inline Action 在 endAction slot),禁止自刻
- * `<Button>清除</Button>` 作 clear。
+ * 規則:清除用 X 行內動作,不要用文字按鈕
+ * 設定 clearable 後,TimePicker 會自動在欄位尾端渲染一個 X 行內動作來清空值,
+ * 點擊即清空。不要自己擺一顆「清除」文字按鈕——統一用 X 圖示符合全站慣例。
  */
 export const RuleClearNoLabelButton: Story = {
   name: '清除用 X 行內動作,不用文字按鈕',

@@ -33,7 +33,7 @@ export const Overview: Story = {
           aside={
             <AppShellAside title="Detail panel" width={320}>
               <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
-                <p className="text-body">Aside 內容(consumer 自管 padding,遵循 layoutSpace.spec.md 規則 1B 父層管)</p>
+                <p className="text-body">Aside 內容(留白由使用此面板的內容自行管理)</p>
               </div>
             </AppShellAside>
           }
@@ -43,9 +43,8 @@ export const Overview: Story = {
           <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
             <h2 className="text-h4 mb-3">Main &lt;main&gt; landmark + padding=0</h2>
             <p className="text-body text-fg-secondary">
-              內容自管 padding,遵循 layoutSpace.spec.md 6 條規則。本 slot 自身不發明 padding —
-              consumer 內容是 bounded surface 自帶 padding(規則 1A)/ 純 layout primitive 父層管
-              (規則 1B)/ list with hover 每 item 自帶(規則 1C)三派並存。
+              主內容區自身不加任何留白,留白由內容決定:自帶邊框的卡片或表格自己帶內距、
+              純排版容器由外層父層統一管理、有 hover 效果的列表則每一列各自帶內距。三種情況並存。
             </p>
           </div>
         </AppShell>
@@ -141,12 +140,13 @@ export const Accessibility: Story = {
       <ul className="text-body space-y-2 list-disc pl-5">
         <li>
           <strong>Landmark</strong>:`&lt;header&gt;` / `&lt;nav&gt;` / `&lt;aside&gt;` / `&lt;main&gt;`
-          各自 implicit role。primary-header mode 的 `&lt;header&gt;` 是 banner role;primary-sidebar mode 的 header
-          因為在 `&lt;main&gt;` descendant 不是 banner(per W3C ARIA in HTML)。
+          各自有對應的無障礙地標角色。在 primary-header 模式,最上方那條橫跨整個視窗的 global header
+          是整站層級的標頭。在 primary-sidebar 模式,header 放在主內容欄頂端、與 `&lt;main&gt;` 並排(兄弟節點,
+          不是 main 的子層),角色是當前頁的工具列,而非整站標頭。
         </li>
         <li><strong>Skip to main</strong>:`Tab` 第一站 focus skip-link → jump 到 `#app-shell-main`(WCAG 2.4.1)</li>
         <li><strong>Keyboard shortcuts</strong>:`⌘B` / `Ctrl+B` toggle sidebar(消費 Sidebar SSOT)/ `⌘.` / `Ctrl+.` toggle aside</li>
-        <li><strong>Modal Aside title</strong>:required prop → `aria-labelledby` 強制(per `sheet.spec.md:98`)</li>
+        <li><strong>Modal Aside title</strong>:title 是必填 prop → 行動裝置上以 Sheet 形式開啟時,自動連結 `aria-labelledby`,讓螢幕報讀器讀得到面板名稱</li>
         <li><strong>Focus trap</strong>:Sheet open 時 focus 在 Aside 內,Esc 關回 trigger(Radix Dialog 內建)</li>
       </ul>
     </div>

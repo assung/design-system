@@ -58,7 +58,7 @@ export const UsageGuidance: Story = {
               <LinkTo kind="Design System/Components/Tooltip/展示" name="長文字"><span className="text-primary hover:underline font-medium cursor-pointer">長文字</span></LinkTo>
             </li>
           </ul>
-          <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親」)。</p>
+          <p className="text-fg-muted mt-3">判斷不確定時:回到「畫面上的資訊是否已足夠」這個核心問題;若提示需要被點擊或停留互動,改用近親元件(見下方「vs 近親」)。</p>
         </div>
       </Section>
 
@@ -122,7 +122,7 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="❌ 需要放互動元素(按鈕 / 連結):用 HoverCard"
-          note="Tooltip 不能包含可點擊元素——使用者滑鼠離開 trigger 就消失,來不及點到浮層內的按鈕。需要互動內容(NameCard、link preview、action)必須用 HoverCard。完整分界 完整定義在 hover-card.spec.md"
+          note="Tooltip 不能包含可點擊元素——使用者滑鼠離開觸發器就消失,來不及點到浮層內的按鈕。需要互動內容(人物名片、連結預覽、操作按鈕)必須改用 HoverCard。"
         >
           <Tooltip>
             <TooltipTrigger asChild>
@@ -142,7 +142,7 @@ export const UsageGuidance: Story = {
           title="判斷法:「使用者會想移到浮層上做事嗎?」"
           note="需要 → HoverCard(停留行為可互動);不需要,純看一句話 → Tooltip"
         >
-          <Label>完整對照見 hover-card.spec.md「與 Tooltip 的分界」(主檔擁有者)</Label>
+          <Label>完整對照見 HoverCard 的「與 Tooltip 的分界」說明</Label>
         </Rule>
       </Section>
     </div>

@@ -97,8 +97,8 @@ export const FlightDepartureTime: Story = {
 }
 
 /**
- * 營業時間 — 兩個 TimePicker 組合達成 range 語意(MVP 不內建 Range;
- * 對齊 Ant composition 思路,見 spec「為何無 Range」段)。
+ * 營業時間 — 需要「開始到結束」的時間範圍時,並排放兩個 TimePicker(中間加箭頭)即可,
+ * TimePicker 本身不提供範圍模式。
  */
 export const ShopBusinessHours: Story = {
   name: '店家營業時間',

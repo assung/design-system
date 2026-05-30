@@ -143,9 +143,9 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">Live 範例</span>
             <Tooltip defaultOpen>
               <TooltipTrigger asChild>
-                <Button variant="secondary" startIcon={Info} size="sm">滑鼠移上</Button>
+                <Button variant="secondary" startIcon={Info} size="sm">付款狀態</Button>
               </TooltipTrigger>
-              <TooltipContent side="top">這是一個 Tooltip</TooltipContent>
+              <TooltipContent side="top">款項已於 2024/12/01 撥款至銀行帳戶</TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -296,7 +296,7 @@ const InspectorInner = () => {
               <div className="text-[10px] text-fg-muted">dark: --color-neutral-5-opaque</div>
             </PropRow>
             <PropRow label="text">
-              <span>white (text-white)</span>
+              <TkVal token="text-on-emphasis" value="白色（深底反白文字）" />
             </PropRow>
             <PropRow label="font">
               <TkVal token="text-body" value="14px / font-normal" />
@@ -407,7 +407,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `tooltip.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  tooltip  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tooltip#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger 時顯示\n- Esc — 關閉\n\n  Focus  :non-modal hover/focus surface——focus 開啟 surface 但**不 trap**,focus 仍留在 trigger,Esc 關閉。Visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"ARIA / Pattern:沿用 Radix tooltip 的無障礙預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tooltip#accessibility)。\n\n  鍵盤行為:\n\n- Tab — focus 到觸發器時顯示\n- Esc — 關閉\n\n  焦點:hover / focus 浮層,非 modal——focus 開啟浮層但不鎖住焦點,焦點仍留在觸發器,按 Esc 關閉。觸發器有可見 focus ring(2px 外框)。\n\n  驗證:Storybook a11y addon 面板應 0 個 critical 違規;純鍵盤即可完整操作(無需滑鼠)。文字對比 ≥ 4.5:1、UI 元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

@@ -266,7 +266,7 @@ export const AffixRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="affix=value 適合靜態 / poll 場景,status-icon 適合 final state"
+        title="affix=value 適合需持續更新的場景,status-icon 適合終態(完成 / 失敗)"
         note="value 讓使用者讀到確切數字,適合配額、完成比例等需要精確資訊的情境。status-icon 只在完成或失敗時呈現,讓終態一眼可辨。"
       >
         <Frame>

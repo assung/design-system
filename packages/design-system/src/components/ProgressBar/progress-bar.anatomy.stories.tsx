@@ -115,7 +115,6 @@ export const Overview = {
               {[
                 ['value', 'number (0-100)', '—', '當前進度,超出自動 clamp'],
                 ['status', "'inProgress' | 'success' | 'error'", "'inProgress'", 'fill 色語意'],
-                ['size', "'sm' | 'md' | 'lg'", "'md'", 'track 高度(2 / 4 / 6 px)'],
                 ['affix', "'value' | 'status-icon' | ReactNode", '—', '右側附加:百分比文字 / 狀態 icon / 客製內容'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}>
@@ -279,7 +278,7 @@ export const Inspector = {
     <div className="flex flex-col gap-4">
       <H3>元件檢閱器</H3>
       <Desc>
-        選擇任意組合,即時查看 fill / track token 與 layout。藍圖展示 track 高度隨 size 切換。
+        選擇任意組合,即時查看 fill / track token 與 layout。藍圖標示固定的 track 高度(4px)與 fill 寬度。
       </Desc>
       <InspectorInner />
     </div>
@@ -304,7 +303,7 @@ export const ColorMatrix = {
           <thead>
             <tr>
               <Th>Status</Th>
-              <Th>預覽(md, value=60)</Th>
+              <Th>預覽(value=60)</Th>
               <Th>Track</Th>
               <Th>Fill</Th>
               <Th>Affix icon</Th>

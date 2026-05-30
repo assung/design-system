@@ -51,8 +51,8 @@ export const ColorMatrix: Story = {
 
         {/* Trigger layer */}
         <div className="flex flex-col gap-2">
-          <div className="text-h6 font-semibold text-foreground">Layer 1:Trigger(Field family)</div>
-          <div className="text-caption text-fg-muted mb-2">主檔:<span className="font-mono">components/Field/field-controls.spec.md</span></div>
+          <div className="text-h6 font-semibold text-foreground">第 1 層:觸發欄位(沿用一般輸入欄位配色)</div>
+          <div className="text-caption text-fg-muted mb-2">色彩與 Input / Select 等輸入欄位共用同一套規則。</div>
           <div className="overflow-x-auto">
             <table className="text-caption border-collapse min-w-[640px]">
               <thead>
@@ -106,9 +106,9 @@ export const ColorMatrix: Story = {
 
         {/* Panel layer */}
         <div className="flex flex-col gap-2">
-          <div className="text-h6 font-semibold text-foreground">Layer 2:Panel column item(SelectMenu family)</div>
+          <div className="text-h6 font-semibold text-foreground">第 2 層:面板裡的時 / 分 / 秒選項(沿用下拉選單配色)</div>
           <div className="text-caption text-fg-muted mb-2">
-            主檔:<span className="font-mono">patterns/element-anatomy/item-anatomy.spec.md</span>「選擇 / 狀態視覺規則」
+            選項的 hover / 選中 / 停用配色,與下拉選單(Select / 選單項目)的選取狀態共用同一套規則。
           </div>
           <div className="text-caption text-fg-secondary mb-3 max-w-[720px]">
             <strong>關鍵決策:selected 走 neutral 非 primary</strong>(對齊 SelectMenu 設計準則)。TimePicker panel 是「列表選中」語意,跟 SelectMenu / MenuItem 同流派;DatePicker date cell 用 `--primary` 是因為那是「最終選定日期」的強 affordance(確定性),兩者不同語意,不互調。

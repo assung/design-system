@@ -69,7 +69,7 @@ export const MinMaxStep: Story = {
 //   anatomy.stories.tsx StateBehavior 已 cover disabled state。展示層保留 SizeAlignment + MinMaxStep。
 //   (legacy Disabled body 移到 anatomy StateBehavior demo;若要看 disabled,進 anatomy 頁)
 export const Disabled_REMOVED: Story = {
-  name: '（已 retire,見 anatomy StateBehavior）',
+  name: '停用狀態（已移至設計規格頁示範）',
   tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="w-[360px] flex flex-col gap-6">

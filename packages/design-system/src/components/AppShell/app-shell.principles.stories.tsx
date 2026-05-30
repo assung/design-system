@@ -60,9 +60,9 @@ export const UsageGuidance: Story = {
       <section>
         <h2 className="text-h4 mb-2">vs Sidebar 規則</h2>
         <p className="text-body">
-          AppShell own composition + layout mode + Aside responsive 切換。Sidebar 視覺 + 行為 + mobile sheet
-          SSOT 在 <code>sidebar.spec.md</code>,**AppShell 不 customize Sidebar**。多 sidebar 等未來 Sidebar
-          SSOT 擴充才支援。
+          AppShell 只負責整體組合、版面模式、以及右側面板的響應式開合。Sidebar 的外觀、行為、行動裝置上的
+          抽屜形式都由 Sidebar 元件自己定義,<strong>AppShell 不會去改 Sidebar 的樣式</strong>。
+          多個 sidebar 的情境要等 Sidebar 元件本身支援後才提供。
         </p>
       </section>
 
