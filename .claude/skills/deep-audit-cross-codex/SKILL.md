@@ -6,33 +6,7 @@ arguments: scope?=full|changed focus?=「ssot|visual|behavior|all」
 
 # Deep Audit Cross-Codex — 雙 model adversarial 完整 DS 稽核
 
-> **SSOT integrity invariant**(2026-05-18 user-mandated):本 skill 的 audit dim list **完全 chain `/design-system-audit --deep` SSOT**(`.claude/skills/design-system-audit/SKILL.md` `## The N audit dimensions` 段)。
->
-> **禁** hardcode dim count(`46 dim` / `53 dim` 等具體數字)— 用「全 dim」/「Group A-P」/「per design-system-audit SSOT」表達。新增 / 刪除 / 修改稽核項目 → **只動 design-system-audit/SKILL.md**,本 skill 自動繼承。
->
-> Mechanical 強制:hook `check_dim_count_drift.sh` 攔 Edit 寫死數字。
-
-**生態位**:`/design-system-audit --deep` 是 Claude solo 全 dim 稽核 SSOT;本 skill 是**雙 model 完整 sweep**(Claude solo → codex parallel → 比稿辯論共識 → 落地),chain 既有 audit dim 不 fork。
-
-**上游 canonical 全繼承**(per user「避免膨脹但別漏」):本 skill chain CLAUDE.md 全 mindset + meta-patterns 全 active M-rules + 治理 8-home / 自主執行 / 命名 SSOT canonical,**不重述、不 hardcode count(避 R19 膨脹),全靠 reference**。
-
-對齊 mindset #1「不取巧省工」+ M31 dual-track + 用戶 2026-05-18 directive(verbatim):
-
-> 「完整深度進階稽核整個 design system」+「codex 跑相同的完整深度進階稽核」+「跟 codex 討論辯論出共識」+「SSOT-UI/UX 增刪改需要用中文具體人話言簡意賅地講給我聽讓我判斷決策,其他的決策基本上就是不以省工為前提...自主自動自發地做到完整、完美」
-
-**+ 用戶 2026-05-29 directive(verbatim,permanent codify)**:
-
-> 「你應該要確保任何 infra 包括各種 Claude.md, skills, hooks 等在 ds repo, template repo, fork template 的 repo, 都能正常順利如預期的運作達到預期的效果, 且流程都正確無誤,且該維持 SSOT 的部分又能完全維持」+「我們的工作流程就是用 claude code 直接連去 repo 進行各種增刪改, 然後要可以部署出來讓人驗證, 驗證完成之後再推去 main」+「確保環境建置是能夠全雲端的, 且該自動化的就自動化, 真的無法自動化的要有具體的言簡意賅的中文明確引導」+「確保所有原則都是足夠泛化可以用來舉一反三的原則, 避免原則無限膨脹, 沒有多餘重複的且是 SSOT, 並確保所有 infra 都是最佳有效率的 claude code 實務, 並確保 infra 能夠產出世界級的設計並符合我們一致的設計語言和確保 ssot, 然後所有程式碼都是乾淨簡潔易懂好維護好管理的, 且是會有大腦地自動優化不斷改善, 確保自己永遠符合上述原則」
-
-**機械強制 R18-R26 對齊**:
-- R18 泛化 / 舉一反三 → 上游 mindset #6 + meta-patterns velocity ≤ 3/quarter(`/knowledge-prune`)
-- R19 避免膨脹 → 上游治理 canonical 行數預算 + `/knowledge-prune` 季度
-- R20 無多餘重複 SSOT → 上游 Rule-of-3(`/knowledge-prune` D1 + ensure-canonical Phase 3)
-- R21 最佳 Claude Code 實務 → 上游「世界級對照」section
-- R22 世界級 + 一致設計 → 上游 mindset #1 + A.3 7 目標 simultaneous
-- R24 code clean → chain `/code-quality-audit`(Phase A.4 verify chain)
-- R25 大腦自動 self-improve → chain `/ensure-canonical` Phase F + M14
-- R26 永遠符合 → M19 trigger phrase auto-pipeline(`stop_self_audit.sh` 機械強制)
+上游 context / 框架(SSOT integrity invariant + 生態位 + canonical 全繼承)+ user-verbatim directives(2026-05-18 + 2026-05-29)+ 機械強制 R18-R26 對齊清單 詳 references/upstream-directives-r-mapping.md
 
 ## When to invoke
 
@@ -271,32 +245,5 @@ Send via `codex exec`(local CLI per M31 Step 0.4)或 cloud `@codex` 後序。
 - `references/phase-a-workflow.md` — A.0 全盤閱讀 file list canonical + A.1 全 dim sub-agent dispatch template
 - `references/phase-b-codex-brief.md` — codex brief template(B.1)+ Step 4.5 verify checklist + Step 5 比稿 matrix template
 - `references/triage-rubric.md` — Scope classifier(SSOT-UI/UX vs non-SSOT)+ 中文人話 propose format + 7 autonomous 目標 expansion
-
-## 與其他 skill 分工
-
-| Skill | Scope | 不重疊 |
-|---|---|---|
-| `/design-system-audit --deep` | 全 dim Claude solo audit | 本 skill chain 為 Phase A.1,額外 Phase B + 全盤閱讀 preflight + 比稿辯論 |
-| `/codex-collab` | M31 5-step dual-track for **任意題目** | 本 skill chain 為 Phase B,額外 Phase A 前置 + 全 dim 完整覆蓋(per design-system-audit SSOT) + Phase C 共識 commit |
-| `/propose-options` | M18 4-Q gate single propose | 本 skill A.2 / B.5 chain 用它格式化 propose |
-| `/ensure-canonical` | M19 5-layer auto-pipeline | 本 skill A.3 / B.5 chain 用它落地 canonical |
-| `/knowledge-prune` | 治理文件冗贅清 | **Transitively chained**:Phase A.1 chain `/design-system-audit --deep` → Phase 4.5 auto-chain `/knowledge-prune`(per `design-system-audit/SKILL.md:334-340` 9-trigger 條件)。SSOT 透過 `Skill` tool 直接 invoke,**不**重寫 prune logic / **不**複製 phase。Mechanical signal:`check_audit_post_report_validator.sh:81` emit `prune-chain-trigger` → `inject_pending_self_audit.sh` parse `.claude/logs/audit-post-report-validator.jsonl` → next-turn inject directive |
-| `/bug-fix-rhythm` | surgical visual bug 修 | 正交,本 skill 是 broad sweep;surgical bug 不該觸發本 skill |
-
-## Anti-pattern(永久 ban)
-
-- ❌ Skip A.0 全盤閱讀(憑記憶判斷哪些 spec 該讀)
-- ❌ A.1 sub-agent prompt 含「sample top N」/「heavy agent skip」escape
-- ❌ A.2 propose 用 jargon(L1-L7 / SSOT / canonical 在 propose 內裸用)
-- ❌ 跳 Phase B 只跑 Phase A(除非 codex transport 全失敗 + user 同意)
-- ❌ B.2 收 codex reply 直接 paste 給 user(pass-through,M31 Step 4.5 verify 跳)
-- ❌ B.4 disagreement 用直覺 vote / 「兩邊都對」打太極(cite battle invariant)
-- ❌ C.2 AI 自決 merge main(M28 violation)
-- ❌ Phase A 完成沒等 user 拍板 SSOT-UI/UX 就進 Phase B(scope 跑掉)
-
-## 世界級對照
-
-- **RFC 學術同儕審查**:作者 v1 + reviewer v2(獨立)+ public cite battle 收斂共識
-- **Linux kernel patch review**:Maintainer first-pass + lkml mailing list 二 review + cite source 比稿
-- **Google ML eng-design-review**:proposer + adversarial reviewer + structured disagreement protocol
-- **Anthropic constitutional AI critic + revise**:同 model 不同 prompt 互審 → 本 skill 升級成跨 model
+- `references/upstream-directives-r-mapping.md` — 上游 context / 框架(SSOT integrity invariant + 生態位 + canonical 全繼承)+ user-verbatim directives(2026-05-18 + 2026-05-29)+ 機械強制 R18-R26 對齊清單
+- `references/skill-relationships-antipatterns-benchmarks.md` — 與其他 skill 分工 + Anti-pattern(永久 ban)+ 世界級對照
