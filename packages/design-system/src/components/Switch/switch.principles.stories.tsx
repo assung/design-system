@@ -49,13 +49,13 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Switch/展示" name="搭配標籤"><span className="text-primary hover:underline font-medium cursor-pointer">搭配標籤</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時,問自己:這是切換即生效的獨立開關,還是表單裡要按送出才成立的勾選?前者用 Switch,後者用 Checkbox。下面幾段有完整對照。</p>
     </div>
 
       {/* vs 近親元件 — 原 VsCheckboxRule */}
       <div>
         <Rule
-          title="vs 近親元件 — Switch 是即時套用的布林開關 (sweet spot)"
+          title="vs 近親元件 — Switch 最適合即時生效的布林開關"
           note="切換即生效——物理開關類比(牆上 light switch、iPhone settings)。使用者按下那刻 Bluetooth 就開了,不經任何 submit 流程"
         >
           <div className="border border-border rounded-lg p-4 space-y-3">
@@ -92,7 +92,7 @@ export const UsageGuidance: Story = {
           title="vs 近親元件 — 判斷法:「旁邊有 submit / cancel button 嗎?」"
           note="有 → Checkbox(form 流程、值隨 submit 送出);沒有,是獨立 inline control → Switch(切換即生效)"
         >
-          <Label>完整三角度對照 完整定義在 checkbox.spec.md「與 Switch 的分界」</Label>
+          <Label>三個判斷角度(套用時機、心智模型、是否可反悔)的完整對照,以 Checkbox 為主要說明對象</Label>
         </Rule>
       </div>
 

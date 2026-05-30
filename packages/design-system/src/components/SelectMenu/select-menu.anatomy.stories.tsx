@@ -183,7 +183,7 @@ export const Overview: Story = {
                   <Td mono>creatable</Td>
                   <Td mono>boolean</Td>
                   <Td mono>false</Td>
-                  <Td>無結果時顯示「建立 xxx」option</Td>
+                  <Td>無結果時顯示「直接使用「xxx」」option(createLabel 可自訂文案)</Td>
                 </tr>
                 <tr>
                   <Td mono>groups</Td>

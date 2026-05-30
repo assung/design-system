@@ -31,7 +31,7 @@ export const Overview: Story = {
   render: () => (
     <div className="flex flex-col gap-6 w-[520px]">
       <section>
-        <h3 className="text-body font-bold mb-2">機制(Ant compact-item.ts source verified)</h3>
+        <h3 className="text-body font-bold mb-2">接合機制</h3>
         <ul className="text-body text-fg-secondary list-disc pl-5 space-y-1">
           <li>子 controls 保留自身 border + radius(不 strip)</li>
           <li>鄰接子用 <code>margin-left: -1px</code> 重疊 border → 視覺 1 條線</li>
@@ -61,7 +61,7 @@ export const SizeMatrix: Story = {
           <p className="text-caption text-fg-muted mb-2">size="{size}"</p>
           <FieldControlGroup block>
             <Select size={size} className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
-            <Input size={size} className="flex-1" defaultValue="value" />
+            <Input size={size} className="flex-1" defaultValue="無線滑鼠" />
           </FieldControlGroup>
         </div>
       ))}
@@ -89,7 +89,7 @@ export const StateBehavior: Story = {
         </FieldControlGroup>
       </div>
       <div>
-        <p className="text-caption text-fg-muted mb-2">cell error(其中一 child invalid → border-error + z-3)</p>
+        <p className="text-caption text-fg-muted mb-2">cell error(其中一 child invalid → border-error;聚焦該 child 時才提升到 z-3 蓋過鄰接 border)</p>
         <FieldControlGroup block>
           <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
           <Input className="flex-1" defaultValue="無線滑鼠" error />

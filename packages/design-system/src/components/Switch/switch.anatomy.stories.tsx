@@ -173,7 +173,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>Disabled 策略:opacity 而非灰階 swap</H3>
         <Desc>Switch 的 on/off 視覺差異**唯一載體是顏色**(track bg-primary vs bg-border)——track 和 thumb 在 on/off 之間形狀完全相同。若用灰階 swap(把 primary 換成 border),disabled 的 ON 和 OFF 會看起來一模一樣,使用者無法分辨當前狀態。必須保留顏色。</Desc>
-        <p className="text-footnote text-fg-muted">對照 Checkbox / Slider 用灰階 swap(形狀/位置承載 state,不依賴顏色)——詳見 switch.spec.md「Disabled 用 `opacity`」。</p>
+        <p className="text-footnote text-fg-muted">對照 Checkbox / Slider 用灰階弱化(它們的形狀或位置本身就承載開 / 關狀態,不靠顏色),所以灰掉也看得出狀態;Switch 只靠顏色,只能降透明度保留顏色。</p>
       </div>
     </div>
   ),
@@ -215,7 +215,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `switch.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  switch  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/switch#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- Space / Enter — toggle on/off\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1"}</p>
+      <p className="whitespace-pre-line">{"無障礙設計摘要:\n\n  ARIA  :Switch 本體是一顆原生切換按鈕(role=\"switch\" + aria-checked),角色與狀態都由瀏覽器和 Radix 自動提供。可參考 [Radix 無障礙說明](https://www.radix-ui.com/primitives/docs/components/switch#accessibility)。\n\n  鍵盤操作  :\n\n- Tab — 把焦點移到開關上\n- Space / Enter — 切換開 / 關\n\n  焦點外觀  :開關本身就能被 Tab 聚焦(它是一顆按鈕);聚焦時會顯示一圈藍色 focus ring(由設計系統的 focus-visible 樣式提供,2px ring 用 --ring 色)。它是單一控件,沒有「焦點鎖定 / 還原」這種彈窗才有的行為。\n\n  驗證  :Storybook a11y 面板應為 0 critical violation;只用鍵盤即可完整操作(不需滑鼠)。文字對比 WCAG AA ≥ 4.5:1、UI 元素 ≥ 3:1。"}</p>
     </div>
   ),
 }

@@ -202,7 +202,7 @@ Switch 可透過 `label` / `description` props 內部直接渲染緊鄰文字：
 - Tab — focus
 - Space / Enter — toggle on/off
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:Switch 本體是原生切換按鈕,本身即可被 Tab 聚焦;聚焦時的 focus-visible ring 由 design-system 的 focus-visible 樣式提供(`focus-visible:ring-2 focus-visible:ring-ring`)。Switch 是單一控件,不涉及 focus trap / restoration(那是 Dialog / Popover 等容器才有的行為)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

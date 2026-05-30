@@ -36,7 +36,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Internal/SelectionControl/展示" name="前綴頭像"><span className="text-primary hover:underline font-medium cursor-pointer">前綴頭像</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時,參考下方「SelectionControl 與 Checkbox + Field 的差異」說明;若場景不符,改用對應的近親元件。</p>
     </div>
 
       {/* vs 近親 — VsCheckboxRule — 原 VsCheckboxRule */}
