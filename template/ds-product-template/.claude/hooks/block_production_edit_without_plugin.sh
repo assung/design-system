@@ -25,13 +25,17 @@ esac
 
 HOME_DIR="${HOME:-$(echo ~)}"
 CWD="$(pwd)"
-for p in \
-  "$HOME_DIR/.claude/plugins/design-system" \
-  "$HOME_DIR/.claude/plugins/design-system@qijenchen-ds" \
-  "$CWD/.claude/plugins/design-system" \
-  "$CWD/.claude/plugins/design-system@qijenchen-ds"; do
-  [ -d "$p" ] && exit 0   # 已裝 → 放行(plugin 自己的 hook 接手)
-done
+# 2026-05-31 fix(infra-audit P1):原查 ~/.claude/plugins/design-system = Claude Code 從不建的路徑,
+# fork user 正確裝 plugin 後仍永久誤擋。真實 layout:marketplace cloned 到 ~/.claude/plugins/marketplaces/<name>/
+# + 記在 known_marketplaces.json(keyed by marketplace name)。我們 marketplace name = qijenchen-ds。
+MARKETPLACE="qijenchen-ds"
+KM="$HOME_DIR/.claude/plugins/known_marketplaces.json"
+if [ -d "$HOME_DIR/.claude/plugins/marketplaces/$MARKETPLACE" ] \
+   || [ -d "$CWD/.claude/plugins/marketplaces/$MARKETPLACE" ] \
+   || { [ -f "$KM" ] && grep -q "\"$MARKETPLACE\"" "$KM"; } \
+   || [ -d "$HOME_DIR/.claude/plugins/design-system" ]; then
+  exit 0   # 已裝 → 放行(plugin 自己的 hook 接手)
+fi
 
 # 沒裝 + 改 production code → BLOCK
 cat >&2 <<'EOF'

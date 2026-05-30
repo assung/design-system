@@ -35,13 +35,17 @@ fi
 # (c) Plugin 已安裝?Anthropic plugin install 可能使用 <plugin> 或
 # <plugin>@<marketplace> directory name;accept both.
 PLUGIN_INSTALLED=0
+# 2026-05-31 fix(infra-audit P1):真實 Claude Code layout = ~/.claude/plugins/marketplaces/<name>/
+# + known_marketplaces.json(keyed by marketplace name)。原查 plugins/design-system + 錯的
+# .claude/marketplaces(漏 plugins/)= 裝了仍誤判未裝。marketplace name = qijenchen-ds。
+MARKETPLACE="qijenchen-ds"
+KM="$HOME/.claude/plugins/known_marketplaces.json"
+[ -d "$HOME/.claude/plugins/marketplaces/$MARKETPLACE" ] && PLUGIN_INSTALLED=1
+[ -d "$CWD/.claude/plugins/marketplaces/$MARKETPLACE" ] && PLUGIN_INSTALLED=1
+{ [ -f "$KM" ] && grep -q "\"$MARKETPLACE\"" "$KM"; } && PLUGIN_INSTALLED=1
+# legacy / 舊 layout fallback
 [ -d "$HOME/.claude/plugins/design-system" ] && PLUGIN_INSTALLED=1
-[ -d "$HOME/.claude/plugins/design-system@qijenchen-ds" ] && PLUGIN_INSTALLED=1
 [ -d "$CWD/.claude/plugins/design-system" ] && PLUGIN_INSTALLED=1
-[ -d "$CWD/.claude/plugins/design-system@qijenchen-ds" ] && PLUGIN_INSTALLED=1
-# 也接受 plugin marketplace cache(claude code 自動產生)
-[ -d "$HOME/.claude/marketplaces"/*/design-system/ ] 2>/dev/null && PLUGIN_INSTALLED=1
-[ -d "$HOME/.claude/marketplaces"/*/design-system@qijenchen-ds/ ] 2>/dev/null && PLUGIN_INSTALLED=1
 
 if [ "$PLUGIN_INSTALLED" = "1" ]; then
   exit 0

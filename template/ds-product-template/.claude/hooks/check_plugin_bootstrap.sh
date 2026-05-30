@@ -10,13 +10,16 @@ set -uo pipefail
 
 HOME_DIR="${HOME:-$(echo ~)}"
 CWD="$(pwd)"
-for p in \
-  "$HOME_DIR/.claude/plugins/design-system" \
-  "$HOME_DIR/.claude/plugins/design-system@qijenchen-ds" \
-  "$CWD/.claude/plugins/design-system" \
-  "$CWD/.claude/plugins/design-system@qijenchen-ds"; do
-  [ -d "$p" ] && exit 0   # 已裝 → silent
-done
+# 2026-05-31 fix(infra-audit P1):真實 Claude Code layout = marketplaces/<name>/ + known_marketplaces.json
+# (原查 plugins/design-system 路徑從不存在 → 裝了仍每 session 誤提醒)。marketplace name = qijenchen-ds。
+MARKETPLACE="qijenchen-ds"
+KM="$HOME_DIR/.claude/plugins/known_marketplaces.json"
+if [ -d "$HOME_DIR/.claude/plugins/marketplaces/$MARKETPLACE" ] \
+   || [ -d "$CWD/.claude/plugins/marketplaces/$MARKETPLACE" ] \
+   || { [ -f "$KM" ] && grep -q "\"$MARKETPLACE\"" "$KM"; } \
+   || [ -d "$HOME_DIR/.claude/plugins/design-system" ]; then
+  exit 0   # 已裝 → silent
+fi
 
 cat <<'EOF'
 🛑 DS governance plugin 尚未安裝 — 用 Claude 做產品前必先裝(否則沒有設計原則 / SSOT 的機械防線,
