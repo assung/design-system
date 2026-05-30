@@ -251,6 +251,30 @@ if command -v node >/dev/null 2>&1 && [ -f scripts/sync-governance-counters.mjs 
   fi
 fi
 
+# Check 11: Cross-repo env smoke(2026-05-30 — NON-BLOCKING:只進 PRUNE_TRIGGERS soft channel,
+# 永不進 BLOCKER 路徑、永不非零退出。set -uo pipefail(無 -e)→ 探針非零返回不殺 script;
+# 但 set -u 下 unset var 必 ${VAR:-} guard。每探針獨立、無 network、無 blocking subshell。
+ENV_SMOKE=""
+# (a) plugin-mode 完整性 — CLAUDE_PLUGIN_ROOT 在 ds-repo native mode 可能 UNSET → 先 guard 才用
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ ! -d "${CLAUDE_PLUGIN_ROOT:-}/hooks" ]; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - Plugin mode:\$CLAUDE_PLUGIN_ROOT 有設但 hooks/ 找不到 → plugin install 可能不完整(跑 /plugin marketplace update)。"
+fi
+# (b) node 在 PATH — audit scripts 依賴
+if ! command -v node >/dev/null 2>&1; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - node 不在 PATH → audit scripts(dispatch-audit-dims / content-quality)在此環境跑不動。"
+fi
+# (c) codex transport(informational;缺 = fork repo 正常,Phase B 自動 fallback)
+if [ ! -x node_modules/.bin/codex ] && ! command -v codex >/dev/null 2>&1; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - codex CLI 缺 → deep-audit Phase B dual-track 自動 fallback Phase-A-only(fork repo 屬正常;要雙軌跑 npm i -D @openai/codex)。"
+fi
+# (d) consumer-mode DS resolution — fork repo 引 npm DS 但未安裝
+if [ -f package.json ] && grep -q '"@qijenchen/design-system"' package.json 2>/dev/null && [ ! -d node_modules/@qijenchen/design-system ]; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - Consumer repo 引用 @qijenchen/design-system 但 node_modules 沒裝(跑 npm install)。"
+fi
+if [ -n "$ENV_SMOKE" ]; then
+  PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- 🩺 env-smoke(non-blocking,環境健檢):${ENV_SMOKE}"
+fi
+
 # Inject if HARD BLOCKERS(must)or auto-prune-triggers or quarterly-prune-overdue
 QUARTERLY_DUE=""
 if [ -f .claude/logs/.last-prune ]; then
@@ -271,6 +295,8 @@ elif [ -n "$PRUNE_TRIGGERS" ]; then
 else
   MSG="🧭 Governance hygiene reminder (SessionStart):${QUARTERLY_DUE}\nNot blocking — address inline when convenient."
 fi
+# fail-open:無 jq(eg. 殘缺 PATH / minimal cloud sandbox)→ 靜默 exit 0,不吐 malformed JSON(2026-05-30 硬化)
+command -v jq >/dev/null 2>&1 || exit 0
 ESCAPED=$(printf '%b' "$MSG" | jq -Rs .)
 printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$ESCAPED"
 exit 0

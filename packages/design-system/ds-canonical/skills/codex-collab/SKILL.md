@@ -62,7 +62,7 @@ ls -la ~/.codex/auth.json                                              # 3 Auth(
 | Step | Claude | Codex | 共通 invariant |
 |---|---|---|---|
 | **1 各自熟讀** | grep / read spec.md / canonical / source 真讀 | `exec -s read-only` grep / git show / read source | 憑印象 propose = M31 違反 |
-| **2 各自驗證** | `npx tsc -b` + invariant + audit script | `exec` 跑 grep / git show 證據 | 任一方未跑真 verify 撤回 propose |
+| **2 各自驗證** | `npx tsc -b` + invariant + audit script | **audit-verify**:`exec --dangerously-bypass-approvals-and-sandbox -C $PWD`(user-authorize)跑**同樣** tsc / invariant / .mjs / Playwright + 貼 stdout(per `references/phase-b-codex-brief.md` B.0.1);**純讀**:`exec -s read-only` grep / git show | 任一方未跑真 verify 撤回;**禁** codex 只目測機械維度(verify 不對稱違 M31 Step 2)|
 | **3 各自視覺稽核** | playwright screenshot + DOM + pixel audit | code-read + diff + grep visual path | 只 code 跳 visual 違反 user directive |
 | **4 各自 cite-based propose** | 3-column:`spec.md path:line / 引文 / reasoning` | 同上獨立出 | hand-wave 無 cite 撤回 |
 | **5 整合完美版本**(NOT pass-through)| Agree → synthesize 補對方缺漏;Disagree → cite battle verify 對方 cite + counter-cite | 同上雙向 | **絕禁** Claude pass-through codex / 只一方驗證跳整合 |
