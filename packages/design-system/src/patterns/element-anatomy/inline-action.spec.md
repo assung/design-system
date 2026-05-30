@@ -199,7 +199,7 @@ Canonical 實作於 `item-anatomy.tsx`,匯出 `ItemInlineAction` / `ItemSuffix`(
 <ItemSuffix hoverReveal>{actions.map((a) => <ItemInlineAction action={a} />)}</ItemSuffix>
 ```
 
-**Host 走宣告式 API**(`inlineActions?: InlineActionConfig[]` prop)— 不自刻 button JSX。已遷移:`SidebarMenuButton`。Pending refactor:`Input` / `NumberInput` / `Tag` / `LinkInput` / `Combobox`。
+**Host 走宣告式 API**(`inlineActions?: InlineActionConfig[]` / `endAction?: InlineActionConfig` prop)— 不自刻 button JSX。已遷移:`SidebarMenuButton` / `Input` / `NumberInput`(2026-05-31 infra-audit 修 stale status:verify input.tsx/number-input.tsx 已用 endAction InlineActionConfig)。Pending refactor:`Tag` / `LinkInput` / `Combobox`。
 
 ### Dismiss canonical — X close only
 
@@ -302,3 +302,13 @@ hook `check_story_anatomy.sh` 規則 B 已在 stories 層攔 label Button 作 di
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `sheet.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `alert.spec.md`
+- `breadcrumb.spec.md`
+- `data-table.spec.md`
+- `field-controls.spec.md`
+- `popover.spec.md`
