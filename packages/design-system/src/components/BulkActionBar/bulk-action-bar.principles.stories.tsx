@@ -150,7 +150,7 @@ export const ActionVariantRule: Story = {
     <div>
       <Rule
         title="✅ 批次 action 用 tertiary,destructive 用 tertiary + danger"
-        note="批次操作是『可取消的入口』(點下後一般會走 confirmation dialog)。primary 留給 dialog 內最終確認那顆。對齊 button.spec.md「Inline destructive 不用 primary」canonical"
+        note="批次操作是『可取消的入口』(點下後通常還會跳出確認視窗),所以用次要樣式(tertiary)就好;最強調的 primary 樣式留給確認視窗裡那顆最終按鈕。刪除這類危險操作也只加 danger 紅色,不升成 primary。"
       >
         <BulkActionBar
           selection={['a', 'b', 'c']}

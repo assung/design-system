@@ -299,7 +299,7 @@ export const ScopeRule: Story = {
     <div>
       <Rule
         title="Breadcrumb 可容納 icon 強化首項（如 Home）"
-        note="首項用 Home icon 是業界慣例(Material / Atlassian),視覺錨點明確。其他 item 通常純文字。Icon size 由 DS 統一管(消費 BREADCRUMB_ICON_SIZE SSOT,對齊 uiSize.spec.md Icon Size Tier sm/md=16,lg=20),consumer 用 `startIcon` prop 不傳 size。"
+        note="首項用 Home icon 是業界慣例(Material / Atlassian),視覺錨點明確。其他 item 通常純文字。圖示大小由設計系統統一控制(小 / 中尺寸 16px、大尺寸 20px),你只要用 `startIcon` 指定要哪個圖示,不用自己設大小。"
       >
         <Breadcrumb>
           <BreadcrumbList>
