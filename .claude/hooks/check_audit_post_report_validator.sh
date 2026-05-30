@@ -58,12 +58,21 @@ if [ -f "$AUDIT_PROMPTS" ]; then
   # 才能派 agent;deterministic/hook dim 不需）。prompts < judgment dim = 有 judgment dim 派不出 agent。
   # 2026-05-30 fix(hook-test surfaced):`grep -c ... || echo 0` 在 0-match 時 grep 已印 "0" + exit 1,
   # `|| echo 0` 再 append → "0\n0" → 下方 `[ -lt ]` integer error → trigger 失效。改 `|| true` + 取首行。
-  PROMPT_DIM_COUNT=$(grep -cE '^##[[:space:]]+[0-9]+\.' "$AUDIT_PROMPTS" 2>/dev/null | head -1 || true)
-  PROMPT_DIM_COUNT=${PROMPT_DIM_COUNT:-0}
-  JUDGMENT_DIMS=$(node -e "try{const m=JSON.parse(require('fs').readFileSync('$PROJECT_DIR/.claude/logs/audit-coverage-matrix.json','utf8'));console.log(Object.values(m.coverage_by_dim).filter(v=>v.tier==='PURE-JUDGMENT').length)}catch{console.log(24)}" 2>/dev/null || echo 24)
-  if [ "$PROMPT_DIM_COUNT" -lt "$JUDGMENT_DIMS" ]; then
-    WARNINGS="${WARNINGS}\n  🔴 [C] audit-prompts.md prompt coverage:${PROMPT_DIM_COUNT} prompt < ${JUDGMENT_DIMS} PURE-JUDGMENT dim — 有 judgment dim 無 prompt → sub-agent 派不動 → 必被跳過。補 prompt 進 audit-prompts.md"
-    TRIGGER_PRUNE=1
+  # 2026-05-31 fix(infra-audit self-finding):原 `[53 -lt 23]` 是 count-vs-count = 永遠 false = dead gate。
+  # 改 SET-MEMBERSHIP:逐個 PURE-JUDGMENT dim 號檢查 audit-prompts.md 有無對應 `## N.` heading,列出缺的。
+  MISSING_PROMPTS=$(node -e "
+    try {
+      const fs=require('fs');
+      const m=JSON.parse(fs.readFileSync('$PROJECT_DIR/.claude/logs/audit-coverage-matrix.json','utf8'));
+      const judg=Object.entries(m.coverage_by_dim).filter(([k,v])=>v.tier==='PURE-JUDGMENT').map(([k])=>+k);
+      const prompts=fs.readFileSync('$AUDIT_PROMPTS','utf8');
+      const have=new Set([...prompts.matchAll(/^##\s+(\d+)\./gm)].map(x=>+x[1]));
+      console.log(judg.filter(d=>!have.has(d)).join(','));
+    } catch(e){ console.log(''); }
+  " 2>/dev/null || echo "")
+  if [ -n "$MISSING_PROMPTS" ]; then
+    WARNINGS="${WARNINGS}\n  🔴 [C] audit-prompts.md 缺 judgment dim prompt:dim ${MISSING_PROMPTS} 是 PURE-JUDGMENT 卻無 \`## N.\` rubric → sub-agent 派不出正確 prompt → 必被跳過。補這些 dim 的 prompt 進 audit-prompts.md。"
+    TRIGGER_PRUNE=1; CRITICAL_FAIL=1
   fi
 fi
 
@@ -82,7 +91,7 @@ fi
 if [ "$DIM_COUNT" -ge 10 ]; then   # 只對 full/deep-audit 規模 report 要求(小 scoped report 豁免)
   if ! grep -qiE 'story-vs-code|FALSE_CLAIM|claimsVerified|宣稱.*(真實|code)|A\.1b|逐句比對' "$FILE_PATH" 2>/dev/null; then
     WARNINGS="${WARNINGS}\n  🔴 [F] Story-vs-code adversarial pass 缺席:deep-audit report(${DIM_COUNT} dim)無 A.1b per-component story-vs-code verdict 證據。202 FALSE_CLAIM(2026-05-30)正是此 pass 沒跑 → 補跑 A.1b(讀每元件 .tsx + wrap lib 逐句驗 anatomy/a11y/spec 宣稱)再出 report。"
-    TRIGGER_PRUNE=1
+    TRIGGER_PRUNE=1; CRITICAL_FAIL=1
   fi
 
   # ─ Validator G: 全 PURE-JUDGMENT dim(含 infra 62/66/68/72)必 show「真跑」證據,非只 mention(2026-05-30 generalize)─
@@ -95,8 +104,15 @@ if [ "$DIM_COUNT" -ge 10 ]; then   # 只對 full/deep-audit 規模 report 要求
   EVIDENCE_COUNT=${EVIDENCE_COUNT:-0}
   if [ "$EVIDENCE_COUNT" -lt "$PJ_COUNT" ]; then
     WARNINGS="${WARNINGS}\n  🔴 [G] PURE-JUDGMENT dim 真跑證據不足:report 只 ${EVIDENCE_COUNT} 個 per-dim 證據 marker < ${PJ_COUNT} judgment dim(含 infra 62/66/68/72)。judgment dim 無 script/hook 兜底,必每 dim show『DS-wide N files scanned + file:line / 0-after-全掃』證據,否則=mention-only 偷懶。補齊再出 report。"
-    TRIGGER_PRUNE=1
+    TRIGGER_PRUNE=1; CRITICAL_FAIL=1
   fi
+fi
+
+# ─ Validator BLOCK gate(2026-05-31 fix infra-audit self-finding:原 hook 只 exit 0 + additionalContext
+#   soft-inject = 我過度宣稱「BLOCKER」。改:C/F/G critical fail → stderr + exit 2 真 block PostToolUse)─
+if [ "${CRITICAL_FAIL:-0}" -eq 1 ]; then
+  printf '🚨 AUDIT-REPORT VALIDATOR BLOCK(C/F/G critical):%b\n\n此 deep-audit report 不合格,補齊上述後重出 report。' "$WARNINGS" >&2
+  exit 2
 fi
 
 # ─ Validator E: prune-chain-trigger emit ──────────────────────────────────

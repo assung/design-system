@@ -1258,3 +1258,50 @@ Report ONLY violations。Format:
 
 End: `N components checked, M reverse drift gaps.` Under 400 words. Don't fix.
 ```
+
+## 62. Fork Netlify onboarding canonical(PURE-JUDGMENT,2026-05-31 補 — infra-audit self-finding 漏)
+
+**Type**: Absolute / **Canonical**: `template/ds-product-template/{netlify.toml,.storybook/manager-head.html,CLAUDE.md}` + `scripts/setup-netlify-access.mjs` + `build-published-template-mirror.mjs` / **Home**: scenario-definition.md
+
+```
+Your job(NO-SAMPLE):驗 fork user 從 published template 起手到首次部署的 onboarding 全鏈完整且正確。
+Enumerate + Read(全部,非 sample):template/ds-product-template/ 全 27 file 中的 netlify.toml / manager-head.html /
+CLAUDE.md Access-control 段 / package.json deploy scripts / setup-netlify-access.mjs。對每環節驗:
+1. netlify.toml build/publish/headers 正確(consumer 直接能 deploy)
+2. Basic Password / Access-control 機制有 documented plain-Chinese 引導
+3. mirror build 真把這些 inject 到 published(跑 build-published-template-mirror.mjs --out 驗 0 leak + 檔齊)
+4. CLAUDE.md 對 fork user 的 setup 步驟無斷點 / 斷點有具體中文引導
+Report file:line gaps。End:`N onboarding 環節 checked, M gaps`。Don't fix.
+```
+
+## 66. Cross-repo dispatch + visual parity(PURE-JUDGMENT,2026-05-31 補)
+
+**Type**: Absolute / **Canonical**: `release.yml` dispatch steps + `template/sync-design-system.yml` + `composition-fidelity.yml` + `dogfood-prepublish-verify.mjs` + `scripts/visual-assertions.json` / **Home**: scenario-definition.md mirror chain
+
+```
+Your job(NO-SAMPLE):驗 DS push main → npm publish → fork repo 取得更新 → visual parity 整鏈無斷。
+Enumerate + Read:release.yml(publish + dispatch)/ mirror workflow / sync-design-system.yml(fork 端接收)/
+composition-fidelity visual-diff scenarios(全 N scenario)/ dogfood-prepublish。對每環節驗 trigger event type 正確、
+無 PAT scope 漏、visual parity scenario 覆蓋 stakeholder flow。Report file:line。End:`N 環節, M gaps`。Don't fix.
+```
+
+## 68. Stories-vs-spec drift(PURE-JUDGMENT,2026-05-31 補)
+
+**Type**: Absolute / **Canonical**: `@canonical-pattern` / `@anti-pattern` markers + 各 component spec.md / **Home**: 該 component spec.md
+
+```
+Your job(NO-SAMPLE 全 component):驗 stories 標的 @canonical-pattern / @anti-pattern 與 spec.md 宣告一致,
+且 anatomy/principles 教的 pattern 未與 spec「禁止事項」矛盾。Enumerate 全 83 component。Report file:line drift。
+End:`N components, M drift`。Don't fix.
+```
+
+## 72. DS API surface tightening(PURE-JUDGMENT,2026-05-31 補)
+
+**Type**: Watch / **Canonical**: per-component API surface + `tightening-roadmap.md`(若存在;不存在則以 props-naming.md + 各 spec API 段為準)/ **Home**: 該 component spec.md API 段
+
+```
+Your job(NO-SAMPLE 全 component):per-component review 公開 API surface 是否過寬 / 漏緊(eg. CircularProgress
+size?:number 該否限 token tier、prop 命名違 props-naming canonical、escape-hatch prop 該收)。Enumerate 全 component
+export interface。Report over-broad / mis-named API with file:line + 建議 tighten 方向(propose only,不自動改 = SSOT-UI/UX)。
+End:`N components, M API-surface concerns`。Don't fix。
+```
