@@ -78,7 +78,7 @@ Example violations(historic — 2026-05-22 prune verify 後均已收斂為 point
 
 #### D2 — Dead & stale(fire / edit recency)
 
-- **Dead hooks**:讀 `.claude/logs/hook-fires-per-hook.jsonl`(2026-04-25 起 instrumented via `_log-fire.sh` helper),6 月 0 fire 的 hook 名 → retire 提名
+- **Dead hooks**:跑 `npm run audit:hook-quality`(= `scripts/audit-hook-quality.mjs`,讀 `.claude/logs/hook-fires-per-hook.jsonl` 自動產 per-hook signal-to-noise report → `.claude/logs/hook-quality-report.json`:fire_count_6mo / fire_per_day / hot-warm-cool-dead 分類 / file_exists orphan signal / retire_candidate flag)。6 月 0 fire 的 hook 名 → retire 提名(report 已標 `dead`)
 - **Stale memories**:`ls -la ~/.claude/.../memory/*.md`,6 月無 git log 變動且不在 MEMORY.md index head = stale
 - **Unused skills**:`skill-invokes.jsonl` 3 月 0 invoke(除非是 rare-event skill,例 `delivery-handoff`)
 

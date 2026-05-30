@@ -41,6 +41,7 @@
     "sync:ds-canonical": "node scripts/sync-ds-canonical.mjs",
     "verify:consumer-css": "node scripts/verify-consumer-css-entry.mjs",
     "verify:published-deploy": "node scripts/verify-published-deploy.mjs",
+    "audit:hook-quality": "node scripts/audit-hook-quality.mjs",
     "sync-counters": "node scripts/sync-governance-counters.mjs",
     "changeset": "changeset",
     "changeset:version": "changeset version && node scripts/sync-version-to-all-manifests.mjs",
