@@ -61,17 +61,20 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['TreeView', '', '', ''],
-                ['  value', 'string', '—', '當前選取的 node value(受控)'],
-                ['  onValueChange', '(value: string) => void', '—', '選取 callback'],
+                ['  selectedIds', 'Set<string>', '—', '選取的 node id(受控)'],
+                ['  onSelectedChange', '(ids: Set<string>) => void', '—', '選取變更 callback'],
+                ['  selectionMode', "'single' | 'multiple'", "'single'", "multiple 模式自動顯示 checkbox"],
+                ['  expandedIds / onExpandedChange', 'Set<string> / handler', '—', '展開狀態受控'],
+                ['  defaultExpandedIds', 'string[]', '—', '初始展開(uncontrolled)'],
+                ['  draggable / onDragEnd', 'boolean / handler', 'false', '拖曳重排'],
                 ['  size', "'sm' | 'md' | 'lg'", "'md'", 'font-size tier'],
                 ['TreeItem', '', '', ''],
-                ['  value', 'string', '必填', '唯一識別碼'],
+                ['  id', 'string', '必填', '唯一識別碼'],
                 ['  label', 'ReactNode', '必填', 'node 名稱'],
                 ['  icon', 'LucideIcon', '—', 'Prefix icon(資料夾 / 檔案類型)'],
-                ['  defaultExpanded', 'boolean', 'false', '初始展開狀態(uncontrolled)'],
-                ['  expanded / onExpandedChange', 'boolean / handler', '—', '展開狀態受控'],
-                ['  actions', 'ReactNode', '—', 'hover 時 suffix 顯示的 inline actions'],
-                ['  badge', 'ReactNode', '—', 'suffix 固定 badge(計數等)'],
+                ['  checkbox', 'ReactNode', '—', 'multiple 模式 selection checkbox(通常自動帶入)'],
+                ['  inlineActions / inlineActionsSlot', 'ReactNode', '—', 'hover suffix inline actions'],
+                ['  disabled', 'boolean', 'false', '停用該 node'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
