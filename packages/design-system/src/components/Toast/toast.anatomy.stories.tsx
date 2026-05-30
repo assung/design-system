@@ -5,7 +5,7 @@
 //     載體(對齊 Polaris / Material / Sonner 共識)。Toast 本身無尺寸決策,
 //     由 sonner Provider 控制 viewport position 與 stacking。
 import type { Meta, StoryObj } from '@storybook/react'
-import { toast } from './toast'
+import { toast, Toaster } from './toast'
 import { Button } from '@/design-system/components/Button/button'
 import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
@@ -38,6 +38,7 @@ export const Overview: Story = {
           })}>觸發 action toast</Button>
         </div>
       </div>
+      <Toaster />
 
       <div>
         <H3>ToastOptions(toast 函式參數)</H3>
@@ -127,8 +128,9 @@ export const Inspector: Story = {
           觸發 toast
         </Button>
         <p className="text-footnote text-fg-muted">
-          toast 會在右下角跳出(由 Provider 層 `&lt;Toaster /&gt;` 決定位置)。連續點擊觸發多個 toast 觀察 stacking。
+          toast 會在右下角跳出(由 Provider 層的 Toaster 決定位置)。連續點擊觸發多個 toast 觀察堆疊。
         </p>
+        <Toaster />
       </div>
     )
   },
@@ -200,6 +202,7 @@ export const ColorMatrix: Story = {
             </Button>
           ))}
         </div>
+        <Toaster />
       </div>
     </div>
   ),
@@ -218,9 +221,9 @@ export const StateBehavior: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>階段</Th><Th>觸發</Th><Th>行為</Th><Th>Token / 數值</Th></tr></thead>
             <tbody>
-              <tr><Td mono>進場</Td><Td mono>toast()</Td><Td>從右下滑入 + fade-in + stacking shift</Td><Td mono>duration-200</Td></tr>
+              <tr><Td mono>進場</Td><Td mono>toast()</Td><Td>從右下滑入 + fade-in + stacking shift</Td><Td mono>~400ms(sonner 內建)</Td></tr>
               <tr><Td mono>自動關閉</Td><Td>`duration` 到期</Td><Td>fade-out + 向右滑出</Td><Td mono>duration ?? 4000ms</Td></tr>
-              <tr><Td mono>手動 dismiss</Td><Td>X button / Swipe right</Td><Td>立即 fade-out + swipe</Td><Td mono>swipe threshold 20px</Td></tr>
+              <tr><Td mono>手動 dismiss</Td><Td>X button / 向右滑動</Td><Td>立即 fade-out + 滑出</Td><Td mono>滑動超過 45px</Td></tr>
               <tr><Td mono>Pause on hover</Td><Td>Hover 任一 toast</Td><Td>倒數暫停;離開後 resume</Td><Td mono>sonner 預設開啟</Td></tr>
             </tbody>
           </table>
@@ -230,8 +233,8 @@ export const StateBehavior: Story = {
       <div>
         <H3>Stacking — 多個 toast 堆疊</H3>
         <Desc>
-          連續觸發多個 toast 時,sonner 自動堆疊(最新的在上,舊的往下縮到後層)。超過 `visibleToasts`
-          數量時,溢出部分隱藏但保留計數。Hover 任一 toast 時展開全部,離開後收合。
+          連續觸發多個 toast 時,sonner 自動堆疊(最新的在上,舊的往下縮到後層)。預設最多同時顯示 3 則,
+          超過的會直接隱藏(不顯示「+N」計數)。Hover 任一 toast 時展開全部,離開後收合。
         </Desc>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -254,14 +257,14 @@ export const StateBehavior: Story = {
       <div>
         <H3>Swipe to dismiss — 觸控 / 滑鼠拖曳關閉</H3>
         <Desc>
-          Toast 支援向右 swipe 關閉(mobile 友善)。拖曳超過 20px threshold → 鬆開觸發 dismiss;
-          未達 threshold → 彈回原位。
+          Toast 支援向右滑動關閉(mobile 友善)。拖曳超過 45px(或滑動速度夠快)→ 鬆開觸發關閉;
+          未達門檻 → 彈回原位。
         </Desc>
         <Button
           variant="tertiary"
-          onClick={() => toast({ variant: 'info', title: '試著向右拖我', description: '超過 20px 會被關掉' })}
+          onClick={() => toast({ variant: 'info', title: '試著向右拖我', description: '向右拖超過 45px 會被關掉' })}
         >
-          觸發可 swipe 的 toast
+          觸發可滑動關閉的 toast
         </Button>
       </div>
 
@@ -303,6 +306,7 @@ export const StateBehavior: Story = {
           </table>
         </div>
       </div>
+      <Toaster />
     </div>
   ),
 }

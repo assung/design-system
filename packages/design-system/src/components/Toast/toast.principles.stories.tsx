@@ -2,7 +2,7 @@
 import React from 'react'
 import LinkTo from '@storybook/addon-links/react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { toast } from './toast'
+import { toast, Toaster } from './toast'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
@@ -48,7 +48,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Toast/展示" name="互動測試"><span className="text-primary hover:underline font-medium cursor-pointer">互動測試</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:先看下方「何時用 / 何時不用」的對照;若訊息重要到使用者必須看到、或需要使用者確認,就不該用 Toast,改用 Alert(持久顯示)或 Dialog(阻斷確認)。</p>
     </div>
 
       {/* vs 近親 — VsAlertVsDialogRule — 原 VsAlertVsDialogRule */}
@@ -102,6 +102,7 @@ export const UsageGuidance: Story = {
         <Label warn>↑ 破壞性動作靠 Toast action 確認 → 4 秒消失 / 點錯只能救 → 用 Dialog 聚焦確認</Label>
       </Rule>
     </div>
+    <Toaster />
     </div>
   ),
 }
@@ -141,6 +142,7 @@ export const ActionRule: Story = {
       >
         <Label warn>判準:如果後端真的無法復原 → Dialog 確認;若是 soft delete 可復原 → Toast + Undo</Label>
       </Rule>
+      <Toaster />
     </div>
   ),
 }
@@ -167,6 +169,7 @@ export const VariantRule: Story = {
       >
         <Button variant="tertiary" onClick={() => toast({ variant: 'neutral', title: '檔案已下載' })}>neutral 範例</Button>
       </Rule>
+      <Toaster />
     </div>
   ),
 }
@@ -208,6 +211,7 @@ export const DurationRule: Story = {
       >
         <Label warn>Toast 不該永遠停留——真的需要 persistent 用 Alert</Label>
       </Rule>
+      <Toaster />
     </div>
   ),
 }

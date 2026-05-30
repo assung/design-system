@@ -367,16 +367,18 @@ TreeView 真實展示需要**多層巢狀結構**才有意義(單節點無法體
 
 ## A11y 預設
 
-**ARIA / Pattern**:繼承 Radix `collapsible` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/collapsible#accessibility)。
+**ARIA / Pattern**:自建 ARIA tree(非沿用 Radix 預設)。容器 `role="tree"`(多選時加 `aria-multiselectable`),每個 node `role="treeitem"` + `aria-expanded`(expandable 才有)/ `aria-selected` / `aria-level`,皆由元件手動設定(`tree-view.tsx` L880-888)。Radix `collapsible` 僅用於 children 展開 / 收合的高度動畫,**不提供** tree 的 role / aria / 鍵盤導覽(Radix 沒有 Tree primitive,見「定位」段)。對齊 [WAI-ARIA TreeView pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/)。
 
-**Keyboard 行為**:
+**Keyboard 行為**(自建 handler,`tree-view.tsx` L502-587):
 
-- Tab — 進入 tree
-- ↑/↓ — 導覽 items
-- ←/→ — collapse/expand
-- Enter — activate
+- Tab — 焦點進入整棵 tree(單一 tab stop)
+- ↑/↓ — 在可見 node 之間移動
+- → — 展開 node,已展開則移到第一個 child
+- ← — 收合 node,leaf 則跳回 parent
+- Home / End — 跳到第一個 / 最後一個可見 node
+- Enter / Space — 選取目前 node
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:焦點由元件自管(roving focus)——整棵 tree 是單一 tab stop(root `tabIndex={0}`),鍵盤移動時用內描邊高亮標示目前 node(`ring-2 ring-ring ring-inset`,非 `outline`)。**無** focus trap、**無** focus restoration(tree 不是浮層,不需要)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

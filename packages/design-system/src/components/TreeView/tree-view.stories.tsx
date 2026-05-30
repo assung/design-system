@@ -276,18 +276,18 @@ export const IndentAlignment: Story = {
         </p>
       </div>
       <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden py-2">
-        <TreeView aria-label="對齊驗證" defaultExpandedIds={['a', 'b', 'c']}>
-          <TreeItem id="a" icon={Folder} label="有 icon + 有 children">
-            <TreeItem id="a1" icon={FileText} label="有 icon leaf" />
-            <TreeItem id="a2" label="無 icon leaf（應有 icon 佔位）" />
+        <TreeView aria-label="專案檔案樹" defaultExpandedIds={['src', 'components', 'public']}>
+          <TreeItem id="src" icon={Folder} label="src">
+            <TreeItem id="app" icon={FileCode} label="App.tsx" />
+            <TreeItem id="readme" label="README.md" />
           </TreeItem>
-          <TreeItem id="b" label="無 icon + 有 children">
-            <TreeItem id="b1" label="子 leaf" />
+          <TreeItem id="public" label="public">
+            <TreeItem id="favicon" icon={Image} label="favicon.ico" />
           </TreeItem>
-          <TreeItem id="c" icon={Folder} label="3 層深度驗證">
-            <TreeItem id="c1" icon={Folder} label="Level 1">
-              <TreeItem id="c1a" icon={FileCode} label="Level 2 leaf" />
-              <TreeItem id="c1b" label="Level 2 無 icon" />
+          <TreeItem id="components" icon={Folder} label="components">
+            <TreeItem id="button" icon={Folder} label="Button">
+              <TreeItem id="button-tsx" icon={FileCode} label="Button.tsx" />
+              <TreeItem id="button-test" label="Button.test.tsx" />
             </TreeItem>
           </TreeItem>
         </TreeView>

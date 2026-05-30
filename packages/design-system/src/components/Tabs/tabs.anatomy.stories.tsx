@@ -72,7 +72,9 @@ export const Overview: Story = {
                 ['TabsTrigger', '', '', ''],
                 ['  value', 'string', '必填', '唯一識別碼,對應 TabsContent value'],
                 ['  startIcon', 'LucideIcon', '—', '前綴 icon(描述 tab 類型)'],
-                ['  suffix', 'ReactNode', '—', '後綴(badge 計數 / endIcon 指示)'],
+                ['  badge', 'ReactNode', '—', '後綴計數指示(通常放 Badge)'],
+                ['  endIcon', 'LucideIcon', '—', '後綴純視覺 indicator(方向 / 狀態,連同 tab 一起點)'],
+                ['  inlineAction', 'ReactNode', '—', '後綴獨立點擊區(自己的 handler,不切 tab)'],
                 ['  disabled', 'boolean', 'false', '停用該 tab'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -412,7 +414,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `tabs.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  tabs  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tabs#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 TabList\n- ←/→ — 切 tab\n- Home/End — 第一 / 最後 tab\n- Enter / Space — activate\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `tabs.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  tabs  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tabs#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 TabList(整組 tabs 是單一 tab stop)\n- ←/→ — 在 tab 之間移動(roving tabindex,焦點不被困在 tab 列內)\n- Home/End — 第一 / 最後 tab\n- Enter / Space — activate\n\n  Focus  :Tabs 是內嵌導覽,不會把焦點困住(無 focus trap);用 roving tabindex 管理 tab 之間的移動。選中的 tab 與內容面板各自有 focus-visible 焦點框(ring-2 ring-ring,per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。"}</p>
     </div>
   ),
 }
