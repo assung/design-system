@@ -101,7 +101,7 @@ export const UsageGuidance: Story = {
             <Input className="flex-1" placeholder="912 345 678" />
           </FieldControlGroup>
         </Field>
-        <p className="text-caption text-fg-muted mt-2">Field label / description / error 對 group 整體生效;group 內 children 自管 size cascade。</p>
+        <p className="text-caption text-fg-muted mt-2">Field label / description / error 對 group 整體生效;children 的 size 各自從外層 Field context 繼承(FCG 不傳遞 size)。</p>
       </section>
 
       <section>

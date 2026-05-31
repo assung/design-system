@@ -67,7 +67,7 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="❌ 不用其他 calendar library 平行實作"
-          note="未來若需要 Date Range / DateTime,擴充本 Calendar(`./calendar.tsx`)而非引入第二個 library——避免兩套視覺語言在同一系統並存"
+          note="未來若需要 Date Range / DateTime,擴充本 DateGrid(`../DateGrid/date-grid.tsx`)而非引入第二個 library——避免兩套視覺語言在同一系統並存"
         >
           <Label>實作細節見 Design System / Components / DatePicker / 設計規格</Label>
         </Rule>
@@ -123,7 +123,7 @@ export const CalendarRule: Story = {
 
         <Rule
           title="Calendar 內部 token 全由 DS 控制"
-          note="Calendar 的月份 caption / nav 按鈕 / 星期標頭 / 日格 / hover / selected / today 全部由 DS token 驅動:hover 用 neutral-hover、selected 用 primary、today 用 ring-primary。切 dark mode 自動聯動,不需元件內重寫"
+          note="Calendar 的月份 caption / nav 按鈕 / 星期標頭 / 日格 / hover / selected / today 全部由 DS token 驅動:hover 用 ring-primary 透明底圈、selected 用 primary 藍底白字圓、today 用 primary 底部 bar(after 偽元素)。切 dark mode 自動聯動,不需元件內重寫"
         >
           <DatePicker value={releaseDate} onChange={setReleaseDate} />
           <Label>↑ 發佈日:Calendar 所有視覺 token 來自 semantic.css</Label>

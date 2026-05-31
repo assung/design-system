@@ -44,7 +44,8 @@ export const Overview: Story = {
         </div>
         <ul className="text-caption text-fg-muted mt-3 list-disc pl-5 space-y-1">
           <li>
-            <span className="font-mono">wrapper</span> — dashed border + rounded-md + px-6 py-10,
+            <span className="font-mono">wrapper</span> — dashed border + rounded-md + 對稱
+            `p-[var(--layout-space-loose)]`(density-aware:md=16px / lg=24px),
             `role="button"` + `tabIndex=0`,承載 drag events
           </li>
           <li>
@@ -241,9 +242,9 @@ export const ColorMatrix: Story = {
                   <TokenCell token="--surface" />
                 </Td>
                 <Td>
-                  <TokenCell token="--fg-muted" />
+                  <TokenCell token="--primary" />
                 </Td>
-                <Td>不變灰;顯示 CircularProgress + `cursor-progress` + `pointer-events-none`</Td>
+                <Td>不變灰;預設 icon 換成 CircularProgress(arc `--primary`) + `cursor-progress` + `pointer-events-none`</Td>
               </tr>
               <tr>
                 <Td mono>disabled</Td>
@@ -254,9 +255,9 @@ export const ColorMatrix: Story = {
                   <TokenCell token="--surface" />
                 </Td>
                 <Td>
-                  <TokenCell token="--fg-muted" />
+                  <TokenCell token="--foreground" />
                 </Td>
-                <Td>整體套 `opacity-disabled` + `pointer-events-none`</Td>
+                <Td>整體套 `opacity-disabled` + `pointer-events-none`(icon 仍 `--foreground`,由 wrapper opacity 變淡)</Td>
               </tr>
             </tbody>
           </table>
@@ -292,7 +293,8 @@ export const SizeMatrix: Story = {
         <H3>本元件不提供 `size` 變體</H3>
         <Desc>
           FileUpload 是 self-contained primitive(獨立拖放區),不參與 field-height family。
-          內部 padding 固定為 `px-6 py-10`,預設 children 的 icon / title / description 尺寸
+          內部 padding 為對稱 `p-[var(--layout-space-loose)]`(density-aware:md=16px / lg=24px),
+          預設 children 的 icon / title / description 尺寸
           由 Empty 元件 擁有(主檔)(`../Empty/empty.spec.md`)。
           <br />
           <strong>空間大小由 consumer 以 wrapper width / min-height 控制</strong>
@@ -310,14 +312,9 @@ export const SizeMatrix: Story = {
             </thead>
             <tbody>
               <tr>
-                <Td mono>px-6</Td>
-                <Td mono>24px 左右 padding</Td>
-                <Td>固定,不隨 density 變化</Td>
-              </tr>
-              <tr>
-                <Td mono>py-10</Td>
-                <Td mono>40px 上下 padding</Td>
-                <Td>垂直鬆散感 = 拖放區視覺邀請性</Td>
+                <Td mono>p-[var(--layout-space-loose)]</Td>
+                <Td mono>md=16px / lg=24px(對稱四邊)</Td>
+                <Td>density-aware,對齊 DS chrome padding canonical(非固定值)</Td>
               </tr>
               <tr>
                 <Td mono>default children</Td>
@@ -448,7 +445,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `fileupload.spec.md` 「A11y 預設」段。摘要:\n\n-  role=\"button\"  +  tabIndex=0 (disabled 時  -1 )\n- Enter / Space 鍵觸發檔案選取浮窗(模擬 click)\n-  aria-disabled={true}  當 disabled\n-  <input type=\"file\">  隱藏但仍可被 screen reader 偵測到;Label 透過 container 文字(title + description)提供情境"}</p>
+      <p className="whitespace-pre-line">{"詳 `fileupload.spec.md` 「A11y 預設」段。摘要:\n\n-  role=\"button\"  +  tabIndex=0 (disabled 時  -1 )\n- Enter / Space 鍵觸發檔案選取浮窗(模擬 click)\n-  aria-disabled={true}  當 disabled\n-  <input type=\"file\">  以  hidden (display:none) 隱藏,移出無障礙樹;互動由外層  role=\"button\"  wrapper 承載,accessible name 來自 wrapper 內 Empty 的 title + description 文字"}</p>
     </div>
   ),
 }

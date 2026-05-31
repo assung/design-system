@@ -244,7 +244,7 @@ export const StateBehavior: Story = {
           <li>點擊 trigger → 開啟</li>
           <li>點 Popover 外部 → 關閉(click outside)</li>
           <li>按 Esc → 關閉</li>
-          <li>焦點離開 trigger-content 樹 → 關閉(可 `onOpenAutoFocus` preventDefault 覆寫)</li>
+          <li>焦點離開 trigger-content 樹 → 關閉(focus outside,Radix `DismissableLayer` 控制)</li>
         </ul>
       </div>
 

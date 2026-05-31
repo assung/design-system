@@ -245,7 +245,7 @@ export const SizeMatrix: Story = {
     <div className="flex flex-col gap-6">
       <div>
         <H3>三種 Size</H3>
-        <Desc>Indicator 尺寸對齊 Avatar.block tier(sm 24、md 32、lg 40)。字體跟 MenuItem / TreeItem 同 tier。</Desc>
+        <Desc>Indicator 直徑:sm 8px dot(hit area 24px)、md 24px、lg 32px(md/lg 對齊 Avatar tier)。字體跟 MenuItem / TreeItem 同 tier。</Desc>
         <div className="flex flex-col gap-4">
           {(['sm', 'md', 'lg'] as const).map(size => (
             <div key={size} className="border border-dashed border-divider rounded-md p-4">
@@ -371,7 +371,7 @@ export const StateBehavior: Story = {
         <span className="text-caption font-medium text-fg-secondary">行為 1:進度流轉(current → completed 連鎖變化)</span>
         <Desc>
           當 consumer 把 cart 推入 completedValues 並把 shipping 設為 current,observe 三件事同時發生:
-          cart indicator 切 filled check、connector(cart→shipping)切 primary、shipping 切 hollow-ring。
+          cart indicator 切 filled check、connector(cart→shipping)切 primary、shipping(md current)切 filled bg-primary + 白數字並疊 focus 外環。
           對照 Linear 的 onboarding / Stripe Checkout。
         </Desc>
         <ProgressFlow />

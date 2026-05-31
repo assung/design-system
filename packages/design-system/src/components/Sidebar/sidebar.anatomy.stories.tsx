@@ -162,7 +162,7 @@ export const Overview: Story = {
           SidebarMenu        ← flex-col, no gap
             SidebarMenuItem
               SidebarMenuButton  ← item-layout row
-    SidebarFooter          ← h-[var(--chrome-header-height)]
+    SidebarFooter          ← shrink-0 py-2 border-t (高度由內容決定)
   SidebarTrigger           ← 放主內容 header
 `}</pre>
         </div>
@@ -201,9 +201,9 @@ export const Overview: Story = {
             </tr>
             <tr>
               <Td mono>SidebarFooter</Td>
-              <Td>Chrome slot</Td>
+              <Td>Container</Td>
               <Td>—</Td>
-              <Td>同 Header</Td>
+              <Td>靠底 menu group 容器(shrink-0 + border-t),高度由內容決定</Td>
             </tr>
             <tr>
               <Td mono>SidebarContent</Td>

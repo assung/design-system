@@ -169,13 +169,13 @@ export const Overview: Story = {
               </tr>
               <tr>
                 <Td mono>title</Td>
-                <Td mono>string</Td>
+                <Td mono>ReactNode</Td>
                 <Td>—(必填)</Td>
                 <Td>主要訊息,單行 truncate</Td>
               </tr>
               <tr>
                 <Td mono>description</Td>
-                <Td mono>string</Td>
+                <Td mono>ReactNode</Td>
                 <Td mono>undefined</Td>
                 <Td>輔助文字,有值時 title 加粗</Td>
               </tr>

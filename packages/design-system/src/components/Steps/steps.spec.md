@@ -179,7 +179,7 @@ indicator 圓形 flex items-center 居中
 
 sm 沒有 icon 空間,用色塊表達:
 - `upcoming` → 灰實心點(`bg-fg-disabled`)
-- `current` → 藍色**空心**環(`border-2 border-primary`)
+- `current`(linear)→ 藍色**空心**環(`border: 2px solid var(--primary-hover)`);non-linear current 走灰實心點(`bg-fg-disabled`)。`reachable` 也是空心環
 - `completed` → 藍實心點(`bg-primary`)
 - `error` → 紅實心點(`bg-error`)
 
@@ -194,7 +194,7 @@ linear && step === value(且不在上面兩者)        → current
 其他                                             → upcoming
 ```
 
-**關鍵**:`current` 狀態**只在 linear 模式**下被 auto-promote。非 linear 模式下,使用者「瀏覽」到 upcoming step 時,step 本身的 content state 仍然是 `upcoming`(還沒做),focus 透過 inset ring 視覺表達,**不會**變成 current 的 filled 藍色。
+**關鍵**:`current` 狀態**只在 linear 模式**下被 auto-promote。非 linear 模式下,使用者「瀏覽」到 upcoming step 時,step 本身的 content state 仍然是 `upcoming`(還沒做),focus 透過 box-shadow 外環視覺表達,**不會**變成 current 的 filled 藍色。
 
 ### 為什麼非 linear 不 promote
 
@@ -204,59 +204,58 @@ linear && step === value(且不在上面兩者)        → current
 - 跟 mental model「我只是在看,這步還沒做」衝突
 - completedValues 沒有變化,前一個 current 突然不見
 
-正確做法:focus 跟 content state 完全解耦——focus 透過 inset ring 視覺表達,content state 由 linear/completedValues/errorValues 決定。linear 是 `current` 概念存在的前提。
+正確做法:focus 跟 content state 完全解耦——focus 透過 box-shadow 外環視覺表達,content state 由 linear/completedValues/errorValues 決定。linear 是 `current` 概念存在的前提。
 
 Per-item `state="error"` prop 存在但是 **escape hatch**,僅用在 inline JSX 想直接宣告錯誤的罕見場景;一般情況用 `errorValues` array 統一管理,不要混用。
 
 ---
 
-## Focus marker — Inset ring(bounding box 永遠不變)
+## Focus marker — Outer ring(box-shadow,bounding box 永遠不變)
 
-**`value` 指向的 step,透過「inset ring」視覺表達 focus——而非加外圈 ring**。
+**`value` 指向的 step,透過「box-shadow 外圈環」視覺表達 focus**。
 
-### Inset ring 的關鍵設計
+### Outer ring 的關鍵設計
 
-- **Bounding box 固定**:focused / non-focused 的 indicator 佔用完全相同的寬高(md=24px,lg=32px,sm=24px hit area)
-- **Nested element 實作**:外層 span 作為 ring 色彩,內層 absolute span 填 `inset: Npx`(內縮 N px)當 inner 色彩 + 放內容
-- **非 box-shadow inset**:box-shadow 無法讓 ring 跟 inner 用不同顏色(filled state 下 ring 跟 bg 同色會完全隱形),nested element 能乾淨處理所有 state
+- **Bounding box 固定**:box-shadow 不佔 layout(zero layout impact),focused / non-focused 的 indicator 佔用完全相同的寬高(md=24px,lg=32px,sm=24px hit area)
+- **Surface gap + ring 兩層 box-shadow 實作**:`0 0 0 2px var(--surface), 0 0 0 4px <ringColor>`——內圈先用 surface 色拉開 2px gap,外圈再疊 2px ring 色,形成「indicator 外有一圈帶間隙的環」(對齊 Polaris / shadcn focus-ring surface-gap idiom)
+- **Ring 色由 state 決定**:`error` → `--error-hover`;non-linear `current` → `--border-hover`;其餘(含 linear current / completed / upcoming / reachable)→ `--primary-hover`
 
 ### State × Focus 視覺矩陣(md/lg)
 
-| State | Non-focused(filled) | Focused(inset ring) |
-|---|---|---|
-| upcoming | `bg-muted` + `text-fg-disabled` 數字 | `bg-primary`(outer ring)+ `bg-muted`(inner)+ `fg-disabled` 數字 |
-| current | `bg-primary` + white 數字 | `bg-primary`(outer ring)+ `bg-surface`(inner)+ `primary` 數字 |
-| completed | `bg-primary` + white ✓ | `bg-primary`(outer ring)+ `bg-surface`(inner)+ `primary` ✓ |
-| error | `bg-error` + white ✕ | `bg-error`(outer ring)+ `bg-surface`(inner)+ `error` ✕ |
+filled 底色與內容色**完全由 content state 決定,不因 focused 改變**;focused 只額外疊一圈 box-shadow 外環。
 
-**注意 linear mode 的 current 永遠 focused**,所以 linear mode 下 current step 永遠是 inset ring 樣式(而非 non-focused 的 filled 藍)。
+| State | 底色 + 內容(focused / non-focused 相同) | Focused 額外疊加 |
+|---|---|---|
+| upcoming | `bg-muted` + `fg-disabled` 數字 | `--primary-hover` 外環 |
+| current(linear)| `bg-primary` + white 數字 | `--primary-hover` 外環 |
+| current(non-linear)| `bg-secondary` + `foreground` 數字 | `--border-hover` 外環 |
+| completed | `bg-primary` + white ✓ | `--primary-hover` 外環 |
+| error | `bg-error` + white ✕ | `--error-hover` 外環 |
+
+**注意 linear mode 的 current 永遠 focused**,所以 linear mode 下 current step 永遠帶外環(底色仍是 filled 藍,只是多疊一圈 ring)。
 
 ### Sm 尺寸的 focus 處理
 
-sm 的 8px dot 太小,無法用 nested element 做 inset ring。改用 `box-shadow` halo 在 dot 外圍繞 2px 圈——**但仍在 24px hit area 內**,所以 bounding 不變。
+sm 的 8px dot 用同一套 `getOuterRingShadow` box-shadow halo 在 dot 外圍繞圈——**但仍在 24px hit area 內**,所以 bounding 不變。
 
 ### 為什麼 bounding 不變這麼重要
 
-連結線幾何依賴 indicator 的邊緣位置。如果 focus 改變 bounding box,連結線的起點/終點會跟著變,造成「focused step 的連結線比別的短一點點」的視覺不齊感。**Inset ring 讓 indicator 的物理尺寸永遠相同**——focus 狀態變化時 **只有內部視覺改變,外部幾何不變**——連結線可以用統一公式,自然一致。
+連結線幾何依賴 indicator 的邊緣位置。如果 focus 改變 bounding box,連結線的起點/終點會跟著變,造成「focused step 的連結線比別的短一點點」的視覺不齊感。**box-shadow 外環不佔 layout**——focus 狀態變化時外部幾何完全不變——連結線可以用統一公式,自然一致。
 
-### 為什麼不用原本的「外圈 ring」設計
+### 為什麼用 surface-gap 而非單純貼邊 ring
 
-原本實作在 indicator 外加一圈 primary ring,導致兩個問題:
-1. Bounding box 變大,連結線位置隨 focus 切換漂移(這是之前「連結線間距沒韻律」的根因)
-2. Filled primary circle + primary outer ring 的視覺讀成「雙圈」,用户反應「很醜」
-
-改 inset ring 同時解決兩個問題。
+直接在 filled circle 外貼一圈同色 ring 會讀成「雙圈」很醜;先用 `var(--surface)` 拉一圈 2px gap 再疊 ring,讓環跟 indicator 之間有底色間隙,視覺乾淨且各 state 都清楚(對齊 shadcn `ring-offset` / Polaris focus indicator surface-gap canonical)。
 
 ### Non-linear 被選中 ≠ current(關鍵規則)
 
 非 linear 模式使用者點 upcoming step 瀏覽時,step 的 **content state 仍是 upcoming**(見「自動推導」節),只是 focused。視覺上會是:
-- Outer: `primary` ring(focus marker 永遠 primary,表達「你在看這一步」)
-- Inner: `bg-muted`(保留 upcoming 的灰色感)
-- Number: `fg-disabled`(保留 upcoming 的弱字)
+- 底色:`bg-muted`(保留 upcoming 的灰色感,不因 focused 改變)
+- 數字:`fg-disabled`(保留 upcoming 的弱字)
+- 外環:`--primary-hover` box-shadow ring(focus marker,表達「你在看這一步」)
 
 **不會**變成 current 的 filled 藍——這對齊使用者 mental model「我只是在看,這步還沒做」。
 
-**Ring 不是 selection marker**。Steps 不是 SelectMenu / DropdownMenu 這類 selection control;ring 是 focus marker 單一語意。`CLAUDE.md` 的「選擇 / 狀態視覺」規則 B 指出的 `bg-neutral-selected`、radio 圓圈等 selection 視覺**都不適用 Steps**——Steps 用 inset ring 表達「you are here」,不是「你選中了這個」。
+**Ring 不是 selection marker**。Steps 不是 SelectMenu / DropdownMenu 這類 selection control;ring 是 focus marker 單一語意。`CLAUDE.md` 的「選擇 / 狀態視覺」規則 B 指出的 `bg-neutral-selected`、radio 圓圈等 selection 視覺**都不適用 Steps**——Steps 用 box-shadow 外環表達「you are here」,不是「你選中了這個」。
 
 ---
 

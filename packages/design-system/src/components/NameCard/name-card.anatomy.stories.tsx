@@ -77,7 +77,7 @@ export const Overview: Story = {
               <tr><Td>Profile header</Td><Td>Avatar 64px + Name + Subtitle</Td><Td>永遠顯示</Td><Td>—</Td></tr>
               <tr><Td>Action buttons</Td><Td>CTA(Message / Follow / Invite)</Td><Td mono>actions 有值</Td><Td>無(貼在 profile 下)</Td></tr>
               <tr><Td>Status 區</Td><Td>狀態標籤 + 可選 statusMessage</Td><Td mono>status 有值</Td><Td mono>border-t border-divider</Td></tr>
-              <tr><Td>Info fields</Td><Td>DescriptionList cols=2</Td><Td mono>fields.length {'>'} 0</Td><Td mono>border-t border-divider</Td></tr>
+              <tr><Td>Info fields</Td><Td>DescriptionList cols=2</Td><Td>永遠顯示(always-render,缺值顯 — 佔位)</Td><Td mono>border-t border-divider</Td></tr>
               <tr><Td>View more</Td><Td>Button variant=link, 填滿寬度</Td><Td mono>onViewMore 有值</Td><Td mono>border-t border-divider</Td></tr>
             </tbody>
           </table>
@@ -101,7 +101,7 @@ export const Overview: Story = {
                 ['status', "'online' | 'away' | 'busy' | 'offline'", '—', '觸發 Status section + Avatar 狀態點'],
                 ['statusMessage', 'ReactNode', '—', '狀態說明文字(完整顯示,內容多時 Body 區捲動)'],
                 ['actions', 'ReactNode', '—', 'CTA buttons(通常 2 個 sm Button)'],
-                ['fields', '{ label: string; value: string }[]', '—', 'Info fields,走 DescriptionList cols=2'],
+                ['fields', '{ label: string; value: ReactNode }[]', '—', 'Info fields,走 DescriptionList cols=2'],
                 ['onViewMore', '() => void', '—', 'View more callback(有值才顯示該 section)'],
                 ['viewMoreLabel', 'string', "'View more'", 'View more button 文字'],
               ].map(([p, t, d, desc]) => (
@@ -124,7 +124,7 @@ export const Overview: Story = {
               <tr><Td>Avatar 大小</Td><Td mono>64px(對齊 Avatar.block tier)</Td></tr>
               <tr><Td>Actions padding</Td><Td mono>px-4 pb-3 + gap-2</Td></tr>
               <tr><Td>Status / Info padding</Td><Td mono>px-4 py-3</Td></tr>
-              <tr><Td>View more padding</Td><Td mono>px-4 py-2</Td></tr>
+              <tr><Td>View more padding</Td><Td mono>px-4 py-3</Td></tr>
               <tr><Td>Section 分隔</Td><Td mono>border-t border-divider</Td></tr>
             </tbody>
           </table>
@@ -497,7 +497,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `name-card.spec.md` 「A11y 預設」段。摘要:\n\n> 命名對齊 DS 設計準則(2026-05-18,per  # 命名與語言一致性 )。本節原標題「無障礙」,改「A11y 預設」與其他 spec 一致。\n\n-   Trigger 整合  :Avatar 作為 HoverCard trigger 時, onFocus  /  onBlur  與 mouseenter/leave 同時觸發由 Radix HoverCard 管理——鍵盤使用者 Tab 到 avatar 可自動顯示 card,Escape 關閉\n-   Focus 順序  :NameCard 內若有 Action button,Tab 順序為 trigger(Avatar)→ 第一個 action → 後續 action → view more;不抓取 focus 進入浮層(保留 Radix  HoverCard  預設語意,與 Popover 的 focus trap 不同)\n-   Live region 語意  :NameCard 是展示內容,非 announcement,不套  aria-live \n-   DL 語意  :Info Fields 使用 "}</p>
+      <p className="whitespace-pre-line">{"詳 `name-card.spec.md` 「A11y 預設」段。摘要:\n\n> 命名對齊 DS 設計準則(2026-05-18,per  # 命名與語言一致性 )。本節原標題「無障礙」,改「A11y 預設」與其他 spec 一致。\n\n-   Trigger 整合  :Avatar 作為 HoverCard trigger 時, onFocus  /  onBlur  與 mouseenter/leave 同時觸發由 Radix HoverCard 管理——鍵盤使用者 Tab 到 avatar 可自動顯示 card,Escape 關閉\n-   Focus 順序  :Radix  HoverCard  預設不抓取 focus 進入浮層——HoverCardContent 每次 render 把浮層內所有 tabIndex>=0 節點 set tabindex=-1(@radix-ui/react-hover-card dist index.js L217-222),刻意把 action / view more 移出 tab order。hover-integrated 路徑下鍵盤使用者 Tab 只停在 trigger(Avatar),無法 Tab 聚焦浮層內 action / view more(與 Popover 的 focus trap 截然不同)。需要鍵盤可達 action 改用 Popover / Dialog\n-   Live region 語意  :NameCard 是展示內容,非 announcement,不套  aria-live \n-   DL 語意  :Info Fields 使用 "}</p>
     </div>
   ),
 }

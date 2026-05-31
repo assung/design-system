@@ -57,7 +57,7 @@ export const Overview: Story = {
             <thead><tr><Th>Prop (SheetContent)</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               <tr><Td mono>side</Td><Td mono>'top' | 'right' | 'bottom' | 'left'</Td><Td mono>'right'</Td><Td>滑入方向,決定浮層位置 + 動畫</Td></tr>
-              <tr><Td mono>open / onOpenChange</Td><Td mono>boolean / (o) =&gt; void</Td><Td mono>—</Td><Td>controlled 開關(選用)</Td></tr>
+              <tr><Td mono>open / onOpenChange</Td><Td mono>boolean / (o) =&gt; void</Td><Td mono>—</Td><Td>controlled 開關(選用)——掛在 root <code>Sheet</code> 非 SheetContent</Td></tr>
               <tr><Td mono>onEscapeKeyDown</Td><Td mono>(e) =&gt; void</Td><Td mono>—</Td><Td>Esc 鍵 callback,preventDefault 阻止關閉</Td></tr>
               <tr><Td mono>onPointerDownOutside</Td><Td mono>(e) =&gt; void</Td><Td mono>—</Td><Td>點擊外部 callback,preventDefault 阻止關閉</Td></tr>
             </tbody>
@@ -184,14 +184,14 @@ export const ColorMatrix: Story = {
     <div className="flex flex-col gap-8">
       <div>
         <H3>Sheet 視覺 token（與 Dialog 共用基底）</H3>
-        <Desc>Sheet 和 Dialog 共用 `bg-surface-raised` + `border-border` + elevation-200——改其中一個必須連動另一個,不讓 modal 家族視覺漂移。</Desc>
+        <Desc>Sheet 和 Dialog 共用 `bg-surface-raised` + elevation-200——改其中一個必須連動另一個,不讓 modal 家族視覺漂移。容器邊框各自不同:Sheet 用較淡的 `border-divider`,Dialog 用 `border-border`。</Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>層</Th><Th>Token</Th><Th>說明</Th></tr></thead>
             <tbody>
               <tr><Td>Overlay</Td><Td><TokenCell token="--overlay" display="bg-overlay" /></Td><Td>背景遮罩 semi-transparent</Td></tr>
               <tr><Td>Sheet 背景</Td><Td><TokenCell token="--surface-raised" display="bg-surface-raised" /></Td><Td>比 surface 高一階</Td></tr>
-              <tr><Td>邊框</Td><Td><TokenCell token="--border" display="border-border" /></Td><Td>與 Dialog 統一</Td></tr>
+              <tr><Td>容器邊框</Td><Td><TokenCell token="--divider" display="border-divider" /></Td><Td>側緣描邊,較 Dialog 的 border-border 淡一階</Td></tr>
               <tr><Td>分隔線（header / footer）</Td><Td><TokenCell token="--divider" display="border-divider" /></Td><Td>區隔 section</Td></tr>
               <tr><Td>主要文字</Td><Td><TokenCell token="--foreground" display="text-foreground" /></Td><Td>Title</Td></tr>
               <tr><Td>次要文字</Td><Td><TokenCell token="--fg-secondary" display="text-fg-secondary" /></Td><Td>Description</Td></tr>

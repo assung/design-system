@@ -102,7 +102,7 @@ NameCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,對齊 
 
 ## Status 區
 
-非互動狀態標籤以 `bg-muted` 承載(不用 `bg-secondary`——Muted 視覺重量更低,對齊 Badge / Skeleton family)。狀態點顏色走 `--status-*` presence token(2026-04-20):`online` / `away` / `busy` / `offline`——跟 Avatar status 同源、獨立於 success/warning/error(presence 不是 validation state)。訊息必須包在 `<DescriptionList>` 內以 `<DescriptionItem>` 呈現(不可孤立 dt/dd),clamp 兩行避免無限伸展。
+非互動狀態標籤以 `bg-muted` 承載(不用 `bg-secondary`——Muted 視覺重量更低,對齊 Badge / Skeleton family)。狀態點顏色走 `--status-*` presence token(2026-04-20):`online` / `away` / `busy` / `offline`——跟 Avatar status 同源、獨立於 success/warning/error(presence 不是 validation state)。訊息必須包在 `<DescriptionList>` 內以 `<DescriptionItem>` 呈現(不可孤立 dt/dd),**完整顯示不截斷**——內容過長時由 Body 區 `<ScrollArea>` 在固定高度內捲動,不 clamp 行數。
 
 ## Info Fields
 
@@ -110,7 +110,7 @@ NameCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,對齊 
 
 ## View More
 
-`Button variant="link" size="sm" className="w-full"`——填滿容器寬度的文字按鈕。位於獨立的 bordered section（`border-t border-divider`），`py-2` 較緊湊。
+`Button variant="link" size="sm" className="w-full"`——填滿容器寬度的文字按鈕。位於獨立的 bordered section（`border-t border-divider`），`py-3`（12px,對齊本 spec「View more 按鈕 padding」段,比一般 link 按鈕多呼吸空間）。
 
 只在傳入 `onViewMore` callback 時顯示。
 
@@ -138,7 +138,7 @@ NameCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,對齊 
 > 命名對齊 DS canonical(2026-05-18,per `# 命名與語言一致性`)。本節原標題「無障礙」,改「A11y 預設」與其他 spec 一致。
 
 - **Trigger 整合**:Avatar 作為 HoverCard trigger 時,`onFocus` / `onBlur` 與 mouseenter/leave 同時觸發由 Radix HoverCard 管理——鍵盤使用者 Tab 到 avatar 可自動顯示 card,Escape 關閉
-- **Focus 順序**:NameCard 內若有 Action button,Tab 順序為 trigger(Avatar)→ 第一個 action → 後續 action → view more;不抓取 focus 進入浮層(保留 Radix `HoverCard` 預設語意,與 Popover 的 focus trap 不同)
+- **Focus 順序**:Radix `HoverCard` 預設**不抓取 focus 進入浮層**——`HoverCardContent` 每次 render 用 TreeWalker 把浮層內所有 `tabIndex >= 0` 節點 set `tabindex="-1"`(`@radix-ui/react-hover-card` dist `index.js` L217-222 + `getTabbableNodes` L279-288),刻意把 NameCard 的 action button / view more 移出 tab order。因此 hover-integrated 路徑下,鍵盤使用者 Tab 只停在 trigger(Avatar),**無法 Tab 逐一聚焦浮層內的 action / view more**(與 Popover 的 focus trap 截然不同,這是 HoverCard 作為「hover-only 預覽」的刻意設計)。需要鍵盤可達 action 的情境應改用 Popover / Dialog,不要用 HoverCard
 - **Live region 語意**:NameCard 是展示內容,非 announcement,不套 `aria-live`
 - **DL 語意**:Info Fields 使用 DescriptionList(`<dl>/<dt>/<dd>`),screen reader 會讀成「term X, description Y」對話;詳見 `../DescriptionList/description-list.spec.md`「無障礙」段
 - **CTA button aria-label**:icon-only action button 必須帶 `aria-label`(「傳訊息給 {name}」「加入 {name} 為好友」),不只是 icon 視覺

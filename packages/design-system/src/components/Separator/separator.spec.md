@@ -94,7 +94,7 @@ Separator 是**視覺分隔 primitive**(一條 1px 線),結構極薄:
 Separator 是**純視覺 divider**,預設 ARIA 行為(對齊 Radix Separator primitive):
 
 - **預設 `role="none"`(decorative)**:純視覺分隔,SR 不朗讀(避免「separator」/「horizontal rule」雜訊干擾 list 朗讀)
-- **語意分隔場景(`decorative=false`)**:當 Separator 真實切分內容區段(`<nav>` 內分 navigation group / Menu 分群),Radix 自動 render `<div role="separator" aria-orientation="horizontal|vertical">`,SR 讀「separator」幫助理解結構
+- **語意分隔場景(`decorative=false`)**:當 Separator 真實切分內容區段(`<nav>` 內分 navigation group / Menu 分群),Radix 自動 render `<div role="separator">`,SR 讀「separator」幫助理解結構。`aria-orientation` 僅在 `orientation="vertical"` 時輸出(`aria-orientation="vertical"`);`horizontal`(WAI-ARIA separator 預設方向)時 Radix 刻意省略冗餘屬性,故 DOM 不出現 `aria-orientation="horizontal"`
 - **判斷**:同 list 內 item 之間的視覺隔線 = decorative(預設);跨 region 的結構分隔(sidebar group / menu group)= semantic(`decorative={false}`)
 - **不取得 focus**:Separator 永遠 non-interactive,無鍵盤行為
 - **驗證**:Storybook a11y addon panel 0 critical violation;對齊 [Radix Separator a11y](https://www.radix-ui.com/primitives/docs/components/separator#accessibility)

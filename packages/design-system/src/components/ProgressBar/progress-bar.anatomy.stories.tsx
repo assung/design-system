@@ -257,7 +257,7 @@ const InspectorInner = () => {
               <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Style</span>
             </div>
             <PropRow label="Radius">rounded-full(track & fill)</PropRow>
-            <PropRow label="Transition">width 300ms</PropRow>
+            <PropRow label="Transition">all 300ms(fill width + status color)</PropRow>
             <PropRow label="A11y">role=progressbar · aria-valuenow=value</PropRow>
             {affix === 'value' && (
               <PropRow label="Value text">text-caption · tabular-nums · text-foreground</PropRow>

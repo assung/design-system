@@ -282,7 +282,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"ARIA / 語意:採用原生 <textarea> 元素,自帶完整無障礙語意;搭配 Field 使用時,會補上 aria-labelledby / aria-invalid / aria-describedby 連到對應的標籤、錯誤與說明文字。\n\n鍵盤操作:\n\n- Tab — 聚焦進出欄位\n- 字母鍵 — 輸入文字\n- Enter — 換行(不送出表單,與 Input 不同)\n\n聚焦:聚焦時邊框換成主色,清楚標示目前作用中的欄位。\n\n對比要求:文字對背景對比至少 4.5:1,邊框等介面元素至少 3:1,確保弱視使用者也能辨識。整個欄位不靠滑鼠也能完整操作。"}</p>
+      <p className="whitespace-pre-line">{"ARIA / 語意:採用原生 <textarea> 元素,自帶完整無障礙語意;搭配 Field 使用時,標籤透過原生 <label for> 與欄位關聯,並補上 aria-invalid / aria-describedby 連到對應的錯誤與說明文字。\n\n鍵盤操作:\n\n- Tab — 聚焦進出欄位\n- 字母鍵 — 輸入文字\n- Enter — 換行(不送出表單,與 Input 不同)\n\n聚焦:聚焦時邊框換成主色,清楚標示目前作用中的欄位。\n\n對比要求:文字對背景對比至少 4.5:1,邊框等介面元素至少 3:1,確保弱視使用者也能辨識。整個欄位不靠滑鼠也能完整操作。"}</p>
     </div>
   ),
 }

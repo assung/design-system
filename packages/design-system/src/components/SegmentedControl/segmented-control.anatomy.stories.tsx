@@ -65,7 +65,7 @@ export const Overview: Story = {
                 ['  value', 'string', '必填', '唯一識別碼'],
                 ['  startIcon', 'LucideIcon', '—', 'label 左側 icon'],
                 ['  badge', 'ReactNode', '—', 'label 右側 badge(計數指示器,如「全部 12」)'],
-                ['  aria-label', 'string', '(iconOnly 必填)', 'iconOnly 時 TS 強制必填,自動渲染 tooltip'],
+                ['  aria-label', 'string', '(iconOnly 必填)', 'iconOnly 時必填(dev-mode runtime warn,非 TS 強制),自動渲染 tooltip'],
                 ['  disabled', 'boolean', 'false', '單獨 item 停用(不得是當前 value)'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -257,7 +257,7 @@ export const IconOnlyMatrix: Story = {
     <div className="flex flex-col gap-8">
       <div>
         <H3>iconOnly 是 group-level,不是 item-level</H3>
-        <Desc>**必須整組一致**:要嘛全部 icon-only,要嘛全部帶 label。混搭會讓使用者無法預測哪個 item 有 tooltip、哪個沒有,也破壞 segmented 的對稱感。iconOnly 時每個 item 變正方形(`aspect-square p-0`),必須設 aria-label(TS 強制),自動渲染 tooltip。</Desc>
+        <Desc>**必須整組一致**:要嘛全部 icon-only,要嘛全部帶 label。混搭會讓使用者無法預測哪個 item 有 tooltip、哪個沒有,也破壞 segmented 的對稱感。iconOnly 時每個 item 變正方形(`aspect-square p-0`),必須設 aria-label(dev-mode runtime warn,非 TS 強制),自動渲染 tooltip。</Desc>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <span className="text-caption text-fg-muted w-24">對齊選擇</span>
@@ -289,7 +289,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"  ARIA / Pattern  :繼承 Radix toggle-group primitive 的無障礙預設——整組 role=\"group\",每個 item role=\"radio\"(type=\"single\" 互斥選一),鍵盤導覽由 primitive 處理。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/toggle-group#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入整組(只有一個 tab 停留點,落在選中項;沒選就落第一項)\n- ←/→ — 在 item 之間移動 focus 並切換選取\n- Enter / Space — 選取目前 focus 的 item\n\n  Focus  :採 roving tabindex——整組共用一個 tab 停留點,方向鍵在 item 間移動;不是 Dialog 那種把焦點關在裡面的 focus trap。Focus ring 對齊 Button:2px var(--ring) 外框。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"  ARIA / Pattern  :繼承 Radix toggle-group primitive 的無障礙預設——整組 role=\"group\",每個 item role=\"radio\"(type=\"single\" 互斥選一),鍵盤導覽由 primitive 處理。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/toggle-group#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入整組(只有一個 tab 停留點,落在選中項;沒選就落第一項)\n- ←/→ — 在 item 之間移動 roving focus(只移焦點,不切換選取)\n- Enter / Space — 選取目前 focus 的 item\n\n  Focus  :採 roving tabindex——整組共用一個 tab 停留點,方向鍵在 item 間移動焦點(選取仍需 Enter/Space/click);不是 Dialog 那種把焦點關在裡面的 focus trap。Focus ring 對齊 Button:focus-visible:ring-2 ring-ring ring-offset-1(box-shadow ring,非 CSS outline)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

@@ -74,7 +74,7 @@ Popover（浮動容器，handle 展開 / 定位）
 
 **定位**:SelectMenu 的 `sideOffset` 與 `align` 直接走 Popover canonical——`sideOffset=8` / `align` 跟隨 trigger 位置(見 `../Popover/popover.spec.md`「Align 對齊 canonical(跨浮層 SSOT)」)。SelectMenu 不自訂浮層定位規則。
 
-**視覺 vs 語意**(2026-04-20 精緻化):SelectMenu 的 **width 預設跟 trigger(input)同寬**(Radix trigger-width),此時 `start` / `center` / `end` 三種 align 呈現視覺完全相同(popover 正好跟 input 貼合,左右邊緣對齊無差異)。但當 consumer 傳 `minWidth` 大於 input 寬度(例:長 option label 要空間展示)、或 option 內容撐開導致 popover 寬於 trigger,**align 的視覺差異立刻顯現**——此時嚴格照 structured overlay canonical(trigger 在左 → start / 中 → center / 右 → end)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+**視覺 vs 語意**(2026-04-20 精緻化):SelectMenu 的 **width 預設跟 trigger(input)同寬**(Radix trigger-width),此時 `start` / `end` 兩種 align 呈現視覺完全相同(popover 正好跟 input 貼合,左右邊緣對齊無差異)。但當 consumer 傳 `minWidth` 大於 input 寬度(例:長 option label 要空間展示)、或 option 內容撐開導致 popover 寬於 trigger,**align 的視覺差異立刻顯現**——此時嚴格照 structured overlay canonical(trigger 在左 → start / 右 → end)。(SelectMenu `align` prop 僅暴露 `'start' | 'end'`,不開放底層 Radix 的 `center`。) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 換言之 SelectMenu **永遠照 canonical**,只是大多數情況 width=trigger-width 讓 canonical 視覺上被 mask,一旦 popover 突破 trigger 寬度 canonical 立刻生效。規則沒例外,只是呈現條件。
 
@@ -204,13 +204,13 @@ SelectMenu 是 **composite**(Popover trigger + Command search + 滾動 MenuItem 
 **Keyboard 行為**:
 
 - Tab — focus trigger
-- Enter / Space / ↓ — 開啟 menu
-- ↑/↓ — 導覽 options
+- Enter / Space — 開啟 menu(trigger 為 native button,Enter/Space fire click)
+- ↑/↓ — 導覽 options(menu 開啟後)
 - Enter — 選擇
 - 字母鍵 — type-ahead 過濾(search 模式)
 - Esc — 關閉
 
-**Focus**:menu 開啟時 focus 第一 option / 選中項;關閉時 focus 回 trigger。
+**Focus**:menu 開啟時 active-descendant 虛擬焦點落在第一個 / 已選 option(`aria-activedescendant` 高亮,非 DOM focus;cmdk listbox 模式);searchable 時 DOM focus 給搜尋 input,非 searchable 時落在 content 容器。option 為 `role="option"` 無 tabIndex,DOM focus 不落在 option 上。關閉時 focus 回 trigger。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

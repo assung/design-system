@@ -25,7 +25,7 @@ export const Overview: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Anatomy</H3>
-        <Desc>PeoplePicker 是組合元件——Popover(浮層)+ Command(cmdk 搜尋)+ SelectMenu(選單)+ PersonDisplay(Avatar + Name)。外觀對齊 Select / Combobox,差異在選項前綴有 Avatar 視覺。</Desc>
+        <Desc>PeoplePicker 是組合元件——single mode 包 Select、multi mode 包 Combobox,已選值用 PersonDisplay(Avatar + Name)呈現。浮層搜尋(Popover + cmdk + SelectMenu)是底層 Select / Combobox 內部細節。外觀對齊 Select / Combobox,差異在選項前綴有 Avatar 視覺。</Desc>
         <div className="max-w-md border border-border rounded-lg p-4">
           <PeoplePicker
             people={SAMPLE_PEOPLE}
@@ -65,7 +65,7 @@ export const Overview: Story = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", 'Field mode'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", 'Field mode'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '對齊 field-height tier'],
                 ['value', 'PersonValue | PersonValue[] | null', '—', '單選 / 多選(類型決定模式)'],
                 ['onChange', '(value: PersonValue[]) => void', '—', '值變更 callback'],
@@ -87,7 +87,7 @@ export const Overview: Story = {
 export const Inspector: Story = {
   name: '元件檢閱器',
   parameters: {
-    docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。切 `mode` 看 edit / readonly / disabled 視覺差異,切 `size` 對照 field-height tier。' } },
+    docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。切 `mode` 看 edit / display / readonly / disabled 視覺差異,切 `size` 對照 field-height tier。' } },
   },
   args: {
     mode: 'edit',
@@ -99,7 +99,7 @@ export const Inspector: Story = {
     emptyText: '沒有符合的人員',
   },
   argTypes: {
-    mode: { control: 'radio', options: ['edit', 'readonly', 'disabled'] },
+    mode: { control: 'radio', options: ['edit', 'display', 'readonly', 'disabled'] },
     size: { control: 'radio', options: ['sm', 'md', 'lg'] },
     disabled: { control: 'boolean' },
     searchPlaceholder: { control: 'text' },
@@ -330,7 +330,8 @@ export const StateBehavior: Story = {
       <div>
         <H3>空 value(尚未指派)</H3>
         <Desc>
-          value = null 時 field 顯示 placeholder(「指派對象」)而非 Avatar——暗示可點擊新增。
+          value = null 時 trigger 顯示預設 placeholder(「請選擇人員」)而非 Avatar——暗示可點擊新增。
+          本例只傳 `searchPlaceholder="指派對象…"`(搜尋框 placeholder,展開後才出現在浮層搜尋輸入框內)。
         </Desc>
         <PeoplePicker
           people={SAMPLE_PEOPLE}

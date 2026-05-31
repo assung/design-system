@@ -312,7 +312,7 @@ export const StateBehavior: Story = {
             <tbody>
               <tr><Td mono>uploading</Td><Td mono>bg-primary</Td><Td>—</Td></tr>
               <tr><Td mono>completed</Td><Td mono>bg-success(100%)</Td><Td>CircleCheck(text-success)</Td></tr>
-              <tr><Td mono>error</Td><Td mono>bg-error(失敗點位置)</Td><Td>XCircle(text-error)</Td></tr>
+              <tr><Td mono>error</Td><Td mono>bg-error(寬度 = consumer 傳入 progress)</Td><Td>XCircle(text-error)</Td></tr>
               <tr><Td>(無 status)</Td><Td>無 bar</Td><Td>—</Td></tr>
             </tbody>
           </table>

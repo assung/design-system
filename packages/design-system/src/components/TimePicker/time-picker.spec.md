@@ -115,16 +115,14 @@ TimePicker 是**單一時間**(時/分/秒)輸入與顯示元件,對齊 Ant Desi
 Panel 展開後的 column picker 結構:
 
 ```
-┌─────────────────────────────────┐
-│  時    分    [秒]                │  ← header(有 label 時顯示)
-├─────┬─────┬──────────────────┤
+┌─────┬─────┬──────────────────┐
 │  09 │  00 │                   │
-│  10 │  15 │  每欄 scrollable   │  ← body
-│▓11▓│▓30▓│  選中項藍底白字     │
+│  10 │  15 │  每欄 scrollable   │  ← body(無可見「時 / 分 / 秒」標題列;
+│▓11▓│▓30▓│  選中項灰底         │     label 僅作 listbox aria-label,不渲染)
 │  12 │  45 │                   │
 │  13 │     │                   │
 ├─────┴─────┴──────────────────┤
-│            [Now]    [OK]     │  ← footer(選填)
+│            [此刻]    [確定]    │  ← footer(固定)
 └───────────────────────────────┘
 ```
 
@@ -134,7 +132,7 @@ Panel 展開後的 column picker 結構:
 |-------|------|-------|
 | 正常 | 置中文字 | `text-foreground` |
 | hover | 灰底 | `hover:bg-neutral-hover` |
-| **selected** | **灰底**(非藍底) | `bg-neutral-selected text-foreground rounded-md` |
+| **selected** | **灰底**(非藍底,滿欄矩形填色 `w-full`,無圓角) | `bg-neutral-selected text-foreground` |
 | disabled(`disabledTime`) | 灰字 | `text-fg-disabled cursor-not-allowed` |
 
 **為什麼 selected 走 neutral 非 primary**(2026-04-21 canonical):TimePicker panel 是「**列表選中**」語意 — user 在時 / 分 / 秒選項間切換,跟 `SelectMenu` / `MenuItem` 同流派(單選 list → `bg-neutral-selected`)。**DatePicker date cell selected 用 `bg-primary`** 是因為那是「**最終選定日期**」的強 affordance(確定性)。兩者不同語意,不互調。
@@ -143,36 +141,30 @@ Panel 展開後的 column picker 結構:
 
 ### Spacing + 結構(2026-04-21 canonical,2026-04-21 window width 修正)
 
-- Panel 內 padding = `--layout-space-tight`(12px @ md density)
-- **三欄(時 / 分 / 秒)各欄 `w-12`(48px)固定,非 flex-1 均分**(對齊 Ant / Google 世界級慣例 `@benchmark-unverified` visual measurement)。**分隔「:」移除**(AR8 canonical — Ant TimePicker / Google Calendar 同樣不加 `:`,靠 column 間距自明 `@benchmark-unverified` visual)
+- Footer 內 padding = `--layout-space-tight`(12px @ md density)
+- **Panel 容器固定寬:2 欄(時 / 分)`w-40`(160px)/ 3 欄(時 / 分 / 秒)`w-60`(240px)**;**每欄 `flex-1 h-full` 等分**容器寬(非固定 `w-12`)。**分隔「:」移除**(AR8 canonical — Ant TimePicker / Google Calendar 同樣不加 `:`,靠 column 間距自明 `@benchmark-unverified` visual)
 - Scrollable list 用 **`<ScrollArea>`**(對齊 DS 跨 OS 一致 overlay 捲軸 canonical);不 raw `overflow-y-auto`
 - **Scroll-into-view**:mount = `behavior:'auto'`(避閃爍),後續 `value` 變更 = `behavior:'smooth'`(對齊 iOS / Material / Ant timepicker idiom)。SSOT 在 `time-columns.tsx` `TimeColumn` useEffect
 - 每 item **`h-field-sm`(28px @ md / 32px @ lg)對齊 DatePicker date cell**(跨 picker 視覺一致)
-- List 高 `h-[216px]`(容納約 7 個 item 置中)
+- Panel 容器高 `h-[216px]`(含 footer);TimeColumns 為 `flex-1 min-h-0`,實際可捲動 list 高 ≈ 216 − footer 40 = **~176px**(約可見 6 個 item)
 
-### Panel 寬度 content-driven(AR42 修正,2026-04-21)
+### Panel 寬度(固定容器寬,隨 showSeconds 切換)
 
-**每欄 w-12(48px)固定,Panel 寬度隨 showSeconds 動態變化**:
+**Panel 容器固定寬度,欄位 `flex-1` 等分該寬度**(`TimeColumns` 的 `widthClass = showSeconds ? 'w-60' : 'w-40'`):
 
-| 模式 | 欄數 | Panel 寬(含 padding + gap) |
-|------|------|---------------------------|
-| HH:mm(預設)| 2 欄 | `2 × 48 + gap-1 × 1 + px × 2` ≈ 48×2 + 4 + 24 = **124px** |
-| HH:mm:ss(showSeconds=true)| 3 欄 | `3 × 48 + gap-1 × 2 + px × 2` ≈ 48×3 + 8 + 24 = **176px** |
+| 模式 | 欄數 | TimeColumns 容器寬 | 每欄寬(`flex-1` 等分) |
+|------|------|------|------|
+| HH:mm(預設)| 2 欄 | `w-40` = **160px** | ~80px |
+| HH:mm:ss(showSeconds=true)| 3 欄 | `w-60` = **240px** | ~80px |
 
 **世界級對照**:
 - Ant Design TimePicker:每欄 ~56px,3 欄 ~170px(Panel 含 footer)`@benchmark-unverified` visual measurement(visual sampling,not source-citable as exact pixel)
 - Google Calendar Quick-Time:~150-170px
 - Material 3 TimePicker dial:~180px(含 AM/PM)`@benchmark-unverified` visual measurement
-- 本 DS:每欄 48px,2 欄 ~124px / 3 欄 ~176px,**符合世界級緊湊節奏**
-
-**為什麼每欄 48px 不 56 / 64**:
-- 48px = `h-field-sm × 1.7`,兩位數字 `tabular-nums`(約 16-18px 寬)+ 左右呼吸 ~15px。不貼邊也不浪費
-- 56-64px 寬度逼近 Select menu 語境;picker column 超過此寬度會模糊 picker vs menu 的視覺界線
-- Ant 56 / 本 DS 48 差異在:Ant 的 item 有圓角 button 佔寬,本 DS 走 `rounded-md` `text-center`,視覺 48px 不擠 `@benchmark-unverified` visual measurement
+- 本 DS:2 欄 160px / 3 欄 240px,**符合世界級緊湊節奏**
 
 **showSeconds 切換時 panel 寬度會跟著變**(刻意):
-- 對齊 Ant 慣例(content-driven)
-- showSeconds=false 的 panel 本就應該更窄,兩欄 + 大量留白會顯得 panel 空洞
+- showSeconds=false 的 panel 本就應該更窄(`w-40`),兩欄 + 大量留白會顯得 panel 空洞
 - Popover position 受 side / align / collisionPadding 控制,寬度變化只移動 panel 位置不影響 anchor 關係
 
 ---
@@ -184,9 +176,8 @@ Panel 展開後的 column picker 結構:
 | 點 trigger | 開 Panel |
 | Esc | 關 Panel(不確認) |
 | Tab | 焦點在 column 間移動 |
-| ↑ / ↓ | 欄內上下選 |
-| Enter | 確認當前 highlight |
-| 直接鍵入數字(optional) | 跳到對應值 |
+| ↑ / ↓ | 欄內上下選(每次移動即 commit,無 highlight 中間態) |
+| Home / End | 跳該欄首 / 尾 enabled 值 |
 
 ---
 
@@ -199,7 +190,7 @@ Panel 展開後的 column picker 結構:
 `value={null}` / `value=""` / `value=undefined` 都視為空,trigger 顯示 `placeholder`。Display 模式空值顯示 `—`(對齊 `EMPTY_DISPLAY`)。
 
 ### 驗證時機
-- Panel 關閉(OK 或 outside click)時 commit value 給 `onChange`
+- **每次欄位選取(時 / 分 / 秒任一改變)當下即 commit value 給 `onChange`**(eager commit,非 OK 才送)。OK 鈕(「確定」)只負責關閉 Panel,不另行 commit。`此刻` 按鈕則一次 commit 當前時間並關閉 Panel
 - `disabledTime` 在 Panel 開啟時套用(selected hour 改變會重算 disabledMinutes)
 - 若 consumer 需要 form-level 必填驗證 → 外層 `<Field>` + `<FieldError>` 承擔(不是 TimePicker 本體責任)
 
@@ -210,10 +201,10 @@ N/A — TimePicker 是純同步輸入,無 async 狀態。
 
 ## A11y 預設
 
-- trigger 需 `aria-label`(若沒外部 `<label>`)
-- Panel 開啟時 trigger `aria-expanded="true"`
-- 每欄 `role="listbox"`,item `role="option" aria-selected`
-- Screen reader 讀出「時間選擇器,當前 9 時 30 分」
+- trigger `role="combobox"`,在 `<Field>` 內時以 `aria-labelledby` 指向 field label(`fieldCtx.labelId`)
+- Panel 開啟時 trigger `aria-expanded="true"` + `aria-haspopup="dialog"`
+- 每欄 `role="listbox"`(`aria-label` 為 `hours` / `minutes` / `seconds`),item `role="option" aria-selected`
+- Screen reader 經 trigger 的 label + 內層可見值文字朗讀目前選取時間(目前值以可見 `<span>` 呈現,無額外 `aria-valuetext`)
 
 ---
 
@@ -264,7 +255,7 @@ trigger 的互動狀態(focus / invalid / disabled / readonly)完全繼承 `../F
 
 - **Disabled**:Field SSOT own;trigger 自動 disabled(`text-fg-disabled` + 不開 picker),Display mode + disabled 維持時間格式但 token 切 disabled。
 - **Loading**:TimePicker 為 sync UI(time math 在 client),無 loading state。極端 case(後端 disabled-times list)應由 consumer 先 disable trigger 直到 fetch 完成。
-- **Empty(no value)**:`value=null` 為合法 initial state,trigger 顯 placeholder(預設「選擇時間」);`null` + Display mode 顯 `—`(em dash + `text-fg-muted`)對齊 Input display empty 慣例。
+- **Empty(no value)**:`value=null` 為合法 initial state,trigger 顯 placeholder;**未傳 `placeholder` 時 default = 格式遮罩**(`HH:MM`,showSeconds=true 時 `HH:MM:SS`),非固定文案。`null` + Display mode 顯 `—`(em dash + `text-fg-muted`)對齊 Input display empty 慣例。
 - **Empty(disabled all times)**:極端場景(`disabledHours` / `disabledMinutes` 覆蓋全範圍),panel column 全 disabled,鍵盤焦點停留無導覽目標。
 - **Dark mode / density**:走 Field + Popover SSOT 自動 adapt;panel column item 由 MenuItem SSOT 控 density。
 

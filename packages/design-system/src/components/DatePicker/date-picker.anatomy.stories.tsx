@@ -784,7 +784,7 @@ export const CalendarTokens = {
         <div className="flex flex-col gap-1">
           <H3>Calendar Popup — 本 DS 自建</H3>
           <Desc>
-            DatePicker 展開的 Calendar 使用 react-day-picker v9 + 本 DS token 覆寫預設視覺(見 ./calendar.tsx)。
+            DatePicker 展開的 DateGrid 使用 react-day-picker v9 + 本 DS token 覆寫預設視覺(見 ../DateGrid/date-grid.tsx)。
             所有視覺 token 由 semantic token 驅動,切 dark mode 自動聯動,不需元件內重寫。
           </Desc>
         </div>
@@ -879,8 +879,8 @@ export const CalendarTokens = {
                   </tr>
                   <tr>
                     <Td>日格</Td>
-                    <Td mono>h-9 · w-9</Td>
-                    <Td>36×36,容納點擊區 + 視覺指示</Td>
+                    <Td mono>h-field-sm · w-[var(--field-height-sm)]</Td>
+                    <Td>28×28 @ md / 32×32 @ lg,容納點擊區 + 視覺指示</Td>
                   </tr>
                   <tr>
                     <Td>Popover padding</Td>
@@ -912,7 +912,7 @@ export const CalendarTokens = {
        │ 點擊開啟
        ▼
 <Popover align="start">
-  <Calendar />                      ← react-day-picker + 本 DS token
+  <DateGrid />                      ← react-day-picker + 本 DS token
 </Popover>`}
           </pre>
         </div>

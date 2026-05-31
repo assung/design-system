@@ -44,7 +44,7 @@ const PARTS: Record<PartKey, PartSpec> = {
   dayToday:     { label: 'Today(未選)', bg: 'transparent',     text: '--foreground',  border: 'transparent', extra: '數字下方藍色底線(underline bar)' },
   dayHover:     { label: 'Hover',        bg: 'transparent',     text: '--foreground',  border: '--primary',   extra: 'hover 藍圈 1.5px(無填底)' },
   dayOutside:   { label: 'Outside 月份', bg: 'transparent',     text: '--fg-muted',    border: 'transparent' },
-  dayDisabled:  { label: 'Disabled',     bg: 'transparent',     text: '--fg-disabled', border: 'transparent', extra: 'text-fg-disabled · pointer-events-none' },
+  dayDisabled:  { label: 'Disabled',     bg: '--bg-disabled',   text: '--fg-disabled', border: 'transparent', extra: 'bg-disabled · cursor-not-allowed · native disabled' },
   dayFocus:     { label: 'Focus-visible',bg: 'transparent',     text: '--foreground',  border: '--ring',      extra: 'ring-2 ring-ring' },
 }
 
@@ -277,7 +277,7 @@ export const Inspector = {
               <div className="py-2 border-b border-divider">
                 <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Style</span>
               </div>
-              <PropRow label="日格 Radius">rounded-md · 4px</PropRow>
+              <PropRow label="日格 Radius">rounded-full · 圓形</PropRow>
               <PropRow label="Focus">ring-2 ring-ring</PropRow>
               <PropRow label="Transition">transition-colors</PropRow>
             </div>
@@ -379,12 +379,12 @@ export const SizeMatrix = {
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
-        <H3>固定尺寸 — 不隨 density 變化</H3>
+        <H3>尺寸對照 — 隨 density 縮放</H3>
         <Desc>
-          Calendar 的日格固定 36×36(h-9 w-9),不隨 density token 切換而變化。
-          原因:Calendar 是浮層內(DatePicker popup)或 dashboard 小卡中的 inline 元件,
-          與 field-height family(輸入欄高度)無關。月曆格子需要固定尺寸確保數字對齊、
-          週間視覺節奏一致,參考 shadcn / Google Calendar / Notion 的共識做法。
+          Calendar 的日格用 h-field-sm w-[var(--field-height-sm)](28×28 md / 32×32 lg),
+          隨 density token 切換而縮放,與 popup 內其他欄位(Input / Button)保持比例。
+          月曆格子靠 table-native border-spacing 確保數字對齊、週間視覺節奏一致,
+          參考 shadcn / Google Calendar / Notion 的共識做法。
         </Desc>
       </div>
 
@@ -407,27 +407,27 @@ export const SizeMatrix = {
             </tr>
             <tr>
               <Td mono>月份 caption</Td>
-              <Td mono>h 36px</Td>
-              <Td mono>h-9</Td>
-              <Td>與日格同高,垂直節奏對齊</Td>
+              <Td mono>h 24px</Td>
+              <Td mono>h-field-xs</Td>
+              <Td>單行置中,nav 按鈕從兩側 absolute 貼齊</Td>
             </tr>
             <tr>
               <Td mono>Nav 按鈕</Td>
-              <Td mono>28×28</Td>
-              <Td mono>h-7 w-7</Td>
-              <Td>比日格稍小,視覺次要</Td>
+              <Td mono>24×24</Td>
+              <Td mono>size=xs iconOnly</Td>
+              <Td>Button variant=text,視覺次要</Td>
             </tr>
             <tr>
               <Td mono>星期標頭</Td>
-              <Td mono>36×32</Td>
-              <Td mono>w-9 h-8</Td>
-              <Td>寬度對齊日格,高度略矮</Td>
+              <Td mono>h 28px(寬 table-native 自動)</Td>
+              <Td mono>h-7</Td>
+              <Td>寬度由 table 自動對齊日格</Td>
             </tr>
             <tr>
               <Td mono>日格</Td>
-              <Td mono>36×36</Td>
-              <Td mono>h-9 w-9</Td>
-              <Td><span className="text-error font-medium">固定</span>,不隨 density 變化</Td>
+              <Td mono>28×28 (md) / 32×32 (lg)</Td>
+              <Td mono>h-field-sm w-[var(--field-height-sm)]</Td>
+              <Td><span className="text-fg-secondary font-medium">隨 density 縮放</span></Td>
             </tr>
             <tr>
               <Td mono>月份 gap</Td>

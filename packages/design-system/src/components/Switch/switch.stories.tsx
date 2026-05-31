@@ -26,11 +26,11 @@ export const Modes: Story = {
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-        <Switch mode="readonly" checked aria-label="啟用通知(readonly mode demo)" />
+        <Switch readOnly checked aria-label="啟用通知(readonly demo)" />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
-        <Switch mode="disabled" checked aria-label="啟用通知(disabled mode demo)" />
+        <Switch disabled checked aria-label="啟用通知(disabled demo)" />
       </div>
     </div>
   ),

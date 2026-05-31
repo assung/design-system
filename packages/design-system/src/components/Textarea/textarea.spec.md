@@ -27,7 +27,7 @@ benchmark:
 
 Textarea 是**多行文字**的輸入與顯示元件——Input 的多行版本。格式化邏輯為 identity（value → value）。
 
-**Layout Family**：Family 4（Field control）— multi-line variant。結構與單行 Family 4 相同（fieldWrapper + startIcon + content + endAction，視覺對齊 Family 1），僅高度可隨 rows / auto-resize 擴展、不受 `--field-height-*` 約束。
+**Layout Family**：Family 4（Field control）— multi-line variant。結構與單行 Family 4 相同（fieldWrapper + startIcon + content + endAction，視覺對齊 Family 1），僅高度可隨 rows / resize-y 擴展、不受 `--field-height-*` 約束。
 
 **實作基礎**：native `<textarea>` + 橋接 DS token，無 external primitive base。shadcn 同類做法。
 
@@ -99,7 +99,7 @@ sm 與 md 視覺相同（純命名 mapping，對齊 Field family）。
 
 ### Controlled / Uncontrolled(M26)
 
-native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Textarea 是 thin wrapper 直接 forward。3 模式:uncontrolled(只 `defaultValue`)/ controlled(`value` + `onChange`)/ read-only(走 `readOnly` prop,Radix-style)。autoResize 與兩模式都相容(內部 layoutEffect 量 scrollHeight,不影響 value source)。
+native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Textarea 是 thin wrapper 直接 forward。3 模式:uncontrolled(只 `defaultValue`)/ controlled(`value` + `onChange`)/ read-only(走 `readOnly` prop,Radix-style)。
 
 ### Readonly 特例
 
@@ -121,7 +121,7 @@ native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Tex
 
 Textarea 是 **Field Controls family 的多行變體**,共用規則由 `../Field/field-controls.spec.md` own:
 
-- **無 Inspector**:多行輸入的關鍵決策是「行數(rows)」與「resize 行為」,互動 Inspector 無法呈現「使用者輸入長文」的真實感——已由 `SizeMatrix`(各 size × rows 組合) + `RowsResizeMatrix`(auto-resize vs fixed rows vs resize-y)完整覆蓋。其他 prop(disabled / readonly / invalid)由 Field family 共用 pattern 管理。
+- **無 Inspector**:多行輸入的關鍵決策是「行數(rows)」與「resize 行為」,互動 Inspector 無法呈現「使用者輸入長文」的真實感——已由 `SizeMatrix`(各 size × rows 組合) + `RowsResizeMatrix`(rows 控制預設行數 / resize-y 垂直可調 / min-h-* 覆寫最小高度)完整覆蓋。其他 prop(disabled / readonly / invalid)由 Field family 共用 pattern 管理。
 - **無 StateBehavior**:Textarea 的互動狀態(focus ring / invalid / disabled / readonly)完全繼承 Field Controls SSOT(`field-controls.spec.md`「Mode 狀態」),無 Textarea 特有的 state 行為。重寫 StateBehavior = 與 Field family 漂移風險。
 
 對應 anatomy story:保留 `Overview` + `SizeMatrix` + `ModeMatrix`(edit/readonly/disabled continuation of Field) + `ColorMatrix` + 元件特有 `RowsResizeMatrix`。
@@ -137,7 +137,7 @@ Textarea 是 **Field Controls family 的多行變體**,共用規則由 `../Field
 
 ## A11y 預設
 
-**ARIA / Pattern**:native `<textarea>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+**ARIA / Pattern**:native `<textarea>` element 預設 a11y;label 關聯走 native `<label htmlFor>`(FieldLabel 渲染 `<label htmlFor={ctx.id}>`,textarea `id` 對應)。搭配 Field 時 textarea 自身補 `aria-invalid`(error 態)/ `aria-describedby`(description / error 文字)。
 
 **Keyboard 行為**:
 

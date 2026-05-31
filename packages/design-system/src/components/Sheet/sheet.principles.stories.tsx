@@ -322,7 +322,7 @@ export const HeaderFooterStructureRule: Story = {
     <div>
       <Rule
         title="標準結構 — Header(標題 + 描述) + 主內容 + Footer(按鈕列)"
-        note="與 Dialog 共用 overlay-surface 視覺語言(bg-surface-raised / border-border)。Header 放 SheetTitle + SheetDescription,Footer 放按鈕列;主內容區 flex-1 + overflow-y-auto 吃長內容"
+        note="與 Dialog 共用 overlay-surface 視覺語言(bg-surface-raised / elevation-200;容器邊框用較淡的 border-divider,Dialog 用 border-border)。Header 放 SheetTitle + SheetDescription,Footer 放按鈕列;主內容區 flex-1 + ScrollArea(跨 OS 一致捲軸,非 native overflow-y-auto)吃長內容"
       >
         <Sheet>
           <SheetTrigger asChild>

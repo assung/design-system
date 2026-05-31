@@ -113,7 +113,7 @@ CheckboxItem 和 RadioItem 雖然涉及「選擇」，但它們控制的是**即
 [prefix]  [label]  [suffix]
 ```
 
-- prefix：由 `DropdownMenuItem` 的 `startIcon` prop 傳入，經 MenuItem 內部以 item-anatomy 的 `<ItemPrefix>` / `<ItemIcon>`（`h-[1lh]` 對齊第一行 label）渲染。icon 跟 label 同色（foreground）
+- prefix：由 `DropdownMenuItem` 的 `startIcon` prop 傳入，經 MenuItem 內部的 prefix 對齊容器（消費 item-anatomy 的 `itemPrefixAlignVariants`，`h-[1lh]` 對齊第一行 label）渲染。icon 跟 label 同色（foreground）
 - label：文字內容，`flex-1`
 - suffix：`DropdownMenuShortcut` 或自行組合的後綴容器，`ml-auto` 靠右。指示型 icon 用 `fg-muted`
 

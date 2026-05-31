@@ -210,7 +210,7 @@ export const KeyboardMatrix: Story = {
             <thead><tr><Th>按鍵</Th><Th>行為</Th></tr></thead>
             <tbody>
               <tr><Td mono>← / →</Td><Td>- / + step</Td></tr>
-              <tr><Td mono>↓ / ↑</Td><Td>+ / - step(vertical-inverted 時相反)</Td></tr>
+              <tr><Td mono>↑ / ↓</Td><Td>+ / - step(vertical-inverted 時相反)</Td></tr>
               <tr><Td mono>PageDown / PageUp</Td><Td>± step × 10</Td></tr>
               <tr><Td mono>Home / End</Td><Td>跳到 min / max</Td></tr>
               <tr><Td mono>Tab</Td><Td>range mode 在多 thumb 間切換焦點</Td></tr>

@@ -13,12 +13,12 @@ export default meta
    Types & Data
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type StateKey = 'default' | 'hover' | 'active' | 'disabled'
+type StateKey = 'default' | 'hover' | 'disabled'
 type CheckedKey = 'unchecked' | 'checked'
 type SizeKey = 'sm' | 'md' | 'lg'
 type ColorSpec = { border: string; bg: string; dot: string }
 
-const STATES: StateKey[] = ['default', 'hover', 'active', 'disabled']
+const STATES: StateKey[] = ['default', 'hover', 'disabled']
 const CHECKED_STATES: CheckedKey[] = ['unchecked', 'checked']
 const SIZES: SizeKey[] = ['sm', 'md', 'lg']
 
@@ -27,13 +27,11 @@ const TOKEN_MAP: Record<CheckedKey, Record<StateKey, ColorSpec>> = {
   unchecked: {
     default:  { border: '--border',      bg: '--surface',  dot: 'transparent' },
     hover:    { border: '--border-hover', bg: '--surface',  dot: 'transparent' },
-    active:   { border: '--border-hover', bg: '--surface',  dot: 'transparent' },
     disabled: { border: 'transparent',   bg: '--bg-disabled', dot: 'transparent' },
   },
   checked: {
     default:  { border: '--primary',       bg: '--surface',     dot: '--primary' },
     hover:    { border: '--primary-hover',  bg: '--surface',     dot: '--primary-hover' },
-    active:   { border: '--primary-active', bg: '--surface',     dot: '--primary-active' },
     disabled: { border: 'transparent',     bg: '--bg-disabled', dot: '--fg-disabled' },
   },
 }
@@ -576,7 +574,7 @@ const StateBehaviorInner = () => {
         <Desc>
           Radio 的關鍵行為來自 <span className="font-mono">RadioGroup</span> 層級——單選互斥(切 A 會同時清 B),
           而非個別 item 的 toggle(那是 Checkbox)。本 story 展示 RadioGroup 特有行為,item 級別的
-          default / hover / active / checked / disabled 色彩對照見「3. 色彩對照表」。
+          default / hover / checked / disabled 色彩對照見「3. 色彩對照表」。
         </Desc>
       </div>
 

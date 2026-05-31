@@ -226,8 +226,8 @@ export const ColorMatrix: Story = {
       <div>
         <H3>TabsTrigger 四態色彩</H3>
         <Desc>
-          Tabs 未選狀態用 fg-secondary(不搶視覺),hover 走 標準互動高亮 primary-hover
-          (跟 Breadcrumb / Chip 一致)。Selected 用 foreground + bottom 2px primary-hover 下線
+          Tabs 未選狀態用 fg-secondary(不搶視覺),hover 時文字色轉 foreground(text-foreground，
+          neutral 最深)。Selected 用 foreground + bottom 2px primary-hover 下線
           ——下線是「當前位置」的明確指示器,不靠底色區分。
         </Desc>
         <div className="overflow-x-auto mb-4">

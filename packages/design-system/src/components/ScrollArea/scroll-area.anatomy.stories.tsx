@@ -313,8 +313,8 @@ export const SizeMatrix: Story = {
         <table className="text-caption border-collapse">
           <thead><tr><Th>屬性</Th><Th>值</Th><Th>備註</Th></tr></thead>
           <tbody>
-            <tr><Td>Vertical scrollbar 寬</Td><Td mono>w-2.5 (10px)</Td><Td>Radix 內部套 h-full</Td></tr>
-            <tr><Td>Horizontal scrollbar 高</Td><Td mono>h-2.5 (10px)</Td><Td>Radix 內部套 w-full</Td></tr>
+            <tr><Td>Vertical scrollbar 寬</Td><Td mono>w-2.5 (10px)</Td><Td>本 DS ScrollBar 套 h-full;Radix 再以 absolute(top:0/bottom:corner)撐滿高度</Td></tr>
+            <tr><Td>Horizontal scrollbar 高</Td><Td mono>h-2.5 (10px)</Td><Td>本 DS ScrollBar 套 flex-col;Radix 再以 absolute(left/right:0)撐滿寬度</Td></tr>
             <tr><Td>Thumb inset</Td><Td mono>p-[1px]</Td><Td>thumb 與 track 邊緣保持 1px 透氣</Td></tr>
             <tr><Td>Thumb radius</Td><Td mono>rounded-full</Td><Td>對齊 macOS / modern DS 慣例</Td></tr>
             <tr><Td>Density 反應</Td><Td mono>無</Td><Td>不隨 --field-height-* / --layout-space-* 放大</Td></tr>

@@ -13,12 +13,12 @@ export default meta
    Types & Data
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type ModeKey = 'edit' | 'readonly' | 'disabled'
+type ModeKey = 'edit' | 'display' | 'readonly' | 'disabled'
 type StateKey = 'default' | 'hover' | 'focus' | 'error' | 'disabled'
 type SizeKey = 'sm' | 'md' | 'lg'
 type ColorSpec = { bg: string; text: string; border: string; placeholder: string }
 
-const MODES: ModeKey[] = ['edit', 'readonly', 'disabled']
+const MODES: ModeKey[] = ['edit', 'display', 'readonly', 'disabled']
 const EDIT_STATES: StateKey[] = ['default', 'hover', 'focus', 'error', 'disabled']
 const SIZES: SizeKey[] = ['sm', 'md', 'lg']
 
@@ -29,6 +29,9 @@ const COLOR_MAP: Record<ModeKey, Partial<Record<StateKey, ColorSpec>>> = {
     focus:    { bg: '--surface',      text: '--foreground',  border: '--primary',       placeholder: '--fg-muted' },
     error:    { bg: '--surface',      text: '--foreground',  border: '--error',         placeholder: '--fg-muted' },
     disabled: { bg: '--bg-disabled',  text: '--fg-disabled', border: 'transparent',     placeholder: '--fg-disabled' },
+  },
+  display: {
+    default:  { bg: 'transparent',    text: '--foreground',  border: 'transparent',     placeholder: '--fg-muted' },
   },
   readonly: {
     default:  { bg: '--bg-disabled',  text: '--foreground',  border: 'transparent',     placeholder: '--fg-muted' },
@@ -55,6 +58,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
 
 const MODE_DESC: Record<ModeKey, string> = {
   edit:     '表單可編輯欄位 — bg-surface + border + hover/focus 回饋',
+  display:  '純展示資料 — 無 chrome（transparent）+ 文字正常色，空值顯示 —（em dash）',
   readonly: '不可編輯但可見 — bg-disabled(neutral-2) + 無邊框 + 文字正常色',
   disabled: '被停用的欄位 — bg-disabled(neutral-2) + 無邊框 + 文字灰化',
 }
@@ -207,11 +211,12 @@ export const Overview = {
           {MODES.map((m) => (
             <div key={m} className="flex items-center gap-4">
               <div className="w-64 shrink-0">
-                <Input
-                  mode={m}
-                  defaultValue="Wireless Bluetooth Headphones"
-                  size="md"
-                />
+                {/* display mode 讀 value(非 defaultValue)渲染 <span>;其餘 mode 用 defaultValue 保持 uncontrolled */}
+                {m === 'display' ? (
+                  <Input mode={m} value="Wireless Bluetooth Headphones" size="md" />
+                ) : (
+                  <Input mode={m} defaultValue="Wireless Bluetooth Headphones" size="md" />
+                )}
               </div>
               <span className="text-caption text-fg-secondary">{MODE_DESC[m]}</span>
             </div>
@@ -236,7 +241,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", '顯示模式，disabled/readOnly 原生屬性會自動覆蓋'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", '顯示模式，disabled/readOnly 原生屬性會自動覆蓋'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid，僅 edit 模式生效'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '高度與字體，與 Button 共用 field-height token'],
                 ['startIcon', 'LucideIcon', '—', '左側靜態 icon，fg-muted，pointer-events-none'],
@@ -324,7 +329,11 @@ const InspectorInner = () => {
               error={error}
               startIcon={hasStartIcon ? Search : undefined}
               endAction={hasEndAction && isEdit ? { icon: X, label: '清除', onClick: () => {} } : undefined}
-              defaultValue="Wireless Bluetooth Headphones"
+              // display mode 讀 value 渲染 <span>;其餘 mode 用 defaultValue 保持 uncontrolled
+              {...(mode === 'display'
+                ? { value: 'Wireless Bluetooth Headphones' }
+                : { defaultValue: 'Wireless Bluetooth Headphones' })}
+              key={mode}
               className="w-72"
             />
           </div>
@@ -744,7 +753,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳「無障礙設計」段摘要:\n\n  ARIA / Pattern  :採用原生  <input>  元素,自帶基本無障礙;外層 Field 容器補上  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  鍵盤行為  :\n\n- Tab — 聚焦到欄位\n- 字母鍵 — 輸入文字\n- 一般文字編輯鍵(方向鍵 / Backspace / Delete / 全選)由瀏覽器原生提供\n\n  聚焦樣式  :原生 input 的外框已被關閉(outline-none);聚焦時的視覺提示由外層 Field 容器的藍色邊框( focus-within 變 border-primary )提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA 對比 ≥ 4.5:1(文字)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳「無障礙設計」段摘要:\n\n  ARIA / Pattern  :採用原生  <input>  元素,自帶基本無障礙。Label 關聯走原生  <label htmlFor={fieldCtx.id}>  配 input  id (FieldLabel 提供,非 aria-labelledby)。Input 自身在  <input>  上設  aria-invalid (error 時)/  aria-required  /  aria-describedby (指向 FieldContext descriptionId)/  aria-errormessage (error 時指向 errorId)。\n\n  鍵盤行為  :\n\n- Tab — 聚焦到欄位\n- 字母鍵 — 輸入文字\n- 一般文字編輯鍵(方向鍵 / Backspace / Delete / 全選)由瀏覽器原生提供\n\n  聚焦樣式  :原生 input 的外框已被關閉(outline-none);聚焦時的視覺提示由外層 Field 容器的藍色邊框( focus-within 變 border-primary )提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA 對比 ≥ 4.5:1(文字)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

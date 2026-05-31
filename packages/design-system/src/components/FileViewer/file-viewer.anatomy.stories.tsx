@@ -100,7 +100,7 @@ export const Overview: Story = {
               {/* Toolbar */}
               <div className="h-14 shrink-0 flex items-center justify-between bg-surface-raised border-b border-divider px-6">
                 <span className="text-body-lg text-foreground">① Toolbar — 檔名 + zoom/info/download/close</span>
-                <span className="text-caption text-fg-muted">h-14 固定</span>
+                <span className="text-caption text-fg-muted">--chrome-header-height(lg=56）</span>
               </div>
               {/* Viewport + InfoPanel */}
               <div className="flex-1 min-h-0 flex">
@@ -144,7 +144,7 @@ export const Overview: Story = {
               <tr>
                 <Td mono>Toolbar</Td>
                 <Td>永遠顯示</Td>
-                <Td mono>h-14, bg-surface-raised, border-b</Td>
+                <Td mono>--chrome-header-height, bg-surface-raised, border-b</Td>
                 <Td>檔名 + 按鈕列(zoom → info → download → close,影響力遞增)；bg-surface-raised 確保 overlay 上的 chrome 不透明</Td>
               </tr>
               <tr>
@@ -162,7 +162,7 @@ export const Overview: Story = {
               <tr>
                 <Td mono>Filmstrip</Td>
                 <Td mono>showFilmstrip && files.length &gt; 1</Td>
-                <Td mono>h-24, bg-surface, border-t</Td>
+                <Td mono>h-24, bg-surface-raised, border-t</Td>
                 <Td>64×64 thumb 水平捲動(horizontal-overflow pattern)</Td>
               </tr>
             </tbody>
@@ -349,7 +349,7 @@ export const Inspector: Story = {
           />
           <p className="text-footnote text-fg-muted mt-2 leading-relaxed">
             提醒:filmstrip 需 `showFilmstrip && files.length &gt; 1` 才顯示;
-            prev/next arrow 需 `files.length &gt; 1`;切換 files 時 zoom 自動重設 100%。
+            prev/next arrow 需 `files.length &gt; 1`;切換 files 時 shell 不重設 zoom,由 renderer onLoad 重新 fit-page。
           </p>
         </div>
 
@@ -383,7 +383,7 @@ export const Inspector: Story = {
                 <tr>
                   <Td>Toolbar / InfoPanel / Filmstrip 背景</Td>
                   <Td>
-                    <TokenCell token="--surface" display="bg-surface" />
+                    <TokenCell token="--surface-raised" display="bg-surface-raised" />
                   </Td>
                 </tr>
                 <tr>
@@ -394,7 +394,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>Toolbar 高度</Td>
-                  <Td mono>h-14(56px,與 InfoPanel header 等高)</Td>
+                  <Td mono>--chrome-header-height(lg=56px,ChromeHeader lockDensity="lg",與 InfoPanel header 等高)</Td>
                 </tr>
                 <tr>
                   <Td>Toolbar 水平 padding</Td>
@@ -402,7 +402,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>Toolbar 按鈕 gap</Td>
-                  <Td mono>gap-1(icon 群)/ gap-2(左右分組)</Td>
+                  <Td mono>gap-2(8px,對齊 DS 按鈕 gap canonical;含 ZoomInput 內部)</Td>
                 </tr>
                 <tr>
                   <Td>InfoPanel 寬</Td>
@@ -422,7 +422,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>Filmstrip thumb gap</Td>
-                  <Td mono>gap-1(4px,對齊 lightbox 慣例)</Td>
+                  <Td mono>gap-[var(--layout-space-tight)](density-aware,對齊 lightbox 慣例)</Td>
                 </tr>
                 <tr>
                   <Td>Filmstrip active thumb ring</Td>
@@ -442,7 +442,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>ZoomInput 寬</Td>
-                  <Td mono>w-20(80px,含 dropdown trigger 7w)</Td>
+                  <Td mono>autoWidth(field-sizing:content,隨 % 文字寬;chevron 為 endSlot)</Td>
                 </tr>
                 <tr>
                   <Td>Prev/Next arrow Button size</Td>
@@ -482,8 +482,8 @@ export const ColorMatrix: Story = {
           style={{ width: 720 }}
         >
           <div className="bg-canvas">
-            <div className="h-14 flex items-center px-6 bg-surface border-b border-divider">
-              <span className="text-body-lg text-foreground">Toolbar — bg-surface</span>
+            <div className="h-14 flex items-center px-6 bg-surface-raised border-b border-divider">
+              <span className="text-body-lg text-foreground">Toolbar — bg-surface-raised</span>
             </div>
             <div className="flex">
               <div
@@ -492,12 +492,12 @@ export const ColorMatrix: Story = {
               >
                 <span className="text-body text-fg-secondary">Viewport — bg-canvas</span>
               </div>
-              <aside className="w-56 bg-surface border-l border-divider flex items-center justify-center">
-                <span className="text-body text-fg-secondary">InfoPanel — bg-surface</span>
+              <aside className="w-56 bg-surface-raised border-l border-divider flex items-center justify-center">
+                <span className="text-body text-fg-secondary">InfoPanel — bg-surface-raised</span>
               </aside>
             </div>
-            <div className="h-24 flex items-center px-6 bg-surface border-t border-divider">
-              <span className="text-body text-fg-secondary">Filmstrip — bg-surface</span>
+            <div className="h-24 flex items-center px-6 bg-surface-raised border-t border-divider">
+              <span className="text-body text-fg-secondary">Filmstrip — bg-surface-raised</span>
             </div>
           </div>
         </div>
@@ -532,9 +532,9 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td>Toolbar / InfoPanel / Filmstrip</Td>
                 <Td>
-                  <TokenCell token="--surface" display="bg-surface" />
+                  <TokenCell token="--surface-raised" display="bg-surface-raised" />
                 </Td>
-                <Td>比 canvas 高一階,形成 chrome 分層</Td>
+                <Td>遮蓋型浮層必須不透明(不用 bg-surface,dark = white α8 半透明);比 canvas 高一階形成 chrome 分層</Td>
               </tr>
               <tr>
                 <Td>分隔線</Td>
@@ -632,9 +632,9 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>Toolbar 高</Td>
-                <Td mono>h-14(56px)</Td>
+                <Td mono>--chrome-header-height(lg=56px)</Td>
                 <Td>Figma toolbar 48–56 / macOS Preview 56</Td>
-                <Td>容 32 px 按鈕 + 12 px 上下 breathing</Td>
+                <Td>ChromeHeader lockDensity="lg",token 驅動;lg 下值為 56px</Td>
               </tr>
               <tr>
                 <Td>InfoPanel 寬</Td>
@@ -656,9 +656,9 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>Filmstrip thumb gap</Td>
-                <Td mono>gap-1(4px)</Td>
+                <Td mono>gap-[var(--layout-space-tight)]</Td>
                 <Td>Google Photos / Dropbox 3–4 px</Td>
-                <Td>緊密排列,lightbox 慣例</Td>
+                <Td>density-aware token,緊密排列 lightbox 慣例</Td>
               </tr>
               <tr>
                 <Td>Toolbar 按鈕</Td>
@@ -668,9 +668,9 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>ZoomInput 寬</Td>
-                <Td mono>w-20(80px)</Td>
+                <Td mono>autoWidth(field-sizing:content)</Td>
                 <Td>Figma zoom 80 / Google Slides 72</Td>
-                <Td>容「400%」4 字元 + chevron 7w</Td>
+                <Td>隨 % 文字寬自適應,chevron 為 endSlot inline action</Td>
               </tr>
               <tr>
                 <Td>Prev/Next arrow</Td>

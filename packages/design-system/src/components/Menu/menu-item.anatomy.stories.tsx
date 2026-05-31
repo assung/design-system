@@ -513,7 +513,7 @@ const InspectorInner = () => {
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Typography</span></div>
             <PropRow label="Label"><TkVal token={s.labelFont} value={s.labelSize} /></PropRow>
             {hasDesc && <PropRow label="Description"><TkVal token={s.descFont} value={s.descSize} /></PropRow>}
-            {hasDesc && <PropRow label="Label-Desc 間距"><TkVal token="mt-0.5" value="2px" /></PropRow>}
+            {hasDesc && <PropRow label="Label-Desc 間距"><TkVal token={size === 'lg' ? '--item-gap-label-desc-scanning-lg' : '--item-gap-label-desc-scanning'} value="2px" /></PropRow>}
           </div>
 
           {/* SELECTION */}

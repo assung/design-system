@@ -176,12 +176,11 @@ Switch 可透過 `label` / `description` props 內部直接渲染緊鄰文字：
 
 ---
 
-## 為何無 Inspector / ColorMatrix
+## 為何無 ColorMatrix
 
-- **無 Inspector**:Switch 決策維度只有 `size`(sm / md / lg)× `checked`(ON / OFF)× `disabled` / `readonly`——已由 `SizeMatrix` / `StateBehavior`(四 state + disabled 策略 + readonly) / `LabelIntegration`(Field 整合)三張 story 完整覆蓋。互動 Inspector 切 checked 只是重複 StateBehavior 的 ON / OFF 對照——Switch 是二元元件,互動試玩對教學價值低。
-- **無 ColorMatrix**:Switch 只有一套色彩——ON 用 `bg-primary`(track) + `bg-surface`(thumb),OFF 用 `bg-muted`(track) + `bg-surface`(thumb),無 variant / hue 變體。狀態色完全內嵌在 `StateBehavior` story(ON / OFF / disabled 的 track bg + thumb 綁定)。重寫 ColorMatrix = 複製 StateBehavior 內容。
+- **無 ColorMatrix**:Switch 只有一套色彩——ON 用 `bg-primary`(track) + `bg-on-emphasis`(thumb),OFF 用 `bg-border`(neutral-5)(track) + `bg-on-emphasis`(thumb),無 variant / hue 變體。狀態色完全內嵌在 `StateBehavior` story(ON / OFF / disabled 的 track bg + thumb 綁定)。重寫 ColorMatrix = 複製 StateBehavior 內容。
 
-對應 anatomy story:保留 `Overview` + `SizeMatrix` + `StateBehavior` + 元件特有 `LabelIntegration`(Field 包裝後的 label/description 管理)。
+對應 anatomy story:`Overview` + `Inspector` + `SizeMatrix` + `StateBehavior` + 元件特有 `LabelIntegration`(Field 包裝後的 label/description 管理)+ `Accessibility`。
 
 ---
 

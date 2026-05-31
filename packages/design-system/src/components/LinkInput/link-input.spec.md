@@ -110,7 +110,7 @@ LinkInput 是 **Field Controls family 成員**——互動狀態(focus / invalid
 
 ## A11y 預設
 
-**ARIA / Pattern**:native `<input>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+**ARIA / Pattern**:native `<input type="url">` element 預設 a11y;label 關聯靠 `id`(`fieldCtx.id`)+ FieldLabel `<label htmlFor>`(native `for` 機制);input 上另設 `aria-invalid` / `aria-describedby`(error 時 `aria-errormessage`)。
 
 **Keyboard 行為**:
 
@@ -119,7 +119,7 @@ LinkInput 是 **Field Controls family 成員**——互動狀態(focus / invalid
 - Enter — 提交,觸發 blur 驗證
 - Esc — 取消編輯,回復原值,不觸發驗證
 
-**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+**Focus**:原生 input outline 已關閉;focus 視覺提示由 Field wrapper 的 `focus-within:!border-primary` 提供(滑鼠點入也亮藍框,對齊 Field wrapper canonical)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

@@ -311,7 +311,7 @@ export const Overview = {
                 ['onChange', '(value: string) => void', '—', '值變更回呼'],
                 ['placeholder', 'string', '—', '未選值時的提示文字'],
                 ['clearable', 'boolean', 'false', '有值時顯示 clear 按鈕（僅 edit 模式）'],
-                ['startIcon', 'LucideIcon', '—', '左側 icon，代表 value 的圖示（僅 text 模式）'],
+                ['startIcon', 'LucideIcon', '—', '左側 field-level 指示 icon（muted，僅 plain 模式；代表 value 的圖示走 option.icon）'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid（僅 edit 模式有視覺效果）'],
                 ['disabled', 'boolean', '—', '原生屬性，自動覆蓋 mode 為 disabled'],
               ].map(([p, t, d, desc]) => (
@@ -811,7 +811,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"無障礙行為依裝置分兩條路徑:\n\n  ARIA / Pattern  :桌機(非觸控)觸發點是一個容器,標記  role=\"combobox\"  +  aria-expanded  /  aria-haspopup=\"listbox\" ,選項在浮層的 listbox 裡;searchable 模式時容器內另放一個可打字篩選的  <input> 。手機(觸控)改用瀏覽器原生的  <select>  element,直接取得作業系統內建的無障礙與 picker。Field wrapper 兩邊都補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為  :\n\n- Tab — 聚焦到觸發點\n- Enter / Space — 展開選單(searchable 模式則直接進入打字篩選)\n- ↑ / ↓ — 選單展開後在選項間移動\n- 字母鍵 — 選單內逐字定位(searchable 模式為打字篩選)\n- Enter — 選定目前 highlight 的選項並關閉\n- Esc — 關閉選單(清除值走右側 clear 按鈕,非 Esc)\n\n  Focus  :DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供;手機原生  <select>  另有系統 focus ring。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"無障礙行為依裝置分兩條路徑:\n\n  ARIA / Pattern  :桌機(非觸控)觸發點是一個容器,標記  role=\"combobox\"  +  aria-expanded  /  aria-haspopup=\"listbox\" ,選項在浮層的 listbox 裡;searchable 模式時容器內另放一個可打字篩選的  <input> 。手機(觸控)改用瀏覽器原生的  <select>  element,直接取得作業系統內建的無障礙與 picker。Field wrapper 兩邊都補  aria-invalid  /  aria-required  /  aria-describedby  /  aria-errormessage ;手機原生  <select>  另由 FieldLabel 的  htmlFor  關聯取得 accessible name。\n\n  Keyboard 行為  :\n\n- Tab — 聚焦到觸發點\n- Enter / Space — 展開選單(searchable 模式則直接進入打字篩選)\n- ↑ / ↓ — 選單展開後在選項間移動\n- 字母鍵 — searchable 模式為打字篩選;手機原生 <select> 為平台內建 type-to-jump 逐字定位(桌機非 searchable combobox 無逐字定位)\n- Enter — 選定目前 highlight 的選項並關閉\n- Esc — 關閉選單(清除值走右側 clear 按鈕,非 Esc)\n\n  Focus  :DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供;手機原生  <select>  另有系統 focus ring。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

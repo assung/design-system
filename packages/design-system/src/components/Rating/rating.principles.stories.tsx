@@ -267,11 +267,11 @@ export const YellowStarConvention: Story = {
 
       <Rule
         title="填色 = 黃，空色 = 灰"
-        note="空星用灰（`--color-neutral-4`）不用黃的淺色（yellow-2）——空星要表達「未選」不是「弱黃選」。灰色是跨系統的「empty / disabled」通用語。"
+        note="空星用灰（`--divider`，= `--color-neutral-4`）不用黃的淺色（yellow-2）——空星要表達「未選」不是「弱黃選」。灰色是跨系統的「empty / disabled」通用語。"
       >
         <div className="flex flex-col gap-2">
           <Rating value={3.5} readOnly precision="half" size="lg" aria-label="黃填灰空" />
-          <Label>✅ filled = `--warning`，empty = `--color-neutral-4`</Label>
+          <Label>✅ filled = `--warning`，empty = `--divider`（= `--color-neutral-4`）</Label>
         </div>
       </Rule>
 

@@ -202,7 +202,7 @@ SegmentedControl 必須能塞進 `Field` 容器（就像 `Input` / `Button` / `S
 
 `iconOnly` 為 true 時：
 - 每個 item 變正方形（`aspect-square p-0`）
-- 每個 item 必須設定 `aria-label`（必要 prop，TS 層強制）
+- 每個 item 必須設定 `aria-label`（語意契約；TS 層做不到 conditional 強制，改以 dev-mode runtime `console.warn` 提醒）
 - 每個 item 自動以 `aria-label` 渲染 tooltip（與 Button icon-only 一致）
 
 ---
@@ -258,7 +258,7 @@ Items 之間 `-ml-px`（除了第一個）讓相鄰 border 重疊、視覺上只
 ## 為何無 Inspector / ColorMatrix
 
 - **無 Inspector**:SegmentedControl 決策維度是 `size` × `fullWidth` × `iconOnly`,已在 `SizeMatrix` / `FullWidthMatrix` / `IconOnlyMatrix` 三張矩陣完整覆蓋。互動 Inspector 切單組合不如矩陣對照——「fullWidth 三種尺寸」「iconOnly 單例 vs 整組」這類設計決策是結構性並排比較題,不是單組合試玩題。
-- **無 ColorMatrix**:SegmentedControl 繼承 Button family 的視覺系統(見「與 Button 的血緣」段),**selected segment 走 tertiary Button 底色**(`bg-surface-raised` + `border`),非 selected segment 走 text Button 底色(透明 + hover `neutral-hover`)——色彩完全由 Button variant 決定,非 SegmentedControl 自有變體。重寫 ColorMatrix = 複製 Button tertiary/text 的 ColorMatrix。狀態色已在 `StateBehavior` 覆蓋。
+- **無 ColorMatrix**:SegmentedControl 沒有 Button 那種強調層級 variant(primary / secondary / tertiary / text)——只有「選中 / 未選」兩種 **state**,色彩變化純由 state 驅動(底色恆為 `bg-surface` 不變;選中 = `text-primary-hover` + `border-primary-hover`;未選 hover = `text-foreground`,詳「狀態」段)。這是 pill 風格元件(Chip / SegmentedControl)共用的選中規則,非 Button variant。因此 ColorMatrix(逐 variant 列色)不適用,狀態色已在 `StateBehavior` 完整覆蓋。
 
 對應 anatomy story:保留 `Overview` + `SizeMatrix` + `StateBehavior` + 元件特有 `FullWidthMatrix` + `IconOnlyMatrix`。
 
@@ -278,10 +278,10 @@ Items 之間 `-ml-px`（除了第一個）讓相鄰 border 重疊、視覺上只
 **Keyboard 行為**:
 
 - Tab — 進入 group(focus 在第一個或選中項)
-- ←/→ — 切 segment
-- Enter / Space — 選擇
+- ←/→ — 在 item 間移動 roving focus(只移焦點,不切換選取)
+- Enter / Space — 選取目前 focus 的 item
 
-**Focus**:Radix primitive 採 roving tabindex（整組共用單一 tab 停留點，方向鍵在 item 間移動），非 Dialog 式 focus trap / restoration。Focus ring 對齊 Button focus-visible canonical（`outline: 2px solid var(--ring)`）。
+**Focus**:Radix primitive 採 roving tabindex（整組共用單一 tab 停留點，方向鍵在 item 間移動焦點，不切換選取），非 Dialog 式 focus trap / restoration。Focus ring 對齊 Button focus-visible canonical（`focus-visible:ring-2 ring-ring ring-offset-1`——box-shadow ring，非 CSS outline）。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

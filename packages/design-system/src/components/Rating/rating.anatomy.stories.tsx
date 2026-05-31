@@ -292,14 +292,14 @@ export const ColorMatrix = {
             <Td mono>empty</Td>
             <Td><Rating value={0} readOnly size="md" aria-label="零分" /></Td>
             <Td>—</Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td>—</Td>
           </tr>
           <tr>
             <Td mono>half</Td>
             <Td><Rating value={3.5} readOnly precision="half" size="md" aria-label="3.5 星" /></Td>
             <Td><TokenCell token="--warning" /></Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td className="text-[11px]">left 50% filled overlay</Td>
           </tr>
           <tr>
@@ -313,14 +313,14 @@ export const ColorMatrix = {
             <Td mono>focus (keyboard)</Td>
             <Td><Rating defaultValue={3} size="md" aria-label="focus 範例" /></Td>
             <Td><TokenCell token="--warning" /></Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td className="text-[11px]">ring-2 ring-ring ring-offset-2</Td>
           </tr>
           <tr>
             <Td mono>disabled</Td>
             <Td><Rating value={3} disabled size="md" aria-label="disabled 範例" /></Td>
             <Td><TokenCell token="--warning" /></Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td className="text-[11px]">opacity-disabled · pointer-events-none</Td>
           </tr>
         </tbody>
@@ -484,7 +484,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `rating.spec.md` 「A11y 預設」段。摘要:\n\n-   interactive  ： role=\"slider\"  +  aria-valuenow={value}  +  aria-valuemin={0}  +  aria-valuemax={max}  +  tabIndex={0} ，鍵盤 Arrow Left/Right/Up/Down 改值（precision=half 時 step=0.5，否則 step=1）\n-   readOnly  ： role=\"img\"  +  aria-label （  必填  ），例： aria-label=\"平均評分 4.7 星，共 5 星\" 。無 tabIndex\n-   disabled  ： aria-disabled=\"true\"  +  pointer-events-none \n-   單顆星    aria-hidden ：所有內部  <button> （包含 half-pre"}</p>
+      <p className="whitespace-pre-line">{"詳 `rating.spec.md` 「A11y 預設」段。摘要:\n\n-   interactive  ： role=\"slider\"  +  aria-valuenow={value}  +  aria-valuemin={0}  +  aria-valuemax={max}  +  tabIndex={0} ，鍵盤 Arrow Left/Right/Up/Down 改值（precision=half 時 step=0.5，否則 step=1）\n-   readOnly  ： role=\"img\"  +  aria-label （  必填  ），例： aria-label=\"平均評分 4.7 星，共 5 星\" 。無 tabIndex\n-   disabled  ： aria-disabled=\"true\"  +  pointer-events-none \n-   單顆星    aria-hidden ：內部點擊目標是  <span role=\"presentation\" aria-hidden> （非 interactive element，避免與外層 role=\"slider\" 形成 axe nested-interactive；含 half-precision 兩個 hover zone）"}</p>
     </div>
   ),
 }

@@ -663,7 +663,7 @@ export const StateBehavior = {
             <div className="w-[200px]">
               <NumberInput value={focusValue} onChange={setFocusValue} prefix="$" placeholder="點擊 focus" />
             </div>
-            <span className="text-[11px] text-fg-muted">input 永遠 focus-visible（瀏覽器規範），統一 border-primary 1px</span>
+            <span className="text-[11px] text-fg-muted">input outline-none；focus 時由 wrapper focus-within 觸發 border-primary 1px</span>
           </div>
         </div>
 

@@ -82,7 +82,7 @@ RadioGroup 是**互斥單選且全選項可見**的表單控件——從 2-5 個
 
 ## StateBehavior(RadioGroup 層級特有)
 
-Item-level default / hover / active / checked / disabled **色彩**與 Checkbox 共用同一套 SelectionItem 規則,由 `ColorMatrix` story 承載;RadioGroup 的 `StateBehavior` story 展示**群組層級的互斥行為**(單選模型 / 個別 disabled / 整組 disabled),這是 Checkbox 沒有的維度。
+Item-level default / hover / checked / disabled **色彩**與 Checkbox 共用同一套 SelectionItem 規則,由 `ColorMatrix` story 承載;RadioGroup 的 `StateBehavior` story 展示**群組層級的互斥行為**(單選模型 / 個別 disabled / 整組 disabled),這是 Checkbox 沒有的維度。
 
 ---
 

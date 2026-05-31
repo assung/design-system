@@ -96,7 +96,7 @@ col.accessor('price', {
 ## 邊界案例
 
 - **Disabled**:由 Field SSOT own(`Field/field-controls.spec.md` State machine 段)。視覺:wrapper bg → `bg-fg-disabled-subtle`、formatted text → `text-fg-disabled`(M24 state>emphasis)。Display mode + disabled 維持格式化輸出但 token 切 disabled。
-- **Loading**:走 Field SSOT 的 `loading?: boolean`(`field-controls.spec.md` L70-115);endAction slot 自動切 `<CircularProgress/>` + `aria-busy="true"`,input 仍可編輯。
+- **Loading**:NumberInput 不提供 loading state(`NumberInputProps` 無 `loading` prop、無 `CircularProgress` / `aria-busy` 邏輯)。數值輸入為同步操作,無 async fetch 語意;若需 async 場景(如遠端校驗)請走外層 Field validation + `endSlot` 自訂 spinner。
 - **Empty(null / undefined / 空字串)**:Display mode 渲 `—`(em dash + `text-fg-muted`);Edit mode placeholder 走 default placeholder color。
 - **Invalid input**(non-numeric):input 為 `type="text" inputMode="decimal"`,onChange 以 `Number(raw)` parse,NaN 時忽略不觸發 `onChange`(value 維持原值);搭配 Field validation 渲 error variant(`aria-invalid="true"` + `text-fg-error` border + 下方 error message)。
 - **Dark mode / density**:走 Field SSOT,不獨立 own。
@@ -119,7 +119,7 @@ col.accessor('price', {
 - Tab — focus
 - 數字鍵 — 輸入數值
 
-**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+**Focus**:native input 為 `outline-none` 無自身 focus ring;藍框由 Field wrapper 的 `focus-within:!border-primary` 提供(input 取得 focus → wrapper `focus-within` fire → border 轉 primary)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

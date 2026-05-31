@@ -197,8 +197,8 @@ export const SectionRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="每個 section 獨立，按資料決定出現"
-        note="Profile header 必有;status / actions / fields / viewMore 各自按有無資料決定渲染。不強制全部塞滿——不同情境（basic contact / full profile）自然長出不同形狀"
+        title="每個 section 各有渲染規則"
+        note="Profile header + Info fields 永遠顯示（fields 為 always-render：缺值顯 — 佔位，固定結構防漂移）;status / actions / viewMore 則各自按有無資料決定渲染。不強制全部塞滿——不同情境（basic contact / full profile）自然長出不同形狀"
       >
         <div className="flex items-center gap-4 flex-wrap">
           <div className="border border-border rounded-lg">

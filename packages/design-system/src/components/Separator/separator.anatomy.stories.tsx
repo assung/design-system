@@ -64,7 +64,7 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['orientation', "'horizontal' | 'vertical'", "'horizontal'", '分隔線方向'],
-                ['decorative', 'boolean', 'true', 'true=裝飾性(無 a11y role)/ false=語意分隔(role="separator")'],
+                ['decorative', 'boolean', 'true', 'true=裝飾性(role="none",SR 跳過)/ false=語意分隔(role="separator")'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -119,7 +119,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"Separator 非互動元件——不取得 focus、無鍵盤行為。ARIA role 視 decorative 而定(對齊 Radix Separator primitive):\n\n- 預設 decorative=true:render role=\"none\",screen reader 跳過(避免「separator」雜訊干擾 list 朗讀)\n- 語意分隔場景 decorative={false}:render role=\"separator\" aria-orientation=\"horizontal|vertical\",screen reader 讀出群組邊界\n\n判斷:同 list 內 item 之間的視覺隔線 = decorative(預設);跨 region 的結構分隔(sidebar group / menu group)= semantic。詳 separator.spec.md「A11y 預設」段。"}</p>
+      <p className="whitespace-pre-line">{"Separator 非互動元件——不取得 focus、無鍵盤行為。ARIA role 視 decorative 而定(對齊 Radix Separator primitive):\n\n- 預設 decorative=true:render role=\"none\",screen reader 跳過(避免「separator」雜訊干擾 list 朗讀)\n- 語意分隔場景 decorative={false}:render role=\"separator\"(aria-orientation 僅 orientation=\"vertical\" 時輸出;horizontal 為預設方向,Radix 省略冗餘屬性),screen reader 讀出群組邊界\n\n判斷:同 list 內 item 之間的視覺隔線 = decorative(預設);跨 region 的結構分隔(sidebar group / menu group)= semantic。詳 separator.spec.md「A11y 預設」段。"}</p>
     </div>
   ),
 }

@@ -39,7 +39,6 @@ sizes:
 traits:
   - hasVariants
   - hasSizes
-  - hasInteractiveStates
 benchmark:
   - Ant Design Tag: github.com/ant-design/ant-design/tree/master/components/tag
   - MUI Chip: github.com/mui/material-ui/tree/master/packages/mui-material/src/Chip
@@ -263,8 +262,8 @@ Tag 是**純顯示 indicator**(非互動 — 見「與 Button 的差異」段),�
 Tag 是**純視覺 indicator**(非互動 control,互動版本是 Chip),預設 ARIA 行為:
 
 - **靜態 Tag**(無 `onDismiss`):render 為 `<span>`,無 role(SR 讀文字內容,跟隨 inline flow)。若 Tag 表達狀態語意(「進行中」「已逾期」),consumer 應在父 region 用 `aria-label` 或視覺 prefix(icon)讓 SR 理解 context
-- **Dismissible Tag**(`onDismiss` 存在):inline X close 為 `<Button iconOnly dismiss size="xs" aria-label="移除 {tagLabel}" />` — 對齊 inline-action canonical(`patterns/element-anatomy/inline-action.spec.md`)
-- **Keyboard**:靜態 Tag 不取得 focus(無互動);dismissible 的 X 走 Button 鍵盤(Tab → focus → Enter/Space → dismiss)
+- **Dismissible Tag**(`onDismiss` 存在):inline X close 走 `<ItemInlineActionButton icon={X} size="md" aria-label="移除 {tagLabel}" />`(item-anatomy SSOT 的原生 `<button>`,非 `Button` 元件)— 對齊 inline-action canonical(`patterns/element-anatomy/inline-action.spec.md`)
+- **Keyboard**:靜態 Tag 不取得 focus(無互動);dismissible 的 X 走原生 button 鍵盤(Tab → focus → Enter/Space → dismiss)
 - **Color-only 語意警告**:Tag 用色相區分狀態時必有文字 label 或 prefix icon(色盲 user 友好);對齊 WCAG 1.4.1「不僅靠顏色傳達」
 - **驗證**:Storybook a11y addon panel 0 critical violation;WCAG AA contrast ≥ 4.5:1(text)/ 3:1(icon)
 

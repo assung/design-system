@@ -252,8 +252,8 @@ export const VisualTokenRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="selected = bg-primary · today = ring-primary"
-        note="選中日用 primary 實心填滿(和系統其他選中態如 Checkbox checked、Tab active 一致);今日但未選 = ring-1 框定位(告訴使用者「這是今天」,但不搶選中視覺)。兩者同時成立時實心 selected 視覺優先。"
+        title="selected = bg-primary · today = 數字下方藍色底線"
+        note="選中日用 primary 實心填滿(和系統其他選中態如 Checkbox checked、Tab active 一致);今日但未選 = 數字下方藍色底線 bar(after pseudo,告訴使用者「這是今天」,但不搶選中視覺)。兩者同時成立時實心 selected 視覺優先,底線 bar 切 on-emphasis(白)保持可見。"
       >
         <Demo title="今日 + 已選他日">
           <DateGrid
@@ -270,8 +270,8 @@ export const VisualTokenRule: Story = {
       </Rule>
 
       <Rule
-        title="前後月日期 = text-fg-disabled(淡化),禁用日 = text-fg-disabled(semantic)"
-        note="前後月的補格讓使用者認得「跨月邊界」但不搶主要月份的閱讀焦點;disabled 日期保留可見(告訴使用者「這天存在但不能選」),套 `text-fg-disabled` + `pointer-events-none`(對齊 Button variant=text disabled 設計準則,非 opacity)。"
+        title="前後月日期 = text-fg-muted(淡化,比 disabled 弱),禁用日 = text-fg-disabled(semantic)"
+        note="前後月的補格讓使用者認得「跨月邊界」但不搶主要月份的閱讀焦點;disabled 日期保留可見(告訴使用者「這天存在但不能選」),套 `bg-disabled` + `text-fg-disabled` + `cursor-not-allowed`,點擊阻擋靠 react-day-picker 給 button 的 native `disabled` 屬性(對齊 Button disabled 設計準則,非 opacity)。"
       >
         <Demo title="showOutsideDays + disabled 過去日期">
           <DateGrid

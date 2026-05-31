@@ -72,7 +72,7 @@ const [country, setCountry] = useState('tw')
 ### 歷史
 
 - **2026-05-21 前**:刻意 controlled-only,理由「內部狀態複雜易 race」
-- **2026-05-21 D3 audit**:per Phase A deep audit Dim 26 verify + user verbatim「決策三照妳建議」+「都給我做到好」→ 補 `defaultValue` + `useState` internal state + 互斥 signal。實作:`select.tsx:L443 isControlled = valueProp !== undefined` + `internalValue` state + `handleValueChange` 內 `if (!isControlled) setInternalValue(v)`
+- **2026-05-21 D3 audit**:per Phase A deep audit Dim 26 verify + user verbatim「決策三照妳建議」+「都給我做到好」→ 補 `defaultValue` + internal state + 互斥 signal。實作:NativeSelect + CustomSelect 兩路徑統一走既有 `useControllable` hook(`value` / `defaultValue` / `onChange`),`valueProp !== undefined` 為 controlled signal;`handleValueChange` 呼叫 `setValue` 統一更新(取代早期自刻 `isControlled` + `internalValue` state pattern,對齊 M17 SSOT)
 
 ---
 
@@ -290,15 +290,16 @@ Select 是 **Field Controls family 成員**——互動狀態(focus / invalid / 
 
 ## A11y 預設
 
-**ARIA / Pattern**:native `<input>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+**ARIA / Pattern**:依裝置分兩條路徑。桌機(非觸控)觸發點是容器 `<div>`,標記 `role="combobox"` + `aria-expanded` / `aria-haspopup="listbox"`,選項在浮層 listbox 裡;searchable 模式時容器內另放可打字篩選的 `<input>`。手機(觸控)改用瀏覽器原生 `<select>` element,直接取得作業系統內建的無障礙與 picker。兩路徑皆由 Field wrapper 補 `aria-invalid` / `aria-required` / `aria-describedby` / `aria-errormessage`。
 
 **Keyboard 行為**:
 
-- Tab — focus
-- 字母鍵 — 輸入
-- Esc — 清空(若 clearable + 有值)
+- Tab — 聚焦到觸發點
+- Enter / Space — 展開選單(searchable 模式則直接進入打字篩選)
+- ↑ / ↓ — 選單展開後在選項間移動
+- Esc — 關閉選單(清除值走右側 clear 按鈕,非 Esc)
 
-**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+**Focus**:DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供;手機原生 `<select>` 另有系統 focus ring。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

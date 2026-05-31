@@ -55,7 +55,7 @@ const SIZE_SPECS: Record<
   },
   lg: {
     fieldHeight: '--field-height-lg',
-    fieldHeightPx: 40,
+    fieldHeightPx: 36,
     text: 'text-body-lg',
     textPx: 16,
     iconPx: 20,
@@ -75,8 +75,8 @@ export const Overview: Story = {
       <div>
         <H3>Anatomy</H3>
         <Desc>
-          SelectionItem 是 Checkbox / RadioGroup 共用的 layout primitive。4-slot 結構:
-          <code className="font-mono text-footnote mx-1">[control] [optional prefix] [content] [optional suffix]</code>
+          SelectionItem 是 Checkbox / RadioGroup 共用的 layout primitive。3-slot 結構:
+          <code className="font-mono text-footnote mx-1">[control] [optional prefix (icon | avatar)] [content]</code>
           。Padding 公式
           <code className="font-mono text-footnote mx-1">py = (field-height - 1lh) / 2</code>
           讓單行高度自動對齊同 size 的 Input,density 切換時跟著算。
