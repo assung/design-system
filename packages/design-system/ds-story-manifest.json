@@ -7,14 +7,13 @@
       "scripts/composition-fidelity-visual-diff.mjs",
       "product-workspace apps/template/src/AllDsComponents.stories.tsx (DsCanonicalPortal)"
     ],
-    "generatedAt": "2026-05-28T10:49:59.438Z"
+    "generatedAt": "2026-05-31T10:10:43.088Z"
   },
   "components": {
     "accordion": {
       "tiers": {
         "展示": [
           "design-system-components-accordion-展示--default",
-          "design-system-components-accordion-展示--states",
           "design-system-components-accordion-展示--faq",
           "design-system-components-accordion-展示--settings-sections",
           "design-system-components-accordion-展示--advanced-options"
@@ -168,8 +167,6 @@
           "design-system-components-breadcrumb-展示--default",
           "design-system-components-breadcrumb-展示--interactive-ellipsis",
           "design-system-components-breadcrumb-展示--declarative-auto-collapse",
-          "design-system-components-breadcrumb-展示--deep",
-          "design-system-components-breadcrumb-展示--two-levels",
           "design-system-components-breadcrumb-展示--with-home-icon",
           "design-system-components-breadcrumb-展示--paired-with-page-title",
           "design-system-components-breadcrumb-展示--integrate-router-link"
@@ -1326,9 +1323,7 @@
         ],
         "設計原則": [
           "design-system-components-separator-設計原則--usage-guidance",
-          "design-system-components-separator-設計原則--who-decides-rule",
-          "design-system-components-separator-設計原則--decorative-semantic-rule",
-          "design-system-components-separator-設計原則--not-as-border-rule"
+          "design-system-components-separator-設計原則--decorative-semantic-rule"
         ]
       },
       "openSnapshotIds": [],
@@ -1686,5 +1681,5 @@
     }
   },
   "totalComponents": 62,
-  "totalStories": 916
+  "totalStories": 911
 }

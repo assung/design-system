@@ -66,6 +66,8 @@ export * from './components/Tooltip/index'
 export * from './components/TreeView/index'
 
 // ─── Patterns ─────────────────────────────────────────────────────────────
+export * from './patterns/element-anatomy/index'
+export * from './patterns/header-canonical/index'
 export * from './patterns/horizontal-overflow/index'
 export * from './patterns/overlay-surface/index'
 export * from './patterns/resize-handle/index'

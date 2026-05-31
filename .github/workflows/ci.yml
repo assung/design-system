@@ -105,7 +105,12 @@ jobs:
           echo "✅ compile-stories: no drift"
 
       - name: Storybook build
-        run: npm run build-storybook 2>&1 | tail -20
+        # 2026-05-31 fix(假綠 anchor):原 `| tail -20` 讓 pipe exit code = tail(永遠 0)→
+        # build-storybook 失敗(如 CSF index error / 未閉合 JSX tag)被吞 → CI 假綠,只有 release.yml
+        # FULL smoke 才抓到。set -o pipefail 讓 build 真實 exit code 傳出 → build 失敗 = CI 紅。
+        run: |
+          set -o pipefail
+          npm run build-storybook 2>&1 | tail -30
 
       - name: Storybook story runtime smoke test(Phase 4.13 — 0 console error gate)
         # 2026-05-25 Phase 4.13 加 — 本 session 已踩 3 個 story runtime bug(Breadcrumb asChild

@@ -263,7 +263,7 @@ export const ColorMatrix: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Arrow(浮層按鈕)</H3>
-        <Desc>Arrow 為 `<Button variant="tertiary">`——`bg-surface` + `border-border`,無 elevation shadow,rounded-full 圓形,疊在照片或內容上仍清晰可見。</Desc>
+        <Desc>Arrow 為 `&lt;Button variant="tertiary"&gt;`——`bg-surface` + `border-border`,無 elevation shadow,rounded-full 圓形,疊在照片或內容上仍清晰可見。</Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>Fill</Th><Th>Stroke</Th><Th>Shadow</Th><Th>Opacity</Th></tr></thead>

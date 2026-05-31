@@ -436,7 +436,7 @@ export const StateBehavior: Story = {
 
       <div>
         <H3>disabled item</H3>
-        <Desc>AccordionItem 設 disabled 後,對應 trigger 切語義 disabled 文字色(`text-fg-disabled`,非 opacity)且 pointer-events-none;Radix 將 disabled 設在原生 `<button>` 上,故鍵盤 Tab 會跳過該 trigger(原生 disabled 不可聚焦),ArrowUp/Down 也會略過它。</Desc>
+        <Desc>AccordionItem 設 disabled 後,對應 trigger 切語義 disabled 文字色(`text-fg-disabled`,非 opacity)且 pointer-events-none;Radix 將 disabled 設在原生 `&lt;button&gt;` 上,故鍵盤 Tab 會跳過該 trigger(原生 disabled 不可聚焦),ArrowUp/Down 也會略過它。</Desc>
         <div className="border border-border rounded-lg p-4 max-w-[640px]">
           <Accordion type="single" collapsible>
             <AccordionItem value="a">

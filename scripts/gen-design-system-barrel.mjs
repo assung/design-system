@@ -53,9 +53,12 @@ exports.push('// ─── Patterns ──────────────�
 for (const dir of patternDirs.sort()) {
   const dirPath = path.join(patternsDir, dir)
   const files = fs.readdirSync(dirPath)
-  const kebab = pascalToKebab(dir)
-  const main = [`${kebab}.tsx`, `${kebab}.ts`].find(c => files.includes(c))
-  if (main) {
+  // 2026-05-31 fix(Release blocker since Phase 1):原以 `<dir-kebab>.tsx` 判定 main file,
+  // 但 element-anatomy(主檔 item-anatomy.tsx)/ header-canonical(chrome-header.tsx)/
+  // action-bar 的主檔名 ≠ dir 名 → 3 pattern 被漏 export → apps/template `import { ItemAvatar }`
+  // 失敗 → storybook FULL build rollup 錯 → Release/npm publish 掛(beta.39/40)。改判 index.ts
+  // 存在(barrel 本就 re-export `./patterns/${dir}/index`,index.ts auto-gen 必存在)。
+  if (files.includes('index.ts')) {
     exports.push(`export * from './patterns/${dir}/index'`)
   }
 }
