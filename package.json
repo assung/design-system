@@ -47,7 +47,7 @@
     "changeset": "changeset",
     "changeset:version": "changeset version && node scripts/sync-version-to-all-manifests.mjs",
     "postinstall": "node scripts/ensure-playwright-browsers.mjs",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "gen-ds-story-manifest": "node scripts/gen-ds-story-manifest.mjs",
     "postbuild-storybook": "node scripts/gen-ds-story-manifest.mjs"
   },
