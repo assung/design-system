@@ -8,6 +8,7 @@ import {
   CheckCircle2, Pause,
   Hash, CornerDownLeft, Zap,
   FileText, Mail, CalendarDays, Microscope, Bot,
+  X, RefreshCw, MessageSquare, Circle, Loader2,
 } from 'lucide-react'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Badge } from '@/design-system/components/Badge/badge'
@@ -18,6 +19,15 @@ import { cn } from '@/lib/utils'
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 type AgentStatus = 'running' | 'waiting' | 'done' | 'error'
+
+type LogState = 'done' | 'active' | 'pending'
+
+interface LogStep {
+  label: string
+  detail?: string
+  time?: string
+  state: LogState
+}
 
 interface Agent {
   id: string
@@ -30,6 +40,8 @@ interface Agent {
   progress?: number
   lastAction: string
   actionLabel?: string
+  objective: string
+  log: LogStep[]
 }
 
 interface PriorityTask {
@@ -50,6 +62,14 @@ const AGENTS: Agent[] = [
     currentTask: '閱讀 Q2 競品分析：Notion AI、Linear、Raycast 功能對比',
     progress: 78,
     lastAction: '剛剛',
+    objective: '彙整 Notion AI、Linear、Raycast 三家在 AI 委派與指令面板的功能差異，產出一頁競品對比表給產品團隊。',
+    log: [
+      { label: '解析任務範圍', detail: '鎖定 3 家競品 × 5 個功能維度', time: '09:12', state: 'done' },
+      { label: '擷取 Notion AI 公開文件', detail: '已讀 14 篇 help center 文章', time: '09:18', state: 'done' },
+      { label: '擷取 Linear 變更日誌', detail: '已讀 2024 Q1–Q2 release notes', time: '09:31', state: 'done' },
+      { label: '彙整 Raycast 擴充生態', detail: '正在比對 command palette 行為', time: '09:44', state: 'active' },
+      { label: '產出對比表草稿', state: 'pending' },
+    ],
   },
   {
     id: 'drafting',
@@ -61,6 +81,13 @@ const AGENTS: Agent[] = [
     currentTask: 'Q2 路線圖草稿已完成，等待您審閱後發送給工程團隊',
     lastAction: '12 分鐘前',
     actionLabel: '審閱草稿',
+    objective: '根據上週策略會議記錄，草擬 Q2 工程路線圖並準備發送給工程團隊 review。',
+    log: [
+      { label: '讀取策略會議記錄', detail: '5/28 product sync 逐字稿', time: '08:40', state: 'done' },
+      { label: '對齊既有 roadmap 結構', detail: '沿用 Q1 三欄式分類', time: '08:52', state: 'done' },
+      { label: '草擬路線圖內容', detail: '12 個 initiative、3 個里程碑', time: '09:05', state: 'done' },
+      { label: '等待您審閱', detail: '審閱後將發送給工程團隊', state: 'active' },
+    ],
   },
   {
     id: 'email',
@@ -72,6 +99,13 @@ const AGENTS: Agent[] = [
     currentTask: '本週已處理 14 封例行郵件，起草 3 封待發回覆',
     lastAction: '34 分鐘前',
     actionLabel: '查看草稿',
+    objective: '分類本週收件匣、自動回覆例行郵件，並為需要您決定的郵件起草回覆。',
+    log: [
+      { label: '掃描收件匣', detail: '本週 47 封新郵件', time: '昨天 18:00', state: 'done' },
+      { label: '分類與優先排序', detail: '14 例行 · 3 需決策 · 30 可忽略', time: '昨天 18:02', state: 'done' },
+      { label: '自動回覆例行郵件', detail: '已送出 14 封', time: '昨天 18:05', state: 'done' },
+      { label: '起草待決策回覆', detail: '3 封草稿待您審閱', time: '昨天 18:09', state: 'done' },
+    ],
   },
   {
     id: 'calendar',
@@ -83,6 +117,13 @@ const AGENTS: Agent[] = [
     currentTask: '協調週五 sprint retrospective，聯繫 5 位與會者確認時間',
     progress: 40,
     lastAction: '3 分鐘前',
+    objective: '找出週五下午 5 位與會者都有空的時段，發送 sprint retrospective 會議邀請。',
+    log: [
+      { label: '讀取 5 位與會者行事曆', detail: '已取得 free/busy 資料', time: '09:40', state: 'done' },
+      { label: '計算共同空檔', detail: '週五 14:00 與 16:00 兩個候選', time: '09:42', state: 'done' },
+      { label: '聯繫與會者確認時間', detail: '3/5 已回覆，等待 2 位', time: '09:43', state: 'active' },
+      { label: '發送會議邀請', state: 'pending' },
+    ],
   },
 ]
 
@@ -117,10 +158,13 @@ const StatusLabel = ({ status }: { status: AgentStatus }) => {
   return <span className={cn('text-caption leading-compact', cls)}>{text}</span>
 }
 
-const AgentCard = ({ agent }: { agent: Agent }) => {
+const AgentCard = ({ agent, onOpen }: { agent: Agent; onOpen: () => void }) => {
   const Icon = agent.icon
   return (
-    <div className="rounded-xl border border-border bg-surface p-4 flex flex-col gap-3 hover:border-[var(--border-hover)] hover:shadow-[var(--elevation-100)] transition-all cursor-default">
+    <div
+      onClick={onOpen}
+      className="rounded-xl border border-border bg-surface p-4 flex flex-col gap-3 hover:border-[var(--border-hover)] hover:shadow-[var(--elevation-100)] transition-all cursor-pointer"
+    >
       <div className="flex items-start gap-3">
         <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', agent.color, agent.iconColor)}>
           <Icon className="w-4 h-4" strokeWidth={1.75} />
@@ -141,11 +185,11 @@ const AgentCard = ({ agent }: { agent: Agent }) => {
         <ProgressBar value={agent.progress} status="inProgress" />
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
         {agent.actionLabel ? (
-          <Button size="sm" variant="secondary">{agent.actionLabel}</Button>
+          <Button size="sm" variant="secondary" onClick={onOpen}>{agent.actionLabel}</Button>
         ) : (
-          <Button size="sm" variant="text" className="text-fg-muted hover:text-foreground">查看詳情</Button>
+          <Button size="sm" variant="text" className="text-fg-muted hover:text-foreground" onClick={onOpen}>查看詳情</Button>
         )}
         {agent.status === 'running' && (
           <Button size="sm" variant="text" className="text-fg-muted px-2">
@@ -157,13 +201,142 @@ const AgentCard = ({ agent }: { agent: Agent }) => {
   )
 }
 
+const LogStepRow = ({ step, isLast }: { step: LogStep; isLast: boolean }) => {
+  const node = {
+    done: <CheckCircle2 className="w-4 h-4 text-[var(--success)]" />,
+    active: <Loader2 className="w-4 h-4 text-[var(--color-blue-6)] animate-spin" />,
+    pending: <Circle className="w-4 h-4 text-fg-disabled" />,
+  }[step.state]
+  return (
+    <li className="flex gap-3">
+      <div className="flex flex-col items-center shrink-0">
+        <span className="shrink-0">{node}</span>
+        {!isLast && <span className="w-px flex-1 bg-divider my-1" />}
+      </div>
+      <div className={cn('flex-1 min-w-0', isLast ? 'pb-0' : 'pb-4')}>
+        <div className="flex items-baseline gap-2">
+          <p className={cn(
+            'text-caption font-medium leading-compact',
+            step.state === 'pending' ? 'text-fg-disabled' : 'text-foreground',
+          )}>{step.label}</p>
+          {step.time && <span className="text-caption text-fg-disabled font-mono ml-auto shrink-0">{step.time}</span>}
+        </div>
+        {step.detail && <p className="text-caption text-fg-muted leading-[1.4] mt-0.5">{step.detail}</p>}
+      </div>
+    </li>
+  )
+}
+
+const AgentDetailPanel = ({ agent, onClose }: { agent: Agent; onClose: () => void }) => {
+  const Icon = agent.icon
+  return (
+    <>
+      {/* Scrim */}
+      <div
+        onClick={onClose}
+        className="absolute inset-0 bg-[var(--color-neutral-12)]/20 z-10 animate-in fade-in duration-150"
+      />
+      {/* Panel */}
+      <aside className="absolute top-0 right-0 bottom-0 w-[420px] z-20 flex flex-col bg-surface border-l border-divider shadow-[var(--elevation-200)] animate-in slide-in-from-right duration-200">
+        {/* Header */}
+        <header className="flex items-start gap-3 px-5 py-4 border-b border-divider shrink-0">
+          <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', agent.color, agent.iconColor)}>
+            <Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
+          </div>
+          <div className="flex-1 min-w-0 pt-0.5">
+            <p className="text-body font-semibold text-foreground leading-compact">{agent.name}</p>
+            <div className="flex items-center gap-1.5 mt-1">
+              <StatusDot status={agent.status} />
+              <StatusLabel status={agent.status} />
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 flex items-center justify-center rounded-md text-fg-muted hover:bg-[var(--color-neutral-1-opaque)] hover:text-foreground transition-colors shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </header>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          {/* Objective */}
+          <div className="mb-5">
+            <p className="text-caption font-medium text-fg-muted uppercase tracking-wider mb-2">任務目標</p>
+            <p className="text-caption text-fg-secondary leading-[1.5]">{agent.objective}</p>
+          </div>
+
+          {/* Progress */}
+          {agent.status === 'running' && agent.progress !== undefined && (
+            <div className="mb-5">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-caption font-medium text-fg-muted uppercase tracking-wider">進度</span>
+                <span className="text-caption font-mono text-fg-secondary">{agent.progress}%</span>
+              </div>
+              <ProgressBar value={agent.progress} status="inProgress" />
+            </div>
+          )}
+
+          {/* Timeline */}
+          <div>
+            <p className="text-caption font-medium text-fg-muted uppercase tracking-wider mb-3">執行紀錄</p>
+            <ul className="flex flex-col">
+              {agent.log.map((step, i) => (
+                <LogStepRow key={step.label} step={step} isLast={i === agent.log.length - 1} />
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Footer actions */}
+        <footer className="shrink-0 border-t border-divider px-5 py-3 flex items-center gap-2">
+          {agent.status === 'waiting' ? (
+            <>
+              <Button size="sm" variant="primary" className="flex-1">批准並發送</Button>
+              <Button size="sm" variant="secondary">編輯</Button>
+            </>
+          ) : (
+            <>
+              <Button size="sm" variant="secondary" className="gap-1.5 flex-1">
+                <MessageSquare className="w-3.5 h-3.5" />
+                追問 agent
+              </Button>
+              {agent.status === 'running' ? (
+                <Button size="sm" variant="secondary" className="gap-1.5">
+                  <Pause className="w-3.5 h-3.5" />
+                  暫停
+                </Button>
+              ) : (
+                <Button size="sm" variant="secondary" className="gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  重新指派
+                </Button>
+              )}
+            </>
+          )}
+        </footer>
+      </aside>
+    </>
+  )
+}
+
 // ── Main Layout ───────────────────────────────────────────────────────────────
 
-const CommandNexusPage: React.FC = () => {
+const CommandNexusPage: React.FC<{ initialOpenAgentId?: string | null }> = ({ initialOpenAgentId = null }) => {
   const [commandValue, setCommandValue] = React.useState('')
+  const [openAgentId, setOpenAgentId] = React.useState<string | null>(initialOpenAgentId)
+  const openAgent = AGENTS.find((a) => a.id === openAgentId) ?? null
+
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenAgentId(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   return (
-    <div className="flex h-screen flex-col bg-canvas overflow-hidden">
+    <div className="relative flex h-screen flex-col bg-canvas overflow-hidden">
 
       {/* Global Header */}
       <header className="flex h-12 items-center shrink-0 px-4 gap-3 border-b border-divider bg-surface">
@@ -264,7 +437,7 @@ const CommandNexusPage: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4">
               {AGENTS.map((agent) => (
-                <AgentCard key={agent.id} agent={agent} />
+                <AgentCard key={agent.id} agent={agent} onOpen={() => setOpenAgentId(agent.id)} />
               ))}
             </div>
 
@@ -310,6 +483,11 @@ const CommandNexusPage: React.FC = () => {
           <kbd className="inline-flex items-center px-1 rounded border border-border font-mono text-[10px]">↵</kbd>
         </div>
       </div>
+
+      {/* Agent Detail Panel */}
+      {openAgent && (
+        <AgentDetailPanel agent={openAgent} onClose={() => setOpenAgentId(null)} />
+      )}
     </div>
   )
 }
@@ -341,4 +519,9 @@ type Story = StoryObj
 export const Overview: Story = {
   name: '命令中樞',
   render: () => <CommandNexusPage />,
+}
+
+export const AgentDetailOpen: Story = {
+  name: 'Agent 詳情展開',
+  render: () => <CommandNexusPage initialOpenAgentId="research" />,
 }

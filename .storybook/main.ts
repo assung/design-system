@@ -8,7 +8,6 @@ import {
   sharedFramework,
   sharedDocsConfig,
   sharedTypescriptConfig,
-  sharedStoryGlobs,
 } from '@qijenchen/storybook-config/preset'
 
 const config: StorybookConfig = {
