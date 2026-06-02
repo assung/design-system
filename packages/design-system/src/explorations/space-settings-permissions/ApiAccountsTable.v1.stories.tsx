@@ -23,7 +23,7 @@ import { createColumnHelper, type ColumnDef } from '@tanstack/react-table'
 import {
   KeyRound, Bot, Cloud, Slack, Database, Zap, FileText,
   Search, Filter, Plus, MoreVertical, Pencil, RotateCcw, PauseCircle,
-  PlayCircle, ScrollText, ShieldX, ShieldAlert, ExternalLink,
+  PlayCircle, ScrollText, ShieldX, ShieldAlert, ExternalLink, Eye,
 } from 'lucide-react'
 import { DataTable } from '@/design-system/components/DataTable/data-table'
 import '@/design-system/components/DataTable/column-types' // ColumnMeta declaration merging
@@ -49,6 +49,10 @@ import {
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription,
   DialogBody, DialogFooter, DialogClose,
 } from '@/design-system/components/Dialog/dialog'
+import {
+  Sheet, SheetContent, SheetHeader, SheetBody, SheetFooter, SheetTitle, SheetClose,
+} from '@/design-system/components/Sheet/sheet'
+import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 
 // ── Domain model ────────────────────────────────────────────────────────────
 
@@ -126,6 +130,16 @@ const ACCOUNTS: ApiAccount[] = [
     status: 'revoked', lastUsed: '41 天前', expiry: '已過期',
   },
 ]
+
+// 詳情抽屜用的延伸 metadata(建立者 / 建立於 / 金鑰 ID)— 與表格欄分離,避免主表臃腫
+const ACCOUNT_META: Record<string, { owner: string; created: string; keyId: string; activity: string[] }> = {
+  a1: { owner: 'Aaron Sung', created: '2025-11-03', keyId: 'key_live_…a91f', activity: ['8 分鐘前 — 寫入 12 個頁面', '今天 02:00 — 排程同步成功', '昨天 — 輪替金鑰'] },
+  a2: { owner: 'Mei Lin', created: '2025-09-21', keyId: 'key_live_…3c7d', activity: ['2 分鐘前 — 索引 340 個頁面', '1 小時前 — 索引 12 個附件', '今天 06:00 — 全量重建'] },
+  a3: { owner: 'David Wu', created: '2026-01-14', keyId: 'key_live_…f205', activity: ['1 小時前 — 推送 3 則通知', '今天 — 訂閱 page.published', '3 天前 — 更新 webhook URL'] },
+  a4: { owner: 'Aaron Sung', created: '2025-06-30', keyId: 'key_live_…8b1e', activity: ['3 天前 — 匯出 1.2 GB', '上週 — 匯出成功', '2025-12 — 建立'] },
+  a5: { owner: 'Mei Lin', created: '2026-05-28', keyId: '(尚未產生)', activity: ['等待管理員審批中'] },
+  a6: { owner: 'David Wu', created: '2024-08-02', keyId: '(已撤銷)', activity: ['41 天前 — 最後一次讀取', '2024-09 — 遷移完成', '2024-08 — 建立'] },
+}
 
 // ── Visual mappings(集中,避免 magic value 散落)──────────────────────────
 
@@ -223,7 +237,7 @@ function PrivilegeCell({ account, defaultOpen }: { account: ApiAccount; defaultO
   )
 }
 
-function RowActions({ account, defaultOpen }: { account: ApiAccount; defaultOpen?: boolean }) {
+function RowActions({ account, defaultOpen, onViewDetails }: { account: ApiAccount; defaultOpen?: boolean; onViewDetails?: () => void }) {
   const isRevoked = account.status === 'revoked'
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
@@ -231,6 +245,7 @@ function RowActions({ account, defaultOpen }: { account: ApiAccount; defaultOpen
         <Button variant="text" size="xs" iconOnly startIcon={MoreVertical} aria-label={`${account.handle} 操作`} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem startIcon={Eye} onSelect={() => onViewDetails?.()}>檢視詳情</DropdownMenuItem>
         <DropdownMenuItem startIcon={Pencil}>編輯權限</DropdownMenuItem>
         <DropdownMenuItem startIcon={RotateCcw}>輪替金鑰</DropdownMenuItem>
         <DropdownMenuItem startIcon={ScrollText}>檢視稽核紀錄</DropdownMenuItem>
@@ -330,8 +345,8 @@ function ApiAccountsToolbar() {
 
 const ROLE_OPTIONS = (Object.keys(ROLE_META) as Role[]).map((r) => ({ value: r, label: ROLE_META[r].label }))
 
-function PrivilegeMatrixRow({ resource }: { resource: Resource }) {
-  const [level, setLevel] = React.useState<Level>('none')
+function PrivilegeMatrixRow({ resource, defaultLevel = 'none' }: { resource: Resource; defaultLevel?: Level }) {
+  const [level, setLevel] = React.useState<Level>(defaultLevel)
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-body text-foreground">{resource}</span>
@@ -404,6 +419,136 @@ function AuthorizeDialog({ trigger, defaultOpen }: { trigger: React.ReactNode; d
 
 const authorizeButton = <Button variant="primary" size="md" startIcon={Plus}>授權 API account</Button>
 
+// ── Row-detail drawer(Sheet)─────────────────────────────────────────────
+
+function DrawerSection({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <h4 className="text-body font-medium text-foreground">{title}</h4>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+/** 點 row「檢視詳情」開啟的右側抽屜:身分 / Role / 可編輯權限矩陣 / 金鑰 / 用量 / 生命週期。 */
+function AccountDetailSheet({
+  account, open, onOpenChange,
+}: { account: ApiAccount | null; open: boolean; onOpenChange: (open: boolean) => void }) {
+  if (!account) return null
+  const meta = ACCOUNT_META[account.id]
+  const status = STATUS_META[account.status]
+  const role = ROLE_META[account.role]
+  const isRevoked = account.status === 'revoked'
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="flex flex-col sm:max-w-md">
+        <SheetHeader>
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar size={36} shape="square" icon={KeyRound} color="neutral" aria-hidden />
+            <div className="min-w-0">
+              <SheetTitle className="truncate">{account.handle}</SheetTitle>
+              <p className="text-caption text-fg-muted font-mono truncate">{account.iam}</p>
+            </div>
+          </div>
+        </SheetHeader>
+
+        <SheetBody className="flex flex-col gap-[var(--layout-space-loose)]">
+          {/* Overview */}
+          <DrawerSection title="總覽" action={<Tag color={status.color} size="sm">{status.label}</Tag>}>
+            <DescriptionList direction="horizontal">
+              <DescriptionItem label="APP name">
+                <span className="inline-flex items-center gap-1.5">
+                  <Avatar size={16} shape="square" icon={account.app.icon} color={account.app.color} aria-hidden />
+                  {account.app.name}
+                </span>
+              </DescriptionItem>
+              <DescriptionItem label="Purpose">{account.purpose}</DescriptionItem>
+              <DescriptionItem label="建立者">{meta.owner}</DescriptionItem>
+              <DescriptionItem label="建立於">{meta.created}</DescriptionItem>
+              <DescriptionItem label="Last used">{account.lastUsed}</DescriptionItem>
+              <DescriptionItem label="Expiry">
+                {account.expiry === null
+                  ? <span className="inline-flex items-center gap-1 text-[var(--color-yellow-7)]"><ShieldAlert size={14} aria-hidden /> 無到期</span>
+                  : account.expiry}
+              </DescriptionItem>
+            </DescriptionList>
+          </DrawerSection>
+
+          {/* Role(治理身分,獨立軸)*/}
+          <DrawerSection title="Role">
+            <p className="text-caption text-fg-muted mb-2">帳號在此空間的治理身分(沿用成員語彙),獨立於 API scope。</p>
+            <Select options={ROLE_OPTIONS} defaultValue={account.role} />
+          </DrawerSection>
+
+          {/* API privilege(技術 scope,可編輯矩陣)*/}
+          <DrawerSection title="API privilege">
+            <p className="text-caption text-fg-muted mb-3">逐 resource 設定 None / Read / Write。Write 含 Read。</p>
+            <div className="flex flex-col gap-2.5">
+              {RESOURCES.map((r) => <PrivilegeMatrixRow key={r} resource={r} defaultLevel={account.privileges[r]} />)}
+            </div>
+          </DrawerSection>
+
+          {/* Key management */}
+          <DrawerSection title="金鑰" action={<Button variant="secondary" size="sm" startIcon={RotateCcw}>輪替金鑰</Button>}>
+            <DescriptionList direction="horizontal">
+              <DescriptionItem label="金鑰 ID"><span className="font-mono">{meta.keyId}</span></DescriptionItem>
+            </DescriptionList>
+            <p className="text-caption text-fg-muted mt-2">完整金鑰僅在產生時顯示一次,無法再次檢視。輪替會立即失效舊金鑰。</p>
+          </DrawerSection>
+
+          {/* Recent activity */}
+          <DrawerSection title="近期活動" action={<Button variant="text" size="sm" endIcon={ExternalLink}>完整稽核紀錄</Button>}>
+            <ul className="flex flex-col gap-1.5">
+              {meta.activity.map((line, i) => (
+                <li key={i} className="text-caption text-fg-secondary">{line}</li>
+              ))}
+            </ul>
+          </DrawerSection>
+        </SheetBody>
+
+        <SheetFooter>
+          <div className="flex items-center justify-between w-full gap-2">
+            {isRevoked
+              ? <Button variant="secondary" startIcon={PlayCircle}>重新啟用</Button>
+              : <Button variant="secondary" startIcon={PauseCircle}>暫停</Button>}
+            <div className="flex items-center gap-2">
+              <SheetClose asChild><Button variant="secondary">關閉</Button></SheetClose>
+              <Button variant="secondary" danger startIcon={ShieldX}>撤銷授權</Button>
+            </div>
+          </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+/** API accounts section — 章節標題 + 工具列 + 表格 + 受控詳情抽屜(row「檢視詳情」開啟)。 */
+function ApiAccountsSection() {
+  const [detail, setDetail] = React.useState<ApiAccount | null>(null)
+  return (
+    <>
+      <SectionHeader
+        title="API accounts"
+        count={ACCOUNTS.length}
+        description="透過 API 存取此空間的服務帳號與整合。授予每個整合最小必要權限。"
+        action={<AuthorizeDialog trigger={authorizeButton} />}
+      />
+      <ApiAccountsToolbar />
+      <DataTable
+        columns={apiColumns}
+        data={ACCOUNTS}
+        height="auto"
+        rowActions={(row) => <RowActions account={row} onViewDetails={() => setDetail(row)} />}
+      />
+      <AccountDetailSheet account={detail} open={detail !== null} onOpenChange={(o) => !o && setDetail(null)} />
+    </>
+  )
+}
+
 // ── Members section(既有表格,提供同頁脈絡)────────────────────────────
 
 const MEMBERS: PersonData[] = [
@@ -468,20 +613,8 @@ export const PermissionsPage: Story = {
 
             <Separator className="my-8" />
 
-            {/* Section 2 — 新增 API accounts 表格 */}
-            <SectionHeader
-              title="API accounts"
-              count={ACCOUNTS.length}
-              description="透過 API 存取此空間的服務帳號與整合。授予每個整合最小必要權限。"
-              action={<AuthorizeDialog trigger={authorizeButton} />}
-            />
-            <ApiAccountsToolbar />
-            <DataTable
-              columns={apiColumns}
-              data={ACCOUNTS}
-              height="auto"
-              rowActions={(row) => <RowActions account={row} />}
-            />
+            {/* Section 2 — 新增 API accounts 表格 + 詳情抽屜 */}
+            <ApiAccountsSection />
           </TabsContent>
 
           <TabsContent value="general" className="pt-6">
@@ -527,6 +660,20 @@ export const RowActionsOpen: Story = {
       <RowActions account={ACCOUNTS[0]} defaultOpen />
     </div>
   ),
+}
+
+/** Row 詳情抽屜展開:身分 / Role / 可編輯權限矩陣 / 金鑰 / 用量 / 生命週期。 */
+export const AccountDetailDrawer: Story = {
+  name: '帳號詳情抽屜(展開)',
+  render: () => {
+    const [open, setOpen] = React.useState(true)
+    return (
+      <div className="min-h-screen bg-surface p-8">
+        <Button variant="secondary" onClick={() => setOpen(true)}>開啟詳情抽屜</Button>
+        <AccountDetailSheet account={ACCOUNTS[0]} open={open} onOpenChange={setOpen} />
+      </div>
+    )
+  },
 }
 
 /** 空狀態:尚無任何 API account 被授權。 */
