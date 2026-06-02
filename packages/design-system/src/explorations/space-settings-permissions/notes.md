@@ -39,18 +39,19 @@
 | `完整 Permissions 頁` | 4 設定分頁脈絡 + 成員 section + API accounts section(hero)|
 | `授權 API account(Dialog)` | 新增流程 — 身分/app/purpose/role/privilege 矩陣/expiry(`defaultOpen`)|
 | `API privilege Popover(展開)` | Stripe-style scope 矩陣 |
-| `列操作選單(展開)` | row `⋮` 動作 |
+| `列操作選單(展開)` | row `⋮` 動作(檢視詳情 / 編輯 / 輪替 / 稽核 / 暫停 / 撤銷)|
+| `帳號詳情抽屜(展開)` | 右側 Sheet — 身分 / Overview / Role / 可編輯權限矩陣 / 金鑰(reveal-once)/ 近期活動 / 生命週期 footer |
 | `空狀態` | `Empty` + CTA |
 
 ## 消費的 SSOT
 
-DataTable / Tag / Avatar(square)/ Popover / DropdownMenu / Dialog / Field / Input / Textarea /
-Select / SegmentedControl / Empty / Separator / Tabs。色彩走 status/semantic token + primitive(`--color-*`)。
+DataTable / Tag / Avatar(square)/ Popover / DropdownMenu / Dialog / Sheet / DescriptionList /
+Field / Input / Textarea / Select / SegmentedControl / Empty / Separator / Tabs。色彩走
+status/semantic token + primitive(`--color-*`)。
 
 ## 下一輪候選(未做,待 user 反饋)
 
-- **Row 詳情 Sheet**:點 row 開右側 drawer — 完整身分 / owner / 可編輯權限矩陣 / 金鑰輪替(reveal-once)/ 用量 + 稽核 / 生命週期。
-- **金鑰 reveal-once** 真實流程(授權後僅顯示一次)。
+- **金鑰 reveal-once** 真實流程(授權後僅顯示一次的可複製金鑰)。
 - 搜尋 / 篩選真實 wiring(目前 toolbar 為視覺占位)。
 - IAM account hoverCard NameCard(created-by / created-on / key id)。
 - Approval 分頁 ↔ Status「Pending approval」雙向連結。
